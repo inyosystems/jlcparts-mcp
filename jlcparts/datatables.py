@@ -356,7 +356,7 @@ def clearDir(directory):
             shutil.rmtree(file_path)
 
 
-WEB_FILE_FORMAT_VERSION = 2
+WEB_FILE_FORMAT_VERSION = 3
 LOOKUP_BUCKET_SIZE_DEFAULT = 100000
 MAX_COMPONENTS_PER_SHARD_DEFAULT = 20000
 COMPONENT_ROW_SCHEMA = {
@@ -371,6 +371,11 @@ COMPONENT_ROW_SCHEMA = {
     "attributes": 8,
     "stock": 9,
     "subcategory": 10,
+}
+SEARCH_INDEX_ROW_SCHEMA = {
+    "lcsc": 0,
+    "text": 1,
+    "shard": 2,
 }
 COMPONENT_SOURCE_SCHEMA = [
     "lcsc",
@@ -441,8 +446,26 @@ def _componentRows(components, subcategoryId, attributeLut):
     return rows
 
 
+def _componentSearchText(component):
+    return " ".join([
+        str(component.get("lcsc", "")),
+        str(component.get("mfr", "")),
+        str(component.get("description", "")),
+    ]).lower()
+
+
+def _writeSearchIndexRows(searchIndexFile, components, shardName):
+    for component in components:
+        json.dump([
+            component["lcsc"],
+            _componentSearchText(component),
+            shardName,
+        ], searchIndexFile, separators=(",", ":"), sort_keys=False)
+        searchIndexFile.write("\n")
+
+
 def _flushComponentShard(chunk, shardName, outdir, subcategoryId, attributeLut,
-                         files, lookupBuckets, lookupBucketSize):
+                         files, lookupBuckets, lookupBucketSize, searchIndexFile):
     shardRows = _componentRows(chunk, subcategoryId, attributeLut)
     shardPath = os.path.join(outdir, shardName)
     shardHash = _writeJsonLinesArtifact(shardRows, shardPath)
@@ -456,6 +479,7 @@ def _flushComponentShard(chunk, shardName, outdir, subcategoryId, attributeLut,
     for component in chunk:
         bucket = _lookupBucketForLcsc(component["lcsc"], lookupBucketSize)
         lookupBuckets.setdefault(bucket, {})[component["lcsc"]] = shardName
+    _writeSearchIndexRows(searchIndexFile, chunk, shardName)
 
 
 def _lutToEntries(lutMap):
@@ -512,59 +536,75 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
     lookupBuckets = {}
     totalComponents = 0
     categoryId = 0
+    searchIndexFilename = "search-index.jsonl.gz"
+    searchIndexPath = os.path.join(outdir, searchIndexFilename)
+    searchIndexFile = gzip.open(searchIndexPath, "wt", encoding="utf-8")
+    json.dump(SEARCH_INDEX_ROW_SCHEMA, searchIndexFile, separators=(",", ":"), sort_keys=False)
+    searchIndexFile.write("\n")
 
-    for catName, subcategories in sortedCategories:
-        for subcatName in subcategories:
-            if not _isUsableCategory(catName, subcatName):
-                continue
-            processed += 1
-            componentCount = lib.countCategoryComponents(
-                catName,
-                subcatName,
-                stockNewerThan=ignoreoldstock
-            )
-            if componentCount == 0:
-                continue
-
-            categoryId += 1
-            categoryKey = _stableComponentFilebase(catName, subcatName)
-            shardNames = []
-            totalComponents += componentCount
-            print(f"{((processed - 1) / max(total, 1) * 100):.2f} % {catName}: {subcatName} ({componentCount})")
-
-            chunk = []
-            shardIndex = 0
-            for component in lib.iterCategoryComponents(
-                    catName, subcatName, stockNewerThan=ignoreoldstock,
-                    fetchSize=max(1000, min(max_components_per_shard, 5000))):
-                chunk.append(component)
-                if len(chunk) < max_components_per_shard:
+    try:
+        for catName, subcategories in sortedCategories:
+            for subcatName in subcategories:
+                if not _isUsableCategory(catName, subcatName):
                     continue
-                shardIndex += 1
-                shardName = f"components-{categoryKey}-{shardIndex:03d}.jsonl.gz"
-                _flushComponentShard(
-                    chunk, shardName, outdir, categoryId, attributeLut,
-                    files, lookupBuckets, lookup_bucket_size
+                processed += 1
+                componentCount = lib.countCategoryComponents(
+                    catName,
+                    subcatName,
+                    stockNewerThan=ignoreoldstock
                 )
-                shardNames.append(shardName)
+                if componentCount == 0:
+                    continue
+
+                categoryId += 1
+                categoryKey = _stableComponentFilebase(catName, subcatName)
+                shardNames = []
+                totalComponents += componentCount
+                print(f"{((processed - 1) / max(total, 1) * 100):.2f} % {catName}: {subcatName} ({componentCount})")
+
                 chunk = []
+                shardIndex = 0
+                for component in lib.iterCategoryComponents(
+                        catName, subcatName, stockNewerThan=ignoreoldstock,
+                        fetchSize=max(1000, min(max_components_per_shard, 5000))):
+                    chunk.append(component)
+                    if len(chunk) < max_components_per_shard:
+                        continue
+                    shardIndex += 1
+                    shardName = f"components-{categoryKey}-{shardIndex:03d}.jsonl.gz"
+                    _flushComponentShard(
+                        chunk, shardName, outdir, categoryId, attributeLut,
+                        files, lookupBuckets, lookup_bucket_size, searchIndexFile
+                    )
+                    shardNames.append(shardName)
+                    chunk = []
 
-            if chunk:
-                shardIndex += 1
-                shardName = f"components-{categoryKey}-{shardIndex:03d}.jsonl.gz"
-                _flushComponentShard(
-                    chunk, shardName, outdir, categoryId, attributeLut,
-                    files, lookupBuckets, lookup_bucket_size
-                )
-                shardNames.append(shardName)
+                if chunk:
+                    shardIndex += 1
+                    shardName = f"components-{categoryKey}-{shardIndex:03d}.jsonl.gz"
+                    _flushComponentShard(
+                        chunk, shardName, outdir, categoryId, attributeLut,
+                        files, lookupBuckets, lookup_bucket_size, searchIndexFile
+                    )
+                    shardNames.append(shardName)
 
-            categoryEntries.append({
-                "id": categoryId,
-                "category": catName,
-                "subcategory": subcatName,
-                "componentCount": componentCount,
-                "shards": shardNames,
-            })
+                categoryEntries.append({
+                    "id": categoryId,
+                    "category": catName,
+                    "subcategory": subcatName,
+                    "componentCount": componentCount,
+                    "shards": shardNames,
+                })
+    finally:
+        searchIndexFile.close()
+
+    searchIndexHash = sha256file(searchIndexPath)
+    files[searchIndexFilename] = {
+        "name": searchIndexFilename,
+        "kind": "search-index",
+        "sha256": searchIndexHash,
+        "entryCount": totalComponents,
+    }
 
     attributesLutFilename = "attributes-lut.json.gz"
     attributesLutPath = os.path.join(outdir, attributesLutFilename)
@@ -596,6 +636,7 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
         "totalComponents": totalComponents,
         "lookupBucketSize": lookup_bucket_size,
         "attributesLut": attributesLutFilename,
+        "searchIndex": searchIndexFilename,
         "categories": categoryEntries,
         "lookupBuckets": lookupFiles,
         "files": files,

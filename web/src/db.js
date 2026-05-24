@@ -156,11 +156,11 @@ function decodeComponentRow(row, schema, attributeLut) {
     };
 }
 
-function componentText(component) {
+function componentRowText(row, schema) {
     return (
-        component.lcsc + " " +
-        component.mfr + " " +
-        component.description
+        row[schema.lcsc] + " " +
+        row[schema.mfr] + " " +
+        row[schema.description]
     ).toLocaleLowerCase();
 }
 
@@ -170,12 +170,61 @@ function splitSearchWords(searchString) {
         .map(x => x.toLocaleLowerCase());
 }
 
-function matchesSearch(component, words) {
+function textMatchesSearch(text, words) {
     if (words.length === 0) {
         return true;
     }
-    const text = componentText(component);
     return words.every(word => text.includes(word));
+}
+
+async function collectSearchIndexMatches(manifest, words, checkAbort) {
+    const matchesByShard = new Map();
+    let schema = null;
+    const aborted = await streamJsonLines(manifest.searchIndex, (row, idx) => {
+        if (idx === 0) {
+            schema = row;
+            return;
+        }
+        if (textMatchesSearch(row[schema.text], words)) {
+            const shardName = row[schema.shard];
+            if (!matchesByShard.has(shardName)) {
+                matchesByShard.set(shardName, new Set());
+            }
+            matchesByShard.get(shardName).add(row[schema.lcsc]);
+        }
+        if (checkAbort?.()) {
+            return 'abort';
+        }
+    }, checkAbort);
+    return aborted ? null : matchesByShard;
+}
+
+async function queryComponentsFromMatches(manifest, matchesByShard, checkAbort) {
+    if (matchesByShard.size === 0) {
+        return [];
+    }
+
+    const attributeLut = await ensureJsonFile(manifest.attributesLut);
+    const results = [];
+    for (const [shardName, lcscMatches] of matchesByShard) {
+        let schema = null;
+        const aborted = await streamJsonLines(shardName, (row, idx) => {
+            if (idx === 0) {
+                schema = row;
+                return;
+            }
+            if (lcscMatches.has(row[schema.lcsc])) {
+                results.push(decodeComponentRow(row, schema, attributeLut));
+            }
+            if (checkAbort?.()) {
+                return 'abort';
+            }
+        }, checkAbort);
+        if (aborted) {
+            return null;
+        }
+    }
+    return checkAbort?.() ? null : results;
 }
 
 export async function fetchJson(path, errorIntro = "Cannot fetch JSON: ") {
@@ -400,6 +449,15 @@ export async function queryComponents({ categoryIds, allCategories, searchString
         return [];
     }
 
+    const words = splitSearchWords(searchString);
+    if (allCategories && words.length > 0 && manifest.searchIndex) {
+        const matchesByShard = await collectSearchIndexMatches(manifest, words, checkAbort);
+        if (matchesByShard === null) {
+            return null;
+        }
+        return await queryComponentsFromMatches(manifest, matchesByShard, checkAbort);
+    }
+
     const selectedCategories = new Set(categoryIds || []);
     const shardNames = [];
     for (const category of manifest.categories) {
@@ -412,7 +470,6 @@ export async function queryComponents({ categoryIds, allCategories, searchString
     }
 
     const attributeLut = await ensureJsonFile(manifest.attributesLut);
-    const words = splitSearchWords(searchString);
     const results = [];
 
     for (const shardName of Array.from(new Set(shardNames))) {
@@ -422,9 +479,8 @@ export async function queryComponents({ categoryIds, allCategories, searchString
                 schema = row;
                 return;
             }
-            const component = decodeComponentRow(row, schema, attributeLut);
-            if (matchesSearch(component, words)) {
-                results.push(component);
+            if (textMatchesSearch(componentRowText(row, schema), words)) {
+                results.push(decodeComponentRow(row, schema, attributeLut));
             }
             if (checkAbort?.()) {
                 return 'abort';
