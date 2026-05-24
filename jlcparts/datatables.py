@@ -5,6 +5,7 @@ import shutil
 import json
 import datetime
 import gzip
+from collections import OrderedDict, defaultdict
 from pathlib import Path
 
 import click
@@ -356,9 +357,13 @@ def clearDir(directory):
             shutil.rmtree(file_path)
 
 
-WEB_FILE_FORMAT_VERSION = 3
+WEB_FILE_FORMAT_VERSION = 4
 LOOKUP_BUCKET_SIZE_DEFAULT = 100000
-MAX_COMPONENTS_PER_SHARD_DEFAULT = 20000
+MAX_COMPONENTS_PER_SHARD_DEFAULT = 1000
+TRIGRAM_SIZE = 3
+MAX_TRIGRAM_BUCKET_ROWS = 100000
+TRIGRAM_GROUP_PREFIX_SIZE = 2
+SEARCH_GRAM_RE = re.compile(r"^[a-z0-9-]{3}$")
 COMPONENT_ROW_SCHEMA = {
     "lcsc": 0,
     "mfr": 1,
@@ -454,18 +459,39 @@ def _componentSearchText(component):
     ]).lower()
 
 
+def _cleanSearchText(text):
+    return text.replace("\t", " ").replace("\r", " ").replace("\n", " ")
+
+
+def _searchTrigrams(text):
+    if len(text) < TRIGRAM_SIZE:
+        return set()
+    return {
+        gram
+        for i in range(len(text) - TRIGRAM_SIZE + 1)
+        for gram in [text[i:i + TRIGRAM_SIZE]]
+        if SEARCH_GRAM_RE.match(gram)
+    }
+
+
+def _trigramGroup(gram):
+    return gram[:TRIGRAM_GROUP_PREFIX_SIZE]
+
+
+def _trigramGroupFileName(group):
+    encoded = group.encode("utf-8").hex()
+    return f"search-trigrams-{encoded}.tsv.gz"
+
+
 def _writeSearchIndexRows(searchIndexFile, components, shardName):
     for component in components:
-        json.dump([
-            component["lcsc"],
-            _componentSearchText(component),
-            shardName,
-        ], searchIndexFile, separators=(",", ":"), sort_keys=False)
-        searchIndexFile.write("\n")
+        searchText = _cleanSearchText(_componentSearchText(component))
+        searchIndexFile.write(f"{component['lcsc']}\t{shardName}\t{searchText}\n")
 
 
 def _flushComponentShard(chunk, shardName, outdir, subcategoryId, attributeLut,
-                         files, lookupBuckets, lookupBucketSize, searchIndexFile):
+                         files, lookupBuckets, lookupBucketSize, searchIndexFile,
+                         trigramCounts):
     shardRows = _componentRows(chunk, subcategoryId, attributeLut)
     shardPath = os.path.join(outdir, shardName)
     shardHash = _writeJsonLinesArtifact(shardRows, shardPath)
@@ -479,7 +505,113 @@ def _flushComponentShard(chunk, shardName, outdir, subcategoryId, attributeLut,
     for component in chunk:
         bucket = _lookupBucketForLcsc(component["lcsc"], lookupBucketSize)
         lookupBuckets.setdefault(bucket, {})[component["lcsc"]] = shardName
+        for gram in _searchTrigrams(_cleanSearchText(_componentSearchText(component))):
+            trigramCounts[gram] += 1
     _writeSearchIndexRows(searchIndexFile, chunk, shardName)
+
+
+class _LruTextWriters:
+    def __init__(self, maxOpen):
+        self.maxOpen = maxOpen
+        self.writers = OrderedDict()
+
+    def write(self, filename, text):
+        writer = self.writers.get(filename)
+        if writer is None:
+            if len(self.writers) >= self.maxOpen:
+                _, oldWriter = self.writers.popitem(last=False)
+                oldWriter.close()
+            writer = open(filename, "a", encoding="utf-8")
+            self.writers[filename] = writer
+        else:
+            self.writers.move_to_end(filename)
+        writer.write(text)
+
+    def close(self):
+        for writer in self.writers.values():
+            writer.close()
+        self.writers.clear()
+
+
+def _writeTrigramIndexes(searchIndexPath, outdir, files, totalComponents, trigramCounts):
+    if totalComponents == 0:
+        return {}
+
+    selectedGrams = {
+        gram: count
+        for gram, count in trigramCounts.items()
+        if count <= MAX_TRIGRAM_BUCKET_ROWS
+    }
+    if not selectedGrams:
+        return {}
+
+    tempDir = os.path.join(outdir, ".trigram-tmp")
+    Path(tempDir).mkdir(parents=True, exist_ok=True)
+    writers = _LruTextWriters(maxOpen=64)
+    groupTempFiles = {}
+    groupRows = defaultdict(int)
+    try:
+        with gzip.open(searchIndexPath, "rt", encoding="utf-8") as searchIndexFile:
+            for line in searchIndexFile:
+                line = line.rstrip("\n")
+                if not line:
+                    continue
+                textStart = line.find("\t", line.find("\t") + 1)
+                if textStart == -1:
+                    continue
+                text = line[textStart + 1:]
+                for gram in _searchTrigrams(text):
+                    if gram not in selectedGrams:
+                        continue
+                    group = _trigramGroup(gram)
+                    tempPath = groupTempFiles.get(group)
+                    if tempPath is None:
+                        tempPath = os.path.join(tempDir, _trigramGroupFileName(group)[:-3])
+                        groupTempFiles[group] = tempPath
+                    writers.write(tempPath, f"{gram}\t{line}\n")
+                    groupRows[group] += 1
+    finally:
+        writers.close()
+
+    groupFiles = {}
+    for group, tempPath in sorted(groupTempFiles.items()):
+        filename = _trigramGroupFileName(group)
+        outPath = os.path.join(outdir, filename)
+        with open(tempPath, "rt", encoding="utf-8") as src, gzip.open(outPath, "wt", encoding="utf-8") as dst:
+            shutil.copyfileobj(src, dst)
+        fileHash = sha256file(outPath)
+        files[filename] = {
+            "name": filename,
+            "kind": "search-trigram-group",
+            "sha256": fileHash,
+            "group": group,
+            "entryCount": groupRows[group],
+        }
+        groupFiles[group] = {
+            "file": filename,
+            "rows": groupRows[group],
+        }
+
+    buckets = {}
+    for gram in sorted(selectedGrams):
+        group = _trigramGroup(gram)
+        if group not in groupFiles:
+            continue
+        rows = selectedGrams[gram]
+        buckets[gram] = {
+            "file": groupFiles[group]["file"],
+            "rows": rows,
+            "group": group,
+        }
+
+    shutil.rmtree(tempDir)
+    return {
+        "gramSize": TRIGRAM_SIZE,
+        "groupPrefixSize": TRIGRAM_GROUP_PREFIX_SIZE,
+        "maxBucketRows": MAX_TRIGRAM_BUCKET_ROWS,
+        "groups": groupFiles,
+        "buckets": buckets,
+    }
 
 
 def _lutToEntries(lutMap):
@@ -534,13 +666,12 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
     categoryEntries = []
     attributeLut = {}
     lookupBuckets = {}
+    trigramCounts = defaultdict(int)
     totalComponents = 0
     categoryId = 0
-    searchIndexFilename = "search-index.jsonl.gz"
+    searchIndexFilename = "search-index.tsv.gz"
     searchIndexPath = os.path.join(outdir, searchIndexFilename)
     searchIndexFile = gzip.open(searchIndexPath, "wt", encoding="utf-8")
-    json.dump(SEARCH_INDEX_ROW_SCHEMA, searchIndexFile, separators=(",", ":"), sort_keys=False)
-    searchIndexFile.write("\n")
 
     try:
         for catName, subcategories in sortedCategories:
@@ -574,7 +705,8 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
                     shardName = f"components-{categoryKey}-{shardIndex:03d}.jsonl.gz"
                     _flushComponentShard(
                         chunk, shardName, outdir, categoryId, attributeLut,
-                        files, lookupBuckets, lookup_bucket_size, searchIndexFile
+                        files, lookupBuckets, lookup_bucket_size, searchIndexFile,
+                        trigramCounts
                     )
                     shardNames.append(shardName)
                     chunk = []
@@ -584,7 +716,8 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
                     shardName = f"components-{categoryKey}-{shardIndex:03d}.jsonl.gz"
                     _flushComponentShard(
                         chunk, shardName, outdir, categoryId, attributeLut,
-                        files, lookupBuckets, lookup_bucket_size, searchIndexFile
+                        files, lookupBuckets, lookup_bucket_size, searchIndexFile,
+                        trigramCounts
                     )
                     shardNames.append(shardName)
 
@@ -604,7 +737,12 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
         "kind": "search-index",
         "sha256": searchIndexHash,
         "entryCount": totalComponents,
+        "format": "tsv-v1",
     }
+
+    searchTrigrams = _writeTrigramIndexes(
+        searchIndexPath, outdir, files, totalComponents, trigramCounts
+    )
 
     attributesLutFilename = "attributes-lut.json.gz"
     attributesLutPath = os.path.join(outdir, attributesLutFilename)
@@ -637,6 +775,8 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
         "lookupBucketSize": lookup_bucket_size,
         "attributesLut": attributesLutFilename,
         "searchIndex": searchIndexFilename,
+        "searchIndexFormat": "tsv-v1",
+        "searchTrigrams": searchTrigrams,
         "categories": categoryEntries,
         "lookupBuckets": lookupFiles,
         "files": files,

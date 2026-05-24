@@ -128,6 +128,67 @@ async function streamJsonLines(name, callback, checkAbort) {
     return lineObjects(await gunzipToText(buffer), callback, checkAbort);
 }
 
+async function streamTextLines(name, callback, checkAbort) {
+    const buffer = await ensureBinaryFile(name);
+    if (window.DecompressionStream && window.TextDecoderStream) {
+        const stream = new Blob([buffer]).stream()
+            .pipeThrough(new window.DecompressionStream('gzip'))
+            .pipeThrough(new window.TextDecoderStream());
+        const reader = stream.getReader();
+        let chunk = '';
+        let idx = 0;
+        try {
+            while (true) {
+                if (checkAbort?.()) {
+                    return true;
+                }
+                const { done, value } = await reader.read();
+                if (done) {
+                    if (chunk && callback(chunk, idx++) === 'abort') {
+                        return true;
+                    }
+                    return false;
+                }
+                chunk += value;
+                while (true) {
+                    const newline = chunk.indexOf('\n');
+                    if (newline === -1) {
+                        break;
+                    }
+                    const line = chunk.slice(0, newline).trimEnd();
+                    chunk = chunk.slice(newline + 1);
+                    if (!line) {
+                        continue;
+                    }
+                    if (callback(line, idx++) === 'abort') {
+                        return true;
+                    }
+                    if (checkAbort?.()) {
+                        return true;
+                    }
+                }
+            }
+        } finally {
+            reader.releaseLock();
+        }
+    }
+
+    const lines = (await gunzipToText(buffer)).split(/\r?\n/);
+    let idx = 0;
+    for (const line of lines) {
+        if (!line) {
+            continue;
+        }
+        if (callback(line, idx++) === 'abort') {
+            return true;
+        }
+        if (checkAbort?.()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function decodeAttributes(attributeIds, attributeLut) {
     const attributes = {};
     for (const id of attributeIds || []) {
@@ -177,7 +238,81 @@ function textMatchesSearch(text, words) {
     return words.every(word => text.includes(word));
 }
 
-async function collectSearchIndexMatches(manifest, words, checkAbort) {
+function searchTrigrams(word, gramSize) {
+    if (word.length < gramSize) {
+        return [];
+    }
+    const grams = [];
+    for (let i = 0; i <= word.length - gramSize; i++) {
+        grams.push(word.slice(i, i + gramSize));
+    }
+    return grams;
+}
+
+function selectSearchIndexFile(manifest, words) {
+    const trigrams = manifest.searchTrigrams;
+    if (!trigrams?.buckets) {
+        return { file: manifest.searchIndex };
+    }
+
+    const candidates = [];
+    for (const word of words) {
+        for (const gram of searchTrigrams(word, trigrams.gramSize || 3)) {
+            const bucket = trigrams.buckets[gram];
+            if (bucket) {
+                candidates.push({ ...bucket, gram });
+            }
+        }
+    }
+
+    if (candidates.length === 0) {
+        return { file: manifest.searchIndex };
+    }
+    candidates.sort((a, b) => a.rows - b.rows);
+    return candidates[0];
+}
+
+function parseSearchIndexLine(line) {
+    const firstTab = line.indexOf('\t');
+    const secondTab = line.indexOf('\t', firstTab + 1);
+    if (firstTab === -1 || secondTab === -1) {
+        return null;
+    }
+    return {
+        lcsc: line.slice(0, firstTab),
+        shard: line.slice(firstTab + 1, secondTab),
+        text: line.slice(secondTab + 1),
+    };
+}
+
+async function collectTsvSearchIndexMatches(searchIndexFile, words, checkAbort) {
+    const matchesByShard = new Map();
+    const aborted = await streamTextLines(searchIndexFile.file, line => {
+        if (searchIndexFile.gram) {
+            const firstTab = line.indexOf('\t');
+            if (firstTab === -1 || line.slice(0, firstTab) !== searchIndexFile.gram) {
+                return;
+            }
+            line = line.slice(firstTab + 1);
+        }
+        const row = parseSearchIndexLine(line);
+        if (!row) {
+            return;
+        }
+        if (textMatchesSearch(row.text, words)) {
+            if (!matchesByShard.has(row.shard)) {
+                matchesByShard.set(row.shard, new Set());
+            }
+            matchesByShard.get(row.shard).add(row.lcsc);
+        }
+        if (checkAbort?.()) {
+            return 'abort';
+        }
+    }, checkAbort);
+    return aborted ? null : matchesByShard;
+}
+
+async function collectJsonSearchIndexMatches(manifest, words, checkAbort) {
     const matchesByShard = new Map();
     let schema = null;
     const aborted = await streamJsonLines(manifest.searchIndex, (row, idx) => {
@@ -197,6 +332,15 @@ async function collectSearchIndexMatches(manifest, words, checkAbort) {
         }
     }, checkAbort);
     return aborted ? null : matchesByShard;
+}
+
+async function collectSearchIndexMatches(manifest, words, checkAbort) {
+    if (manifest.searchIndexFormat === "tsv-v1") {
+        return await collectTsvSearchIndexMatches(
+            selectSearchIndexFile(manifest, words), words, checkAbort
+        );
+    }
+    return await collectJsonSearchIndexMatches(manifest, words, checkAbort);
 }
 
 async function queryComponentsFromMatches(manifest, matchesByShard, checkAbort) {
