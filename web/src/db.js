@@ -23,6 +23,7 @@ db.version(2).stores({
 
 const SOURCE_PATH = "data";
 const MANIFEST_PATH = `${SOURCE_PATH}/manifest.json`;
+const SHARD_LOAD_CONCURRENCY = 8;
 const parsedFileCache = new Map();
 let manifestCache = undefined;
 
@@ -238,6 +239,29 @@ function textMatchesSearch(text, words) {
     return words.every(word => text.includes(word));
 }
 
+async function mapConcurrent(items, limit, callback) {
+    const results = new Array(items.length);
+    let nextIndex = 0;
+    let aborted = false;
+    const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+        while (!aborted) {
+            const index = nextIndex++;
+            if (index >= items.length) {
+                return;
+            }
+            const result = await callback(items[index], index);
+            if (result === null) {
+                aborted = true;
+                results[index] = null;
+                return;
+            }
+            results[index] = result;
+        }
+    });
+    await Promise.all(workers);
+    return aborted ? null : results;
+}
+
 function searchTrigrams(word, gramSize) {
     if (word.length < gramSize) {
         return [];
@@ -349,8 +373,8 @@ async function queryComponentsFromMatches(manifest, matchesByShard, checkAbort) 
     }
 
     const attributeLut = await ensureJsonFile(manifest.attributesLut);
-    const results = [];
-    for (const [shardName, lcscMatches] of matchesByShard) {
+    const shardResults = await mapConcurrent(Array.from(matchesByShard), SHARD_LOAD_CONCURRENCY, async ([shardName, lcscMatches]) => {
+        const results = [];
         let schema = null;
         const aborted = await streamJsonLines(shardName, (row, idx) => {
             if (idx === 0) {
@@ -367,8 +391,12 @@ async function queryComponentsFromMatches(manifest, matchesByShard, checkAbort) 
         if (aborted) {
             return null;
         }
+        return results;
+    });
+    if (shardResults === null || checkAbort?.()) {
+        return null;
     }
-    return checkAbort?.() ? null : results;
+    return shardResults.flat();
 }
 
 export async function fetchJson(path, errorIntro = "Cannot fetch JSON: ") {
@@ -614,9 +642,8 @@ export async function queryComponents({ categoryIds, allCategories, searchString
     }
 
     const attributeLut = await ensureJsonFile(manifest.attributesLut);
-    const results = [];
-
-    for (const shardName of Array.from(new Set(shardNames))) {
+    const shardResults = await mapConcurrent(Array.from(new Set(shardNames)), SHARD_LOAD_CONCURRENCY, async shardName => {
+        const results = [];
         let schema = null;
         const aborted = await streamJsonLines(shardName, (row, idx) => {
             if (idx === 0) {
@@ -633,9 +660,12 @@ export async function queryComponents({ categoryIds, allCategories, searchString
         if (aborted) {
             return null;
         }
+        return results;
+    });
+    if (shardResults === null || checkAbort?.()) {
+        return null;
     }
-
-    return checkAbort?.() ? null : results;
+    return shardResults.flat();
 }
 
 function lookupFileForLcsc(manifest, lcsc) {
