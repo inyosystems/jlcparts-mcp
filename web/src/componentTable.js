@@ -176,6 +176,7 @@ export class ComponentOverview extends React.Component {
         this.state = {
             components: [],
             categories: [],
+            properties: [],
             activeProperties: {},
             stockRequired: false,
             requiredProperties: new Set(),
@@ -265,6 +266,7 @@ export class ComponentOverview extends React.Component {
             // Update properties filters
             var t0 = performance.now();
             const collectedProperties = this.collectProperties(components);
+            draft.properties = collectedProperties;
             let properties = {};
             let propertyValueCounts = {};
             for (const propertyDic of collectedProperties) {
@@ -357,7 +359,7 @@ export class ComponentOverview extends React.Component {
                 onChange={this.handleComponentsChange}
                 onAnnounceChange={this.handleStartComponentsChange}/>
             <PropertySelect
-                properties={this.collectProperties(this.state.components)}
+                properties={this.state.properties}
                 values={this.state.activeProperties}
                 onChange={this.handleActivePropertiesChange}
                 onTableInclude={this.handleIncludeInTable}
