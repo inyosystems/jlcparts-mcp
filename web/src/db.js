@@ -24,6 +24,8 @@ db.version(2).stores({
 const SOURCE_PATH = "data";
 const MANIFEST_PATH = `${SOURCE_PATH}/manifest.json`;
 const SHARD_LOAD_CONCURRENCY = 8;
+const SMALL_SHARD_ESTIMATED_ROWS = 1000;
+const BROWSE_SHARD_ESTIMATED_ROWS = 20000;
 const parsedFileCache = new Map();
 let manifestCache = undefined;
 
@@ -367,32 +369,89 @@ async function collectSearchIndexMatches(manifest, words, checkAbort) {
     return await collectJsonSearchIndexMatches(manifest, words, checkAbort);
 }
 
+function componentCountForFile(manifest, name, fallback = SMALL_SHARD_ESTIMATED_ROWS) {
+    return manifest.files[name]?.componentCount ?? fallback;
+}
+
+function chooseHydrationPlans(manifest, matchesByShard) {
+    const categoriesById = new Map(manifest.categories.map(category => [category.id, category]));
+    const matchesByCategory = new Map();
+    const smallPlans = [];
+
+    for (const [shardName, lcscMatches] of matchesByShard) {
+        const categoryId = manifest.files[shardName]?.subcategoryId;
+        const category = categoriesById.get(categoryId);
+        if (!category?.browseShards?.length) {
+            smallPlans.push({ shardNames: [shardName], lcscMatches });
+            continue;
+        }
+        if (!matchesByCategory.has(categoryId)) {
+            matchesByCategory.set(categoryId, {
+                category,
+                lcscMatches: new Set(),
+                smallShardNames: [],
+            });
+        }
+        const categoryMatches = matchesByCategory.get(categoryId);
+        categoryMatches.smallShardNames.push(shardName);
+        for (const lcsc of lcscMatches) {
+            categoryMatches.lcscMatches.add(lcsc);
+        }
+    }
+
+    const plans = [...smallPlans];
+    for (const { category, lcscMatches, smallShardNames } of matchesByCategory.values()) {
+        const smallRows = smallShardNames.reduce(
+            (total, shardName) => total + componentCountForFile(manifest, shardName),
+            0
+        );
+        const browseRows = category.browseShards.reduce(
+            (total, shardName) => total + componentCountForFile(manifest, shardName, BROWSE_SHARD_ESTIMATED_ROWS),
+            0
+        );
+        const fewerBrowseFiles = category.browseShards.length * 3 < smallShardNames.length;
+        if (fewerBrowseFiles && browseRows <= smallRows * 1.25) {
+            plans.push({ shardNames: category.browseShards, lcscMatches });
+        } else {
+            for (const shardName of smallShardNames) {
+                plans.push({ shardNames: [shardName], lcscMatches: matchesByShard.get(shardName) });
+            }
+        }
+    }
+    return plans;
+}
+
 async function queryComponentsFromMatches(manifest, matchesByShard, checkAbort) {
     if (matchesByShard.size === 0) {
         return [];
     }
 
     const attributeLut = await ensureJsonFile(manifest.attributesLut);
-    const shardResults = await mapConcurrent(Array.from(matchesByShard), SHARD_LOAD_CONCURRENCY, async ([shardName, lcscMatches]) => {
-        const results = [];
-        let schema = null;
-        const aborted = await streamJsonLines(shardName, (row, idx) => {
-            if (idx === 0) {
-                schema = row;
-                return;
+    const shardNamesForPlan = plan => plan.shardNames.map(shardName => [shardName, plan.lcscMatches]);
+    const shardResults = await mapConcurrent(
+        chooseHydrationPlans(manifest, matchesByShard).flatMap(shardNamesForPlan),
+        SHARD_LOAD_CONCURRENCY,
+        async ([shardName, lcscMatches]) => {
+            const results = [];
+            let schema = null;
+            const aborted = await streamJsonLines(shardName, (row, idx) => {
+                if (idx === 0) {
+                    schema = row;
+                    return;
+                }
+                if (lcscMatches.has(row[schema.lcsc])) {
+                    results.push(decodeComponentRow(row, schema, attributeLut));
+                }
+                if (checkAbort?.()) {
+                    return 'abort';
+                }
+            }, checkAbort);
+            if (aborted) {
+                return null;
             }
-            if (lcscMatches.has(row[schema.lcsc])) {
-                results.push(decodeComponentRow(row, schema, attributeLut));
-            }
-            if (checkAbort?.()) {
-                return 'abort';
-            }
-        }, checkAbort);
-        if (aborted) {
-            return null;
+            return results;
         }
-        return results;
-    });
+    );
     if (shardResults === null || checkAbort?.()) {
         return null;
     }
@@ -634,7 +693,7 @@ export async function queryComponents({ categoryIds, allCategories, searchString
     const shardNames = [];
     for (const category of manifest.categories) {
         if (allCategories || selectedCategories.has(category.id)) {
-            shardNames.push(...category.shards);
+            shardNames.push(...(category.browseShards ?? category.shards));
         }
     }
     if (shardNames.length === 0) {

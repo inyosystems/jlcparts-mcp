@@ -360,6 +360,7 @@ def clearDir(directory):
 WEB_FILE_FORMAT_VERSION = 4
 LOOKUP_BUCKET_SIZE_DEFAULT = 100000
 MAX_COMPONENTS_PER_SHARD_DEFAULT = 1000
+BROWSE_COMPONENTS_PER_SHARD_DEFAULT = 20000
 TRIGRAM_SIZE = 3
 MAX_TRIGRAM_BUCKET_ROWS = 100000
 TRIGRAM_GROUP_PREFIX_SIZE = 2
@@ -490,24 +491,29 @@ def _writeSearchIndexRows(searchIndexFile, components, shardName):
 
 
 def _flushComponentShard(chunk, shardName, outdir, subcategoryId, attributeLut,
-                         files, lookupBuckets, lookupBucketSize, searchIndexFile,
-                         trigramCounts):
+                         files, lookupBuckets=None, lookupBucketSize=None,
+                         searchIndexFile=None, trigramCounts=None,
+                         kind="components"):
     shardRows = _componentRows(chunk, subcategoryId, attributeLut)
     shardPath = os.path.join(outdir, shardName)
     shardHash = _writeJsonLinesArtifact(shardRows, shardPath)
     files[shardName] = {
         "name": shardName,
-        "kind": "components",
+        "kind": kind,
         "sha256": shardHash,
         "componentCount": len(chunk),
         "subcategoryId": subcategoryId,
     }
-    for component in chunk:
-        bucket = _lookupBucketForLcsc(component["lcsc"], lookupBucketSize)
-        lookupBuckets.setdefault(bucket, {})[component["lcsc"]] = shardName
-        for gram in _searchTrigrams(_cleanSearchText(_componentSearchText(component))):
-            trigramCounts[gram] += 1
-    _writeSearchIndexRows(searchIndexFile, chunk, shardName)
+    if lookupBuckets is not None:
+        for component in chunk:
+            bucket = _lookupBucketForLcsc(component["lcsc"], lookupBucketSize)
+            lookupBuckets.setdefault(bucket, {})[component["lcsc"]] = shardName
+    if trigramCounts is not None:
+        for component in chunk:
+            for gram in _searchTrigrams(_cleanSearchText(_componentSearchText(component))):
+                trigramCounts[gram] += 1
+    if searchIndexFile is not None:
+        _writeSearchIndexRows(searchIndexFile, chunk, shardName)
 
 
 class _LruTextWriters:
@@ -636,11 +642,14 @@ def updateLut(lutMap, item):
     help="Number of parallel processes. Defaults to 1, set to 0 to use all cores")
 @click.option("--max-components-per-shard", type=int, default=MAX_COMPONENTS_PER_SHARD_DEFAULT,
     show_default=True,
-    help="Maximum number of components stored in a single frontend shard")
+    help="Maximum number of components stored in a search/lookup frontend shard")
+@click.option("--browse-components-per-shard", type=int, default=BROWSE_COMPONENTS_PER_SHARD_DEFAULT,
+    show_default=True,
+    help="Maximum number of components stored in a category browsing frontend shard")
 @click.option("--lookup-bucket-size", type=int, default=LOOKUP_BUCKET_SIZE_DEFAULT,
     show_default=True,
     help="Number of LCSC numeric codes stored in a single lookup shard")
-def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard, lookup_bucket_size):
+def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard, browse_components_per_shard, lookup_bucket_size):
     """
     Build datatables out of the LIBRARY and save them in OUTDIR
     """
@@ -690,26 +699,38 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
                 categoryId += 1
                 categoryKey = _stableComponentFilebase(catName, subcatName)
                 shardNames = []
+                browseShardNames = []
                 totalComponents += componentCount
                 print(f"{((processed - 1) / max(total, 1) * 100):.2f} % {catName}: {subcatName} ({componentCount})")
 
                 chunk = []
+                browseChunk = []
                 shardIndex = 0
+                browseShardIndex = 0
                 for component in lib.iterCategoryComponents(
                         catName, subcatName, stockNewerThan=ignoreoldstock,
                         fetchSize=max(1000, min(max_components_per_shard, 5000))):
                     chunk.append(component)
-                    if len(chunk) < max_components_per_shard:
-                        continue
-                    shardIndex += 1
-                    shardName = f"components-{categoryKey}-{shardIndex:03d}.jsonl.gz"
-                    _flushComponentShard(
-                        chunk, shardName, outdir, categoryId, attributeLut,
-                        files, lookupBuckets, lookup_bucket_size, searchIndexFile,
-                        trigramCounts
-                    )
-                    shardNames.append(shardName)
-                    chunk = []
+                    browseChunk.append(component)
+                    if len(chunk) >= max_components_per_shard:
+                        shardIndex += 1
+                        shardName = f"components-{categoryKey}-{shardIndex:03d}.jsonl.gz"
+                        _flushComponentShard(
+                            chunk, shardName, outdir, categoryId, attributeLut,
+                            files, lookupBuckets, lookup_bucket_size, searchIndexFile,
+                            trigramCounts
+                        )
+                        shardNames.append(shardName)
+                        chunk = []
+                    if len(browseChunk) >= browse_components_per_shard:
+                        browseShardIndex += 1
+                        browseShardName = f"browse-components-{categoryKey}-{browseShardIndex:03d}.jsonl.gz"
+                        _flushComponentShard(
+                            browseChunk, browseShardName, outdir, categoryId, attributeLut,
+                            files, kind="browse-components"
+                        )
+                        browseShardNames.append(browseShardName)
+                        browseChunk = []
 
                 if chunk:
                     shardIndex += 1
@@ -720,6 +741,14 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
                         trigramCounts
                     )
                     shardNames.append(shardName)
+                if browseChunk:
+                    browseShardIndex += 1
+                    browseShardName = f"browse-components-{categoryKey}-{browseShardIndex:03d}.jsonl.gz"
+                    _flushComponentShard(
+                        browseChunk, browseShardName, outdir, categoryId, attributeLut,
+                        files, kind="browse-components"
+                    )
+                    browseShardNames.append(browseShardName)
 
                 categoryEntries.append({
                     "id": categoryId,
@@ -727,6 +756,7 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
                     "subcategory": subcatName,
                     "componentCount": componentCount,
                     "shards": shardNames,
+                    "browseShards": browseShardNames,
                 })
     finally:
         searchIndexFile.close()
