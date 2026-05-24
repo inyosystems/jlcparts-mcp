@@ -125,6 +125,50 @@ export function InlineSpinbox(props) {
     </div>
 }
 
+function formatDuration(seconds) {
+    if (seconds === null || seconds === undefined || !Number.isFinite(seconds)) {
+        return "estimating";
+    }
+    if (seconds < 1) {
+        return "less than 1s";
+    }
+    if (seconds < 60) {
+        return `${Math.ceil(seconds)}s`;
+    }
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.ceil(seconds % 60);
+    return `${minutes}m ${remainingSeconds}s`;
+}
+
+function QueryProgress(props) {
+    const progress = props.progress;
+    if (!progress) {
+        return null;
+    }
+    const percent = Math.max(0, Math.min(100, (progress.progress ?? 0) * 100));
+    const fileText = progress.filesTotal
+        ? `${progress.filesDone}/${progress.filesTotal} files`
+        : "";
+    const cacheText = progress.cachedFiles
+        ? `, ${progress.cachedFiles} cached`
+        : "";
+    const etaText = progress.etaSeconds === null
+        ? "ETA: estimating"
+        : `ETA: ${formatDuration(progress.etaSeconds)}`;
+
+    return <div className="w-full px-2 pb-2">
+        <div className="flex flex-wrap text-sm">
+            <span className="flex-none mr-3">{progress.phase}</span>
+            <span className="flex-none mr-3">{Math.round(percent)}%</span>
+            <span className="flex-none mr-3">{fileText}{cacheText}</span>
+            <span className="flex-none">{etaText}</span>
+        </div>
+        <div className="w-full bg-gray-300 mt-1 h-2">
+            <div className="bg-blue-500 h-2" style={{width: `${percent}%`}}></div>
+        </div>
+    </div>;
+}
+
 
 export class ZoomableLazyImage extends React.Component {
     constructor(props) {
@@ -667,6 +711,7 @@ class CategoryFilter extends React.Component {
             categories: {},
             allCategories: false,
             searchString: "",
+            queryProgress: null,
             abort: () => null
         }
     }
@@ -691,13 +736,38 @@ class CategoryFilter extends React.Component {
     async components() {
         this.state.abort();
         let aborted = false;
-        this.setState({abort: () => aborted = true});
-        return await queryComponents({
-            categoryIds: this.collectActiveCategories(),
-            allCategories: this.state.allCategories,
-            searchString: this.state.searchString,
-            checkAbort: () => aborted
-        });
+        const queryToken = Symbol();
+        this.activeQueryToken = queryToken;
+        this.setState({abort: () => aborted = true, queryProgress: null});
+        try {
+            return await queryComponents({
+                categoryIds: this.collectActiveCategories(),
+                allCategories: this.state.allCategories,
+                searchString: this.state.searchString,
+                checkAbort: () => aborted,
+                onProgress: progress => {
+                    if (this.activeQueryToken !== queryToken || aborted) {
+                        return;
+                    }
+                    this.pendingQueryProgress = progress;
+                    if (this.progressUpdatePending) {
+                        return;
+                    }
+                    this.progressUpdatePending = true;
+                    window.requestAnimationFrame(() => {
+                        this.progressUpdatePending = false;
+                        if (this.activeQueryToken !== queryToken || aborted) {
+                            return;
+                        }
+                        this.setState({queryProgress: this.pendingQueryProgress});
+                    });
+                }
+            });
+        } finally {
+            if (this.activeQueryToken === queryToken) {
+                this.setState({queryProgress: null});
+            }
+        }
     }
 
     handleCategoryChange = (category, value) => {
@@ -793,6 +863,7 @@ class CategoryFilter extends React.Component {
                     ↓ <span className="text-bold text-green-500">■</span> Scroll to properties <span className="text-bold text-green-500">■</span> ↓
                 </Link>
             </div>
+            <QueryProgress progress={this.state.queryProgress}/>
             <div className="flex flex-wrap items-stretch">
                 {this.props.categories.map(item => {
                     return <MultiSelectBox

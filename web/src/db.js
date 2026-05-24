@@ -84,8 +84,8 @@ async function gunzipToText(buffer) {
     return pako.ungzip(new Uint8Array(buffer), { to: 'string' });
 }
 
-async function streamJsonLines(name, callback, checkAbort) {
-    const buffer = await ensureBinaryFile(name);
+async function streamJsonLines(name, callback, checkAbort, onDownloadProgress) {
+    const buffer = await ensureBinaryFile(name, onDownloadProgress);
     if (window.DecompressionStream && window.TextDecoderStream) {
         const stream = new Blob([buffer]).stream()
             .pipeThrough(new window.DecompressionStream('gzip'))
@@ -131,8 +131,8 @@ async function streamJsonLines(name, callback, checkAbort) {
     return lineObjects(await gunzipToText(buffer), callback, checkAbort);
 }
 
-async function streamTextLines(name, callback, checkAbort) {
-    const buffer = await ensureBinaryFile(name);
+async function streamTextLines(name, callback, checkAbort, onDownloadProgress) {
+    const buffer = await ensureBinaryFile(name, onDownloadProgress);
     if (window.DecompressionStream && window.TextDecoderStream) {
         const stream = new Blob([buffer]).stream()
             .pipeThrough(new window.DecompressionStream('gzip'))
@@ -311,7 +311,7 @@ function parseSearchIndexLine(line) {
     };
 }
 
-async function collectTsvSearchIndexMatches(searchIndexFile, words, checkAbort) {
+async function collectTsvSearchIndexMatches(searchIndexFile, words, checkAbort, onProgress) {
     const matchesByShard = new Map();
     const aborted = await streamTextLines(searchIndexFile.file, line => {
         if (searchIndexFile.gram) {
@@ -334,11 +334,11 @@ async function collectTsvSearchIndexMatches(searchIndexFile, words, checkAbort) 
         if (checkAbort?.()) {
             return 'abort';
         }
-    }, checkAbort);
+    }, checkAbort, onProgress);
     return aborted ? null : matchesByShard;
 }
 
-async function collectJsonSearchIndexMatches(manifest, words, checkAbort) {
+async function collectJsonSearchIndexMatches(manifest, words, checkAbort, onProgress) {
     const matchesByShard = new Map();
     let schema = null;
     const aborted = await streamJsonLines(manifest.searchIndex, (row, idx) => {
@@ -356,21 +356,100 @@ async function collectJsonSearchIndexMatches(manifest, words, checkAbort) {
         if (checkAbort?.()) {
             return 'abort';
         }
-    }, checkAbort);
+    }, checkAbort, onProgress);
     return aborted ? null : matchesByShard;
-}
-
-async function collectSearchIndexMatches(manifest, words, checkAbort) {
-    if (manifest.searchIndexFormat === "tsv-v1") {
-        return await collectTsvSearchIndexMatches(
-            selectSearchIndexFile(manifest, words), words, checkAbort
-        );
-    }
-    return await collectJsonSearchIndexMatches(manifest, words, checkAbort);
 }
 
 function componentCountForFile(manifest, name, fallback = SMALL_SHARD_ESTIMATED_ROWS) {
     return manifest.files[name]?.componentCount ?? fallback;
+}
+
+function createFileProgressReporter(onProgress, phase, fileNames) {
+    if (!onProgress) {
+        return {
+            fileProgress: () => undefined,
+            fileFinished: () => undefined,
+        };
+    }
+
+    const uniqueFileNames = Array.from(new Set(fileNames));
+    const files = new Map(uniqueFileNames.map(name => [name, {
+        loaded: 0,
+        total: null,
+        done: false,
+        cached: false,
+    }]));
+    const started = performance.now();
+
+    const report = () => {
+        let loadedBytes = 0;
+        let totalBytes = 0;
+        let knownTotal = true;
+        let doneFiles = 0;
+        let cachedFiles = 0;
+
+        for (const file of files.values()) {
+            loadedBytes += file.loaded;
+            if (file.total === null) {
+                knownTotal = false;
+            } else {
+                totalBytes += file.total;
+            }
+            if (file.done) {
+                doneFiles += 1;
+            }
+            if (file.cached) {
+                cachedFiles += 1;
+            }
+        }
+
+        const fileProgress = files.size === 0 ? 1 : doneFiles / files.size;
+        const byteProgress = knownTotal && totalBytes > 0 ? loadedBytes / totalBytes : null;
+        const progress = byteProgress ?? fileProgress;
+        const elapsedSeconds = (performance.now() - started) / 1000;
+        const etaSeconds = progress > 0 && progress < 1
+            ? elapsedSeconds * (1 - progress) / progress
+            : null;
+
+        onProgress({
+            phase,
+            filesDone: doneFiles,
+            filesTotal: files.size,
+            cachedFiles,
+            loadedBytes,
+            totalBytes: knownTotal ? totalBytes : null,
+            progress,
+            etaSeconds,
+        });
+    };
+
+    report();
+    return {
+        fileProgress: name => progress => {
+            const file = files.get(name);
+            if (!file) {
+                return;
+            }
+            file.loaded = progress.loaded ?? file.loaded;
+            file.total = progress.total ?? file.total;
+            file.cached = Boolean(progress.cached);
+            if (file.cached || (file.total !== null && file.loaded >= file.total)) {
+                file.done = true;
+            }
+            report();
+        },
+        fileFinished: name => {
+            const file = files.get(name);
+            if (!file) {
+                return;
+            }
+            file.done = true;
+            if (file.total === null) {
+                file.total = file.loaded;
+            }
+            report();
+        },
+    };
 }
 
 function chooseHydrationPlans(manifest, matchesByShard) {
@@ -421,15 +500,19 @@ function chooseHydrationPlans(manifest, matchesByShard) {
     return plans;
 }
 
-async function queryComponentsFromMatches(manifest, matchesByShard, checkAbort) {
+async function queryComponentsFromMatches(manifest, matchesByShard, checkAbort, onProgress) {
     if (matchesByShard.size === 0) {
         return [];
     }
 
     const attributeLut = await ensureJsonFile(manifest.attributesLut);
     const shardNamesForPlan = plan => plan.shardNames.map(shardName => [shardName, plan.lcscMatches]);
+    const shardItems = chooseHydrationPlans(manifest, matchesByShard).flatMap(shardNamesForPlan);
+    const progress = createFileProgressReporter(
+        onProgress, "Loading component shards", shardItems.map(([shardName]) => shardName)
+    );
     const shardResults = await mapConcurrent(
-        chooseHydrationPlans(manifest, matchesByShard).flatMap(shardNamesForPlan),
+        shardItems,
         SHARD_LOAD_CONCURRENCY,
         async ([shardName, lcscMatches]) => {
             const results = [];
@@ -445,7 +528,8 @@ async function queryComponentsFromMatches(manifest, matchesByShard, checkAbort) 
                 if (checkAbort?.()) {
                     return 'abort';
                 }
-            }, checkAbort);
+            }, checkAbort, progress.fileProgress(shardName));
+            progress.fileFinished(shardName);
             if (aborted) {
                 return null;
             }
@@ -670,7 +754,7 @@ export async function checkForComponentLibraryUpdate() {
     }
 }
 
-export async function queryComponents({ categoryIds, allCategories, searchString, checkAbort }) {
+export async function queryComponents({ categoryIds, allCategories, searchString, checkAbort, onProgress }) {
     const manifest = await getLocalManifest();
     if (!manifest) {
         return [];
@@ -682,11 +766,24 @@ export async function queryComponents({ categoryIds, allCategories, searchString
 
     const words = splitSearchWords(searchString);
     if (allCategories && words.length > 0 && manifest.searchIndex) {
-        const matchesByShard = await collectSearchIndexMatches(manifest, words, checkAbort);
+        const searchIndexFile = manifest.searchIndexFormat === "tsv-v1"
+            ? selectSearchIndexFile(manifest, words)
+            : { file: manifest.searchIndex };
+        const progress = createFileProgressReporter(
+            onProgress, "Scanning search index", [searchIndexFile.file]
+        );
+        const matchesByShard = manifest.searchIndexFormat === "tsv-v1"
+            ? await collectTsvSearchIndexMatches(
+                searchIndexFile, words, checkAbort, progress.fileProgress(searchIndexFile.file)
+            )
+            : await collectJsonSearchIndexMatches(
+                manifest, words, checkAbort, progress.fileProgress(searchIndexFile.file)
+            );
+        progress.fileFinished(searchIndexFile.file);
         if (matchesByShard === null) {
             return null;
         }
-        return await queryComponentsFromMatches(manifest, matchesByShard, checkAbort);
+        return await queryComponentsFromMatches(manifest, matchesByShard, checkAbort, onProgress);
     }
 
     const selectedCategories = new Set(categoryIds || []);
@@ -701,7 +798,9 @@ export async function queryComponents({ categoryIds, allCategories, searchString
     }
 
     const attributeLut = await ensureJsonFile(manifest.attributesLut);
-    const shardResults = await mapConcurrent(Array.from(new Set(shardNames)), SHARD_LOAD_CONCURRENCY, async shardName => {
+    const uniqueShardNames = Array.from(new Set(shardNames));
+    const progress = createFileProgressReporter(onProgress, "Loading component shards", uniqueShardNames);
+    const shardResults = await mapConcurrent(uniqueShardNames, SHARD_LOAD_CONCURRENCY, async shardName => {
         const results = [];
         let schema = null;
         const aborted = await streamJsonLines(shardName, (row, idx) => {
@@ -715,7 +814,8 @@ export async function queryComponents({ categoryIds, allCategories, searchString
             if (checkAbort?.()) {
                 return 'abort';
             }
-        }, checkAbort);
+        }, checkAbort, progress.fileProgress(shardName));
+        progress.fileFinished(shardName);
         if (aborted) {
             return null;
         }
