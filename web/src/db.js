@@ -229,6 +229,41 @@ async function fetchRemoteManifest() {
     return await fetchJson(MANIFEST_PATH, "Cannot fetch component manifest: ");
 }
 
+async function responseArrayBuffer(response, onProgress) {
+    const contentLength = Number.parseInt(response.headers.get("Content-Length"), 10);
+    if (!response.body || !Number.isFinite(contentLength) || contentLength <= 0) {
+        onProgress?.({loaded: 0, total: null});
+        const data = await response.arrayBuffer();
+        onProgress?.({loaded: data.byteLength, total: null});
+        return data;
+    }
+
+    const reader = response.body.getReader();
+    const chunks = [];
+    let loaded = 0;
+    try {
+        while (true) {
+            const {done, value} = await reader.read();
+            if (done) {
+                break;
+            }
+            chunks.push(value);
+            loaded += value.byteLength;
+            onProgress?.({loaded, total: contentLength});
+        }
+    } finally {
+        reader.releaseLock();
+    }
+
+    const data = new Uint8Array(loaded);
+    let offset = 0;
+    for (const chunk of chunks) {
+        data.set(chunk, offset);
+        offset += chunk.byteLength;
+    }
+    return data.buffer;
+}
+
 async function pruneCachedFiles(manifest) {
     const expectedHashes = new Map(
         Object.entries(manifest.files).map(([name, info]) => [name, info.sha256])
@@ -245,7 +280,7 @@ async function pruneCachedFiles(manifest) {
     }
 }
 
-async function ensureBinaryFile(name) {
+async function ensureBinaryFile(name, onDownloadProgress) {
     const manifest = await getLocalManifest();
     if (!manifest) {
         throw Error("Component manifest is not cached locally");
@@ -257,14 +292,16 @@ async function ensureBinaryFile(name) {
 
     const cached = await db.files.get(name);
     if (cached && cached.sha256 === fileInfo.sha256) {
-        return normalizeBinary(cached.data);
+        const data = normalizeBinary(cached.data);
+        onDownloadProgress?.({loaded: data.byteLength, total: data.byteLength, cached: true});
+        return data;
     }
 
     const response = await fetch(dataUrl(name));
     if (!response.ok) {
         throw Error(`Cannot fetch ${name}: ${response.statusText}`);
     }
-    const data = await response.arrayBuffer();
+    const data = await responseArrayBuffer(response, onDownloadProgress);
     await db.files.put({
         name,
         sha256: fileInfo.sha256,
@@ -274,12 +311,12 @@ async function ensureBinaryFile(name) {
     return data;
 }
 
-async function ensureJsonFile(name) {
+async function ensureJsonFile(name, onDownloadProgress) {
     if (parsedFileCache.has(name)) {
         return await parsedFileCache.get(name);
     }
     const promise = (async () => {
-        return JSON.parse(await gunzipToText(await ensureBinaryFile(name)));
+        return JSON.parse(await gunzipToText(await ensureBinaryFile(name, onDownloadProgress)));
     })();
     parsedFileCache.set(name, promise);
     try {
@@ -321,8 +358,19 @@ export async function updateComponentLibrary(report) {
     await storeManifest(manifest);
 
     updateProgress("Metadata", ["Caching attributes", false]);
-    await ensureJsonFile(manifest.attributesLut);
-    updateProgress("Metadata", ["Ready", true]);
+    await ensureJsonFile(manifest.attributesLut, progress => {
+        if (progress.cached) {
+            updateProgress("Metadata", ["Attributes already cached", true, 1]);
+            return;
+        }
+        if (progress.total) {
+            const percent = Math.round(progress.loaded / progress.total * 100);
+            updateProgress("Metadata", [`Downloading attributes (${percent}%)`, false, progress.loaded / progress.total]);
+            return;
+        }
+        updateProgress("Metadata", ["Downloading attributes", false, null]);
+    });
+    updateProgress("Metadata", ["Ready", true, 1]);
 }
 
 export async function checkForComponentLibraryUpdate() {

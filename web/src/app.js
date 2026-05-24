@@ -182,10 +182,28 @@ class Updater extends React.Component {
       let color = status[1] ? "bg-green-500" : "bg-yellow-400";
       items.push(<tr key={task}>
         <td className="p-2">{task}</td>
-        <td className={`p-2 ${color}`}>{status[0]}</td>
+        <td className={`p-2 ${color}`}>
+          {status[0]}
+          {this.renderProgress(status)}
+        </td>
       </tr>)
     }
     return items;
+  }
+
+  renderProgress(status) {
+    if (status.length < 3)
+      return null;
+    let progress = status[2];
+    if (progress === null) {
+      return <div className="w-full bg-gray-300 mt-2 h-2">
+        <div className="bg-blue-500 h-2" style={{width: "50%"}}></div>
+      </div>
+    }
+    let width = Math.max(0, Math.min(100, progress * 100));
+    return <div className="w-full bg-gray-300 mt-2 h-2">
+      <div className="bg-blue-500 h-2" style={{width: `${width}%`}}></div>
+    </div>
   }
 
   render() {
