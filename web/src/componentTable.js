@@ -218,8 +218,6 @@ export class ComponentOverview extends React.Component {
 
         let propertiesList = [];
         for (const property in properties) {
-            if (Object.keys(properties[property]).length <= 1)
-                continue;
             let values = Object.entries(properties[property]).map(x => ({key: x[0], value: x[1]}));
             propertiesList.push({property, values});
         }
@@ -851,7 +849,7 @@ class PropertySelector extends React.Component {
     }
 
     collectValueTypes() {
-        return [...new Set(this.props.item.values.flatMap(x => Object.keys(x.value.values)))].map(x => ({key: x, value: x}));
+        return [...new Set(this.props.item.values.flatMap(x => Object.keys(x.value?.values ?? {})))].map(x => ({key: x, value: x}));
     }
 
     valueOptions() {
@@ -870,9 +868,6 @@ class PropertySelector extends React.Component {
     }
 
     render() {
-        let options = this.valueOptions();
-        if (options.length <= 1)
-            return null;
         return <MultiSelectBox
             className={this.props.className}
             minHeight="10em"
