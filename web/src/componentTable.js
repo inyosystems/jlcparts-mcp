@@ -182,6 +182,7 @@ export class ComponentOverview extends React.Component {
             expectedComponentsVersion: 0,
             componentsVersion: 0,
             tableIncludedProperties: new Set(),
+            propertyValueCounts: {},
             quantity: 1
         };
     }
@@ -263,9 +264,12 @@ export class ComponentOverview extends React.Component {
             draft.components = components;
             // Update properties filters
             var t0 = performance.now();
+            const collectedProperties = this.collectProperties(components);
             let properties = {};
-            for (const propertyDic of this.collectProperties(components)) {
+            let propertyValueCounts = {};
+            for (const propertyDic of collectedProperties) {
                 properties[propertyDic.property] = propertyDic.values.map(x => x.key);
+                propertyValueCounts[propertyDic.property] = propertyDic.values.length;
             }
             for (const property of Object.keys(draft.activeProperties)) {
                 if (!(property in properties)) {
@@ -275,6 +279,7 @@ export class ComponentOverview extends React.Component {
             for (const property in properties) {
                 draft.activeProperties[property] = properties[property];
             }
+            draft.propertyValueCounts = propertyValueCounts;
             var t1 = performance.now();
             console.log("Active categories took ", t1 - t0, "ms" );
         }));
@@ -304,19 +309,33 @@ export class ComponentOverview extends React.Component {
         }));
     }
 
-    filterComponents(components, activeProperties, requiredProperties) {
+    filterComponents(components, activeProperties, requiredProperties, propertyValueCounts) {
+        const activeValueSets = {};
+        for (const property in activeProperties) {
+            if (activeProperties[property].length !== propertyValueCounts[property]) {
+                activeValueSets[property] = new Set(activeProperties[property]);
+            }
+        }
         return components.filter(component => {
+            if (this.state.stockRequired && component.stock < this.state.quantity)
+                return false;
             for (const property in activeProperties) {
-                if (this.state.stockRequired && component.stock < this.state.quantity)
-                    return false;
                 let attributes = component.attributes;
+                const required = requiredProperties.has(property);
+                const allValuesSelected = activeProperties[property].length === propertyValueCounts[property];
+                if (allValuesSelected && !required) {
+                    continue;
+                }
                 if (!(property in attributes)) {
-                    if (requiredProperties.has(property))
+                    if (required)
                         return false;
                     else
                         continue;
                 }
-                if (!(activeProperties[property].includes(valueFootprint(attributes[property]))))
+                if (allValuesSelected) {
+                    continue;
+                }
+                if (!(activeValueSets[property].has(valueFootprint(attributes[property]))))
                     return false;
             }
             return true;
@@ -512,7 +531,7 @@ export class ComponentOverview extends React.Component {
 
         var t0 = performance.now()
         let filteredComponents = this.filterComponents(this.state.components,
-            this.state.activeProperties, this.state.requiredProperties);
+            this.state.activeProperties, this.state.requiredProperties, this.state.propertyValueCounts);
         var t1 = performance.now()
         console.log("Filtering took ", t1 - t0, " ms");
 
