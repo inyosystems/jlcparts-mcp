@@ -23,14 +23,18 @@ function getQuantity(value) {
 // Compare two attributes based on given valueType. If no valueType is
 // specified, use primary attribute of x
 function attributeComparator(x, y, valueType) {
-    if (x === undefined && y === undefined)
+    if ((!x?.values) && (!y?.values))
         return 0;
-    if (x === undefined)
+    if (!x?.values)
         return 1;
-    if (y === undefined)
+    if (!y?.values)
         return -1;
     valueType ??= x.primary;
     valueType ??= x.default;
+    valueType ??= Object.keys(x.values)[0];
+    if (!valueType) {
+        return 0;
+    }
     let comparator = quantityComparator(getQuantity(x.values[valueType]));
     return comparator(
         getValue(x.values[valueType]),
@@ -39,12 +43,23 @@ function attributeComparator(x, y, valueType) {
 }
 
 export function formatAttribute(attribute) {
+    if (!attribute?.values || !attribute?.format) {
+        return "";
+    }
+
     let varNames = Object.keys(attribute.values).map(x => "\\${" + x + "}");
+
+    if (varNames.length === 0) {
+        return "";
+    }
 
     let regex = new RegExp('(' + varNames.join('|') + ')', 'g');
     return attribute.format.replace(regex, match => {
         let name = match.slice(2, -1);
         let value = attribute.values[name];
+        if (!value) {
+            return "";
+        }
         return quantityFormatter(value[1])(value[0]);
     });
 }
