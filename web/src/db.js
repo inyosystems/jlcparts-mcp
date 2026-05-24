@@ -233,14 +233,16 @@ async function pruneCachedFiles(manifest) {
     const expectedHashes = new Map(
         Object.entries(manifest.files).map(([name, info]) => [name, info.sha256])
     );
-    const deletions = [];
+    const staleFiles = [];
     await db.files.each(record => {
         if (expectedHashes.get(record.name) !== record.sha256) {
             parsedFileCache.delete(record.name);
-            deletions.push(db.files.delete(record.name));
+            staleFiles.push(record.name);
         }
     });
-    await Promise.all(deletions);
+    if (staleFiles.length > 0) {
+        await db.files.bulkDelete(staleFiles);
+    }
 }
 
 async function ensureBinaryFile(name) {
