@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build_and_update:
-    name: "Update component database and frontend"
+    name: "Build component database and frontend"
     runs-on: ubuntu-24.04
     environment: github-pages
     steps:
@@ -39,13 +39,14 @@ jobs:
             echo 'jlcparts-dev.honzamrazek.cz' > build/CNAME
           fi
           touch build/.nojekyll
-      - name: Update database
+      - name: Build database files
         env: # Or as an environment variable
           LCSC_KEY: ${{ secrets.LCSC_KEY }}
           LCSC_SECRET: ${{ secrets.LCSC_SECRET }}
           JLCPCB_APP_ID: ${{ secrets.JLCPCB_APP_ID }}
           JLCPCB_ACCESS_KEY: ${{ secrets.JLCPCB_ACCESS_KEY }}
           JLCPCB_SECRET_KEY: ${{ secrets.JLCPCB_SECRET_KEY }}
+          WORKFLOW_EVENT_NAME: ${{ github.event_name }}
         run: |
           set -x
           sudo pip3 install -e .
@@ -83,21 +84,30 @@ jobs:
             fi
           else
             rm -f cache.zip
+            if [ "$WORKFLOW_EVENT_NAME" != "schedule" ]; then
+              echo "No published cache found; only scheduled runs may fetch a fresh database from JLC"
+              exit 1
+            fi
             echo "No published cache found, bootstrapping a fresh database"
           fi
 
-          wget -q ${DATAURL}/parts.checkpoint.json || rm -f parts.checkpoint.json
+          if [ "$WORKFLOW_EVENT_NAME" = "schedule" ]; then
+            wget -q ${DATAURL}/parts.checkpoint.json || rm -f parts.checkpoint.json
 
-          fetch_seconds=${JLCPARTS_FETCH_SECONDS:-2400}
-          lcsc_age=${JLCPARTS_LCSC_AGE:-10000}
-          lcsc_limit=${JLCPARTS_LCSC_LIMIT:-1000}
-          jlcparts fetchdb --verbose \
-                           --checkpoint parts.checkpoint.json \
-                           --max-seconds "$fetch_seconds" \
-                           --age "$lcsc_age" \
-                           --limit "$lcsc_limit" \
-                           cache.sqlite3
-          jlcparts updatepreferred cache.sqlite3
+            fetch_seconds=${JLCPARTS_FETCH_SECONDS:-2400}
+            lcsc_age=${JLCPARTS_LCSC_AGE:-10000}
+            lcsc_limit=${JLCPARTS_LCSC_LIMIT:-1000}
+            jlcparts fetchdb --verbose \
+                             --checkpoint parts.checkpoint.json \
+                             --max-seconds "$fetch_seconds" \
+                             --age "$lcsc_age" \
+                             --limit "$lcsc_limit" \
+                             cache.sqlite3
+            jlcparts updatepreferred cache.sqlite3
+          else
+            rm -f parts.checkpoint.json
+          fi
+
           jlcparts buildtables --jobs 0 \
                                --ignoreoldstock 120 \
                                cache.sqlite3 web/build/data
