@@ -122,7 +122,7 @@ class UpdateBar extends React.Component {
         this.setState({updateAvailable});
       });
       db.settings.get("lastUpdate").then(lastUpdate => {
-        this.setState({lastUpdate});
+        this.setState({lastUpdate: lastUpdate?.value});
       })
     };
 
