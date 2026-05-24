@@ -87,6 +87,21 @@ function valueFootprint(value) {
     return JSON.stringify(value);
 }
 
+function displayText(value) {
+    if (value === null || value === undefined) {
+        return "";
+    }
+    if (typeof value !== "object") {
+        return String(value);
+    }
+    for (const key of ["value", "label", "name", "category", "subcategory", "title"]) {
+        if (key in value) {
+            return displayText(value[key]);
+        }
+    }
+    return JSON.stringify(value);
+}
+
 export function Spinbox() {
     return <div className="w-full text-center">
         <svg className="animate-spin -ml-1 m-8 h-5 w-5 text-black mx-auto inline-block"
@@ -173,9 +188,14 @@ export class ComponentOverview extends React.Component {
 
     componentDidMount() {
         getCategories().then(categories => {
+            const normalizedCategories = categories.map(category => ({
+                ...category,
+                category: displayText(category.category),
+                subcategory: displayText(category.subcategory),
+            }));
             this.setState({
-                categories: this.prepareCategories(categories),
-                rawCategories: categories
+                categories: this.prepareCategories(normalizedCategories),
+                rawCategories: normalizedCategories
             });
         });
     }
