@@ -165,6 +165,20 @@ def test_sampling_rate_range_lists(capsys):
     assert_quantity(values["frequency 2 max"], 192000.0, "frequency")
 
 
+def test_switching_frequency_lists(capsys):
+    values = normalized_values("Frequency - Switching", "2.5MHz, 1.25MHz", capsys)
+
+    assert_quantity(values["frequency 1"], 2.5e6, "frequency")
+    assert_quantity(values["frequency 2"], 1.25e6, "frequency")
+
+    values = normalized_values("Frequency - Switching", "100kHz~1MHz, 340kHz~520kHz", capsys)
+
+    assert_quantity(values["frequency 1 min"], 100e3, "frequency")
+    assert_quantity(values["frequency 1 max"], 1e6, "frequency")
+    assert_quantity(values["frequency 2 min"], 340e3, "frequency")
+    assert_quantity(values["frequency 2 max"], 520e3, "frequency")
+
+
 def test_sampling_rate_time_range(capsys):
     values = normalized_values("Sampling Rate", "0.1ms~23.5ms", capsys)
 
