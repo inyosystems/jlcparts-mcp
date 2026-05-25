@@ -1182,6 +1182,38 @@ def test_input_offset_voltage_drift(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("35ppm/℃", {"coefficient": [35.0, "temperature_coefficient"]}),
+        ("±50ppm/℃", {
+            "coefficient min": [-50.0, "temperature_coefficient"],
+            "coefficient max": [50.0, "temperature_coefficient"],
+        }),
+        ("0ppm/℃~+700ppm/℃", {
+            "coefficient min": [0.0, "temperature_coefficient"],
+            "coefficient max": [700.0, "temperature_coefficient"],
+        }),
+        ("C0G", {"coefficient": ["C0G", "temperature_coefficient_code"]}),
+        ("C0G, NP0", {
+            "coefficient 1": ["C0G", "temperature_coefficient_code"],
+            "coefficient 2": ["NP0", "temperature_coefficient_code"],
+        }),
+        ("±75ppm/℃, ±50ppm/℃", {
+            "coefficient 1 min": [-75.0, "temperature_coefficient"],
+            "coefficient 1 max": [75.0, "temperature_coefficient"],
+            "coefficient 2 min": [-50.0, "temperature_coefficient"],
+            "coefficient 2 max": [50.0, "temperature_coefficient"],
+        }),
+    ],
+)
+def test_temperature_coefficient(value, expected, capsys):
+    values = normalized_values("Temperature Coefficient", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        assert values[quantity] == expected_value
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Energy", "900mJ", 0.9),

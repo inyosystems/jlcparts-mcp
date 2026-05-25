@@ -118,6 +118,14 @@ def readVoltageTemperatureDrift(value):
     value = re.sub(r"/\s*(?:℃|°C|C)$", "", value, flags=re.I).strip()
     return readVoltage(value)
 
+def readTemperatureCoefficient(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = value.replace("±", "").replace("+", "")
+    value = re.sub(r"ppm\s*/?\s*(?:℃|°C|K)?", "", value, flags=re.I).strip()
+    return float(value)
+
 def readPower(value):
     """
     Parse power value (in watts), it can also handle fractions
@@ -697,6 +705,57 @@ def voltageTemperatureDriftAttribute(value):
         "voltage_temperature_drift",
         "drift",
     )
+
+def _temperatureCoefficientPart(part, name):
+    part = part.strip()
+    if part in ["-", "--", "null"]:
+        return scalarAttribute(part, readTemperatureCoefficient, "temperature_coefficient", name)
+    if "ppm" not in part.lower():
+        return {
+            "format": "${" + name + "}",
+            "primary": name,
+            "values": {
+                name: [part, "temperature_coefficient_code"]
+            }
+        }
+    if part.startswith("±"):
+        coefficient = readTemperatureCoefficient(part)
+        return {
+            "format": "${" + name + " min} ~ ${" + name + " max}",
+            "primary": name + " min",
+            "values": {
+                name + " min": [-coefficient, "temperature_coefficient"],
+                name + " max": [coefficient, "temperature_coefficient"],
+            }
+        }
+    range_parts = _rangeParts(part)
+    if range_parts is not None:
+        low, high = range_parts
+        return {
+            "format": "${" + name + " min} ~ ${" + name + " max}",
+            "primary": name + " min",
+            "values": {
+                name + " min": [readTemperatureCoefficient(low), "temperature_coefficient"],
+                name + " max": [readTemperatureCoefficient(high), "temperature_coefficient"],
+            }
+        }
+    return scalarAttribute(part, readTemperatureCoefficient, "temperature_coefficient", name)
+
+def temperatureCoefficientAttribute(value):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        name = "coefficient" if len(parts) == 1 else f"coefficient {index}"
+        parsed = _temperatureCoefficientPart(part, name)
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
 
 def dataRateAttribute(value):
     value = str(value)
