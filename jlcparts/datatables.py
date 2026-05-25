@@ -259,6 +259,8 @@ def normalizeAttribute(key, value):
             value = attributes.luminousIntensityAttribute(value)
         elif key in larr(["Radiant Intensity"]):
             value = attributes.radiantIntensityAttribute(value)
+        elif key in larr(["Input Voltage Noise Density"]):
+            value = attributes.voltageNoiseDensityAttribute(value)
         elif key in larr(["Wavelength - Dominant", "Dominant Wavelength", "Peak Wavelength"]):
             value = attributes.opticalLengthRangeListAttribute(value) if compoundValue(value) else attributes.wavelengthAttribute(value)
         elif key in larr(["Tolerance"]):

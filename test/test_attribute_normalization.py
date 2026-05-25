@@ -1146,6 +1146,24 @@ def test_radiant_intensity(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("15nV/√Hz@10kHz", {"density": 15e-9}),
+        ("600pV/√Hz@1kHz", {"density": 600e-12}),
+        ("1.4uV/√Hz@30kHz", {"density": 1.4e-6}),
+        ("11nV/√Hz@0.1kHz,10kHz", {"density": 11e-9}),
+        ("10nV/√Hz, 20nV/√Hz@10kHz", {"density 1": 10e-9, "density 2": 20e-9}),
+        ("-", {"density": "NaN"}),
+    ],
+)
+def test_input_voltage_noise_density(value, expected, capsys):
+    values = normalized_values("Input Voltage Noise Density", value, capsys)
+
+    for quantity, density in expected.items():
+        assert_quantity(values[quantity], density, "voltage_noise_density")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Energy", "900mJ", 0.9),

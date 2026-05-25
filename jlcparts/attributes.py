@@ -103,6 +103,14 @@ def readVoltage(value):
         return "NaN"
     return readWithSiPrefix(value)
 
+def readVoltageNoiseDensity(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = value.split("@", 1)[0]
+    value = re.sub(r"/\s*(?:√Hz|sqrt\s*Hz)$", "", value, flags=re.I).strip()
+    return readVoltage(value)
+
 def readPower(value):
     """
     Parse power value (in watts), it can also handle fractions
@@ -647,6 +655,25 @@ def radiantIntensityAttribute(value):
             "radiant_intensity",
             f"intensity {index}",
         )
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
+def voltageNoiseDensityAttribute(value):
+    value = str(value).replace(";", ",")
+    parts = [
+        x.strip()
+        for x in re.split(r",(?=\s*[+-]?\d+(?:\.\d+)?\s*[pnumμµ]?V\s*/)", value, flags=re.I)
+    ]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        name = f"density {index}" if len(parts) > 1 else "density"
+        parsed = scalarAttribute(part, readVoltageNoiseDensity, "voltage_noise_density", name)
         values.update(parsed["values"])
         formats.append(parsed["format"])
     return {
