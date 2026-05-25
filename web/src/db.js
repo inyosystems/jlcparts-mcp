@@ -869,3 +869,61 @@ export async function getComponentByLcsc(lcsc) {
     });
     return found;
 }
+
+export async function getComponentsByLcscList(lcscList, onProgress) {
+    const manifest = await getLocalManifest();
+    if (!manifest) {
+        return { components: [], missing: lcscList };
+    }
+
+    const requested = Array.from(new Set(lcscList));
+    const lookupFiles = new Map();
+    for (const lcsc of requested) {
+        const lookupFile = lookupFileForLcsc(manifest, lcsc);
+        if (!lookupFile) {
+            continue;
+        }
+        if (!lookupFiles.has(lookupFile)) {
+            lookupFiles.set(lookupFile, []);
+        }
+        lookupFiles.get(lookupFile).push(lcsc);
+    }
+
+    const matchesByShard = new Map();
+    const missing = new Set(requested);
+    const lookupFileNames = Array.from(lookupFiles.keys());
+    const lookupProgress = createFileProgressReporter(onProgress, "Loading part lookup", lookupFileNames);
+    for (const [lookupFile, lcscs] of lookupFiles) {
+        const lookup = await ensureJsonFile(lookupFile, lookupProgress.fileProgress(lookupFile));
+        lookupProgress.fileFinished(lookupFile);
+        for (const lcsc of lcscs) {
+            const shardName = lookup[lcsc];
+            if (!shardName) {
+                continue;
+            }
+            if (!matchesByShard.has(shardName)) {
+                matchesByShard.set(shardName, new Set());
+            }
+            matchesByShard.get(shardName).add(lcsc);
+        }
+    }
+
+    if (matchesByShard.size === 0) {
+        return { components: [], missing: requested };
+    }
+
+    const components = await queryComponentsFromMatches(
+        manifest, matchesByShard, undefined, onProgress
+    );
+    for (const component of components) {
+        missing.delete(component.lcsc);
+    }
+
+    const componentByLcsc = new Map(components.map(component => [component.lcsc, component]));
+    return {
+        components: requested
+            .map(lcsc => componentByLcsc.get(lcsc))
+            .filter(component => component !== undefined),
+        missing: requested.filter(lcsc => missing.has(lcsc)),
+    };
+}

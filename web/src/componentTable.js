@@ -65,7 +65,7 @@ function getQuantity(value) {
 
 // Compare two attributes based on given valueType. If no valueType is
 // specified, use primary attribute of x
-function attributeComparator(x, y, valueType) {
+export function attributeComparator(x, y, valueType) {
     if ((!x?.values) && (!y?.values))
         return 0;
     if (!x?.values)
@@ -824,7 +824,7 @@ export function findCategoryById(categories = [], id) {
     }
 }
 
-function ExpandedComponent(props) {
+export function ExpandedComponent(props) {
     let comp = props.component;
     const imgSrc = getImageUrl(comp.img, "big") ?? "./brokenimage.svg";
     let category = findCategoryById(props.categories, comp.category)

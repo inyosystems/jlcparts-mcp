@@ -22,6 +22,7 @@ import {
 } from './db'
 import { ComponentOverview } from './componentTable'
 import { History } from './history'
+import { CompareParts } from './compare'
 
 
 library.add(fas, far, fab);
@@ -257,6 +258,9 @@ function Navbar() {
     <NavLink to="/" end className={navClassName}>
       Component search
     </NavLink>
+    <NavLink to="/compare" className={navClassName}>
+      Compare parts
+    </NavLink>
     <NavLink to="/history" className={navClassName}>
        Catalog history
     </NavLink>
@@ -285,6 +289,7 @@ function App() {
           <QueryParamProvider adapter={ReactRouter6Adapter}>
             <Routes>
                 <Route path="/" element={<ComponentOverview/>} />
+                <Route path="/compare" element={<CompareParts/>} />
                 <Route path="/history" element={<History/>} />
                 <Route path="*" element={<NoMatch />} />
             </Routes>
