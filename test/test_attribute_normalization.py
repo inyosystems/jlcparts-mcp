@@ -1013,6 +1013,45 @@ def test_maximum_power_supply_range(value, expected, capsys):
     for quantity, voltage in expected.items():
         assert_quantity(values[quantity], voltage, "voltage")
 
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Collector-Emitter Breakdown Voltage (VCEO)", "100V", {"voltage": 100.0}),
+        ("Collector-Emitter Breakdown Voltage (VCEO)", "160V;150V", {
+            "voltage 1": 160.0,
+            "voltage 2": 150.0,
+        }),
+        ("Collector-Emitter Voltage (VCEO)", "12V, 15V", {
+            "voltage 1": 12.0,
+            "voltage 2": 15.0,
+        }),
+        ("Emitter-Base Voltage (VEBO)", "5V, 6V", {
+            "voltage 1": 5.0,
+            "voltage 2": 6.0,
+        }),
+        ("Input Offset Voltage (VOS)", "200uV", {"voltage": 200e-6}),
+        ("Input Offset Voltage (VOS)", "5mV;-5mV", {
+            "voltage 1": 0.005,
+            "voltage 2": -0.005,
+        }),
+        ("Input Hysteresis Voltage (Vhys)", "1mV, 10mV", {
+            "voltage 1": 0.001,
+            "voltage 2": 0.01,
+        }),
+        ("Gate-Source Breakdown Voltage (Vgss)", "40V", {"voltage": 40.0}),
+        ("Gate-Source Cutoff Voltage (Vgs(Off))", "300mV, 1.5V, 700mV", {
+            "voltage 1": 0.3,
+            "voltage 2": 1.5,
+            "voltage 3": 0.7,
+        }),
+    ],
+)
+def test_voltage_alias_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
 
 def test_gpio_ports_number_count(capsys):
     values = normalized_values("Gpio Ports Number", "34", capsys)

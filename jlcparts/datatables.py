@@ -101,12 +101,27 @@ def normalizeAttribute(key, value):
                 "Voltage - Input (Min)", "Drain Source Voltage (Vdss)",
                 "Drain-Source Voltage (Vdss)", "Voltage - Input Offset(VOS)",
                 "Charging Saturation Voltage", "Isolation Voltage(VRMS)",
-                "Maximum Power Supply Range (Vdd-Vss)"]):
+                "Maximum Power Supply Range (Vdd-Vss)",
+                "Collector-Emitter Breakdown Voltage (VCEO)",
+                "Collector-Emitter Voltage (VCEO)", "Emitter-Base Voltage (VEBO)",
+                "Input Offset Voltage (VOS)", "Input Hysteresis Voltage (Vhys)",
+                "Gate-Source Breakdown Voltage (Vgss)",
+                "Gate-Source Cutoff Voltage (Vgs(Off))"]):
             if key == "charging saturation voltage" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "isolation voltage(vrms)" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "maximum power supply range (vdd-vss)" and compoundValue(value):
+                value = attributes.voltageListAttribute(value)
+            elif key in [
+                    "collector-emitter breakdown voltage (vceo)",
+                    "collector-emitter voltage (vceo)",
+                    "emitter-base voltage (vebo)",
+                    "input offset voltage (vos)",
+                    "input hysteresis voltage (vhys)",
+                    "gate-source breakdown voltage (vgss)",
+                    "gate-source cutoff voltage (vgs(off))",
+                ] and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             else:
                 value = attributes.voltageAttribute(value)
