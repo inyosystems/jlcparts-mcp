@@ -704,6 +704,10 @@ def voltageRangeListAttribute(value, name="voltage"):
 def powerAtConditionAttribute(value, name="power"):
     return scalarAttribute(value, readPower, "power", name)
 
+def powerListAttribute(value, name="power"):
+    value = str(value).replace(";", ",")
+    return scalarListAttribute(value, readPower, "power", name)
+
 def energyAttribute(value):
     return scalarAttribute(value, readEnergy, "energy", "energy")
 
