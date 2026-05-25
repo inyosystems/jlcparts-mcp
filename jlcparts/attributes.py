@@ -705,16 +705,35 @@ def capacitanceAtConditionAttribute(value, name="capacitance"):
 
 def capacitanceAtFrequencyAttribute(value):
     value = str(value)
+    if "," in value or ";" in value:
+        parts = [x.strip() for x in re.split(r"[,;]", value)]
+        values = {}
+        formats = []
+        for i, part in enumerate(parts, start=1):
+            parsed = capacitanceAtFrequencyAttribute(part)
+            format = parsed["format"]
+            for name, parsedValue in parsed["values"].items():
+                numberedName = f"{name} {i}"
+                values[numberedName] = parsedValue
+                format = format.replace("${" + name + "}", "${" + numberedName + "}")
+            formats.append(format)
+        return {
+            "format": ", ".join(formats),
+            "primary": "capacitance 1",
+            "values": values
+        }
     if "@" not in value:
         return scalarAttribute(value, readCapacitance, "capacitance", "capacitance")
     capacitance, frequency = [x.strip() for x in value.split("@", 1)]
+    frequency = rangeOrScalarAttribute(frequency, readFrequency, "frequency", "frequency")
+    values = {
+        "capacitance": [readCapacitance(capacitance), "capacitance"],
+    }
+    values.update(frequency["values"])
     return {
-        "format": "${capacitance} @ ${frequency}",
+        "format": "${capacitance} @ " + frequency["format"],
         "primary": "capacitance",
-        "values": {
-            "capacitance": [readCapacitance(capacitance), "capacitance"],
-            "frequency": [readFrequency(frequency), "frequency"]
-        }
+        "values": values
     }
 
 def inductanceAtFrequency(value):

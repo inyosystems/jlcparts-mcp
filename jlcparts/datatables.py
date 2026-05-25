@@ -271,7 +271,7 @@ def normalizeAttribute(key, value):
                     value = attributes.frequencyListAttribute(value)
                 else:
                     value = attributes.stringAttribute(value) if compoundValue(value) else attributes.frequencyAttribute(value)
-        elif key in larr(["Typical Capatitance"]):
+        elif key in larr(["Typical Capatitance", "Junction Capacitance(Cj)@1mhz"]):
             value = attributes.capacitanceAtFrequencyAttribute(value)
         elif key in larr(["Inductance @ Frequency"]):
             value = attributes.stringAttribute(value) if compoundValue(value) else attributes.inductanceAtFrequency(value)

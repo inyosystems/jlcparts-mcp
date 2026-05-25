@@ -447,6 +447,32 @@ def test_typical_capacitance(value, capacitance, capsys):
         assert_quantity(values["frequency"], 1000.0, "frequency")
 
 
+def test_junction_capacitance_at_frequency(capsys):
+    values = normalized_values("Junction Capacitance(Cj)@1mhz", "75pF@1MHz", capsys)
+
+    assert_quantity(values["capacitance"], 75e-12, "capacitance")
+    assert_quantity(values["frequency"], 1e6, "frequency")
+
+    values = normalized_values("Junction Capacitance(Cj)@1mhz", "0.4pF@200MHz~3GHz", capsys)
+
+    assert_quantity(values["capacitance"], 0.4e-12, "capacitance")
+    assert_quantity(values["frequency min"], 200e6, "frequency")
+    assert_quantity(values["frequency max"], 3e9, "frequency")
+
+
+def test_junction_capacitance_at_frequency_list(capsys):
+    values = normalized_values(
+        "Junction Capacitance(Cj)@1mhz",
+        "0.5pF@1MHz;0.25pF@1MHz",
+        capsys,
+    )
+
+    assert_quantity(values["capacitance 1"], 0.5e-12, "capacitance")
+    assert_quantity(values["frequency 1"], 1e6, "frequency")
+    assert_quantity(values["capacitance 2"], 0.25e-12, "capacitance")
+    assert_quantity(values["frequency 2"], 1e6, "frequency")
+
+
 @pytest.mark.parametrize(
     ("key", "value", "capacitance"),
     [
