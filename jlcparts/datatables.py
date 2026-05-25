@@ -234,12 +234,13 @@ def normalizeAttribute(key, value):
             value = attributes.voltageListAttribute(value)
         elif key in larr(["Integral Non - Linearity", "Integral Nonlinearity", "Inl/Dnl(Lsb)"]):
             value = attributes.lsbListAttribute(value)
-        elif key in larr(["Number of Channels"]):
+        elif key in larr(["Number of Channels", "Number of Elements"]):
             value = attributes.channelCountAttribute(value)
         elif key in larr(["Number of Pins", "Number of Resistors", "Number of Loop",
                     "Number of Regulators", "Number of Outputs", "Number of Capacitors",
                     "Number of I/O", "Gpio Ports Number", "Number of Logic Elements/Blocks",
                     "Number of Differential Input Channels", "Number of Taps",
+                    "Number of Voltages Monitored",
                     "Attrition", "Minimum Order Quantity", "Minimum Placement Quantity",
                     "Minimum Purchase Quantity", "Order Multiple", "Packaging Quantity",
                     "Warehouse Stock - Jiangsu", "Warehouse Stock - Shenzhen",

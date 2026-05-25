@@ -832,6 +832,11 @@ def test_number_of_taps_count(capsys):
 
     assert_quantity(values["count"], 256, "count")
 
+def test_number_of_voltages_monitored_count(capsys):
+    values = normalized_values("Number of Voltages Monitored", "12", capsys)
+
+    assert_quantity(values["count"], 12, "count")
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
@@ -852,6 +857,20 @@ def test_channel_count(value, expected, capsys):
 
     for quantity, count in expected.items():
         assert_quantity(values[quantity], count, "count")
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("2", 2),
+        ("Dual channel", 2),
+        ("Four Channels", 4),
+        ("-", "NaN"),
+    ],
+)
+def test_number_of_elements_count(value, expected, capsys):
+    values = normalized_values("Number of Elements", value, capsys)
+
+    assert_quantity(values["count"], expected, "count")
 
 @pytest.mark.parametrize(
     ("key", "value", "expected"),

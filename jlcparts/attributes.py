@@ -636,6 +636,7 @@ def _readChannelCount(value):
         "single channel": 1,
         "single port": 1,
         "dual": 2,
+        "dual channel": 2,
         "three channels": 3,
         "four channels": 4,
         "quad": 4,
