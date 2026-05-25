@@ -722,3 +722,21 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
     else:
         for index, time in enumerate(expected, start=1):
             assert_quantity(values[f"time {index}"], time, "time")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("240ms", [0.24]),
+        ("100us", [100e-6]),
+        ("12.5s, 7.5s", [12.5, 7.5]),
+    ],
+)
+def test_reset_timeout_times(value, expected, capsys):
+    values = normalized_values("Reset Timeout", value, capsys)
+
+    if len(expected) == 1:
+        assert_quantity(values["time"], expected[0], "time")
+    else:
+        for index, time in enumerate(expected, start=1):
+            assert_quantity(values[f"time {index}"], time, "time")
