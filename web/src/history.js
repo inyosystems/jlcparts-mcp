@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { fetchJson, getCategories, getComponentByLcsc } from './db'
 import { Spinbox, InlineSpinbox, ZoomableLazyImage,
          formatAttribute, findCategoryById, getImageUrl,
@@ -12,62 +12,63 @@ export function History(props) {
     </div>
 }
 
-class HistoryItem extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {};
-    }
+function HistoryItem({ categories, lcsc }) {
+    const [info, setInfo] = useState();
+    const [loaded, setLoaded] = useState(false);
 
-    componentDidMount() {
-        getComponentByLcsc(this.props.lcsc).then(component => {
-            this.setState({info: component});
+    useEffect(() => {
+        let cancelled = false;
+        setInfo(undefined);
+        setLoaded(false);
+        getComponentByLcsc(lcsc).then(component => {
+            if (!cancelled) {
+                setInfo(component);
+                setLoaded(true);
+            }
         });
-    }
+        return () => {
+            cancelled = true;
+        };
+    }, [lcsc]);
 
-    renderImage() {
-        let x = this.state.info;
-        const imgSrc = getImageUrl(x.img, "small") ?? "./brokenimage.svg";
-        return <ZoomableLazyImage
-            height={90}
-            width={90}
-            src={imgSrc}
-            zoomWidth={350}
-            zoomHeight={350}
-            zoomSrc={imgSrc}/>
-    }
-
-    renderLoaded() {
-        let x = this.state.info;
-        let price = getQuantityPrice(1, x.price)
+    if (info !== undefined) {
+        let price = getQuantityPrice(1, info.price)
         let unitPrice = Math.round((price + Number.EPSILON) * 1000) / 1000;
-        let category = findCategoryById(this.props.categories, x.category);
+        let category = findCategoryById(categories, info.category);
+        const imgSrc = getImageUrl(info.img, "small") ?? "./brokenimage.svg";
         return <tr>
             <td className="text-left pl-2">
-                <a href={restoreLcscUrl(x.url, x.lcsc)}
+                <a href={restoreLcscUrl(info.url, info.lcsc)}
                     className="underline text-blue-600"
                     onClick={e => e.stopPropagation()}
                     target="_blank"
                     rel="noopener noreferrer">
-                        {x.lcsc}
+                        {info.lcsc}
                 </a>
             </td>
             <td className="text-left">
                 <a
-                    href={x.datasheet}
+                    href={info.datasheet}
                     onClick={e => e.stopPropagation()}
                     target="_blank"
                     rel="noopener noreferrer">
-                        <FontAwesomeIcon icon="file-pdf"/> {x.mfr}
+                        <FontAwesomeIcon icon="file-pdf"/> {info.mfr}
                 </a>
             </td>
             <td className="text-center">
-                {formatAttribute(x.attributes["Basic/Extended"])[0]}
+                {formatAttribute(info.attributes["Basic/Extended"])[0]}
             </td>
             <td className="text-center">
-                {this.renderImage()}
+                <ZoomableLazyImage
+                    height={90}
+                    width={90}
+                    src={imgSrc}
+                    zoomWidth={350}
+                    zoomHeight={350}
+                    zoomSrc={imgSrc}/>
             </td>
             <td className="text-left">
-                {x.description}
+                {info.description}
             </td>
             <td className="text-left">
                 {category.category}: {category.subcategory}
@@ -76,15 +77,15 @@ class HistoryItem extends React.Component {
                 {`${unitPrice}$/unit`}
             </td>
             <td className="text-right pr-2">
-                {x.stock}
+                {info.stock}
             </td>
         </tr>
     }
 
-    renderUnknown() {
+    if (loaded) {
         return <tr className="text-center">
             <td className="text-left pl-2">
-                {this.props.lcsc}
+                {lcsc}
             </td>
             <td className="" colSpan={7}>
                 Component is missing in database. Do you use the latest database?
@@ -92,20 +93,14 @@ class HistoryItem extends React.Component {
         </tr>
     }
 
-    render() {
-        if (this.state?.info !== undefined)
-            return this.renderLoaded();
-        if ("info" in this.state)
-            return this.renderUnknown();
-        return <tr className="text-center">
-            <td className="text-left pl-2">
-                {this.props.lcsc}
-            </td>
-            <td className="" colSpan={7}>
-                <InlineSpinbox/>
-            </td>
-        </tr>
-    }
+    return <tr className="text-center">
+        <td className="text-left pl-2">
+            {lcsc}
+        </td>
+        <td className="" colSpan={7}>
+            <InlineSpinbox/>
+        </td>
+    </tr>
 }
 
 function DayTable(props) {
@@ -133,13 +128,12 @@ function DayTable(props) {
     </table>
 }
 
-class HistoryTable extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {};
-    }
+function HistoryTable() {
+    const [table, setTable] = useState();
+    const [categories, setCategories] = useState();
 
-    componentDidMount() {
+    useEffect(() => {
+        let cancelled = false;
         fetchJson(process.env.PUBLIC_URL + "/data/changelog.json")
             .then(response => {
                 let log = [];
@@ -150,29 +144,37 @@ class HistoryTable extends React.Component {
                     });
                 }
                 log.sort((a, b) => b.day - a.day);
-                this.setState({table: log});
+                if (!cancelled)
+                    setTable(log);
             })
-            .catch(() => this.setState({table: []}));
-        getCategories().then(categories => this.setState({categories}));
-    }
-
-    render() {
-        if (this.state.table === undefined) {
-            return <Spinbox/>
-        }
-        return this.state.table.map(item => {
-            if (item.components.length === 0)
-                return null;
-            let day = item.day;
-            return <div key={item.day}>
-                <h2 className="w-full text-lg font-bold mt-6">
-                    Newly added components on {day.getDate()}. {day.getMonth() + 1}. {day.getFullYear()}:
-                </h2>
-                <DayTable
-                    components={item.components}
-                    categories={this.state.categories}
-                    />
-            </div>
+            .catch(() => {
+                if (!cancelled)
+                    setTable([]);
+            });
+        getCategories().then(categories => {
+            if (!cancelled)
+                setCategories(categories);
         });
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    if (table === undefined) {
+        return <Spinbox/>
     }
+    return table.map(item => {
+        if (item.components.length === 0)
+            return null;
+        let day = item.day;
+        return <div key={item.day}>
+            <h2 className="w-full text-lg font-bold mt-6">
+                Newly added components on {day.getDate()}. {day.getMonth() + 1}. {day.getFullYear()}:
+            </h2>
+            <DayTable
+                components={item.components}
+                categories={categories}
+                />
+        </div>
+    });
 }

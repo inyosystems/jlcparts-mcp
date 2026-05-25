@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import produce from 'immer';
 import { Waypoint } from 'react-waypoint';
 
 
@@ -41,157 +40,120 @@ function SortableHeaderField(props) {
     </>
 }
 
-export class SortableTable extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            sortBy: null,
-            sortDirection: "asc",
-            visibleItems: 100
-        };
-    }
+export function SortableTable(props) {
+    const [sortBy, setSortBy] = useState(null);
+    const [sortDirection, setSortDirection] = useState("asc");
+    const [visibleItems, setVisibleItems] = useState(100);
 
-    componentDidUpdate(prevProps) {
-        if (prevProps.data !== this.props.data) {
-            this.setState({visibleItems: 100});
-        }
-    }
+    useEffect(() => {
+        setVisibleItems(100);
+    }, [props.data]);
 
-    handleHeaderClick = name => {
-        if (this.state.sortBy === name) {
-            this.setState(produce(this.state, draft => {
-                if (draft.sortDirection === "asc")
-                    draft.sortDirection = "desc";
-                else
-                    draft.sortDirection = "asc";
-            }));
+    const handleHeaderClick = name => {
+        if (sortBy === name) {
+            setSortDirection(current => current === "asc" ? "desc" : "asc");
         }
         else {
-            this.setState(produce(this.state, draft => {
-                draft.sortBy = name;
-                draft.sortDirection = "asc";
-            }));
+            setSortBy(name);
+            setSortDirection("asc");
         }
-    }
+    };
 
-    getComparator = columnName => {
-        return this.props.header.find(obj => obj.name === columnName)?.comparator;
-    }
+    const showMore = () => {
+        setVisibleItems(current => current < props.data.length ? current + 50 : current);
+    };
 
-    getPropAsString = propName => {
-        return this.props?.[propName] ?? "";
-    }
-
-    rowClassName = () => { return this.getPropAsString("rowClassName"); }
-
-    evenRowClassName = () => { return this.getPropAsString("evenRowClassName"); }
-
-    oddRowClassName = () => { return this.getPropAsString("oddRowClassName"); }
-
-    showMore = () => {
-        this.setState(produce(this.state, draft => {
-            if (this.state.visibleItems < this.props.data.length)
-                draft.visibleItems += 50;
-        }));
-    }
-
-    render() {
+    const sortedData = useMemo(() => {
         var t0 = performance.now()
-        var sortedData = [...this.props.data];
-        if (this.state.sortBy) {
-            let pureComparator = this.getComparator(this.state.sortBy);
+        var sortedData = [...props.data];
+        if (sortBy) {
+            let pureComparator = props.header.find(obj => obj.name === sortBy)?.comparator;
             let comparator;
-            if (this.state.sortDirection === "desc")
+            if (sortDirection === "desc")
                 comparator = (a, b) => - pureComparator(a, b);
             else
                 comparator = pureComparator;
 
-            sortedData.sort(comparator);
+            if (comparator)
+                sortedData.sort(comparator);
         }
         var t1 = performance.now()
         console.log("Sorting took " + (t1 - t0) + " milliseconds.")
-        sortedData = sortedData.slice(0, this.state.visibleItems);
-        return <>
-            <table className={this.props.className}>
-                <thead className="sticky top-0 bg-white">
-                    <tr>{
-                        this.props.header.map( x => {
-                            let sortDirection = null;
-                            if (this.state.sortBy === x.name)
-                                sortDirection = this.state.sortDirection;
-                            return <SortableHeaderField
-                                        key={x.name}
-                                        header={x.name}
-                                        sortable={x.sortable}
-                                        onClick={() => this.handleHeaderClick(x.name)}
-                                        sortDirection={sortDirection}
-                                        onDelete={x.onDelete}/>;
-                        })
-                    }</tr>
-                </thead>
-                <tbody>{
-                    sortedData.map((row, index) => {
-                        let className = this.rowClassName();
-                        if ( index % 2 === 0 )
-                            className += " " + this.evenRowClassName();
-                        else
-                            className += " " + this.oddRowClassName();
-                        return <ExpandableTableRow className={className}
-                                                  key={this.props.keyFun(row)}
-                                                  expandableContent={this.props.expandableContent(row)}>
-                                {
-                                    this.props.header.map(cell => {
-                                        return <td key={cell.name} className={cell.className}>
-                                            { cell.displayGetter(row) }
-                                        </td>
-                                    })
-                                }
-                            </ExpandableTableRow>
+        return sortedData;
+    }, [props.data, props.header, sortBy, sortDirection]);
+
+    const visibleData = sortedData.slice(0, visibleItems);
+    return <>
+        <table className={props.className}>
+            <thead className="sticky top-0 bg-white">
+                <tr>{
+                    props.header.map( x => {
+                        let activeSortDirection = null;
+                        if (sortBy === x.name)
+                            activeSortDirection = sortDirection;
+                        return <SortableHeaderField
+                                    key={x.name}
+                                    header={x.name}
+                                    sortable={x.sortable}
+                                    onClick={() => handleHeaderClick(x.name)}
+                                    sortDirection={activeSortDirection}
+                                    onDelete={x.onDelete}/>;
                     })
-                }</tbody>
-            </table>
-            {
-                this.state.visibleItems < this.props.data.length && (
-                    <p className="w-full text-center m-4">Loading more components...</p>
-                )
-            }
-            <Waypoint key="tableEnd" onEnter={this.showMore}/>
-        </>
-    }
+                }</tr>
+            </thead>
+            <tbody>{
+                visibleData.map((row, index) => {
+                    let className = props.rowClassName ?? "";
+                    if ( index % 2 === 0 )
+                        className += " " + (props.evenRowClassName ?? "");
+                    else
+                        className += " " + (props.oddRowClassName ?? "");
+                    return <ExpandableTableRow className={className}
+                                              key={props.keyFun(row)}
+                                              expandableContent={props.expandableContent(row)}>
+                            {
+                                props.header.map(cell => {
+                                    return <td key={cell.name} className={cell.className}>
+                                        { cell.displayGetter(row) }
+                                    </td>
+                                })
+                            }
+                        </ExpandableTableRow>
+                })
+            }</tbody>
+        </table>
+        {
+            visibleItems < props.data.length && (
+                <p className="w-full text-center m-4">Loading more components...</p>
+            )
+        }
+        <Waypoint key="tableEnd" onEnter={showMore}/>
+    </>
 }
 
-class ExpandableTableRow extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            expanded: false
-        }
-    }
+function ExpandableTableRow(props) {
+    const [expanded, setExpanded] = useState(false);
 
-    handleClick = (e) => {
+    const handleClick = (e) => {
         e.preventDefault();
-        this.setState(produce(this.state, draft => {
-            draft.expanded = !draft.expanded;
-        }));
-    }
+        setExpanded(current => !current);
+    };
 
-    render() {
-        let expandableContent = null;
-        let className = this.props.className ?? "";
-        if (this.state.expanded && this.props.expandableContent) {
-            expandableContent = <tr>
-                    <td colSpan={this.props.children.length}>
-                        {this.props.expandableContent}
-                    </td>
-                </tr>;
-        }
-        if (this.props.expandableContent)
-            className += " cursor-pointer";
-        return <>
-            <tr className={className} onClick={this.handleClick}>
-                {this.props.children}
-            </tr>
-            {expandableContent}
-        </>
+    let expandableContent = null;
+    let className = props.className ?? "";
+    if (expanded && props.expandableContent) {
+        expandableContent = <tr>
+                <td colSpan={React.Children.count(props.children)}>
+                    {props.expandableContent}
+                </td>
+            </tr>;
     }
+    if (props.expandableContent)
+        className += " cursor-pointer";
+    return <>
+        <tr className={className} onClick={handleClick}>
+            {props.children}
+        </tr>
+        {expandableContent}
+    </>
 }

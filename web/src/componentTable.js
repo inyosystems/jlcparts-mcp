@@ -1,5 +1,5 @@
 import { getCategories, queryComponents } from "./db";
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { produce, enableMapSet } from "immer";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { LazyLoadImage } from 'react-lazy-load-image-component';
@@ -122,7 +122,7 @@ export function Spinbox() {
 }
 
 export function InlineSpinbox(props) {
-    return <div className={`inline text-center ${props.className}`}>
+    return <div className={`inline text-center ${props.className ?? ""}`}>
         <svg className="animate-spin h-5 w-5 text-black mx-auto inline-block"
              xmlns="http://www.w3.org/2000/svg"
              fill="none" viewBox="0 0 24 24">
@@ -180,48 +180,29 @@ function QueryProgress(props) {
 }
 
 
-export class ZoomableLazyImage extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            hover: false
-        }
-    }
+export function ZoomableLazyImage(props) {
+    const [hover, setHover] = useState(false);
 
-    assignRef = element => {
-        this.container = element;
-    }
-
-    handleMouseEnter = () => {
-        this.setState({hover: true});
-    }
-
-    handleMouseLeave= () => {
-        this.setState({hover: false});
-    }
-
-    render() {
-        return (
-            <div
-                onMouseEnter={this.handleMouseEnter}
-                onMouseLeave={this.handleMouseLeave}>
-                    <LazyLoadImage
-                        height={this.props.width}
-                        width={this.props.height}
-                        src={this.props.src}/>
-                {
-                    this.state.hover && (
-                        <div className="z-40 absolute bg-white border-solid border-gray-600 border-2">
-                            <LazyLoadImage
-                                height={this.props.zoomWidth}
-                                width={this.props.zoomHeight}
-                                src={this.props.zoomSrc}/>
-                        </div>
-                    )
-                }
-            </div>
-        )
-    }
+    return (
+        <div
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}>
+                <LazyLoadImage
+                    height={props.width}
+                    width={props.height}
+                    src={props.src}/>
+            {
+                hover && (
+                    <div className="z-40 absolute bg-white border-solid border-gray-600 border-2">
+                        <LazyLoadImage
+                            height={props.zoomWidth}
+                            width={props.zoomHeight}
+                            src={props.zoomSrc}/>
+                    </div>
+                )
+            }
+        </div>
+    )
 }
 
 export class ComponentOverview extends React.Component {
@@ -934,214 +915,203 @@ class CategoryFilter extends React.Component {
     }
 }
 
-class MultiSelectBox extends React.Component {
-    handleAllClick = e => {
+function MultiSelectBox(props) {
+    const handleAllClick = e => {
         e.preventDefault();
-        let values = this.props.options.map(option => option.key);
-        this.props.onChange(values);
-    }
+        let values = props.options.map(option => option.key);
+        props.onChange(values);
+    };
 
-    handleNoneClick = e => {
+    const handleNoneClick = e => {
         e.preventDefault();
-        this.props.onChange([]);
-    }
+        props.onChange([]);
+    };
 
-    handleSelectChange = e => {
+    const handleSelectChange = e => {
         e.preventDefault();
         let value = Array.from(e.target.selectedOptions, option => option.value);
-        this.props.onChange(value);
-    }
+        props.onChange(value);
+    };
 
-    render() {
-        let selectStyle = {};
-        if (this.props.minHeight)
-            selectStyle.minHeight = this.props.minHeight;
-        return <>
-            <div className={`rounded flex flex-col flex-1 p-1 m-1 ${this.props.className}`}  style={{minWidth: "200px", maxWidth: "400px"}}>
-                <div className="flex-none flex w-full">
-                    <h5 className="block flex-1 font-bold cursor-default rounded px-1 truncate hover:whitespace-normal"
-                        title={this.props.label ?? this.props.name}>
-                        {this.props.label ?? this.props.name}
-                    </h5>
-                    <div className="flex-none">
-                        <button onClick={this.handleAllClick} className="mx-2">All</button>
-                        <button onClick={this.handleNoneClick} className="mx-2">None</button>
-                    </div>
-                </div>
-                <select multiple="multiple" className="flex-1 w-full my-2 p-1"
-                        style={selectStyle}
-                        value={this.props.value} onChange={this.handleSelectChange}>
-                    {this.props.options.map(option => {
-                        return <option value={option.key} key={option.key} title={option.value}>
-                                    {option.label ?? option.value}
-                            </option>;
-                    })}
-                </select>
+    let selectStyle = {};
+    if (props.minHeight)
+        selectStyle.minHeight = props.minHeight;
+    return <>
+        <div className={`rounded flex flex-col flex-1 p-1 m-1 ${props.className}`}  style={{minWidth: "200px", maxWidth: "400px"}}>
+            <div className="flex-none flex w-full">
+                <h5 className="block flex-1 font-bold cursor-default rounded px-1 truncate hover:whitespace-normal"
+                    title={props.label ?? props.name}>
+                    {props.label ?? props.name}
+                </h5>
                 <div className="flex-none">
-                    {this.props.children}
+                    <button onClick={handleAllClick} className="mx-2">All</button>
+                    <button onClick={handleNoneClick} className="mx-2">None</button>
                 </div>
             </div>
-        </>;
-    }
-}
-
-class SingleSelectBox extends React.Component {
-    render() {
-        return <select className={this.props.className} onChange={this.props.onChange}>
-            {this.props.options.map(option => {
-                return <option value={option.key} key={option.key}>
-                            {option.value}
-                    </option>;
-            })}
-        </select>
-    }
-}
-
-class PropertySelector extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            sortBy: this.collectValueTypes()[0].value
-        };
-    }
-
-    collectValueTypes() {
-        return [...new Set(this.props.item.values.flatMap(x => Object.keys(x.value?.values ?? {})))].map(x => ({key: x, value: x}));
-    }
-
-    valueOptions() {
-        let options = [...this.props.item.values];
-        options.sort((a, b) => {
-            return attributeComparator(a.value, b.value, this.state.sortBy);
-        })
-        return options.map(x => ({
-            key: x.key,
-            value: formatAttribute(x.value),
-            label: `${formatAttribute(x.value)} (${formatCount(x.count)})`
-        }));
-    }
-
-    handleSortChange = e => {
-        this.setState({sortBy: e.target.value});
-    }
-
-    render() {
-        return <MultiSelectBox
-            className={this.props.className}
-            minHeight="10em"
-            name={this.props.item.property}
-            options={this.valueOptions()}
-            value={this.props.value}
-            onChange={value => {
-                this.props.onChange(value); } }
-        >
-            <div className="w-full flex">
-                <div className="flex-none">
-                    Sort by:
-                </div>
-                <div className="flex-1 ml-2">
-                    <SingleSelectBox
-                        className="w-full rounded bg-white"
-                        value={this.state.sortBy}
-                        options={this.collectValueTypes()}
-                        onChange={this.handleSortChange}/>
-                </div>
-            </div>
-            <div className="w-full">
-                <input
-                    className="mr-2 leading-tight"
-                    type="checkbox"
-                    checked={this.props.tableIncluded}
-                    onChange={e => {
-                        this.props.onTableInclude(e.target.checked); } } />
-                Table column
-            </div>
-            <div className="w-full">
-                <input
-                    className="mr-2 leading-tight"
-                    type="checkbox"
-                    checked={this.props.required}
-                    onChange={e => {
-                        this.props.onPropertyRequired(e.target.checked); } } />
-                Required
-            </div>
-        </MultiSelectBox>;
-    }
-}
-
-class PropertySelect extends React.Component {
-    render() {
-        return <div className="w-full p-2 border-b-2 border-gray-600 bg-gray-200">
-            <h3 className="block w-full text-lg mx-2 font-bold" id="property-select">
-                <span className="text-bold text-green-500">⛶</span> Property filter
-            </h3>
-            <div className="flex flex-wrap items-stretch">
-                { this.props.properties.length === 0
-                ? <p className="mx-2">
-                    There are no properties to select from. Select category or adjust the full-text search to include some components.
-                 </p>
-                : this.props.properties.map(item => {
-                    return <PropertySelector
-                        key={item.property}
-                        className="bg-blue-500"
-                        item={item}
-                        value={this.props.values[item.property]}
-                        onChange={value => this.props.onChange(item.property, value)}
-                        tableIncluded={this.props.tableIncluded.includes(item.property)}
-                        onTableInclude={value => this.props.onTableInclude(item.property, value)}
-                        required={this.props.requiredProperties.includes(item.property)}
-                        onPropertyRequired={value => this.props.onPropertyRequired(item.property, value) }
-                    />;
+            <select multiple="multiple" className="flex-1 w-full my-2 p-1"
+                    style={selectStyle}
+                    value={props.value ?? []} onChange={handleSelectChange}>
+                {props.options.map(option => {
+                    return <option value={option.key} key={option.key} title={option.value}>
+                                {option.label ?? option.value}
+                        </option>;
                 })}
-            </div>
-            <div className="w-full flex p-2">
-                <Link activeClass="active"
-                    className="w-full md:w-1/2 block md:mr-2 bg-gray-500 hover:bg-gray-700 text-black py-1 px-2 rounded text-center"
-                    to="results" spy={true} smooth={true} duration={100} >
-                    ↓ <span className="text-bold text-blue-500">■</span> Scroll to results <span className="text-bold text-blue-500">■</span> ↓
-                </Link>
-                <Link activeClass="active"
-                    className="w-full md:w-1/2 block md:ml-2 bg-gray-500 hover:bg-gray-700 text-black py-1 px-2 rounded text-center"
-                    to="category-select" spy={true} smooth={true} duration={100} >
-                    ↑ <span className="text-bold text-red-500">■</span> Scroll to search bar <span className="text-bold text-red-500">■</span> ↑
-                </Link>
+            </select>
+            <div className="flex-none">
+                {props.children}
             </div>
         </div>
-    }
+    </>;
 }
 
-class QuantitySelect extends React.Component {
-    render() {
-        return <div className="w-full p-2 border-b-2 border-gray-600 bg-gray-200">
-            <div className="flex">
-                <div className="flex-none py-2 mr-2">
-                    Specify quantity (for price point selection)
-                </div>
-                <input
-                    className="block flex-1 bg-white appearance-none border-2 border-gray-500 rounded w-full
-                        py-1 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white
-                        focus:border-blue-500"
-                    type="number"
-                    min={1}
-                    onChange={e => this.props.onChange(e.target.value)}
-                    value={this.props.value}
-                    />
-                <div className="flex-none flex items-center">
-                    <input
-                        className="px-2 ml-3 transform scale-150"
-                        type="checkbox"
-                        checked={this.props.stockRequired}
-                        onChange={e => {
-                            this.props.onStockRequired(e.target.checked)
-                        }}/>
-                    <span className="ml-1 py-2 pl-2 leading-none">
-                        Require on stock <br/>
-                        <span className="text-gray-600 text-xs">
-                            (Stock data can be 24 hours old)
-                        </span>
-                    </span>
-                </div>
+function SingleSelectBox(props) {
+    return <select className={props.className} value={props.value} onChange={props.onChange}>
+        {props.options.map(option => {
+            return <option value={option.key} key={option.key}>
+                        {option.value}
+                </option>;
+        })}
+    </select>
+}
+
+function PropertySelector(props) {
+    const valueTypes = useMemo(
+        () => [...new Set(props.item.values.flatMap(x => Object.keys(x.value?.values ?? {})))]
+            .map(x => ({key: x, value: x})),
+        [props.item.values]
+    );
+    const [sortBy, setSortBy] = useState(valueTypes[0]?.value ?? "");
+
+    useEffect(() => {
+        if (!valueTypes.some(x => x.value === sortBy)) {
+            setSortBy(valueTypes[0]?.value ?? "");
+        }
+    }, [sortBy, valueTypes]);
+
+    const valueOptions = useMemo(() => {
+        let options = [...props.item.values];
+        options.sort((a, b) => attributeComparator(a.value, b.value, sortBy));
+        return options.map(x => {
+            const formatted = formatAttribute(x.value);
+            return {
+                key: x.key,
+                value: formatted,
+                label: `${formatted} (${formatCount(x.count)})`
+            };
+        });
+    }, [props.item.values, sortBy]);
+
+    return <MultiSelectBox
+        className={props.className}
+        minHeight="10em"
+        name={props.item.property}
+        options={valueOptions}
+        value={props.value}
+        onChange={value => {
+            props.onChange(value); } }
+    >
+        <div className="w-full flex">
+            <div className="flex-none">
+                Sort by:
+            </div>
+            <div className="flex-1 ml-2">
+                <SingleSelectBox
+                    className="w-full rounded bg-white"
+                    value={sortBy}
+                    options={valueTypes}
+                    onChange={e => setSortBy(e.target.value)}/>
             </div>
         </div>
-    }
+        <div className="w-full">
+            <input
+                className="mr-2 leading-tight"
+                type="checkbox"
+                checked={props.tableIncluded}
+                onChange={e => {
+                    props.onTableInclude(e.target.checked); } } />
+            Table column
+        </div>
+        <div className="w-full">
+            <input
+                className="mr-2 leading-tight"
+                type="checkbox"
+                checked={props.required}
+                onChange={e => {
+                    props.onPropertyRequired(e.target.checked); } } />
+            Required
+        </div>
+    </MultiSelectBox>;
+}
+
+function PropertySelect(props) {
+    return <div className="w-full p-2 border-b-2 border-gray-600 bg-gray-200">
+        <h3 className="block w-full text-lg mx-2 font-bold" id="property-select">
+            <span className="text-bold text-green-500">⛶</span> Property filter
+        </h3>
+        <div className="flex flex-wrap items-stretch">
+            { props.properties.length === 0
+            ? <p className="mx-2">
+                There are no properties to select from. Select category or adjust the full-text search to include some components.
+             </p>
+            : props.properties.map(item => {
+                return <PropertySelector
+                    key={item.property}
+                    className="bg-blue-500"
+                    item={item}
+                    value={props.values[item.property]}
+                    onChange={value => props.onChange(item.property, value)}
+                    tableIncluded={props.tableIncluded.includes(item.property)}
+                    onTableInclude={value => props.onTableInclude(item.property, value)}
+                    required={props.requiredProperties.includes(item.property)}
+                    onPropertyRequired={value => props.onPropertyRequired(item.property, value) }
+                />;
+            })}
+        </div>
+        <div className="w-full flex p-2">
+            <Link activeClass="active"
+                className="w-full md:w-1/2 block md:mr-2 bg-gray-500 hover:bg-gray-700 text-black py-1 px-2 rounded text-center"
+                to="results" spy={true} smooth={true} duration={100} >
+                ↓ <span className="text-bold text-blue-500">■</span> Scroll to results <span className="text-bold text-blue-500">■</span> ↓
+            </Link>
+            <Link activeClass="active"
+                className="w-full md:w-1/2 block md:ml-2 bg-gray-500 hover:bg-gray-700 text-black py-1 px-2 rounded text-center"
+                to="category-select" spy={true} smooth={true} duration={100} >
+                ↑ <span className="text-bold text-red-500">■</span> Scroll to search bar <span className="text-bold text-red-500">■</span> ↑
+            </Link>
+        </div>
+    </div>
+}
+
+function QuantitySelect(props) {
+    return <div className="w-full p-2 border-b-2 border-gray-600 bg-gray-200">
+        <div className="flex">
+            <div className="flex-none py-2 mr-2">
+                Specify quantity (for price point selection)
+            </div>
+            <input
+                className="block flex-1 bg-white appearance-none border-2 border-gray-500 rounded w-full
+                    py-1 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white
+                    focus:border-blue-500"
+                type="number"
+                min={1}
+                onChange={e => props.onChange(e.target.value)}
+                value={props.value}
+                />
+            <div className="flex-none flex items-center">
+                <input
+                    className="px-2 ml-3 transform scale-150"
+                    type="checkbox"
+                    checked={props.stockRequired}
+                    onChange={e => {
+                        props.onStockRequired(e.target.checked)
+                    }}/>
+                <span className="ml-1 py-2 pl-2 leading-none">
+                    Require on stock <br/>
+                    <span className="text-gray-600 text-xs">
+                        (Stock data can be 24 hours old)
+                    </span>
+                </span>
+            </div>
+        </div>
+    </div>
 }

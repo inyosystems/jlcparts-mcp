@@ -23,63 +23,48 @@ function attributeNumber(component, name) {
     return Number.isFinite(number) ? number : undefined;
 }
 
-export class AttritionInfo extends React.Component {
-    constructor(props) {
-        super(props);
-        this.props = props;
+export function AttritionInfo({ component, quantity }) {
+    const data = {
+        lossNumber: attributeNumber(component, "Attrition"),
+        leastNumber: attributeNumber(component, "Minimum Order Quantity"),
+    };
+
+    if (data.lossNumber === undefined && data.leastNumber === undefined) {
+        return <div className="bg-yellow-400 p-2 mt-2">
+            No attrition data available in this component database.
+        </div>
     }
 
-    price() {
-        const data = this.attritionData();
-        let q = Math.max(parseInt(this.props.quantity) + (data.lossNumber ?? 0),
-            data.leastNumber ?? 0);
-        const unitPrice = getQuantityPrice(q, this.props.component.price);
-        return unitPrice === undefined ? undefined : q * unitPrice;
-    }
+    data.lossNumber ??= 0;
+    data.leastNumber ??= 0;
+    const orderQuantity = Math.max(parseInt(quantity) + data.lossNumber, data.leastNumber);
+    const unitPrice = getQuantityPrice(orderQuantity, component.price);
+    const price = unitPrice === undefined ? undefined : orderQuantity * unitPrice;
 
-    attritionData() {
-        const component = this.props.component;
-        return {
-            lossNumber: attributeNumber(component, "Attrition"),
-            leastNumber: attributeNumber(component, "Minimum Order Quantity"),
-        };
-    }
-
-    render() {
-        let data = this.attritionData();
-        if (data.lossNumber === undefined && data.leastNumber === undefined) {
-            return <div className="bg-yellow-400 p-2 mt-2">
-                No attrition data available in this component database.
-            </div>
-        }
-        data.lossNumber ??= 0;
-        data.leastNumber ??= 0;
-        const price = this.price();
-        return <table className="w-full">
-                <tbody>
-                { data.lossNumber > 0
-                    ? <tr>
-                        <td className="w-1 whitespace-no-wrap">Attrition:</td>
-                        <td className="px-2">{data.lossNumber} pcs</td>
-                      </tr>
-                    : ""
-                }
-                { data.leastNumber > 0
-                    ? <tr>
-                        <td className="w-1 whitespace-no-wrap">Minimal order quantity:</td>
-                        <td className="px-2">{data.leastNumber} pcs</td>
-                      </tr>
-                    : ""
-                }
-                <tr>
-                    <td className="w-1 whitespace-no-wrap">Price for {this.props.quantity} pcs:</td>
-                    <td className="px-2">
-                        {price === undefined
-                            ? "Not available"
-                            : `${Math.round((price + Number.EPSILON) * 1000) / 1000} USD`}
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-    }
+    return <table className="w-full">
+            <tbody>
+            { data.lossNumber > 0
+                ? <tr>
+                    <td className="w-1 whitespace-no-wrap">Attrition:</td>
+                    <td className="px-2">{data.lossNumber} pcs</td>
+                  </tr>
+                : ""
+            }
+            { data.leastNumber > 0
+                ? <tr>
+                    <td className="w-1 whitespace-no-wrap">Minimal order quantity:</td>
+                    <td className="px-2">{data.leastNumber} pcs</td>
+                  </tr>
+                : ""
+            }
+            <tr>
+                <td className="w-1 whitespace-no-wrap">Price for {quantity} pcs:</td>
+                <td className="px-2">
+                    {price === undefined
+                        ? "Not available"
+                        : `${Math.round((price + Number.EPSILON) * 1000) / 1000} USD`}
+                </td>
+            </tr>
+            </tbody>
+        </table>
 }
