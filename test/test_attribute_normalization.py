@@ -870,6 +870,25 @@ def test_voltage_reference_value(value, expected, capsys):
     for quantity, voltage in expected.items():
         assert_quantity(values[quantity], voltage, "voltage")
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("±280mV", {"voltage min": -0.28, "voltage max": 0.28}),
+        ("2V", {"voltage": 2.0}),
+        ("±31.25mV, ±5mV", {
+            "voltage 1 min": -0.03125,
+            "voltage 1 max": 0.03125,
+            "voltage 2 min": -0.005,
+            "voltage 2 max": 0.005,
+        }),
+    ],
+)
+def test_differential_input_voltage(value, expected, capsys):
+    values = normalized_values("Differential Input Voltage", value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
 
 def test_gpio_ports_number_count(capsys):
     values = normalized_values("Gpio Ports Number", "34", capsys)
