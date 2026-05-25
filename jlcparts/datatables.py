@@ -129,7 +129,7 @@ def normalizeAttribute(key, value):
                 value = attributes.voltageListAttribute(value, "voltage")
             else:
                 value = attributes.stringAttribute(value) if compoundValue(value) else attributes.voltageAtConditionAttribute(value, "voltage")
-        elif key in larr(["Voltage - Forward(Vf)"]):
+        elif key in larr(["Voltage - Forward(Vf)", "Forward Voltage (Vf)"]):
             value = attributes.labeledVoltageRangeListAttribute(value, "voltage") if compoundValue(value) else attributes.voltageRangeAttribute(value, "voltage")
         elif key in larr(["Collector-Emitter Saturation Voltage (VCE(sat) @ Ic, Ib)"]):
             value = attributes.voltageAtConditionAttribute(value, "voltage")

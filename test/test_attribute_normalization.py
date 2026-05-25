@@ -435,8 +435,9 @@ def test_voltage_range_list_attributes(key, value, expected, capsys):
         ("3.2V@UVA, 6.5V@UVC", {"voltage 1": 3.2, "voltage 2": 6.5}),
     ],
 )
-def test_forward_voltage_vf_lists(value, expected, capsys):
-    values = normalized_values("Voltage - Forward(Vf)", value, capsys)
+@pytest.mark.parametrize("key", ["Voltage - Forward(Vf)", "Forward Voltage (Vf)"])
+def test_forward_voltage_vf_lists(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
 
     for quantity, voltage in expected.items():
         assert_quantity(values[quantity], voltage, "voltage")
