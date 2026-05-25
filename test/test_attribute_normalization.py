@@ -528,6 +528,16 @@ def test_switch_frequency_values(capsys):
     assert_quantity(values["frequency min"], 233e3, "frequency")
     assert_quantity(values["frequency max"], 1e6, "frequency")
 
+def test_throughput_rate_values(capsys):
+    values = normalized_values("Throughput Rate", "10kHz", capsys)
+
+    assert_quantity(values["frequency"], 10e3, "frequency")
+
+    values = normalized_values("Throughput Rate", "10kHz, 20kHz", capsys)
+
+    assert_quantity(values["frequency 1"], 10e3, "frequency")
+    assert_quantity(values["frequency 2"], 20e3, "frequency")
+
 
 def test_absolute_bandwidth_values(capsys):
     values = normalized_values("Absolute Bandwidth", "863MHz~876MHz", capsys)
