@@ -439,6 +439,7 @@ def test_voltage_range_list_attributes(key, value, expected, capsys):
         ("Quiescent Current (Ground Current)", "800nA", "current", 800e-9, "current"),
         ("Quiescent Current Per Amplifier", "1.14mA", "current", 0.00114, "current"),
         ("Peak Output Current(Sink)", "2mA", "current", 0.002, "current"),
+        ("Peak Output Current(Source)", "400uA", "current", 400e-6, "current"),
         ("Hold Current", "750mA", "current", 0.75, "current"),
     ],
 )
