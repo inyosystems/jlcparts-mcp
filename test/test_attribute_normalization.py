@@ -1405,6 +1405,7 @@ def test_switching_energy_lists(capsys):
         ("Attenuation", "-30dB, -28dB, -38dB", [-30.0, -28.0, -38.0]),
         ("Insertion Loss", "2.5dB, 4dB", [2.5, 4.0]),
         ("Signal-to-Noise Ratio", "90dB, 91dB, 86dB, 88dB", [90.0, 91.0, 86.0, 88.0]),
+        ("S/N Ratio", "64dB, 69dB, 68dB, 66dB", [64.0, 69.0, 68.0, 66.0]),
         ("Power Supply Rejection Ratio (Psrr)", "125dB, 110dB", [125.0, 110.0]),
         ("Power Supply Rejection Ratio (Psrr)", "-", ["NaN"]),
         ("Noise Figure", "7.9dB, 8.1dB", [7.9, 8.1]),

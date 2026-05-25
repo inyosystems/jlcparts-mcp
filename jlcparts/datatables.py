@@ -211,7 +211,7 @@ def normalizeAttribute(key, value):
             value = attributes.meltingI2tAttribute(value)
         elif key in larr(["Attenuation", "Power Supply Rejection Ratio (Psrr)",
                 "Insertion Loss", "Signal-to-Noise Ratio", "Noise Figure",
-                "Common Mode Rejection Ratio(CMRR)", "Common Mode Rejection Ratio (CMRR)",
+                "S/N Ratio", "Common Mode Rejection Ratio(CMRR)", "Common Mode Rejection Ratio (CMRR)",
                 "Return Loss (Min)", "Sound Pressure Level(Spl)", "Peak Gain"]):
             if key == "sound pressure level(spl)":
                 value = attributes.decibelTokenListAttribute(value, "level")
