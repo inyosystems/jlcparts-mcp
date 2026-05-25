@@ -232,8 +232,8 @@ def normalizeAttribute(key, value):
             value = attributes.ratioRangeListAttribute(value, "gain")
         elif key in larr(["Voltage Reference Value", "Full-Scale Range(Fsr)"]):
             value = attributes.voltageListAttribute(value)
-        elif key in larr(["Integral Non - Linearity", "Integral Nonlinearity", "Inl/Dnl(Lsb)"]):
-            value = attributes.lsbListAttribute(value)
+        elif key in larr(["Integral Non - Linearity", "Integral Nonlinearity", "Inl/Dnl(Lsb)", "Gain Error"]):
+            value = attributes.lsbListAttribute(value, "gain error" if key == "gain error" else "linearity")
         elif key in larr(["Number of Channels", "Number of Elements"]):
             value = attributes.channelCountAttribute(value)
         elif key in larr(["Number of Pins", "Number of Resistors", "Number of Loop",

@@ -903,6 +903,7 @@ def test_number_of_elements_count(value, expected, capsys):
         }),
         ("Integral Nonlinearity", "±0.001%", {"linearity": [0.001, "percentage"]}),
         ("Inl/Dnl(Lsb)", "-", {"linearity": ["NaN", "lsb"]}),
+        ("Gain Error", "±0.7LSB", {"gain error": [0.7, "lsb"]}),
     ],
 )
 def test_lsb_linearity(key, value, expected, capsys):
