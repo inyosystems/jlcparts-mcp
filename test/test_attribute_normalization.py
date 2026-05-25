@@ -276,3 +276,24 @@ def test_insulation_od_length_range_lists(capsys):
     assert_quantity(values["length 1 max"], 0.000889, "length")
     assert_quantity(values["length 2 min"], 0.0008382, "length")
     assert_quantity(values["length 2 max"], 0.0009652, "length")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("13@500MHz", [(13.0, 500e6)]),
+        ("30@796KHz", [(30.0, 796e3)]),
+        ("24", [(24.0, None)]),
+        ("-", [("NaN", None)]),
+        ("67@900MHz, 108@1.7GHz, 146@2.4GHz", [(67.0, 900e6), (108.0, 1.7e9), (146.0, 2.4e9)]),
+    ],
+)
+def test_q_at_frequency(value, expected, capsys):
+    values = normalized_values("Q @ Frequency", value, capsys)
+
+    for index, (q, frequency) in enumerate(expected, start=1):
+        assert_quantity(values[f"q {index}"], q, "ratio")
+        if frequency is not None:
+            assert_quantity(values[f"frequency {index}"], frequency, "frequency")
+        else:
+            assert f"frequency {index}" not in values

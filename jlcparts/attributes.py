@@ -668,6 +668,28 @@ def decibelListAttribute(value, name="level"):
         "values": values
     }
 
+def qAtFrequencyAttribute(value):
+    value = str(value)
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        q = part
+        frequency = None
+        if "@" in part:
+            q, frequency = [x.strip() for x in part.split("@", 1)]
+        values[f"q {i}"] = [readWithSiPrefix(q), "ratio"]
+        formatParts = ["${" + f"q {i}" + "}"]
+        if frequency is not None:
+            values[f"frequency {i}"] = [readFrequency(frequency), "frequency"]
+            formatParts.append("@ ${" + f"frequency {i}" + "}")
+        formats.append(" ".join(formatParts))
+    return {
+        "format": ", ".join(formats),
+        "primary": "q 1",
+        "values": values
+    }
+
 def capacitanceAtConditionAttribute(value, name="capacitance"):
     return scalarAttribute(value, readCapacitance, "capacitance", name)
 

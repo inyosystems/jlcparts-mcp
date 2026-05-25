@@ -137,6 +137,8 @@ def normalizeAttribute(key, value):
             value = attributes.energyAttribute(value)
         elif key in larr(["Attenuation", "Power Supply Rejection Ratio (Psrr)"]):
             value = attributes.decibelListAttribute(value, "level")
+        elif key in larr(["Q @ Frequency"]):
+            value = attributes.qAtFrequencyAttribute(value)
         elif key in larr(["Number of Pins", "Number of Resistors", "Number of Loop",
                     "Number of Regulators", "Number of Outputs", "Number of Capacitors",
                     "Attrition", "Minimum Order Quantity", "Minimum Placement Quantity",
