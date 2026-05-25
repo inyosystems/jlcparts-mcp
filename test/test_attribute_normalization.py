@@ -906,6 +906,8 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Switch Length", "12.78mm", 0.01278),
         ("Switch Length", "-", "NaN"),
         ("Switch Width", "6.8mm", 0.0068),
+        ("Diameter", "50mm", 0.05),
+        ("Diameter", "M3", 0.003),
         ("Diameter (Φd)", "30mm", 0.03),
         ("Diameter (Φd)", "1.36cm", 0.0136),
         ("Interface Diameter", "7.5mm", 0.0075),

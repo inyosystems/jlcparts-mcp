@@ -222,12 +222,14 @@ def normalizeAttribute(key, value):
                 value = attributes.capacitanceAttribute(value)
         elif key in larr(["Inductance"]):
             value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.inductanceAttribute(value)
-        elif key in larr(["Length", "Width", "Height", "Switch Height", "Overall Length",
+        elif key in larr(["Length", "Width", "Height", "Diameter", "Switch Height", "Overall Length",
                 "Height Above Board", "X-Length of Bottom Edge on Board (Spacing Line)",
                 "Y-Width of Bottom Edge on Board", "Z-Height of the Board", "Diameter (Φd)", "Insulation Od",
                 "Insulation Height", "Switch Length", "Switch Width", "Interface Length/Height", "Interface Diameter",
                 "Height - Seated (Max)", "Length of Mating Pin", "Operating Height", "L", "Row Spacing",
                 "System Fit Height", "Overall Length/Height"]):
+            if key == "diameter" and isinstance(value, str) and re.fullmatch(r"M\s*\d+(?:\.\d+)?", value, re.I):
+                value = re.sub(r"^M\s*", "", value, flags=re.I) + "mm"
             if key in larr(["Insulation Od", "Interface Length/Height", "Interface Diameter", "System Fit Height"]) and isinstance(value, str) and ("," in value or ";" in value):
                 value = attributes.lengthRangeListAttribute(value, "length")
             else:
