@@ -886,3 +886,21 @@ def test_settling_time_values(value, expected, capsys):
     else:
         for index, time in enumerate(expected, start=1):
             assert_quantity(values[f"time {index}"], time, "time")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("300ns", [300e-9]),
+        ("37ps", [37e-12]),
+        ("1.3us, 0.3us", [1.3e-6, 0.3e-6]),
+    ],
+)
+def test_response_time_tr_values(value, expected, capsys):
+    values = normalized_values("Response Time (Tr)", value, capsys)
+
+    if len(expected) == 1:
+        assert_quantity(values["time"], expected[0], "time")
+    else:
+        for index, time in enumerate(expected, start=1):
+            assert_quantity(values[f"time {index}"], time, "time")
