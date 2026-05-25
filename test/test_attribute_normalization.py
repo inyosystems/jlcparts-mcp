@@ -1156,8 +1156,9 @@ def test_radiant_intensity(value, expected, capsys):
         ("-", {"density": "NaN"}),
     ],
 )
-def test_input_voltage_noise_density(value, expected, capsys):
-    values = normalized_values("Input Voltage Noise Density", value, capsys)
+@pytest.mark.parametrize("key", ["Input Voltage Noise Density", "Noise Density(E N)"])
+def test_input_voltage_noise_density(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
 
     for quantity, density in expected.items():
         assert_quantity(values[quantity], density, "voltage_noise_density")
