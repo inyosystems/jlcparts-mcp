@@ -98,9 +98,9 @@ def normalizeAttribute(key, value):
                 "Drain-Source Voltage (Vdss)"]):
             value = attributes.voltageAttribute(value)
         elif key in larr(["Input Voltage", "Frequency Input Voltage", "Zener Voltage (Range)",
-                "Single Supply", "Operating Voltage", "Voltage - Input(DC)"]):
+                "Single Supply", "Dual Supply", "Operating Voltage", "Voltage - Input(DC)"]):
             complexVoltageAlternatives = isinstance(value, str) and ("/" in value or "、" in value)
-            if key == "operating voltage" and isinstance(value, str) and ("," in value or ";" in value):
+            if key in larr(["Dual Supply", "Operating Voltage"]) and isinstance(value, str) and ("," in value or ";" in value):
                 value = attributes.voltageRangeListAttribute(value, "voltage")
             else:
                 value = attributes.stringAttribute(value) if compoundValue(value) or complexVoltageAlternatives else attributes.voltageRangeAttribute(value, "voltage")

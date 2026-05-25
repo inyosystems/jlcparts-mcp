@@ -104,6 +104,7 @@ def test_resistance_list_attributes(key, value, expected, capsys):
     ("key", "value", "expected"),
     [
         ("Single Supply", "2V~36V", (2.0, 36.0)),
+        ("Dual Supply", "±18V", (-18.0, 18.0)),
         ("Operating Voltage", "±15V", (-15.0, 15.0)),
         ("Operating Voltage", "-15V~15V", (-15.0, 15.0)),
         ("Voltage - Input(DC)", "900mV~5.5V", (0.9, 5.5)),
@@ -132,6 +133,19 @@ def test_operating_voltage_multiple_ranges(capsys):
     assert_quantity(values["voltage 1 max"], 1.89, "voltage")
     assert_quantity(values["voltage 2 min"], 3.135, "voltage")
     assert_quantity(values["voltage 2 max"], 3.465, "voltage")
+
+
+def test_dual_supply_multiple_ranges(capsys):
+    values = normalized_values(
+        "Dual Supply",
+        "1V~18V, -18V~-1V",
+        capsys,
+    )
+
+    assert_quantity(values["voltage 1 min"], 1.0, "voltage")
+    assert_quantity(values["voltage 1 max"], 18.0, "voltage")
+    assert_quantity(values["voltage 2 min"], -18.0, "voltage")
+    assert_quantity(values["voltage 2 max"], -1.0, "voltage")
 
 
 @pytest.mark.parametrize(
