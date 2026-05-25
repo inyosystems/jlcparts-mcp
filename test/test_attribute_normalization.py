@@ -450,6 +450,7 @@ def test_insulation_od_lengths(value, expected, capsys):
     ("key", "value", "expected"),
     [
         ("Insulation Height", "8.51mm", 0.00851),
+        ("Interface Length/Height", "11mm", 0.011),
         ("Switch Length", "12.78mm", 0.01278),
         ("Switch Length", "-", "NaN"),
     ],
@@ -483,6 +484,13 @@ def test_insulation_od_length_range_lists(capsys):
     assert_quantity(values["length 1 max"], 0.000889, "length")
     assert_quantity(values["length 2 min"], 0.0008382, "length")
     assert_quantity(values["length 2 max"], 0.0009652, "length")
+
+
+def test_interface_length_height_lists(capsys):
+    values = normalized_values("Interface Length/Height", "8.5mm, 8.7mm", capsys)
+
+    assert_quantity(values["length 1"], 0.0085, "length")
+    assert_quantity(values["length 2"], 0.0087, "length")
 
 
 @pytest.mark.parametrize(
