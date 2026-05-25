@@ -201,3 +201,50 @@ def test_luminous_intensity(value, expected, capsys):
 def test_energy_values(key, value, expected, capsys):
     values = normalized_values(key, value, capsys)
     assert_quantity(values["energy"], expected, "energy")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Attenuation", "20dB", [20.0]),
+        ("Attenuation", "-30dB, -28dB, -38dB", [-30.0, -28.0, -38.0]),
+        ("Power Supply Rejection Ratio (Psrr)", "125dB, 110dB", [125.0, 110.0]),
+        ("Power Supply Rejection Ratio (Psrr)", "-", ["NaN"]),
+    ],
+)
+def test_decibel_lists(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for index, level in enumerate(expected, start=1):
+        assert_quantity(values[f"level {index}"], level, "decibel")
+
+
+def test_decibel_at_frequency(capsys):
+    values = normalized_values(
+        "Power Supply Rejection Ratio (Psrr)",
+        "70dB@(1kHz), 66dB@(100Hz), 65dB@(10kHz)",
+        capsys,
+    )
+
+    assert_quantity(values["level 1"], 70.0, "decibel")
+    assert_quantity(values["frequency 1"], 1000.0, "frequency")
+    assert_quantity(values["level 2"], 66.0, "decibel")
+    assert_quantity(values["frequency 2"], 100.0, "frequency")
+    assert_quantity(values["level 3"], 65.0, "decibel")
+    assert_quantity(values["frequency 3"], 10000.0, "frequency")
+
+
+def test_decibel_at_frequency_ranges_and_ignored_conditions(capsys):
+    values = normalized_values(
+        "Power Supply Rejection Ratio (Psrr)",
+        "80dB@(1kHz~100kHz)",
+        capsys,
+    )
+
+    assert_quantity(values["level 1"], 80.0, "decibel")
+    assert_quantity(values["frequency 1 min"], 1000.0, "frequency")
+    assert_quantity(values["frequency 1 max"], 100000.0, "frequency")
+
+    values = normalized_values("Power Supply Rejection Ratio (Psrr)", "68dB@(1mA)", capsys)
+    assert_quantity(values["level 1"], 68.0, "decibel")
+    assert "frequency 1" not in values

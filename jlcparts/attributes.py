@@ -137,7 +137,8 @@ def readCharge(value):
 def readFrequency(value):
     if value.strip().upper() == "DC":
         return 0
-    value = erase(value, ["Hz", "HZ", "H"]).strip()
+    value = re.sub(r"hz$", "", value.strip(), flags=re.IGNORECASE)
+    value = erase(value, ["H"]).strip()
     return readWithSiPrefix(value)
 
 def readDataRate(value):
@@ -225,6 +226,13 @@ def readPercentage(value):
         return float(numerator) / float(denominator) * 100
     if value.endswith("%"):
         value = value[:-1]
+    return float(value)
+
+def readDecibel(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"dB$", "", value, flags=re.IGNORECASE).strip()
     return float(value)
 
 def _stripCondition(value):
@@ -611,6 +619,39 @@ def powerAtConditionAttribute(value, name="power"):
 
 def energyAttribute(value):
     return scalarAttribute(value, readEnergy, "energy", "energy")
+
+def decibelListAttribute(value, name="level"):
+    value = str(value)
+    separator = ";" if ";" in value else ","
+    parts = [x.strip() for x in value.split(separator)]
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        signal = part
+        frequency = None
+        match = re.fullmatch(r"(.*?)@\(?([^)]*)\)?", part)
+        if match is not None:
+            signal, frequency = match.groups()
+        values[f"{name} {i}"] = [readDecibel(signal.strip()), "decibel"]
+        formatParts = ["${" + f"{name} {i}" + "}"]
+        if frequency:
+            try:
+                parsedFrequency = rangeOrScalarAttribute(
+                    frequency.strip(),
+                    readFrequency,
+                    "frequency",
+                    f"frequency {i}"
+                )
+                values.update(parsedFrequency["values"])
+                formatParts.append("@ " + parsedFrequency["format"])
+            except Exception:
+                pass
+        formats.append(" ".join(formatParts))
+    return {
+        "format": ", ".join(formats),
+        "primary": f"{name} 1",
+        "values": values
+    }
 
 def capacitanceAtConditionAttribute(value, name="capacitance"):
     return scalarAttribute(value, readCapacitance, "capacitance", name)
