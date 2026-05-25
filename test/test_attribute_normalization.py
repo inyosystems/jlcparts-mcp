@@ -159,6 +159,9 @@ def test_voltage_range_list_attributes(key, value, expected, capsys):
         ("Sampling Rate", "352800Hz", "frequency", 352800.0, "frequency"),
         ("Non-Repetitive Peak Forward Surge Current", "1.95kA", "current", 1950.0, "current"),
         ("Quiescent Supply Current", "50nA", "current", 50e-9, "current"),
+        ("Input Offset Current(IOS)", "8nA", "current", 8e-9, "current"),
+        ("Receive Current", "46mA", "current", 0.046, "current"),
+        ("Current - Collector(Ic)", "4A", "current", 4.0, "current"),
     ],
 )
 def test_scalar_frequency_and_current_attributes(key, value, quantity, expected, unit, capsys):
@@ -209,6 +212,9 @@ def test_sampling_rate_time_range(capsys):
     [
         ("Non-Repetitive Peak Forward Surge Current", "120A, 240A", [120.0, 240.0]),
         ("Quiescent Supply Current", "2mA, 1mA, 600uA", [0.002, 0.001, 0.0006]),
+        ("Input Offset Current(IOS)", "2nA, 5nA", [2e-9, 5e-9]),
+        ("Receive Current", "3.5mA, 5mA", [0.0035, 0.005]),
+        ("Current - Collector(Ic)", "5A, 4.45A", [5.0, 4.45]),
     ],
 )
 def test_current_lists(key, value, expected, capsys):
