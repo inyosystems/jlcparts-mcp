@@ -394,6 +394,21 @@ def test_number_of_io_count(capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("1.5kW", 1500.0),
+        ("150mW", 0.15),
+        ("60W@8/20us", 60.0),
+        ("-", "NaN"),
+    ],
+)
+def test_peak_pulse_power_dissipation_at_pulse(value, expected, capsys):
+    values = normalized_values("Peak Pulse Power Dissipation (Ppp)@10/1000us", value, capsys)
+
+    assert_quantity(values["power"], expected, "power")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("35mcd", {"intensity 1": 0.035}),
         ("2.25cd", {"intensity 1": 2.25}),
         ("68mcd~102mcd", {"intensity 1 min": 0.068, "intensity 1 max": 0.102}),
