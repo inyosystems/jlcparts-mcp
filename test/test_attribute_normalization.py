@@ -894,8 +894,9 @@ def test_peak_pulse_power_8_20us(value, expected, capsys):
         ("-", {"intensity 1": "NaN"}),
     ],
 )
-def test_luminous_intensity(value, expected, capsys):
-    values = normalized_values("Luminous Intensity", value, capsys)
+@pytest.mark.parametrize("key", ["Luminous Intensity", "Light Intensity"])
+def test_luminous_intensity(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
 
     for quantity, intensity in expected.items():
         assert_quantity(values[quantity], intensity, "luminous_intensity")
