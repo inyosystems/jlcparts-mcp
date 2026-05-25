@@ -755,10 +755,13 @@ def vgsThreshold(value):
     Parse single or double value in format '<voltage> @ <current>'
     """
     def readVgs(v):
+        v = v.strip()
         if value == "-":
             return "NaN", "NaN"
         voltage, current = re.match(r"([-\w.]*)(?:[@| ]([-\w.]*))?", v).groups()
         if current is None:
+            current = "-"
+        if current.endswith("V"):
             current = "-"
         return readVoltage(voltage), readCurrent(current)
 

@@ -158,7 +158,7 @@ def normalizeAttribute(key, value):
         elif key in larr(["Vgs(th) (Max) @ Id", "Gate Threshold Voltage (Vgs(th)@Id)",
                           "Gate Threshold Voltage (Vgs(th) @ Id)"]):
             malformedThresholdCurrent = isinstance(value, str) and "@" in value and not re.search(r"\d", value.split("@", 1)[1])
-            value = attributes.stringAttribute(value) if multiScalarValue(value) or malformedThresholdCurrent else attributes.vgsThreshold(value)
+            value = attributes.stringAttribute(value) if malformedThresholdCurrent else attributes.vgsThreshold(value)
         elif key.startswith("Drain to Source Voltage"):
             value = attributes.drainToSourceVoltage(value)
         elif key in larr(["Drain Source On Resistance (RDS(on)@Vgs,Id)",
