@@ -884,6 +884,26 @@ def test_program_storage_size(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("288KB", {"data size": 288 * 1024}),
+        ("8.5MB", {"data size": 8.5 * 1024 * 1024}),
+        ("64KB, 32KB, 16KB", {
+            "data size 1": 64 * 1024,
+            "data size 2": 32 * 1024,
+            "data size 3": 16 * 1024,
+        }),
+        ("-", {"data size": "NaN"}),
+    ],
+)
+def test_ram_size(value, expected, capsys):
+    values = normalized_values("Ram Size", value, capsys)
+
+    for quantity, data_size in expected.items():
+        assert_quantity(values[quantity], data_size, "data_size")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("3000K", {"temperature 1": 3000.0}),
         ("1800K~6500K", {"temperature 1 min": 1800.0, "temperature 1 max": 6500.0}),
         (

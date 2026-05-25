@@ -605,6 +605,10 @@ def dataRateAttribute(value):
 def dataSizeAttribute(value):
     return scalarAttribute(value, readDataSize, "data_size", "data size")
 
+def dataSizeListAttribute(value):
+    value = str(value).replace(";", ",")
+    return scalarListAttribute(value, readDataSize, "data_size", "data size")
+
 def meltingI2tAttribute(value):
     return scalarAttribute(value, readMeltingI2t, "melting_i2t", "melting i2t")
 
