@@ -600,27 +600,29 @@ def rdsOnMaxAtVgsAtIds(value):
     def readRds(v):
         if v == "-":
             return "NaN", "NaN", "NaN"
-        #
-        match = re.fullmatch(
-                r"\s*([\w.]+)\s*(?:[@\s]\s*([-~\w.]+?)\s*(?:(?:[,，]|(?<=[vam])(?=\d))([-\w.]+)\s*)?)?",
-                v,
-                re.I
-            )
-        if match is not None:
-            resistance, voltage, current = match.groups()
+        v = v.strip()
+        if "@" in v:
+            resistance, condition = v.split("@", 1)
+            condition = condition.strip().lstrip("=").strip()
+            if "," in condition or "，" in condition:
+                voltage, current = re.split(r"[,，]", condition, 1)
+            else:
+                voltage, current = condition, None
         else:
-            # There some components in the form 2.5Ω@VGS=10V, try this format
-            resistance, voltage = re.fullmatch(
-                r"\s*(.*Ω)\s*@\s*VGS=\s*(.*V)\s*",
-                v,
-                re.I
-            ).groups()
-            current = None
+            match = re.fullmatch(
+                    r"\s*([\w.Ω]+)\s*(?:\s+([-+~\w.]+?)\s*(?:(?<=\d)([.\w]+)\s*)?)?",
+                    v,
+                    re.I
+                )
+            if match is None:
+                raise ValueError(f"Cannot parse RDS tuple {v}")
+            resistance, voltage, current = match.groups()
 
-        if current is None:
+        resistance = resistance.strip()
+        voltage = voltage.strip() if voltage is not None else "-"
+        current = current.strip() if current is not None else "-"
+        if current == "" or "·" in current:
             current = "-"
-        if voltage is None:
-            voltage = "-"
 
         if not current.endswith("A"):
             if current.endswith("V"):
