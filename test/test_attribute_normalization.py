@@ -231,6 +231,21 @@ def test_switching_frequency_lists(capsys):
     assert_quantity(values["frequency 2 max"], 520e3, "frequency")
 
 
+def test_clock_frequency_lists(capsys):
+    values = normalized_values("Clock Frequency", "32MHz, 32kHz, 1MHz", capsys)
+
+    assert_quantity(values["frequency 1"], 32e6, "frequency")
+    assert_quantity(values["frequency 2"], 32e3, "frequency")
+    assert_quantity(values["frequency 3"], 1e6, "frequency")
+
+    values = normalized_values("Clock Frequency", "100MHz~310MHz, 0.1MHz~200MHz", capsys)
+
+    assert_quantity(values["frequency 1 min"], 100e6, "frequency")
+    assert_quantity(values["frequency 1 max"], 310e6, "frequency")
+    assert_quantity(values["frequency 2 min"], 0.1e6, "frequency")
+    assert_quantity(values["frequency 2 max"], 200e6, "frequency")
+
+
 def test_sampling_rate_time_range(capsys):
     values = normalized_values("Sampling Rate", "0.1ms~23.5ms", capsys)
 
