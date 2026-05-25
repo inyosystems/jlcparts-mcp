@@ -167,7 +167,8 @@ def normalizeAttribute(key, value):
                     "Warehouse Stock - Jiangsu", "Warehouse Stock - Shenzhen",
                     "Warehouse Stock - Hong Kong"]):
             value = attributes.countAttribute(value)
-        elif key in larr(["Capacitance", "Junction Capacitance", "Input Capacitance(Cies)"]):
+        elif key in larr(["Capacitance", "Junction Capacitance", "Input Capacitance(Cies)",
+                "CISS-Input Capacitance", "Output Capacitance(Coes)"]):
             if multiScalarValue(value):
                 value = attributes.stringAttribute(value)
             else:

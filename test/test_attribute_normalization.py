@@ -421,6 +421,20 @@ def test_typical_capacitance(value, capacitance, capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "capacitance"),
+    [
+        ("CISS-Input Capacitance", "1.23nF", 1.23e-9),
+        ("CISS-Input Capacitance", "24pF", 24e-12),
+        ("Output Capacitance(Coes)", "262nF", 262e-9),
+        ("Output Capacitance(Coes)", "160pF", 160e-12),
+    ],
+)
+def test_scalar_capacitance_attributes(key, value, capacitance, capsys):
+    values = normalized_values(key, value, capsys)
+    assert_quantity(values["capacitance"], capacitance, "capacitance")
+
+
+@pytest.mark.parametrize(
     ("value", "expected"),
     [
         ("12.1us", [12.1e-6]),
