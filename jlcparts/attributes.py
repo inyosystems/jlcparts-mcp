@@ -485,6 +485,10 @@ def capacitanceAttribute(value):
         }
     }
 
+def capacitanceListAttribute(value):
+    value = str(value).replace(";", ",")
+    return scalarListAttribute(value, readCapacitance, "capacitance", "capacitance")
+
 def inductanceAttribute(value):
     value = str(value)
     value = readInductance(value)

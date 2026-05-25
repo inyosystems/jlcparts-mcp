@@ -219,6 +219,28 @@ def test_clamping_voltage_ipp(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("3pF", {"capacitance": 3e-12}),
+        (
+            "3pF, 1.5pF, 5pF",
+            {
+                "capacitance 1": 3e-12,
+                "capacitance 2": 1.5e-12,
+                "capacitance 3": 5e-12,
+            },
+        ),
+        ("0.5pF, 2.5nF", {"capacitance 1": 0.5e-12, "capacitance 2": 2.5e-9}),
+    ],
+)
+def test_junction_capacitance_list(value, expected, capsys):
+    values = normalized_values("Junction Capacitance", value, capsys)
+
+    for quantity, capacitance in expected.items():
+        assert_quantity(values[quantity], capacitance, "capacitance")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("240uV", 240e-6),
         ("250nV", 250e-9),
         ("1.6V", 1.6),

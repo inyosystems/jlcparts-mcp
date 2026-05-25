@@ -198,7 +198,9 @@ def normalizeAttribute(key, value):
         elif key in larr(["Capacitance", "Junction Capacitance", "Input Capacitance(Cies)",
                 "CISS-Input Capacitance", "Output Capacitance(Coes)",
                 "Reverse Transfer Capacitance (Cres)", "Con"]):
-            if multiScalarValue(value):
+            if key == "junction capacitance" and compoundValue(value):
+                value = attributes.capacitanceListAttribute(value)
+            elif multiScalarValue(value):
                 value = attributes.stringAttribute(value)
             else:
                 value = attributes.capacitanceAttribute(value)
