@@ -556,6 +556,16 @@ def test_frequency_output_values(capsys):
 
     assert_quantity(values["frequency"], 450e6, "frequency")
 
+def test_gain_bandwidth_product_values(capsys):
+    values = normalized_values("Gain Bandwidth Product", "85MHz, 115MHz", capsys)
+
+    assert_quantity(values["frequency 1"], 85e6, "frequency")
+    assert_quantity(values["frequency 2"], 115e6, "frequency")
+
+    values = normalized_values("Gain Bandwidth Product (GBP)", "1MHz", capsys)
+
+    assert_quantity(values["frequency"], 1e6, "frequency")
+
 
 def test_absolute_bandwidth_values(capsys):
     values = normalized_values("Absolute Bandwidth", "863MHz~876MHz", capsys)
