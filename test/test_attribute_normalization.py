@@ -351,6 +351,21 @@ def test_sampling_frequency(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("3.6GHz", {"frequency": 3.6e9}),
+        ("455kHz", {"frequency": 455e3}),
+        ("1.17645GHz;1.583GHz", {"frequency 1": 1.17645e9, "frequency 2": 1.583e9}),
+    ],
+)
+def test_center_frequency(value, expected, capsys):
+    values = normalized_values("Center Frequency", value, capsys)
+
+    for quantity, frequency in expected.items():
+        assert_quantity(values[quantity], frequency, "frequency")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Non-Repetitive Peak Forward Surge Current", "120A, 240A", [120.0, 240.0]),
