@@ -660,7 +660,7 @@ def voltageAtConditionAttribute(value, name="voltage"):
     return scalarAttribute(value, readVoltage, "voltage", name)
 
 def voltageListAttribute(value, name="voltage"):
-    value = str(value)
+    value = str(value).replace(";", ",")
     if "/" in value and "," not in value:
         value = re.sub(r"(?<=\dV)/(?=\d)", ",", value)
         value = re.sub(r"(?<=\d)/(?=\d)", ",", value)

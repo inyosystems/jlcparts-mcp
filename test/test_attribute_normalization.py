@@ -151,6 +151,20 @@ def test_dual_supply_multiple_ranges(capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("6V", {"voltage": 6.0}),
+        ("13.3V;7.5V", {"voltage 1": 13.3, "voltage 2": 7.5}),
+    ],
+)
+def test_breakdown_voltage_vbr(value, expected, capsys):
+    values = normalized_values("Breakdown Voltage (Vbr)", value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Output Logic Level - High", "8.3V", {"voltage 1": 8.3}),
