@@ -499,6 +499,21 @@ def currentAtConditionAttribute(value, name="current"):
 def voltageAtConditionAttribute(value, name="voltage"):
     return scalarAttribute(value, readVoltage, "voltage", name)
 
+def voltageListAttribute(value, name="voltage"):
+    value = str(value)
+    if "/" in value and "," not in value:
+        value = re.sub(r"(?<=\dV)/(?=\d)", ",", value)
+        value = re.sub(r"(?<=\d)/(?=\d)", ",", value)
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    for i, part in enumerate(parts, start=1):
+        values[f"{name} {i}"] = [readVoltage(_stripCondition(part)), "voltage"]
+    return {
+        "format": ", ".join("${" + f"{name} {i}" + "}" for i in range(1, len(parts) + 1)),
+        "primary": f"{name} 1",
+        "values": values
+    }
+
 def voltageRangeAttribute(value, name="voltage"):
     return rangeOrScalarAttribute(value, readVoltage, "voltage", name)
 
