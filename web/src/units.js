@@ -6,7 +6,8 @@ export function quantityComparator(quantityName) {
         "resistance", "voltage", "current", "power", "count", "capacitance",
         "length", "inductance", "temperature", "charge", "frequency",
         "percentage", "time", "data_rate", "luminous_intensity", "energy",
-        "decibel", "decibel_milliwatt", "ratio", "kelvin", "angle"
+        "decibel", "decibel_milliwatt", "ratio", "kelvin", "angle",
+        "data_size"
     ];
     if (numericQuantities.includes(quantityName))
         return numericComparator;
@@ -27,6 +28,7 @@ export function quantityFormatter(quantityName) {
         capacitance: siFormatter("F"),
         frequency: siFormatter("Hz"),
         data_rate: siFormatter("bps"),
+        data_size: dataSizeFormatter,
         luminous_intensity: siFormatter("cd"),
         length: siFormatter("m"),
         inductance: siFormatter("H"),
@@ -110,6 +112,26 @@ function siFormatterImpl(value, unit) {
 
 function siFormatter(unit) {
     return value => siFormatterImpl(value, unit);
+}
+
+function dataSizeFormatter(value) {
+    if (value === "NaN")
+        return "-";
+    let units = [
+        { magnitude: 1024 * 1024 * 1024, unit: "GB" },
+        { magnitude: 1024 * 1024, unit: "MB" },
+        { magnitude: 1024, unit: "KB" },
+        { magnitude: 1, unit: "B" }
+    ];
+    for (let idx = 0; idx < units.length; idx++) {
+        let candidate = units[idx];
+        if (Math.abs(value) >= candidate.magnitude || candidate.magnitude === 1) {
+            return (value / candidate.magnitude)
+                .toFixed(6)
+                .replace(/0*$/,'')
+                .replace(/[.,]$/,'') + " " + candidate.unit;
+        }
+    }
 }
 
 function resistanceFormatter(resistance) {

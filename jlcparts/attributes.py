@@ -235,6 +235,23 @@ def readAngle(value):
     value = value.replace("°", "")
     return float(value)
 
+def readDataSize(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(Byte|B|KB|MB)", value, re.I)
+    if match is None:
+        raise ValueError(f"Cannot parse data size {value}")
+    number = float(match.group(1))
+    unit = match.group(2).lower()
+    scales = {
+        "byte": 1,
+        "b": 1,
+        "kb": 1024,
+        "mb": 1024 * 1024,
+    }
+    return number * scales[unit]
+
 def readPercentage(value):
     value = value.strip().replace("±", "")
     if value in ["-", "--", "null"]:
@@ -578,6 +595,9 @@ def luminousIntensityAttribute(value):
 def dataRateAttribute(value):
     value = str(value)
     return rangeOrScalarAttribute(value, readDataRate, "data_rate", "data rate")
+
+def dataSizeAttribute(value):
+    return scalarAttribute(value, readDataSize, "data_size", "data size")
 
 def lengthAttribute(value):
     return rangeOrScalarAttribute(value, readLength, "length", "length")

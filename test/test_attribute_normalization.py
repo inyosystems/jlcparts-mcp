@@ -867,6 +867,22 @@ def test_efficiency_values(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("32KB", 32 * 1024),
+        ("1MB", 1024 * 1024),
+        ("384Byte", 384),
+        ("1.75KB", 1.75 * 1024),
+        ("-", "NaN"),
+    ],
+)
+def test_program_storage_size(value, expected, capsys):
+    values = normalized_values("Program Storage Size", value, capsys)
+
+    assert_quantity(values["data size"], expected, "data_size")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("1.5kW", 1500.0),
         ("150mW", 0.15),
         ("60W@8/20us", 60.0),
