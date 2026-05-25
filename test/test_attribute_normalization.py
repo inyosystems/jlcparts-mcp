@@ -1006,6 +1006,31 @@ def test_wire_gauge_mm2(key, value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("22", {"awg 1": 22.0}),
+        ("17~20", {"awg 1 min": 17.0, "awg 1 max": 20.0}),
+        ("10~18, 12~20", {
+            "awg 1 min": 10.0,
+            "awg 1 max": 18.0,
+            "awg 2 min": 12.0,
+            "awg 2 max": 20.0,
+        }),
+        ("10, 12", {"awg 1": 10.0, "awg 2": 12.0}),
+        ("1/0", {"awg 1": 0}),
+        ("2/0~10", {"awg 1 min": -1, "awg 1 max": 10.0}),
+        ("3/0~500", {"awg 1 min": -2, "awg 1 max": 500.0}),
+        ("-", {"awg 1": "NaN"}),
+    ],
+)
+def test_wire_gauge_awg(value, expected, capsys):
+    values = normalized_values("Wire Gauge - Awg", value, capsys)
+
+    for quantity, awg in expected.items():
+        assert_quantity(values[quantity], awg, "awg")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("565nm, 627nm", {"wavelength 1": 565e-9, "wavelength 2": 627e-9}),
         ("R:625nm~645nm, G:524nm~533nm, B:462nm~478nm", {
             "wavelength R min": 625e-9,

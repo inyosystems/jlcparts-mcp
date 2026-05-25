@@ -250,6 +250,15 @@ def readSquareMillimeter(value):
         return "NaN"
     return float(value)
 
+def readAwg(value):
+    value = value.strip()
+    if value in ["-", "--", "null", "~"]:
+        return "NaN"
+    aught = re.fullmatch(r"(\d+)/0", value)
+    if aught is not None:
+        return 1 - int(aught.group(1))
+    return float(value)
+
 def readTime(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
@@ -825,6 +834,23 @@ def areaMm2RangeListAttribute(value):
     return {
         "format": ", ".join(formats),
         "primary": "area 1 min" if any(_rangeParts(part) for part in parts) else "area 1",
+        "values": values
+    }
+
+def awgRangeListAttribute(value):
+    value = str(value).replace(";", ",").strip()
+    if value == "~":
+        value = "-"
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        parsed = rangeOrScalarAttribute(part, readAwg, "awg", f"awg {index}")
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": "awg 1 min" if any(_rangeParts(part) for part in parts) else "awg 1",
         "values": values
     }
 
