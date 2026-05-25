@@ -93,6 +93,8 @@ def test_rds_on_multiple_measurements(value, measurements, capsys):
         ("Resistance - Initial (Ri) (Min)", "2.5Ω", {"resistance": 2.5}),
         ("Resistor on-State", "34mΩ", {"resistance": 0.034}),
         ("Resistor on-State", "10mΩ;30mΩ", {"resistance 1": 0.01, "resistance 2": 0.03}),
+        ("On-State Resistance (Max)", "3.5kΩ", {"resistance": 3500.0}),
+        ("On-State Resistance (Max)", "4.6Ω;5.7Ω", {"resistance 1": 4.6, "resistance 2": 5.7}),
     ],
 )
 def test_resistance_list_attributes(key, value, expected, capsys):
