@@ -389,6 +389,21 @@ def test_decibel_at_frequency_ranges_and_ignored_conditions(capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("IP3", "28dBm", [28.0]),
+        ("IP3", "+41.9dBm", [41.9]),
+        ("P1d B", "-25dBm", [-25.0]),
+    ],
+)
+def test_decibel_milliwatt_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for index, level in enumerate(expected, start=1):
+        assert_quantity(values[f"level {index}"], level, "decibel_milliwatt")
+
+
+@pytest.mark.parametrize(
     ("value", "expected"),
     [
         ("3.43mm", {"length": 0.00343}),

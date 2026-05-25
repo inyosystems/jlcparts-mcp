@@ -236,6 +236,13 @@ def readDecibel(value):
     value = re.sub(r"dB$", "", value, flags=re.IGNORECASE).strip()
     return float(value)
 
+def readDecibelMilliwatt(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"dBm$", "", value, flags=re.IGNORECASE).strip()
+    return float(value)
+
 def _stripCondition(value):
     return value.split("@", 1)[0].strip()
 
@@ -677,6 +684,9 @@ def decibelListAttribute(value, name="level"):
         "primary": f"{name} 1",
         "values": values
     }
+
+def decibelMilliwattListAttribute(value, name="level"):
+    return scalarListAttribute(value, readDecibelMilliwatt, "decibel_milliwatt", name)
 
 def qAtFrequencyAttribute(value):
     value = str(value)
