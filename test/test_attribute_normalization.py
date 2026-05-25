@@ -241,6 +241,20 @@ def test_junction_capacitance_list(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("1000uF", {"capacitance": 1000e-6}),
+        ("3300uF, 300uF", {"capacitance 1": 3300e-6, "capacitance 2": 300e-6}),
+    ],
+)
+def test_capacitive_load_max(value, expected, capsys):
+    values = normalized_values("Capacitive Load (Max)", value, capsys)
+
+    for quantity, capacitance in expected.items():
+        assert_quantity(values[quantity], capacitance, "capacitance")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("240uV", 240e-6),
         ("250nV", 250e-9),
         ("1.6V", 1.6),
