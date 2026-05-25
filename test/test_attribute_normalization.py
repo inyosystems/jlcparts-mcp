@@ -134,6 +134,8 @@ def test_impedance_zzk(value, expected, capsys):
         ("Input Voltage(DC)", "24V", 24.0),
         ("Motor Drive Voltage(Vm)", "8V~45V", (8.0, 45.0)),
         ("Control Voltage", "2.5V~21V", (2.5, 21.0)),
+        ("Vcm - Common Mode Voltage", "-300mV~26V", (-0.3, 26.0)),
+        ("Vcm - Common Mode Voltage", "48V", 48.0),
         ("Low Level Range (VIL)", "700mV~800mV", (0.7, 0.8)),
         ("Low Level Range (VIL)", "0.8V", 0.8),
         ("Operating Voltage", "-", "NaN"),
@@ -197,6 +199,15 @@ def test_input_voltage_dc_multiple_ranges(capsys):
     assert_quantity(values["voltage 1 max"], 31.0, "voltage")
     assert_quantity(values["voltage 2 min"], 6.5, "voltage")
     assert_quantity(values["voltage 2 max"], 36.0, "voltage")
+
+
+def test_common_mode_voltage_multiple_ranges(capsys):
+    values = normalized_values("Vcm - Common Mode Voltage", "-2V~76V, -2V~42V", capsys)
+
+    assert_quantity(values["voltage 1 min"], -2.0, "voltage")
+    assert_quantity(values["voltage 1 max"], 76.0, "voltage")
+    assert_quantity(values["voltage 2 min"], -2.0, "voltage")
+    assert_quantity(values["voltage 2 max"], 42.0, "voltage")
 
 
 def test_dual_supply_multiple_ranges(capsys):
