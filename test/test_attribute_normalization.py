@@ -709,6 +709,8 @@ def test_switching_energy_lists(capsys):
         ("Signal-to-Noise Ratio", "90dB, 91dB, 86dB, 88dB", [90.0, 91.0, 86.0, 88.0]),
         ("Power Supply Rejection Ratio (Psrr)", "125dB, 110dB", [125.0, 110.0]),
         ("Power Supply Rejection Ratio (Psrr)", "-", ["NaN"]),
+        ("Noise Figure", "7.9dB, 8.1dB", [7.9, 8.1]),
+        ("Common Mode Rejection Ratio(CMRR)", "94dB, 118dB", [94.0, 118.0]),
     ],
 )
 def test_decibel_lists(key, value, expected, capsys):
