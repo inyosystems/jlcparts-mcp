@@ -1031,6 +1031,30 @@ def test_wire_gauge_awg(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("2mT", {"field 1": 0.002}),
+        ("9Gs", {"field 1": 0.0009}),
+        ("±3.8mT", {"field 1 min": -0.0038, "field 1 max": 0.0038}),
+        ("2mT~15mT", {"field 1 min": 0.002, "field 1 max": 0.015}),
+        ("2.5mT, -2.5mT", {"field 1": 0.0025, "field 2": -0.0025}),
+        ("6Gs~6mT, -6mT~-6Gs", {
+            "field 1 min": 0.0006,
+            "field 1 max": 0.006,
+            "field 2 min": -0.006,
+            "field 2 max": -0.0006,
+        }),
+        ("-", {"field 1": "NaN"}),
+    ],
+)
+def test_operation_points(value, expected, capsys):
+    values = normalized_values("Operation Points", value, capsys)
+
+    for quantity, field in expected.items():
+        assert_quantity(values[quantity], field, "magnetic_flux_density")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("565nm, 627nm", {"wavelength 1": 565e-9, "wavelength 2": 627e-9}),
         ("R:625nm~645nm, G:524nm~533nm, B:462nm~478nm", {
             "wavelength R min": 625e-9,

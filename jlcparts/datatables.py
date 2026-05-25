@@ -290,6 +290,8 @@ def normalizeAttribute(key, value):
             value = attributes.areaMm2RangeListAttribute(value)
         elif key in larr(["Wire Gauge - Awg"]):
             value = attributes.awgRangeListAttribute(value)
+        elif key in larr(["Operation Points"]):
+            value = attributes.magneticFluxDensityRangeListAttribute(value)
         elif key in larr(["Viewing Angle"]):
             value = attributes.angleListAttribute(value)
         elif key.startswith("continuous drain current"):

@@ -259,6 +259,21 @@ def readAwg(value):
         return 1 - int(aught.group(1))
     return float(value)
 
+def readMagneticFluxDensity(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(mT|Gs)", value, re.I)
+    if match is None:
+        raise ValueError(f"Cannot parse magnetic flux density {value}")
+    number = float(match.group(1))
+    unit = match.group(2).lower()
+    scales = {
+        "mt": 1e-3,
+        "gs": 1e-4,
+    }
+    return number * scales[unit]
+
 def readTime(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
@@ -851,6 +866,38 @@ def awgRangeListAttribute(value):
     return {
         "format": ", ".join(formats),
         "primary": "awg 1 min" if any(_rangeParts(part) for part in parts) else "awg 1",
+        "values": values
+    }
+
+def magneticFluxDensityRangeListAttribute(value):
+    value = str(value).replace(";", ",").strip()
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        name = f"field {index}"
+        if part.startswith("±"):
+            coefficient = readMagneticFluxDensity(part[1:])
+            parsed = {
+                "format": "${" + name + " min} ~ ${" + name + " max}",
+                "primary": name + " min",
+                "values": {
+                    name + " min": [-coefficient, "magnetic_flux_density"],
+                    name + " max": [coefficient, "magnetic_flux_density"],
+                }
+            }
+        else:
+            parsed = rangeOrScalarAttribute(
+                part,
+                readMagneticFluxDensity,
+                "magnetic_flux_density",
+                name,
+            )
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
         "values": values
     }
 
