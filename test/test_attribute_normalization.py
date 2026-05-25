@@ -1006,6 +1006,35 @@ def test_wire_gauge_mm2(key, value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("565nm, 627nm", {"wavelength 1": 565e-9, "wavelength 2": 627e-9}),
+        ("R:625nm~645nm, G:524nm~533nm, B:462nm~478nm", {
+            "wavelength R min": 625e-9,
+            "wavelength R max": 645e-9,
+            "wavelength G min": 524e-9,
+            "wavelength G max": 533e-9,
+            "wavelength B min": 462e-9,
+            "wavelength B max": 478e-9,
+        }),
+        ("390nm~400nm@UVA, 270nm~285nm@UVC", {
+            "wavelength 1 min": 390e-9,
+            "wavelength 1 max": 400e-9,
+            "wavelength 2 min": 270e-9,
+            "wavelength 2 max": 285e-9,
+        }),
+        ("150mcd, 400mcd", {"intensity 1": 0.15, "intensity 2": 0.4}),
+    ],
+)
+def test_peak_wavelength_lists(value, expected, capsys):
+    values = normalized_values("Peak Wavelength", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        unit = "luminous_intensity" if quantity.startswith("intensity") else "length"
+        assert_quantity(values[quantity], expected_value, unit)
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("1080", 1080.0),
         ("0.0004", 0.0004),
         ("-", "NaN"),

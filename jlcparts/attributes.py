@@ -699,6 +699,29 @@ def areaMm2RangeListAttribute(value):
         "values": values
     }
 
+def opticalLengthRangeListAttribute(value):
+    value = str(value).strip()
+    parts = [x.strip() for x in re.split(r"[,;]", value)]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        label = str(index)
+        if ":" in part:
+            label, part = [x.strip() for x in part.split(":", 1)]
+        name = f"wavelength {label}"
+        if re.search(r"cd(?:\s*|$)", part, re.I):
+            name = f"intensity {label}"
+            parsed = scalarAttribute(part, readLuminousIntensity, "luminous_intensity", name)
+        else:
+            parsed = rangeOrScalarAttribute(part, readLength, "length", name)
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
 def wavelengthAttribute(value):
     return rangeOrScalarAttribute(value, readLength, "length", "wavelength")
 
