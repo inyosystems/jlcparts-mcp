@@ -580,6 +580,7 @@ def timeAttribute(value):
     return rangeOrScalarAttribute(value, readTime, "time", "time")
 
 def timeListAttribute(value):
+    value = str(value).replace(";", ",")
     return scalarListAttribute(value, readTime, "time", "time")
 
 def timeAtConditionAttribute(value):

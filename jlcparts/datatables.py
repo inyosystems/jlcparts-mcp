@@ -303,9 +303,9 @@ def normalizeAttribute(key, value):
             value = attributes.stringAttribute(value) if compoundValue(value) else attributes.inductanceAtFrequency(value)
         elif key in larr(["Propagation Delay", "Propagation Delay (TPD)", "Propagation Delay Time", "Turn-On Time",
                 "Turn-Off Time", "Rise Time", "Fall Time", "Reverse Recovery Time (Trr)",
-                "Reset Timeout", "Settling Time", "Response Time (Tr)", "Td(Off)"]):
+                "Reset Timeout", "Settling Time", "Response Time (Tr)", "Time to Trip (Max)", "Td(Off)"]):
             if compoundValue(value) and "@" not in value:
-                if key in larr(["Propagation Delay (TPD)", "Reset Timeout", "Settling Time", "Response Time (Tr)", "Td(Off)"]) and isinstance(value, str) and "," in value:
+                if key in larr(["Propagation Delay (TPD)", "Reset Timeout", "Settling Time", "Response Time (Tr)", "Time to Trip (Max)", "Td(Off)"]) and isinstance(value, str) and ("," in value or ";" in value):
                     value = attributes.timeListAttribute(value)
                 else:
                     value = attributes.stringAttribute(value)

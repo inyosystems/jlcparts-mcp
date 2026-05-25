@@ -928,3 +928,22 @@ def test_response_time_tr_values(value, expected, capsys):
     else:
         for index, time in enumerate(expected, start=1):
             assert_quantity(values[f"time {index}"], time, "time")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("300ms", [0.3]),
+        ("1.17min", [70.2]),
+        ("100ms;8.2s;4.8s", [0.1, 8.2, 4.8]),
+        ("2.5s, 6.3s, 11.4s", [2.5, 6.3, 11.4]),
+    ],
+)
+def test_time_to_trip_max_values(value, expected, capsys):
+    values = normalized_values("Time to Trip (Max)", value, capsys)
+
+    if len(expected) == 1:
+        assert_quantity(values["time"], expected[0], "time")
+    else:
+        for index, time in enumerate(expected, start=1):
+            assert_quantity(values[f"time {index}"], time, "time")
