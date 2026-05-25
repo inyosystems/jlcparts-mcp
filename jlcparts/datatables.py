@@ -134,6 +134,7 @@ def normalizeAttribute(key, value):
                     "Collector Current (Ic)", "Charge Current - Max",
                     "Saturation Current (Isat)", "Reverse Leakage Current", "Reverse Leakage Current (Ir)",
                     "Peak Pulse Current (Ipp)", "Peak Pulse Current (Ipp) @ 10/1000us",
+                    "Peak Pulse Current(Ipp)@8/20us",
                     "Quiescent Current", "Quiescent Current (Iq)", "Quiescent Current(Iq)",
                     "Ib - Input Bias Current", "Standby Current",
                     "Non-Repetitive Peak Forward Surge Current", "Quiescent Supply Current",
@@ -158,6 +159,7 @@ def normalizeAttribute(key, value):
                 "operating current",
                 "collector current (ic)",
                 "current consumption",
+                "peak pulse current(ipp)@8/20us",
             ]
             if key in ["current range", "current consumption"]:
                 value = attributes.currentRangeListAttribute(value)

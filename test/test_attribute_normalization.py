@@ -593,6 +593,22 @@ def test_charge_current_max(value, expected, capsys):
     assert_quantity(values["current"], expected, "current")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("5A", {"current": 5.0}),
+        ("10A@(8/20us)", {"current": 10.0}),
+        ("870mA", {"current": 0.87}),
+        ("15A;37.5A", {"current 1": 15.0, "current 2": 37.5}),
+    ],
+)
+def test_peak_pulse_current_8_20us(value, expected, capsys):
+    values = normalized_values("Peak Pulse Current(Ipp)@8/20us", value, capsys)
+
+    for quantity, current in expected.items():
+        assert_quantity(values[quantity], current, "current")
+
+
 def test_number_of_io_count(capsys):
     values = normalized_values("Number of I/O", "8", capsys)
 
