@@ -165,6 +165,20 @@ def test_breakdown_voltage_vbr(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("17V", {"voltage": 17.0}),
+        ("26V;12V", {"voltage 1": 26.0, "voltage 2": 12.0}),
+    ],
+)
+def test_clamping_voltage_ipp(value, expected, capsys):
+    values = normalized_values("Clamping Voltage@IPP", value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Output Logic Level - High", "8.3V", {"voltage 1": 8.3}),
