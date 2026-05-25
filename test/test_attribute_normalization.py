@@ -913,6 +913,7 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Interface Diameter", "7.5mm", 0.0075),
         ("Length of Mating Pin", "5.84mm", 0.00584),
         ("Operating Height", "8.3mm", 0.0083),
+        ("Operational Height", "2.2mm", 0.0022),
         ("Row Spacing", "2.54mm", 0.00254),
         ("System Fit Height", "1.5mm", 0.0015),
         ("Overall Length/Height", "11mm", 0.011),
