@@ -94,6 +94,8 @@ def test_rds_on_multiple_measurements(value, measurements, capsys):
         ("Resistance @ 25°C", "70mΩ", {"resistance": 0.07}),
         ("Resistance @ 25°C", "10kΩ", {"resistance": 10000.0}),
         ("Resistance @ 25°C", "60Ω, 30Ω", {"resistance 1": 60.0, "resistance 2": 30.0}),
+        ("Resistance Value", "100kΩ", {"resistance": 100000.0}),
+        ("Resistance Value", "1.45kΩ, 2.54kΩ", {"resistance 1": 1450.0, "resistance 2": 2540.0}),
         ("Resistor on-State", "34mΩ", {"resistance": 0.034}),
         ("Resistor on-State", "10mΩ;30mΩ", {"resistance 1": 0.01, "resistance 2": 0.03}),
         ("On-State Resistance (Max)", "3.5kΩ", {"resistance": 3500.0}),
