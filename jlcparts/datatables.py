@@ -97,8 +97,12 @@ def normalizeAttribute(key, value):
                 "Voltage - Output (Fixed)", "Voltage - Output (Min/Fixed)",
                 "Supply Voltage (Max)", "Supply Voltage (Min)", "Output Voltage",
                 "Voltage - Input (Min)", "Drain Source Voltage (Vdss)",
-                "Drain-Source Voltage (Vdss)", "Voltage - Input Offset(VOS)"]):
-            value = attributes.voltageAttribute(value)
+                "Drain-Source Voltage (Vdss)", "Voltage - Input Offset(VOS)",
+                "Charging Saturation Voltage"]):
+            if key == "charging saturation voltage" and compoundValue(value):
+                value = attributes.voltageListAttribute(value)
+            else:
+                value = attributes.voltageAttribute(value)
         elif key in larr(["Input Voltage", "Frequency Input Voltage", "Zener Voltage (Range)",
                 "Single Supply", "Dual Supply", "Operating Voltage", "Voltage - Input(DC)"]):
             complexVoltageAlternatives = isinstance(value, str) and ("/" in value or "、" in value)

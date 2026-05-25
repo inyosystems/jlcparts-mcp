@@ -157,6 +157,20 @@ def test_allowable_voltage_dc(value, expected, capsys):
     assert_quantity(values["voltage"], expected, "voltage")
 
 
+def test_charging_saturation_voltage(capsys):
+    values = normalized_values("Charging Saturation Voltage", "4.2V", capsys)
+
+    assert_quantity(values["voltage"], 4.2, "voltage")
+
+
+def test_charging_saturation_voltage_list(capsys):
+    values = normalized_values("Charging Saturation Voltage", "4.2V, 4.35V, 4.3V", capsys)
+
+    assert_quantity(values["voltage 1"], 4.2, "voltage")
+    assert_quantity(values["voltage 2"], 4.35, "voltage")
+    assert_quantity(values["voltage 3"], 4.3, "voltage")
+
+
 def test_operating_voltage_multiple_ranges(capsys):
     values = normalized_values(
         "Operating Voltage",
