@@ -1,6 +1,4 @@
 import React from "react";
-import { InlineSpinbox } from "./componentTable.js"
-import { CORS_KEY } from "./corsBridge.js";
 
 export function getQuantityPrice(quantity, pricelist) {
     return pricelist.find(pricepoint =>
@@ -8,87 +6,65 @@ export function getQuantityPrice(quantity, pricelist) {
     )?.price ?? pricelist[0]?.price;
 }
 
+function attributeRawValue(attribute) {
+    if (!attribute?.values) {
+        return undefined;
+    }
+    const valueKey = attribute.primary ?? attribute.default ?? Object.keys(attribute.values)[0];
+    return attribute.values[valueKey]?.[0];
+}
+
+function attributeNumber(component, name) {
+    const value = attributeRawValue(component.attributes?.[name]);
+    if (value === undefined || value === null || value === "NaN") {
+        return undefined;
+    }
+    const number = Number(value);
+    return Number.isFinite(number) ? number : undefined;
+}
+
 export class AttritionInfo extends React.Component {
     constructor(props) {
         super(props);
         this.props = props;
-        this.state = {}
-    }
-
-    componentDidMount() {
-        fetch("https://cors.bridged.cc/https://jlcpcb.com/shoppingCart/smtGood/selectSmtComponentList", {
-            method: 'POST',
-            headers: {
-                "Accept": 'application/json, text/plain, */*',
-                "Content-Type": 'application/json;charset=UTF-8',
-                "x-cors-grida-api-key": CORS_KEY
-            },
-            body: JSON.stringify({
-                currentPage: 1,
-                pageSize: 25,
-                keyword: this.props.component.lcsc,
-                firstSortName: "",
-                secondeSortName: "",
-                searchSource: "search",
-                componentAttributes: []
-            })
-        })
-        .then(response => {
-            if (!response.ok || response.status !== 200) {
-                throw new Error(`Cannot fetch ${this.props.component.lcsc}: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(({data}) => {
-            const lcscId = data.componentPageInfo.list.find(({componentCode}) => componentCode === this.props.component.lcsc)?.componentId;
-            if (lcscId === undefined) {
-                throw new Error(`No search results for ${this.props.component.lcsc}`);
-            }
-            return fetch("https://cors.bridged.cc/https://jlcpcb.com/shoppingCart/smtGood/getComponentDetail?componentLcscId=" + lcscId, {
-                headers: {
-                    "x-cors-grida-api-key": CORS_KEY
-                },
-            });
-        })
-        .then(response => {
-            if (!response.ok || response.status !== 200) {
-                throw new Error(`Cannot fetch ${this.props.lcsc}: ${response.statusText}`);
-            }
-            return response.json();
-        })
-        .then(({data}) => {
-            this.setState({data});
-        })
-        .catch(error => {
-            this.setState({error: true, errorMessage: error.toString()});
-            console.log(error);
-        });
     }
 
     price() {
-        let q = Math.max(parseInt(this.props.quantity) + parseInt(this.state.data.lossNumber),
-            this.state.data.leastNumber);
-        return q * getQuantityPrice(q, this.props.component.price);
+        const data = this.attritionData();
+        let q = Math.max(parseInt(this.props.quantity) + (data.lossNumber ?? 0),
+            data.leastNumber ?? 0);
+        const unitPrice = getQuantityPrice(q, this.props.component.price);
+        return unitPrice === undefined ? undefined : q * unitPrice;
+    }
+
+    attritionData() {
+        const component = this.props.component;
+        return {
+            lossNumber: attributeNumber(component, "Attrition"),
+            leastNumber: attributeNumber(component, "Minimum Order Quantity"),
+        };
     }
 
     render() {
-        let data = this.state.data;
-        if (this.state.error) {
+        let data = this.attritionData();
+        if (data.lossNumber === undefined && data.leastNumber === undefined) {
             return <div className="bg-yellow-400 p-2 mt-2">
-                Cannot fetch attrition data from JLC website: {this.state.errorMessage}.
+                No attrition data available in this component database.
             </div>
         }
-        if (data)
-            return <table className="w-full">
+        data.lossNumber ??= 0;
+        data.leastNumber ??= 0;
+        const price = this.price();
+        return <table className="w-full">
                 <tbody>
-                { data.lossNumber
+                { data.lossNumber > 0
                     ? <tr>
                         <td className="w-1 whitespace-no-wrap">Attrition:</td>
                         <td className="px-2">{data.lossNumber} pcs</td>
                       </tr>
                     : ""
                 }
-                { data.leastNumber
+                { data.leastNumber > 0
                     ? <tr>
                         <td className="w-1 whitespace-no-wrap">Minimal order quantity:</td>
                         <td className="px-2">{data.leastNumber} pcs</td>
@@ -97,12 +73,13 @@ export class AttritionInfo extends React.Component {
                 }
                 <tr>
                     <td className="w-1 whitespace-no-wrap">Price for {this.props.quantity} pcs:</td>
-                    <td className="px-2">{Math.round((this.price() + Number.EPSILON) * 1000) / 1000} USD</td>
+                    <td className="px-2">
+                        {price === undefined
+                            ? "Not available"
+                            : `${Math.round((price + Number.EPSILON) * 1000) / 1000} USD`}
+                    </td>
                 </tr>
                 </tbody>
             </table>
-        return <div className="w-full p-4 text-center">
-                <InlineSpinbox/>
-            </div>;
     }
 }

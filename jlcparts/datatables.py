@@ -92,7 +92,9 @@ def normalizeAttribute(key, value):
         elif key in larr(["Power", "Power Per Element", "Power Dissipation (Pd)"]):
             value = attributes.powerAttribute(value)
         elif key in larr(["Number of Pins", "Number of Resistors", "Number of Loop",
-                    "Number of Regulators", "Number of Outputs", "Number of Capacitors"]):
+                    "Number of Regulators", "Number of Outputs", "Number of Capacitors",
+                    "Attrition", "Minimum Order Quantity", "Minimum Placement Quantity",
+                    "Minimum Purchase Quantity"]):
             value = attributes.countAttribute(value)
         elif key in larr(["Capacitance"]):
             value = attributes.capacitanceAttribute(value)
@@ -155,7 +157,9 @@ def normalizeCapitalization(key):
     """
     key = key.lower()
     CAPITALIZATIONS = [
-        "Basic/Extended", "MHz", "GHz", "Hz", "MOQ"
+        "Basic/Extended", "MHz", "GHz", "Hz", "MOQ",
+        "Assembly Process", "Assembly Mode", "Minimum Order Quantity",
+        "Minimum Placement Quantity", "Minimum Purchase Quantity",
     ]
     for capt in CAPITALIZATIONS:
         key = key.replace(capt.lower(), capt)

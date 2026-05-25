@@ -8,6 +8,7 @@ import random
 import re
 import string
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional, List, Any, Callable
 from urllib.parse import unquote
 
@@ -20,6 +21,9 @@ JLCPCB_SECRET_KEY = os.environ.get("JLCPCB_SECRET_KEY")
 JLCPCB_API_HOST = "https://open.jlcpcb.com"
 JLCPCB_COMPONENT_LIST_PATH = "/overseas/openapi/component/getComponentLibraryList"
 JLCPCB_COMPONENT_DETAIL_PATH = "/overseas/openapi/component/getComponentDetailByCode"
+JLCPCB_WEBSITE_API_HOST = "https://jlcpcb.com/api/overseas-pcb-order/v1"
+JLCPCB_WEBSITE_COMPONENT_LIST_PATH = "/shoppingCart/smtGood/selectSmtComponentList/v2"
+JLCPCB_WEBSITE_COMPONENT_DETAIL_PATH = "/shoppingCart/smtGood/getComponentDetail"
 
 JLC_COMPONENT_TABLE_HEADER = [
     "LCSC Part",
@@ -123,12 +127,34 @@ def _datasheet(component) -> str:
 
 
 def _jlcExtra(component) -> dict:
+    attributes = _parameterAttributes(component.get("parameters", []))
+    for sourceKey, attrName in [
+        ("assemblyProcess", "Assembly Process"),
+        ("assemblyMode", "Assembly Mode"),
+        ("lossNumber", "Attrition"),
+        ("leastNumber", "Minimum Order Quantity"),
+        ("leastPatchNumber", "Minimum Placement Quantity"),
+        ("minPurchaseNum", "Minimum Purchase Quantity"),
+    ]:
+        value = component.get(sourceKey)
+        if value is not None and value != "":
+            attributes[attrName] = str(value)
+
+    attrition = {
+        key: component.get(key)
+        for key in ["lossNumber", "leastNumber", "leastPatchNumber", "minPurchaseNum"]
+        if component.get(key) is not None
+    }
     return {
         "source": "jlcpcb_openapi",
         "rohs": component.get("rohsFlag"),
         "eccn": component.get("eccnCode") or "",
         "assembly": component.get("assemblyComponentFlag"),
-        "attributes": _parameterAttributes(component.get("parameters", [])),
+        "assemblyProcess": component.get("assemblyProcess"),
+        "assemblyMode": component.get("assemblyMode"),
+        "websiteComponentId": component.get("websiteComponentId"),
+        "attrition": attrition,
+        "attributes": attributes,
     }
 
 
@@ -171,6 +197,117 @@ def createComponentInterface(lastKey: Optional[str] = None) -> "JlcPcbInterface"
         _requireCredential("JLCPCB_SECRET_KEY", JLCPCB_SECRET_KEY),
         lastKey=lastKey
     )
+
+
+def _website_api_post(path: str, payload: dict) -> dict:
+    resp = requests.post(
+        JLCPCB_WEBSITE_API_HOST + path,
+        json=payload,
+        headers={
+            "Accept": "application/json, text/plain, */*",
+            "Content-Type": "application/json;charset=UTF-8",
+        },
+        timeout=30,
+    )
+    if resp.status_code != 200:
+        raise RuntimeError(f"Cannot fetch {path}: HTTP {resp.status_code}: {resp.text}")
+    data = resp.json()
+    if data.get("code") != 200 or data.get("data") is None:
+        raise RuntimeError(f"Cannot fetch {path}: {data}")
+    return data["data"]
+
+
+def _website_api_get(path: str, params: dict) -> dict:
+    resp = requests.get(
+        JLCPCB_WEBSITE_API_HOST + path,
+        params=params,
+        headers={"Accept": "application/json, text/plain, */*"},
+        timeout=30,
+    )
+    if resp.status_code != 200:
+        raise RuntimeError(f"Cannot fetch {path}: HTTP {resp.status_code}: {resp.text}")
+    data = resp.json()
+    if data.get("code") != 200 or data.get("data") is None:
+        raise RuntimeError(f"Cannot fetch {path}: {data}")
+    return data["data"]
+
+
+def _find_website_component(component_code: str) -> dict:
+    data = _website_api_post(JLCPCB_WEBSITE_COMPONENT_LIST_PATH, {
+        "currentPage": 1,
+        "pageSize": 25,
+        "keyword": component_code,
+        "searchSource": "search",
+        "searchType": 2,
+        "componentBrandList": [],
+        "componentSpecificationList": [],
+        "componentAttributeList": [],
+        "paramList": [],
+    })
+    page_info = data.get("componentPageInfo", {})
+    for row in page_info.get("list", []):
+        if row.get("componentCode") == component_code:
+            return row
+    raise RuntimeError(f"No exact JLC website result for {component_code}")
+
+
+def _get_website_component_detail(component_id: int) -> dict:
+    return _website_api_get(
+        JLCPCB_WEBSITE_COMPONENT_DETAIL_PATH,
+        {"componentLcscId": component_id},
+    )
+
+
+def _website_component_enrichment(component_code: str) -> dict:
+    row = _find_website_component(component_code)
+    component_id = row.get("componentId")
+    if component_id is None:
+        raise RuntimeError(f"No JLC website componentId for {component_code}")
+    detail = _get_website_component_detail(component_id)
+    combined = {**row, **detail}
+    return {
+        "websiteComponentId": component_id,
+        "assemblyProcess": combined.get("assemblyProcess"),
+        "assemblyMode": combined.get("assemblyMode"),
+        "lossNumber": combined.get("lossNumber"),
+        "leastNumber": combined.get("leastNumber"),
+        "leastPatchNumber": combined.get("leastPatchNumber"),
+        "minPurchaseNum": combined.get("minPurchaseNum"),
+    }
+
+
+def _apply_website_enrichment(component: dict, enrichment: dict) -> dict:
+    return {
+        **component,
+        **{
+            key: value
+            for key, value in enrichment.items()
+            if value is not None
+        },
+    }
+
+
+def enrichComponentsFromWebsite(components: List[dict], workers: int = 8,
+                                reporter: Callable[[str], None] = print) -> List[dict]:
+    if not components:
+        return components
+
+    enriched = list(components)
+    by_future = {}
+    with ThreadPoolExecutor(max_workers=max(1, workers)) as executor:
+        for index, component in enumerate(components):
+            code = component.get("componentCode")
+            if not code:
+                continue
+            by_future[executor.submit(_website_component_enrichment, code)] = (index, code)
+
+        for future in as_completed(by_future):
+            index, code = by_future[future]
+            try:
+                enriched[index] = _apply_website_enrichment(enriched[index], future.result())
+            except Exception as e:
+                reporter(f"Cannot enrich {code} from JLC website: {type(e).__name__}: {e}")
+    return enriched
 
 class JlcPcbInterface:
     def __init__(self, appId: str, accessKey: str, secretKey: str,

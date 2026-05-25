@@ -132,7 +132,12 @@ def fetchDb(db, checkpoint, max_seconds, age, limit, retries, retry_delay, verbo
     """
     Fetch JLC PCB component data directly into DB.
     """
-    from .jlcpcb import createComponentInterface, loadCheckpoint, writeCheckpoint
+    from .jlcpcb import (
+        createComponentInterface,
+        enrichComponentsFromWebsite,
+        loadCheckpoint,
+        writeCheckpoint,
+    )
 
     if max_seconds is not None and checkpoint is None:
         raise RuntimeError("max-seconds requires a checkpoint so the fetch can resume")
@@ -178,6 +183,8 @@ def fetchDb(db, checkpoint, max_seconds, age, limit, retries, retry_delay, verbo
                 os.remove(checkpoint)
             done = True
             break
+
+        page = enrichComponentsFromWebsite(page)
 
         with lib.startTransaction():
             for apiComponent in page:
