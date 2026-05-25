@@ -2003,6 +2003,7 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
     [
         ("Propagation Delay Tp Hl", "105ns", {"time": 105e-9}),
         ("Propagation Delay Tp Lh", "55ns, 63ns", {"time 1": 55e-9, "time 2": 63e-9}),
+        ("Propagation Delay Time", "400ns, 420ns", {"time 1": 400e-9, "time 2": 420e-9}),
         ("Max Propagation Delay", "10.6ns@5V,50pF", {"time": 10.6e-9}),
         ("Maximum Propagation Delay", "32ns@6V,150pF", {"time": 32e-9}),
         ("Td(on)", "30ns, 31.6ns", {"time 1": 30e-9, "time 2": 31.6e-9}),
