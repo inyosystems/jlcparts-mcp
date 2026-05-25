@@ -335,6 +335,7 @@ def resistanceAttribute(value):
         }
 
 def resistanceListAttribute(value):
+    value = str(value).replace(";", ",")
     return scalarListAttribute(value, readResistance, "resistance", "resistance")
 
 def impedanceAttribute(value):

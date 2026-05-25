@@ -76,7 +76,7 @@ def normalizeAttribute(key, value):
     try:
         if key in larr(["Resistance", "Resistance in Ohms @ 25°C", "DC Resistance"]):
             value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.resistanceAttribute(value)
-        elif key in larr(["Coil Resistance", "Ron", "Zener Impedance (ZZT)",
+        elif key in larr(["Coil Resistance", "Ron", "Resistor on-State", "Zener Impedance (ZZT)",
                 "Resistance - Initial (Ri) (Min)"]):
             value = attributes.resistanceListAttribute(value) if compoundValue(value) else attributes.resistanceAttribute(value)
         elif key in larr(["Balance Port Impedence", "Unbalance Port Impedence"]):

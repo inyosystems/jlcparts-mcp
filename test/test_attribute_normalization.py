@@ -91,6 +91,8 @@ def test_rds_on_multiple_measurements(value, measurements, capsys):
         ("Zener Impedance (ZZT)", "1.2kΩ", {"resistance": 1200.0}),
         ("Resistance - Initial (Ri) (Min)", "40mΩ", {"resistance": 0.04}),
         ("Resistance - Initial (Ri) (Min)", "2.5Ω", {"resistance": 2.5}),
+        ("Resistor on-State", "34mΩ", {"resistance": 0.034}),
+        ("Resistor on-State", "10mΩ;30mΩ", {"resistance 1": 0.01, "resistance 2": 0.03}),
     ],
 )
 def test_resistance_list_attributes(key, value, expected, capsys):
