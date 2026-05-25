@@ -507,6 +507,20 @@ def test_collector_current(value, expected, capsys):
             assert_quantity(values[f"current {index}"], current, "current")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("800mA", 0.8),
+        ("6uA", 6e-6),
+        ("-", "NaN"),
+    ],
+)
+def test_charge_current_max(value, expected, capsys):
+    values = normalized_values("Charge Current - Max", value, capsys)
+
+    assert_quantity(values["current"], expected, "current")
+
+
 def test_number_of_io_count(capsys):
     values = normalized_values("Number of I/O", "8", capsys)
 
