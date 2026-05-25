@@ -183,6 +183,7 @@ def normalizeAttribute(key, value):
                     "Supply Current Per Channel"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
+                "quiescent current",
                 "quiescent current (iq)",
                 "quiescent current(iq)",
                 "quiescent supply current",
