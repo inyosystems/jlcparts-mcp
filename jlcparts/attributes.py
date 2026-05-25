@@ -1042,7 +1042,7 @@ def drainToSourceVoltage(value):
             "default": "Vds 1",
             "values": {
                 "Vds 1": [v1, "voltage"],
-                "Vds 2": [v1, "voltage"]
+                "Vds 2": [v2, "voltage"]
             }
         }
     else:

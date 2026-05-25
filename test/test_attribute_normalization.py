@@ -205,6 +205,20 @@ def test_breakdown_voltage_vbr(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("1.2kV", {"Vds": 1200.0}),
+        ("600V, 650V", {"Vds 1": 600.0, "Vds 2": 650.0}),
+    ],
+)
+def test_drain_to_source_voltage(value, expected, capsys):
+    values = normalized_values("Drain to Source Voltage", value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("17V", {"voltage": 17.0}),
         ("26V;12V", {"voltage 1": 26.0, "voltage 2": 12.0}),
     ],
