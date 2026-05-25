@@ -332,6 +332,7 @@ def test_voltage_range_list_attributes(key, value, expected, capsys):
         ("Send Current", "266mA", "current", 0.266, "current"),
         ("Current of Transmitting", "21mA", "current", 0.021, "current"),
         ("Current - Leakage", "47uA@25℃,5min", "current", 47e-6, "current"),
+        ("Peak Current", "2.5kA", "current", 2500.0, "current"),
     ],
 )
 def test_scalar_frequency_and_current_attributes(key, value, quantity, expected, unit, capsys):
