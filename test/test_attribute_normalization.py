@@ -477,6 +477,7 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Working Current", "500uA", "current", 500e-6, "current"),
         ("Supply Current Per Channel", "3.6mA", "current", 0.0036, "current"),
         ("Collector Cut-Off Current (Icbo)", "100nA", "current", 100e-9, "current"),
+        ("Current - Collector Cutoff", "50uA", "current", 50e-6, "current"),
     ],
 )
 def test_scalar_frequency_and_current_attributes(key, value, quantity, expected, unit, capsys):
@@ -703,6 +704,7 @@ def test_center_frequency(value, expected, capsys):
         ("Current - Surge(Itsm@F)", "170A@60Hz, 155A@50Hz", [170.0, 155.0]),
         ("Send Current", "9.5mA, 16mA", [0.0095, 0.016]),
         ("Current of Transmitting", "7.1mA, 3.5mA", [0.0071, 0.0035]),
+        ("Current - Collector Cutoff", "100uA, 500uA", [100e-6, 500e-6]),
     ],
 )
 def test_current_lists(key, value, expected, capsys):
