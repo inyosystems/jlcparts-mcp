@@ -50,6 +50,7 @@ const ComponentQueryParams = {
     q: StringParam,
     cf: StringParam,
     all: BooleanParam,
+    none: BooleanParam,
     c: DelimitedNumericArrayParam,
     f: CompressedJsonParam,
 };
@@ -147,6 +148,7 @@ function categoryUrlSignature(query = {}) {
         q: query.q || "",
         cf: query.cf || "",
         all: Boolean(query.all),
+        none: Boolean(query.none),
         c: sortedNumbers(query.c),
     });
 }
@@ -963,13 +965,16 @@ class CategoryFilter extends React.Component {
         const searchString = query?.q ?? "";
         const categoryFilterString = query?.cf ?? "";
         const categoryIds = new Set(sortedNumbers(query?.c));
-        const allCategories = Boolean(query?.all) ||
-            (categoryIds.size === 0 && searchString.trim().length >= 3);
+        const noCategories = Boolean(query?.none);
+        const allCategories = !noCategories && (
+            Boolean(query?.all) ||
+            (categoryIds.size === 0 && searchString.trim().length >= 3)
+        );
         const categories = {};
 
         for (const category of this.props.categories) {
             const visible = this.categoryMatchesFilter(category, categoryFilterString);
-            categories[category.category] = !visible
+            categories[category.category] = noCategories || !visible
                 ? []
                 : allCategories
                 ? category.subcategories.map(subcategory => subcategory.key)
@@ -988,18 +993,24 @@ class CategoryFilter extends React.Component {
         }
         this.lastAppliedUrlSignature = signature;
         clearTimeout(this.searchTimeout);
-        this.setState(this.stateFromUrlQuery(this.props.urlQuery), this.notifyParent);
+        this.setState(this.stateFromUrlQuery(this.props.urlQuery), () => {
+            this.clearStaleFilterUrlState();
+            this.notifyParent();
+        });
     }
 
     buildUrlQueryPatch(state = this.state) {
         const activeCategories = sortedNumbers(Object.values(state.categories).flat());
+        const noCategories = !state.allCategories && activeCategories.length === 0;
         return {
             q: state.searchString || undefined,
             cf: state.categoryFilterString || undefined,
             all: state.allCategories ? true : undefined,
-            c: state.allCategories || activeCategories.length === 0
+            none: noCategories ? true : undefined,
+            c: state.allCategories || noCategories
                 ? undefined
                 : activeCategories,
+            f: noCategories ? undefined : this.props.urlQuery?.f,
         };
     }
 
@@ -1010,6 +1021,12 @@ class CategoryFilter extends React.Component {
             ...patch,
         });
         this.props.setUrlQuery?.(patch, updateType);
+    }
+
+    clearStaleFilterUrlState = () => {
+        if (this.props.urlQuery?.none && this.props.urlQuery?.f !== undefined) {
+            this.props.setUrlQuery?.({f: undefined}, "replaceIn");
+        }
     }
 
     notifyParent = () => {
