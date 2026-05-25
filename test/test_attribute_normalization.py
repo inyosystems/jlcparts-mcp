@@ -499,6 +499,7 @@ def test_junction_capacitance_at_frequency_list(capsys):
         ("CISS-Input Capacitance", "24pF", 24e-12),
         ("Output Capacitance(Coes)", "262nF", 262e-9),
         ("Output Capacitance(Coes)", "160pF", 160e-12),
+        ("Con", "380pF", 380e-12),
     ],
 )
 def test_scalar_capacitance_attributes(key, value, capacitance, capsys):
