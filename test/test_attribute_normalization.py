@@ -130,6 +130,8 @@ def test_impedance_zzk(value, expected, capsys):
         ("Operating Voltage", "-15V~15V", (-15.0, 15.0)),
         ("Voltage - Input(DC)", "900mV~5.5V", (0.9, 5.5)),
         ("Voltage - Input(DC)", "45V", 45.0),
+        ("Input Voltage(DC)", "6V~58V", (6.0, 58.0)),
+        ("Input Voltage(DC)", "24V", 24.0),
         ("Low Level Range (VIL)", "700mV~800mV", (0.7, 0.8)),
         ("Low Level Range (VIL)", "0.8V", 0.8),
         ("Operating Voltage", "-", "NaN"),
@@ -184,6 +186,15 @@ def test_operating_voltage_multiple_ranges(capsys):
     assert_quantity(values["voltage 1 max"], 1.89, "voltage")
     assert_quantity(values["voltage 2 min"], 3.135, "voltage")
     assert_quantity(values["voltage 2 max"], 3.465, "voltage")
+
+
+def test_input_voltage_dc_multiple_ranges(capsys):
+    values = normalized_values("Input Voltage(DC)", "7V~31V;6.5V~36V", capsys)
+
+    assert_quantity(values["voltage 1 min"], 7.0, "voltage")
+    assert_quantity(values["voltage 1 max"], 31.0, "voltage")
+    assert_quantity(values["voltage 2 min"], 6.5, "voltage")
+    assert_quantity(values["voltage 2 max"], 36.0, "voltage")
 
 
 def test_dual_supply_multiple_ranges(capsys):
