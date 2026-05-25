@@ -829,6 +829,30 @@ def test_channel_count(value, expected, capsys):
     for quantity, count in expected.items():
         assert_quantity(values[quantity], count, "count")
 
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Integral Non - Linearity", "1LSB", {"linearity": [1, "lsb"]}),
+        ("Integral Non - Linearity", "1/2LSB", {"linearity": [0.5, "lsb"]}),
+        ("Integral Non - Linearity", "2LSB, 1LSB, 4LSB", {
+            "linearity 1": [2, "lsb"],
+            "linearity 2": [1, "lsb"],
+            "linearity 3": [4, "lsb"],
+        }),
+        ("Integral Nonlinearity", "±8LSB;±1LSB", {
+            "linearity 1": [8, "lsb"],
+            "linearity 2": [1, "lsb"],
+        }),
+        ("Integral Nonlinearity", "±0.001%", {"linearity": [0.001, "percentage"]}),
+        ("Inl/Dnl(Lsb)", "-", {"linearity": ["NaN", "lsb"]}),
+    ],
+)
+def test_lsb_linearity(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, expected_value in expected.items():
+        assert_quantity(values[quantity], expected_value[0], expected_value[1])
+
 
 def test_gpio_ports_number_count(capsys):
     values = normalized_values("Gpio Ports Number", "34", capsys)

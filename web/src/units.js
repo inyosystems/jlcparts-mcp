@@ -7,7 +7,7 @@ export function quantityComparator(quantityName) {
         "length", "inductance", "temperature", "charge", "frequency",
         "percentage", "ppm", "time", "data_rate", "luminous_intensity", "radiant_intensity", "energy",
         "voltage_noise_density", "voltage_temperature_drift", "temperature_coefficient", "decibel", "decibel_milliwatt", "ratio", "kelvin", "angle",
-        "data_size", "melting_i2t", "slew_rate", "area_mm2", "awg", "magnetic_flux_density"
+        "data_size", "melting_i2t", "slew_rate", "area_mm2", "awg", "magnetic_flux_density", "lsb"
     ];
     if (numericQuantities.includes(quantityName))
         return numericComparator;
@@ -37,6 +37,7 @@ export function quantityFormatter(quantityName) {
         voltage_noise_density: siFormatter("V/√Hz"),
         voltage_temperature_drift: siFormatter("V/°C"),
         temperature_coefficient: x => x === "NaN" ? "-" : `${x} ppm/°C`,
+        lsb: x => x === "NaN" ? "-" : `${x} LSB`,
         awg: awgFormatter,
         magnetic_flux_density: siFormatter("T"),
         length: siFormatter("m"),

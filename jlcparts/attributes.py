@@ -349,6 +349,16 @@ def readMeltingI2t(value):
         return "NaN"
     return float(value)
 
+def readLsb(value):
+    value = value.strip().replace("±", "")
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"LSB$", "", value, flags=re.I).strip()
+    if "/" in value:
+        numerator, denominator = value.split("/", 1)
+        return float(numerator) / float(denominator)
+    return float(value)
+
 def readPercentage(value):
     value = value.strip().replace("±", "")
     if value in ["-", "--", "null"]:
@@ -649,6 +659,25 @@ def channelCountAttribute(value):
     return {
         "format": ", ".join("${" + f"count {i}" + "}" for i in range(1, len(parts) + 1)),
         "primary": "count 1",
+        "values": values
+    }
+
+def lsbListAttribute(value, name="linearity"):
+    value = str(value)
+    parts = [x.strip() for x in re.split(r"[,;]", value) if x.strip()]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        quantity = name if len(parts) == 1 else f"{name} {index}"
+        if part.endswith("%"):
+            parsed = scalarAttribute(part, readPercentage, "percentage", quantity)
+        else:
+            parsed = scalarAttribute(part, readLsb, "lsb", quantity)
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
         "values": values
     }
 
