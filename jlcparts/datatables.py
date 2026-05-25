@@ -274,7 +274,7 @@ def normalizeAttribute(key, value):
             value = attributes.kelvinAttribute(value)
         elif key in larr(["Color Temperature"]):
             value = attributes.kelvinRangeListAttribute(value)
-        elif key in larr(["Wire Gauge - MM2"]):
+        elif key in larr(["Wire Gauge - MM2", "Wire Gauge - Sqmm"]):
             value = attributes.areaMm2RangeListAttribute(value)
         elif key in larr(["Viewing Angle"]):
             value = attributes.angleListAttribute(value)
