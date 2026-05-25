@@ -239,11 +239,15 @@ def normalizeAttribute(key, value):
             value = attributes.lsbListAttribute(value, "gain error" if key == "gain error" else "linearity")
         elif key in larr(["Number of Channels", "Number of Elements"]):
             value = attributes.channelCountAttribute(value)
+        elif key in larr(["Filter Order"]):
+            value = attributes.filterOrderAttribute(value)
+        elif key in larr(["Number of Bits Per Element"]):
+            value = attributes.countListAttribute(value)
         elif key in larr(["Number of Pins", "Number of Resistors", "Number of Loop",
                     "Number of Regulators", "Number of Outputs", "Number of Capacitors",
                     "Number of I/O", "Gpio Ports Number", "Number of Logic Elements/Blocks",
                     "Number of Differential Input Channels", "Number of Taps",
-                    "Number of Voltages Monitored",
+                    "Number of Voltages Monitored", "Number of Amplifiers",
                     "Attrition", "Minimum Order Quantity", "Minimum Placement Quantity",
                     "Minimum Purchase Quantity", "Order Multiple", "Packaging Quantity",
                     "Warehouse Stock - Jiangsu", "Warehouse Stock - Shenzhen",

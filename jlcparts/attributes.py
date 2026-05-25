@@ -668,6 +668,24 @@ def channelCountAttribute(value):
         "values": values
     }
 
+def countListAttribute(value):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",") if x.strip()]
+    if len(parts) <= 1:
+        return countAttribute(value)
+    values = {}
+    for index, part in enumerate(parts, start=1):
+        values[f"count {index}"] = [sum(map(int, part.split("+"))), "count"]
+    return {
+        "format": ", ".join("${" + f"count {i}" + "}" for i in range(1, len(parts) + 1)),
+        "primary": "count 1",
+        "values": values
+    }
+
+def filterOrderAttribute(value):
+    value = re.sub(r"(\d+)(?:st|nd|rd|th)\s+Order", r"\1", str(value), flags=re.I)
+    return countListAttribute(value)
+
 def lsbListAttribute(value, name="linearity"):
     value = str(value)
     parts = [x.strip() for x in re.split(r"[,;]", value) if x.strip()]

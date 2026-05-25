@@ -852,6 +852,23 @@ def test_number_of_voltages_monitored_count(capsys):
 
     assert_quantity(values["count"], 12, "count")
 
+def test_number_of_amplifiers_count(capsys):
+    values = normalized_values("Number of Amplifiers", "1", capsys)
+
+    assert_quantity(values["count"], 1, "count")
+
+def test_filter_order_count(capsys):
+    values = normalized_values("Filter Order", "5th Order, 4th Order", capsys)
+
+    assert_quantity(values["count 1"], 5, "count")
+    assert_quantity(values["count 2"], 4, "count")
+
+def test_number_of_bits_per_element_count(capsys):
+    values = normalized_values("Number of Bits Per Element", "4, 2", capsys)
+
+    assert_quantity(values["count 1"], 4, "count")
+    assert_quantity(values["count 2"], 2, "count")
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
