@@ -249,6 +249,18 @@ def scalarAttribute(value, reader, unit, name="value"):
         }
     }
 
+def scalarListAttribute(value, reader, unit, name="value"):
+    value = str(value)
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    for i, part in enumerate(parts, start=1):
+        values[f"{name} {i}"] = [reader(_stripCondition(part)), unit]
+    return {
+        "format": ", ".join("${" + f"{name} {i}" + "}" for i in range(1, len(parts) + 1)),
+        "primary": f"{name} 1",
+        "values": values
+    }
+
 def rangeOrScalarAttribute(value, reader, unit, name="value"):
     value = str(value)
     if value in ["-", "--", "null"]:
@@ -453,6 +465,27 @@ def inductanceAttribute(value):
 def frequencyAttribute(value):
     value = str(value)
     return rangeOrScalarAttribute(value, readFrequency, "frequency", "frequency")
+
+def frequencyListAttribute(value):
+    return scalarListAttribute(value, readFrequency, "frequency", "frequency")
+
+def frequencyRangeListAttribute(value):
+    value = str(value)
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        parsed = rangeOrScalarAttribute(part, readFrequency, "frequency", f"frequency {i}")
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": "frequency 1 min" if any(_rangeParts(part) for part in parts) else "frequency 1",
+        "values": values
+    }
+
+def currentListAttribute(value):
+    return scalarListAttribute(value, readCurrent, "current", "current")
 
 def dataRateAttribute(value):
     value = str(value)

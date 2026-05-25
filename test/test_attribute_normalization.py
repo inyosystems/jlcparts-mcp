@@ -105,3 +105,54 @@ def test_operating_voltage_multiple_ranges(capsys):
     assert_quantity(values["voltage 1 max"], 1.89, "voltage")
     assert_quantity(values["voltage 2 min"], 3.135, "voltage")
     assert_quantity(values["voltage 2 max"], 3.465, "voltage")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "quantity", "expected", "unit"),
+    [
+        ("Sampling Rate", "352800Hz", "frequency", 352800.0, "frequency"),
+        ("Non-Repetitive Peak Forward Surge Current", "1.95kA", "current", 1950.0, "current"),
+        ("Quiescent Supply Current", "50nA", "current", 50e-9, "current"),
+    ],
+)
+def test_scalar_frequency_and_current_attributes(key, value, quantity, expected, unit, capsys):
+    values = normalized_values(key, value, capsys)
+    assert_quantity(values[quantity], expected, unit)
+
+
+def test_sampling_rate_lists(capsys):
+    values = normalized_values("Sampling Rate", "48000Hz, 32000Hz, 44100Hz", capsys)
+
+    assert_quantity(values["frequency 1"], 48000.0, "frequency")
+    assert_quantity(values["frequency 2"], 32000.0, "frequency")
+    assert_quantity(values["frequency 3"], 44100.0, "frequency")
+
+
+def test_sampling_rate_range_lists(capsys):
+    values = normalized_values("Sampling Rate", "16kHz~96kHz, 16kHz~192kHz", capsys)
+
+    assert_quantity(values["frequency 1 min"], 16000.0, "frequency")
+    assert_quantity(values["frequency 1 max"], 96000.0, "frequency")
+    assert_quantity(values["frequency 2 min"], 16000.0, "frequency")
+    assert_quantity(values["frequency 2 max"], 192000.0, "frequency")
+
+
+def test_sampling_rate_time_range(capsys):
+    values = normalized_values("Sampling Rate", "0.1ms~23.5ms", capsys)
+
+    assert_quantity(values["time min"], 0.0001, "time")
+    assert_quantity(values["time max"], 0.0235, "time")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Non-Repetitive Peak Forward Surge Current", "120A, 240A", [120.0, 240.0]),
+        ("Quiescent Supply Current", "2mA, 1mA, 600uA", [0.002, 0.001, 0.0006]),
+    ],
+)
+def test_current_lists(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for index, current in enumerate(expected, start=1):
+        assert_quantity(values[f"current {index}"], current, "current")

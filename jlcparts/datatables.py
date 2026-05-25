@@ -121,8 +121,11 @@ def normalizeAttribute(key, value):
                     "Saturation Current (Isat)", "Reverse Leakage Current", "Reverse Leakage Current (Ir)",
                     "Peak Pulse Current (Ipp)", "Peak Pulse Current (Ipp) @ 10/1000us",
                     "Quiescent Current", "Quiescent Current (Iq)", "Quiescent Current(Iq)",
-                    "Ib - Input Bias Current", "Standby Current"]):
-            if isinstance(value, str) and ("," in value or re.search(r"\d\s*-\s*\d", value)):
+                    "Ib - Input Bias Current", "Standby Current",
+                    "Non-Repetitive Peak Forward Surge Current", "Quiescent Supply Current"]):
+            if key in ["non-repetitive peak forward surge current", "quiescent supply current"] and isinstance(value, str) and "," in value:
+                value = attributes.currentListAttribute(value)
+            elif isinstance(value, str) and ("," in value or re.search(r"\d\s*-\s*\d", value)):
                 value = attributes.stringAttribute(value)
             else:
                 value = attributes.currentAttribute(value)
@@ -215,11 +218,18 @@ def normalizeAttribute(key, value):
         elif key in larr(["Frequency - self resonant", "Output frequency (max)",
                 "Frequency - Switching", "Frequency Range", "Frequency", "Clock Frequency",
                 "Switching Frequency", "Bandwidth", "Gain Bandwidth Product",
-                "Gain Bandwidth Product(GBP)", "Frequency - Center"]):
+                "Gain Bandwidth Product(GBP)", "Frequency - Center", "Sampling Rate"]):
             if isinstance(value, str) and re.search(r"(?:bit/s|bps)\s*$", value, flags=re.IGNORECASE):
                 value = attributes.dataRateAttribute(value)
             else:
-                value = attributes.stringAttribute(value) if compoundValue(value) else attributes.frequencyAttribute(value)
+                if key == "sampling rate" and isinstance(value, str) and re.search(r"\d\s*[munp]?s\b", value, flags=re.IGNORECASE):
+                    value = attributes.timeAttribute(value)
+                elif key == "sampling rate" and isinstance(value, str) and "," in value and "~" in value:
+                    value = attributes.frequencyRangeListAttribute(value)
+                elif key == "sampling rate" and isinstance(value, str) and "," in value:
+                    value = attributes.frequencyListAttribute(value)
+                else:
+                    value = attributes.stringAttribute(value) if compoundValue(value) else attributes.frequencyAttribute(value)
         elif key in larr(["Inductance @ Frequency"]):
             value = attributes.stringAttribute(value) if compoundValue(value) else attributes.inductanceAtFrequency(value)
         elif key in larr(["Propagation Delay", "Propagation Delay Time", "Turn-On Time",
