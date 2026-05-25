@@ -273,6 +273,20 @@ def test_sampling_rate_time_range(capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("490MHz", 490e6),
+        ("16GHz", 16e9),
+        ("-", "NaN"),
+    ],
+)
+def test_cut_off_frequency(value, expected, capsys):
+    values = normalized_values("Cut-Off Frequency", value, capsys)
+
+    assert_quantity(values["frequency"], expected, "frequency")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Non-Repetitive Peak Forward Surge Current", "120A, 240A", [120.0, 240.0]),

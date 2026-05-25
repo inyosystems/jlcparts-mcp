@@ -268,7 +268,7 @@ def normalizeAttribute(key, value):
                 "Frequency - Switching", "Frequency Range", "Frequency", "Clock Frequency",
                 "Switching Frequency", "Bandwidth", "Gain Bandwidth Product",
                 "Gain Bandwidth Product(GBP)", "Frequency - Center", "Sampling Rate",
-                "-3d B Bandwidth"]):
+                "-3d B Bandwidth", "Cut-Off Frequency"]):
             if isinstance(value, str) and re.search(r"(?:bit/s|bps)\s*$", value, flags=re.IGNORECASE):
                 value = attributes.dataRateAttribute(value)
             else:
