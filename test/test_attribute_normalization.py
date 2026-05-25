@@ -76,6 +76,29 @@ def test_rds_on_multiple_measurements(value, measurements, capsys):
 @pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
+        ("Coil Resistance", "1.44kΩ", {"resistance": 1440.0}),
+        ("Coil Resistance", "540Ω, 400Ω, 220Ω", {
+            "resistance 1": 540.0,
+            "resistance 2": 400.0,
+            "resistance 3": 220.0,
+        }),
+        ("Ron", "500mΩ", {"resistance": 0.5}),
+        ("Ron", "245Ω@9V, 2.5kΩ@5V", {
+            "resistance 1": 245.0,
+            "resistance 2": 2500.0,
+        }),
+    ],
+)
+def test_resistance_list_attributes(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, resistance in expected.items():
+        assert_quantity(values[quantity], resistance, "resistance")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
         ("Single Supply", "2V~36V", (2.0, 36.0)),
         ("Operating Voltage", "±15V", (-15.0, 15.0)),
         ("Operating Voltage", "-15V~15V", (-15.0, 15.0)),

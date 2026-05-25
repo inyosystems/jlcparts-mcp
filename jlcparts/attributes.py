@@ -56,6 +56,7 @@ def readResistance(value):
     """
     Given a string, try to parse resistance and return it as Ohms (float)
     """
+    value = value.split("@")[0]
     value = erase(value, ["Ω", "Ohms", "Ohm", "(Max)", "Max"]).strip()
     value = value.replace(" ", "") # Sometimes there are spaces after decimal place
     unitPrefixes = {
@@ -325,6 +326,9 @@ def resistanceAttribute(value):
                 "resistance": [value, "resistance"]
             }
         }
+
+def resistanceListAttribute(value):
+    return scalarListAttribute(value, readResistance, "resistance", "resistance")
 
 def impedanceAttribute(value):
     value = readResistance(value)
