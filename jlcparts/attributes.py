@@ -520,6 +520,7 @@ def frequencyRangeListAttribute(value):
     }
 
 def currentListAttribute(value):
+    value = str(value).replace(";", ",")
     return scalarListAttribute(value, readCurrent, "current", "current")
 
 def luminousIntensityAttribute(value):

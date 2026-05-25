@@ -489,6 +489,24 @@ def test_average_rectified_current(value, expected, capsys):
     assert_quantity(values["current"], expected, "current")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("4A", [4.0]),
+        ("500uA", [500e-6]),
+        ("870mA;770mA", [0.87, 0.77]),
+    ],
+)
+def test_collector_current(value, expected, capsys):
+    values = normalized_values("Collector Current (Ic)", value, capsys)
+
+    if len(expected) == 1:
+        assert_quantity(values["current"], expected[0], "current")
+    else:
+        for index, current in enumerate(expected, start=1):
+            assert_quantity(values[f"current {index}"], current, "current")
+
+
 def test_number_of_io_count(capsys):
     values = normalized_values("Number of I/O", "8", capsys)
 

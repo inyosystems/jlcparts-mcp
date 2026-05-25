@@ -131,6 +131,7 @@ def normalizeAttribute(key, value):
                     "Output Current", "Output Current (Max)", "Rectified Current",
                     "Output / Channel Current", "Current - Output", "Current Range",
                     "Trip Current", "Maximum Continuous Current", "Operating Current",
+                    "Collector Current (Ic)",
                     "Saturation Current (Isat)", "Reverse Leakage Current", "Reverse Leakage Current (Ir)",
                     "Peak Pulse Current (Ipp)", "Peak Pulse Current (Ipp) @ 10/1000us",
                     "Quiescent Current", "Quiescent Current (Iq)", "Quiescent Current(Iq)",
@@ -155,10 +156,11 @@ def normalizeAttribute(key, value):
                 "current of transmitting",
                 "maximum continuous current",
                 "operating current",
+                "collector current (ic)",
             ]
             if key == "current range":
                 value = attributes.currentRangeListAttribute(value)
-            elif key in currentListKeys and isinstance(value, str) and "," in value:
+            elif key in currentListKeys and isinstance(value, str) and ("," in value or ";" in value):
                 value = attributes.currentListAttribute(value)
             elif isinstance(value, str) and ("," in value or re.search(r"\d\s*-\s*\d", value)):
                 value = attributes.stringAttribute(value)
