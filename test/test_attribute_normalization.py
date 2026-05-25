@@ -817,6 +817,11 @@ def test_number_of_differential_input_channels_count(capsys):
 
     assert_quantity(values["count"], 3, "count")
 
+def test_number_of_taps_count(capsys):
+    values = normalized_values("Number of Taps", "256", capsys)
+
+    assert_quantity(values["count"], 256, "count")
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [

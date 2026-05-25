@@ -239,7 +239,7 @@ def normalizeAttribute(key, value):
         elif key in larr(["Number of Pins", "Number of Resistors", "Number of Loop",
                     "Number of Regulators", "Number of Outputs", "Number of Capacitors",
                     "Number of I/O", "Gpio Ports Number", "Number of Logic Elements/Blocks",
-                    "Number of Differential Input Channels",
+                    "Number of Differential Input Channels", "Number of Taps",
                     "Attrition", "Minimum Order Quantity", "Minimum Placement Quantity",
                     "Minimum Purchase Quantity", "Order Multiple", "Packaging Quantity",
                     "Warehouse Stock - Jiangsu", "Warehouse Stock - Shenzhen",
