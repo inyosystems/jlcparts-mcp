@@ -369,6 +369,18 @@ def test_clock_frequency_lists(capsys):
     assert_quantity(values["frequency 2 max"], 200e6, "frequency")
 
 
+def test_cpu_maximum_speed_lists(capsys):
+    values = normalized_values("CPU Maximum Speed", "400MHz, 800MHz, 1GHz", capsys)
+
+    assert_quantity(values["frequency 1"], 400e6, "frequency")
+    assert_quantity(values["frequency 2"], 800e6, "frequency")
+    assert_quantity(values["frequency 3"], 1e9, "frequency")
+
+    values = normalized_values("CPU Maximum Speed", "-", capsys)
+
+    assert_quantity(values["frequency"], "NaN", "frequency")
+
+
 def test_sampling_rate_time_range(capsys):
     values = normalized_values("Sampling Rate", "0.1ms~23.5ms", capsys)
 
