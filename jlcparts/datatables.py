@@ -162,6 +162,7 @@ def normalizeAttribute(key, value):
                 "collector current (ic)",
                 "current consumption",
                 "peak pulse current(ipp)@8/20us",
+                "output current",
             ]
             if key in ["current - leakage"]:
                 value = attributes.currentAttribute(value)

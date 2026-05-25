@@ -190,6 +190,15 @@ def test_current_consumption(value, expected, capsys):
         assert_quantity(values[quantity], current, "current")
 
 
+def test_output_current_list(capsys):
+    values = normalized_values("Output Current", "46mA, 42mA, 48mA, 38mA", capsys)
+
+    assert_quantity(values["current 1"], 46e-3, "current")
+    assert_quantity(values["current 2"], 42e-3, "current")
+    assert_quantity(values["current 3"], 48e-3, "current")
+    assert_quantity(values["current 4"], 38e-3, "current")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
