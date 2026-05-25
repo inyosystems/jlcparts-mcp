@@ -429,12 +429,20 @@ def test_voltage_range_list_attributes(key, value, expected, capsys):
         ("Peak Non-Repetitive Surge Current (Itsm@F)", "160A@50Hz", "current", 160.0, "current"),
         ("Quiescent Current (Ground Current)", "800nA", "current", 800e-9, "current"),
         ("Quiescent Current Per Amplifier", "1.14mA", "current", 0.00114, "current"),
+        ("Peak Output Current(Sink)", "2mA", "current", 0.002, "current"),
         ("Hold Current", "750mA", "current", 0.75, "current"),
     ],
 )
 def test_scalar_frequency_and_current_attributes(key, value, quantity, expected, unit, capsys):
     values = normalized_values(key, value, capsys)
     assert_quantity(values[quantity], expected, unit)
+
+
+def test_peak_output_current_sink_list(capsys):
+    values = normalized_values("Peak Output Current(Sink)", "200uA, 16mA", capsys)
+
+    assert_quantity(values["current 1"], 200e-6, "current")
+    assert_quantity(values["current 2"], 0.016, "current")
 
 
 def test_sampling_rate_lists(capsys):
