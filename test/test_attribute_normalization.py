@@ -842,6 +842,22 @@ def test_conversion_efficiency_values(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("47.6%", {"percentage 1": 47.6}),
+        ("87%, 83%", {"percentage 1": 87.0, "percentage 2": 83.0}),
+        ("0.89", {"percentage 1": 89.0}),
+        ("-", {"percentage 1": "NaN"}),
+    ],
+)
+def test_efficiency_values(value, expected, capsys):
+    values = normalized_values("Efficiency", value, capsys)
+
+    for quantity, percentage in expected.items():
+        assert_quantity(values[quantity], percentage, "percentage")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("1.5kW", 1500.0),
         ("150mW", 0.15),
         ("60W@8/20us", 60.0),

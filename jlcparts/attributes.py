@@ -246,6 +246,15 @@ def readPercentage(value):
         value = value[:-1]
     return float(value)
 
+def readEfficiencyPercentage(value):
+    value = value.strip()
+    if value.endswith("%") or value in ["-", "--", "null"]:
+        return readPercentage(value)
+    parsed = readPercentage(value)
+    if parsed != "NaN" and 0 <= parsed <= 1:
+        return parsed * 100
+    return parsed
+
 def readDecibel(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
@@ -617,6 +626,21 @@ def percentageRangeListAttribute(value):
     formats = []
     for i, part in enumerate(parts, start=1):
         parsed = rangeOrScalarAttribute(part, readPercentage, "percentage", f"percentage {i}")
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": f"percentage 1 min" if any(_rangeParts(part) for part in parts) else "percentage 1",
+        "values": values
+    }
+
+def efficiencyPercentageRangeListAttribute(value):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        parsed = rangeOrScalarAttribute(part, readEfficiencyPercentage, "percentage", f"percentage {i}")
         values.update(parsed["values"])
         formats.append(parsed["format"])
     return {
