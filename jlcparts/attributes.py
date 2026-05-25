@@ -223,6 +223,8 @@ def _rangeParts(value):
     value = value.strip()
     value = re.sub(r"\(.*?\)", "", value)
     value = value.replace(" to ", "~")
+    if "..." in value:
+        return value.split("...", 1)
     if ".." in value:
         return value.split("..", 1)
     if "~" in value:
@@ -1044,6 +1046,7 @@ def capacityAtVoltage(value):
             }
         }
     def readTheTuple(value):
+        value = value.strip()
         try:
             c, v = tuple(value.split("@"))
         except:
@@ -1055,23 +1058,29 @@ def capacityAtVoltage(value):
                 v = None
         c = readCapacitance(c.strip())
         if v is not None:
-            v = readVoltage(v.strip())
+            v = v.strip()
+            if "V" in v or "v" in v:
+                rangeParts = _rangeParts(v)
+                if rangeParts is not None:
+                    v = readVoltage(rangeParts[-1].strip())
+                else:
+                    v = readVoltage(v)
+            else:
+                v = "NaN"
         else:
             v = "NaN"
         return c, v
-    if ";" in value:
-        a, b = tuple(value.split(";"))
-        c1, v1 = readTheTuple(a)
-        c2, v2 = readTheTuple(b)
+    if ";" in value or ("," in value and "@" not in value):
+        separator = ";" if ";" in value else ","
+        parsed = [readTheTuple(x) for x in value.split(separator)]
+        values = {}
+        for i, (c, v) in enumerate(parsed, start=1):
+            values[f"capacity {i}"] = [c, "capacitance"]
+            values[f"voltage {i}"] = [v, "voltage"]
         return {
-            "format": "${capacity 1} @ ${voltage 1}; {capacity 2} @ ${voltage 2}",
+            "format": "; ".join(f"${{capacity {i}}} @ ${{voltage {i}}}" for i in range(1, len(parsed) + 1)),
             "default": "capacity 1",
-            "values": {
-                "capacity 1": [c1, "capacitance"],
-                "voltage 1": [v1, "voltage"],
-                "capacity 2": [c2, "capacitance"],
-                "voltage 2": [v2, "voltage"]
-            }
+            "values": values
         }
     c, v = readTheTuple(value)
     return {

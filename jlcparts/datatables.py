@@ -197,7 +197,7 @@ def normalizeAttribute(key, value):
         elif key in larr(["Input Capacitance (Ciss@Vds)", "Input Capacitance (Ciss @ Vds)",
                    "Output Capacitance (Coss @ Vds)",
                    "Reverse Transfer Capacitance (Crss@Vds)", "Reverse Transfer Capacitance (Crss @ Vds)"]):
-            value = attributes.stringAttribute(value) if multiScalarValue(value) or (isinstance(value, str) and value.count(";") != 0) else attributes.capacityAtVoltage(value)
+            value = attributes.capacityAtVoltage(value)
         elif key in larr(["Total Gate Charge (Qg@Vgs)", "Total Gate Charge (Qg @ Vgs)"]):
             value = attributes.stringAttribute(value) if isinstance(value, str) and value.count(";") != 0 else attributes.chargeAtVoltage(value)
         elif key in larr(["Data Rate"]):
