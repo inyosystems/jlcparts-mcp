@@ -21,7 +21,6 @@ import {
   db
 } from './db'
 import { ComponentOverview } from './componentTable'
-import { History } from './history'
 import { CompareParts } from './compare'
 
 
@@ -261,9 +260,6 @@ function Navbar() {
     <NavLink to="/compare" className={navClassName}>
       Compare parts
     </NavLink>
-    <NavLink to="/history" className={navClassName}>
-       Catalog history
-    </NavLink>
   </div>
 }
 
@@ -290,7 +286,6 @@ function App() {
             <Routes>
                 <Route path="/" element={<ComponentOverview/>} />
                 <Route path="/compare" element={<CompareParts/>} />
-                <Route path="/history" element={<History/>} />
                 <Route path="*" element={<NoMatch />} />
             </Routes>
           </QueryParamProvider>
