@@ -610,6 +610,21 @@ def timeAtConditionAttribute(value):
 def percentageAttribute(value):
     return rangeOrScalarAttribute(value, readPercentage, "percentage", "percentage")
 
+def percentageRangeListAttribute(value):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        parsed = rangeOrScalarAttribute(part, readPercentage, "percentage", f"percentage {i}")
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": f"percentage 1 min" if any(_rangeParts(part) for part in parts) else "percentage 1",
+        "values": values
+    }
+
 def temperatureRangeAttribute(value):
     value = str(value).replace("°C", "℃")
     if value.strip() in ["-", "--", "null"]:

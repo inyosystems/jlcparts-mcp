@@ -252,8 +252,11 @@ def normalizeAttribute(key, value):
             value = attributes.stringAttribute(value) if compoundValue(value) else attributes.wavelengthAttribute(value)
         elif key in larr(["Tolerance"]):
             value = attributes.percentageAttribute(value) if isinstance(value, str) and "%" in value and not compoundValue(value) else attributes.stringAttribute(value)
-        elif key in larr(["Duty Cycle"]):
-            value = attributes.stringAttribute(value) if compoundValue(value) else attributes.percentageAttribute(value)
+        elif key in larr(["Duty Cycle", "Conversion Efficiency"]):
+            if key == "conversion efficiency" and compoundValue(value):
+                value = attributes.percentageRangeListAttribute(value)
+            else:
+                value = attributes.stringAttribute(value) if compoundValue(value) else attributes.percentageAttribute(value)
         elif key == "Rds On (Max) @ Id, Vgs".lower():
             value = attributes.rdsOnMaxAtIdsAtVgs(value)
         elif key in larr(["Operating Temperature", "Operating Temperature (Max)", "Operating Temperature (Min)"]):

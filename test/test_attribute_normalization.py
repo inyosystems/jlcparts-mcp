@@ -821,6 +821,27 @@ def test_viewing_angle_values(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("83%", {"percentage": 83.0}),
+        ("82%~90%", {"percentage min": 82.0, "percentage max": 90.0}),
+        ("89%, 92%", {"percentage 1": 89.0, "percentage 2": 92.0}),
+        ("88.5%, 85.5%, 88.2%, 85.2%", {
+            "percentage 1": 88.5,
+            "percentage 2": 85.5,
+            "percentage 3": 88.2,
+            "percentage 4": 85.2,
+        }),
+    ],
+)
+def test_conversion_efficiency_values(value, expected, capsys):
+    values = normalized_values("Conversion Efficiency", value, capsys)
+
+    for quantity, percentage in expected.items():
+        assert_quantity(values[quantity], percentage, "percentage")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("1.5kW", 1500.0),
         ("150mW", 0.15),
         ("60W@8/20us", 60.0),
