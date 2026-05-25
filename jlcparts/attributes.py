@@ -638,6 +638,9 @@ def powerAtConditionAttribute(value, name="power"):
 def energyAttribute(value):
     return scalarAttribute(value, readEnergy, "energy", "energy")
 
+def energyListAttribute(value):
+    return scalarListAttribute(value, readEnergy, "energy", "energy")
+
 def decibelListAttribute(value, name="level"):
     value = str(value)
     separator = ";" if ";" in value else ","

@@ -224,11 +224,25 @@ def test_luminous_intensity(value, expected, capsys):
         ("Energy", "3.5kJ", 3500.0),
         ("Energy (Max)", "0.05J", 0.05),
         ("Energy (Max)", "-", "NaN"),
+        ("Turn-on Energy (Eon)", "310uJ", 310e-6),
+        ("Switching Energy(Eoff)", "12.9mJ", 0.0129),
     ],
 )
 def test_energy_values(key, value, expected, capsys):
     values = normalized_values(key, value, capsys)
     assert_quantity(values["energy"], expected, "energy")
+
+
+def test_switching_energy_lists(capsys):
+    values = normalized_values("Turn-on Energy (Eon)", "300uJ, 670uJ", capsys)
+
+    assert_quantity(values["energy 1"], 300e-6, "energy")
+    assert_quantity(values["energy 2"], 670e-6, "energy")
+
+    values = normalized_values("Switching Energy(Eoff)", "960uJ, 1.36mJ", capsys)
+
+    assert_quantity(values["energy 1"], 960e-6, "energy")
+    assert_quantity(values["energy 2"], 0.00136, "energy")
 
 
 @pytest.mark.parametrize(
