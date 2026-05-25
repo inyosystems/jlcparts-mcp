@@ -397,6 +397,20 @@ def test_switch_frequency_values(capsys):
     assert_quantity(values["frequency max"], 1e6, "frequency")
 
 
+def test_absolute_bandwidth_values(capsys):
+    values = normalized_values("Absolute Bandwidth", "863MHz~876MHz", capsys)
+
+    assert_quantity(values["frequency min"], 863e6, "frequency")
+    assert_quantity(values["frequency max"], 876e6, "frequency")
+
+    values = normalized_values("Absolute Bandwidth", "2.4GHz~2.5GHz, 4.9GHz~5.95GHz", capsys)
+
+    assert_quantity(values["frequency 1 min"], 2.4e9, "frequency")
+    assert_quantity(values["frequency 1 max"], 2.5e9, "frequency")
+    assert_quantity(values["frequency 2 min"], 4.9e9, "frequency")
+    assert_quantity(values["frequency 2 max"], 5.95e9, "frequency")
+
+
 def test_clock_frequency_lists(capsys):
     values = normalized_values("Clock Frequency", "32MHz, 32kHz, 1MHz", capsys)
 
