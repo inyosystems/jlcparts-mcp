@@ -180,6 +180,7 @@ def normalizeAttribute(key, value):
                     "Peak Current", "Peak Non-Repetitive Surge Current (Itsm@F)",
                     "Hold Current", "Peak Output Current(Sink)",
                     "Peak Output Current(Source)", "Working Current",
+                    "Collector Cut-Off Current (Icbo)",
                     "Supply Current Per Channel"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
