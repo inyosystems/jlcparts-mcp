@@ -81,7 +81,7 @@ def normalizeAttribute(key, value):
             value = attributes.resistanceListAttribute(value) if compoundValue(value) else attributes.resistanceAttribute(value)
         elif key in larr(["Balance Port Impedence", "Unbalance Port Impedence", "Impedance(Zzk)"]):
             value = attributes.impedanceAttribute(value)
-        elif key in larr(["Voltage - Rated", "Voltage Rating - DC", "Allowable Voltage",
+        elif key in larr(["Voltage - Rated", "Voltage Rating - DC", "Allowable Voltage", "Allowable Voltage (DC)",
                 "Rated Voltage", "Rated Voltage (Max)", "Rated Voltage (AC)", "Rated Voltage (DC)",
                 "AC Voltage (Max)", "DC Voltage (Max)",
                 "Supply Voltage", "Supply Voltage (Max)", "Supply Voltage (Min)",

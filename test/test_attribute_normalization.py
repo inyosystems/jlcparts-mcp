@@ -140,6 +140,20 @@ def test_supply_voltage_ranges(key, value, expected, capsys):
         assert_quantity(values["voltage"], expected, "voltage")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("385V", 385.0),
+        ("1.465kV", 1465.0),
+        ("-", "NaN"),
+    ],
+)
+def test_allowable_voltage_dc(value, expected, capsys):
+    values = normalized_values("Allowable Voltage (DC)", value, capsys)
+
+    assert_quantity(values["voltage"], expected, "voltage")
+
+
 def test_operating_voltage_multiple_ranges(capsys):
     values = normalized_values(
         "Operating Voltage",
