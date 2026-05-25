@@ -151,6 +151,8 @@ def normalizeAttribute(key, value):
                 "Height Above Board", "X-Length of Bottom Edge on Board (Spacing Line)",
                 "Y-Width of Bottom Edge on Board", "Z-Height of the Board"]):
             value = attributes.stringAttribute(value) if compoundValue(value) else attributes.lengthAttribute(value)
+        elif key in larr(["Luminous Intensity"]):
+            value = attributes.luminousIntensityAttribute(value)
         elif key in larr(["Wavelength - Dominant", "Dominant Wavelength", "Peak Wavelength"]):
             value = attributes.stringAttribute(value) if compoundValue(value) else attributes.wavelengthAttribute(value)
         elif key in larr(["Tolerance"]):

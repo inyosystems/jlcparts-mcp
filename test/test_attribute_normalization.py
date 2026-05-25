@@ -156,3 +156,34 @@ def test_current_lists(key, value, expected, capsys):
 
     for index, current in enumerate(expected, start=1):
         assert_quantity(values[f"current {index}"], current, "current")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("35mcd", {"intensity 1": 0.035}),
+        ("2.25cd", {"intensity 1": 2.25}),
+        ("68mcd~102mcd", {"intensity 1 min": 0.068, "intensity 1 max": 0.102}),
+        ("800mcd, 1.3cd, 350mcd", {"intensity 1": 0.8, "intensity 2": 1.3, "intensity 3": 0.35}),
+        ("330mcd;840mcd;160mcd", {"intensity 1": 0.33, "intensity 2": 0.84, "intensity 3": 0.16}),
+        ("R:170mcd~360mcd, G:650mcd~1000mcd, B:220mcd~350mcd", {
+            "intensity R min": 0.17,
+            "intensity R max": 0.36,
+            "intensity G min": 0.65,
+            "intensity G max": 1.0,
+            "intensity B min": 0.22,
+            "intensity B max": 0.35,
+        }),
+        ("R:400mcd G:560mcd B:86mcd", {
+            "intensity R": 0.4,
+            "intensity G": 0.56,
+            "intensity B": 0.086,
+        }),
+        ("-", {"intensity 1": "NaN"}),
+    ],
+)
+def test_luminous_intensity(value, expected, capsys):
+    values = normalized_values("Luminous Intensity", value, capsys)
+
+    for quantity, intensity in expected.items():
+        assert_quantity(values[quantity], intensity, "luminous_intensity")

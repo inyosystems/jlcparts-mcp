@@ -5,7 +5,7 @@ export function quantityComparator(quantityName) {
     const numericQuantities = [
         "resistance", "voltage", "current", "power", "count", "capacitance",
         "length", "inductance", "temperature", "charge", "frequency",
-        "percentage", "time", "data_rate"
+        "percentage", "time", "data_rate", "luminous_intensity"
     ];
     if (numericQuantities.includes(quantityName))
         return numericComparator;
@@ -22,6 +22,7 @@ export function quantityFormatter(quantityName) {
         capacitance: siFormatter("F"),
         frequency: siFormatter("Hz"),
         data_rate: siFormatter("bps"),
+        luminous_intensity: siFormatter("cd"),
         length: siFormatter("m"),
         inductance: siFormatter("H"),
         charge: siFormatter("C"),

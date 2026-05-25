@@ -146,6 +146,13 @@ def readInductance(value):
     value = value.replace("H", "").strip()
     return readWithSiPrefix(value)
 
+def readLuminousIntensity(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"cd$", "", value, flags=re.IGNORECASE).strip()
+    return readWithSiPrefix(value)
+
 def readLength(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
@@ -486,6 +493,28 @@ def frequencyRangeListAttribute(value):
 
 def currentListAttribute(value):
     return scalarListAttribute(value, readCurrent, "current", "current")
+
+def luminousIntensityAttribute(value):
+    value = str(value)
+    if "," not in value and ";" not in value and ":" in value:
+        value = re.sub(r"\s+([A-Za-z]+:)", r", \1", value)
+    separator = ";" if ";" in value else ","
+    parts = [x.strip() for x in value.split(separator)]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        label = str(index)
+        if ":" in part:
+            label, part = [x.strip() for x in part.split(":", 1)]
+        name = f"intensity {label}"
+        parsed = rangeOrScalarAttribute(part, readLuminousIntensity, "luminous_intensity", name)
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
 
 def dataRateAttribute(value):
     value = str(value)
