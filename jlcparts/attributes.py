@@ -693,6 +693,20 @@ def qAtFrequencyAttribute(value):
 def capacitanceAtConditionAttribute(value, name="capacitance"):
     return scalarAttribute(value, readCapacitance, "capacitance", name)
 
+def capacitanceAtFrequencyAttribute(value):
+    value = str(value)
+    if "@" not in value:
+        return scalarAttribute(value, readCapacitance, "capacitance", "capacitance")
+    capacitance, frequency = [x.strip() for x in value.split("@", 1)]
+    return {
+        "format": "${capacitance} @ ${frequency}",
+        "primary": "capacitance",
+        "values": {
+            "capacitance": [readCapacitance(capacitance), "capacitance"],
+            "frequency": [readFrequency(frequency), "frequency"]
+        }
+    }
+
 def inductanceAtFrequency(value):
     value = str(value)
     if _hasCompoundValues(value):

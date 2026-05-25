@@ -241,6 +241,8 @@ def normalizeAttribute(key, value):
                     value = attributes.frequencyListAttribute(value)
                 else:
                     value = attributes.stringAttribute(value) if compoundValue(value) else attributes.frequencyAttribute(value)
+        elif key in larr(["Typical Capatitance"]):
+            value = attributes.capacitanceAtFrequencyAttribute(value)
         elif key in larr(["Inductance @ Frequency"]):
             value = attributes.stringAttribute(value) if compoundValue(value) else attributes.inductanceAtFrequency(value)
         elif key in larr(["Propagation Delay", "Propagation Delay Time", "Turn-On Time",

@@ -297,3 +297,19 @@ def test_q_at_frequency(value, expected, capsys):
             assert_quantity(values[f"frequency {index}"], frequency, "frequency")
         else:
             assert f"frequency {index}" not in values
+
+
+@pytest.mark.parametrize(
+    ("value", "capacitance"),
+    [
+        ("190pF@1kHz", 190e-12),
+        ("3.3nF", 3.3e-9),
+        ("-", "NaN"),
+    ],
+)
+def test_typical_capacitance(value, capacitance, capsys):
+    values = normalized_values("Typical Capatitance", value, capsys)
+    assert_quantity(values["capacitance"], capacitance, "capacitance")
+
+    if "@" in value:
+        assert_quantity(values["frequency"], 1000.0, "frequency")
