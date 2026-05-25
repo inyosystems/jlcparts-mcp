@@ -956,7 +956,6 @@ class PropertySelector extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            expanded: false,
             sortBy: this.collectValueTypes()[0].value
         };
     }
@@ -980,48 +979,7 @@ class PropertySelector extends React.Component {
         this.setState({sortBy: e.target.value});
     }
 
-    handleExpandedChange = expanded => {
-        this.setState({expanded});
-    }
-
-    renderFlags() {
-        return <>
-            <label className="flex-none mr-4">
-                <input
-                    className="mr-2 leading-tight"
-                    type="checkbox"
-                    checked={this.props.tableIncluded}
-                    onChange={e => {
-                        this.props.onTableInclude(e.target.checked); } } />
-                Table column
-            </label>
-            <label className="flex-none">
-                <input
-                    className="mr-2 leading-tight"
-                    type="checkbox"
-                    checked={this.props.required}
-                    onChange={e => {
-                        this.props.onPropertyRequired(e.target.checked); } } />
-                Required
-            </label>
-        </>;
-    }
-
     render() {
-        if (!this.state.expanded) {
-            return <div className={`rounded flex flex-col flex-1 p-1 m-1 ${this.props.className}`} style={{minWidth: "200px", maxWidth: "400px"}}>
-                <div className="flex-none flex w-full">
-                    <h5 className="block flex-1 font-bold cursor-default rounded px-1 truncate hover:whitespace-normal">{this.props.item.property}</h5>
-                    <button className="flex-none mx-2" onClick={() => this.handleExpandedChange(true)}>
-                        Values ({this.props.item.values.length})
-                    </button>
-                </div>
-                <div className="flex-none flex flex-wrap px-1 py-2">
-                    {this.renderFlags()}
-                </div>
-            </div>;
-        }
-
         return <MultiSelectBox
             className={this.props.className}
             minHeight="10em"
@@ -1044,10 +1002,22 @@ class PropertySelector extends React.Component {
                 </div>
             </div>
             <div className="w-full">
-                {this.renderFlags()}
+                <input
+                    className="mr-2 leading-tight"
+                    type="checkbox"
+                    checked={this.props.tableIncluded}
+                    onChange={e => {
+                        this.props.onTableInclude(e.target.checked); } } />
+                Table column
             </div>
             <div className="w-full">
-                <button onClick={() => this.handleExpandedChange(false)}>Collapse</button>
+                <input
+                    className="mr-2 leading-tight"
+                    type="checkbox"
+                    checked={this.props.required}
+                    onChange={e => {
+                        this.props.onPropertyRequired(e.target.checked); } } />
+                Required
             </div>
         </MultiSelectBox>;
     }
