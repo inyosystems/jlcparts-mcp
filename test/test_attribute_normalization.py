@@ -313,3 +313,21 @@ def test_typical_capacitance(value, capacitance, capsys):
 
     if "@" in value:
         assert_quantity(values["frequency"], 1000.0, "frequency")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("12.1us", [12.1e-6]),
+        ("199ns", [199e-9]),
+        ("116ns, 115ns", [116e-9, 115e-9]),
+    ],
+)
+def test_td_off_times(value, expected, capsys):
+    values = normalized_values("Td(Off)", value, capsys)
+
+    if len(expected) == 1:
+        assert_quantity(values["time"], expected[0], "time")
+    else:
+        for index, time in enumerate(expected, start=1):
+            assert_quantity(values[f"time {index}"], time, "time")

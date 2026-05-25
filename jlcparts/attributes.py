@@ -559,6 +559,9 @@ def wavelengthAttribute(value):
 def timeAttribute(value):
     return rangeOrScalarAttribute(value, readTime, "time", "time")
 
+def timeListAttribute(value):
+    return scalarListAttribute(value, readTime, "time", "time")
+
 def timeAtConditionAttribute(value):
     return scalarAttribute(value, readTime, "time", "time")
 
