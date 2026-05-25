@@ -415,6 +415,34 @@ def test_voltage_range_list_attributes(key, value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("2V, 3.3V", {"voltage 1": 2.0, "voltage 2": 3.3}),
+        ("1.3V~2V, 2.8V~3.4V", {
+            "voltage 1 min": 1.3,
+            "voltage 1 max": 2.0,
+            "voltage 2 min": 2.8,
+            "voltage 2 max": 3.4,
+        }),
+        ("R:1.9V~2.5V;G:2.8V~3.4V;B:2.8V~3.4V", {
+            "voltage R min": 1.9,
+            "voltage R max": 2.5,
+            "voltage G min": 2.8,
+            "voltage G max": 3.4,
+            "voltage B min": 2.8,
+            "voltage B max": 3.4,
+        }),
+        ("3.2V@UVA, 6.5V@UVC", {"voltage 1": 3.2, "voltage 2": 6.5}),
+    ],
+)
+def test_forward_voltage_vf_lists(value, expected, capsys):
+    values = normalized_values("Voltage - Forward(Vf)", value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "quantity", "expected", "unit"),
     [
         ("Sampling Rate", "352800Hz", "frequency", 352800.0, "frequency"),

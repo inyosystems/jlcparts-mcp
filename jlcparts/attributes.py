@@ -853,6 +853,26 @@ def voltageRangeListAttribute(value, name="voltage"):
         "values": values
     }
 
+def labeledVoltageRangeListAttribute(value, name="voltage"):
+    value = str(value).strip()
+    parts = [x.strip() for x in re.split(r"[,;]", value)]
+    values = {}
+    formats = []
+    range_primary = False
+    for index, part in enumerate(parts, start=1):
+        label = str(index)
+        if ":" in part:
+            label, part = [x.strip() for x in part.split(":", 1)]
+        parsed = voltageRangeAttribute(part, f"{name} {label}")
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+        range_primary = range_primary or _rangeParts(part) is not None
+    return {
+        "format": ", ".join(formats),
+        "primary": f"{name} 1 min" if range_primary and "1 min" in values else next(iter(values)),
+        "values": values
+    }
+
 def powerAtConditionAttribute(value, name="power"):
     return scalarAttribute(value, readPower, "power", name)
 
