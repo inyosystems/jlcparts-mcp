@@ -127,6 +127,7 @@ def normalizeAttribute(key, value):
                     "Current - Supply (Max)", "Supply Current", "Supply Current (Max)",
                     "Output Current", "Output Current (Max)", "Rectified Current",
                     "Output / Channel Current", "Current - Output", "Current Range",
+                    "Trip Current",
                     "Saturation Current (Isat)", "Reverse Leakage Current", "Reverse Leakage Current (Ir)",
                     "Peak Pulse Current (Ipp)", "Peak Pulse Current (Ipp) @ 10/1000us",
                     "Quiescent Current", "Quiescent Current (Iq)", "Quiescent Current(Iq)",

@@ -333,6 +333,21 @@ def test_current_range(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("2.2A", 2.2),
+        ("100mA", 0.1),
+        ("200uA", 0.0002),
+        ("-", "NaN"),
+    ],
+)
+def test_trip_current(value, expected, capsys):
+    values = normalized_values("Trip Current", value, capsys)
+
+    assert_quantity(values["current"], expected, "current")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("35mcd", {"intensity 1": 0.035}),
         ("2.25cd", {"intensity 1": 2.25}),
         ("68mcd~102mcd", {"intensity 1 min": 0.068, "intensity 1 max": 0.102}),
