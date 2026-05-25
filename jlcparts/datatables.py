@@ -287,6 +287,8 @@ def normalizeAttribute(key, value):
             value = attributes.opticalLengthRangeListAttribute(value) if compoundValue(value) else attributes.wavelengthAttribute(value)
         elif key in larr(["Tolerance"]):
             value = attributes.percentageAttribute(value) if isinstance(value, str) and "%" in value and not compoundValue(value) else attributes.stringAttribute(value)
+        elif key in larr(["Precision", "Linearity", "Error", "Degree of Linearity"]):
+            value = attributes.flexiblePercentageAttribute(value)
         elif key in larr(["Duty Cycle", "Conversion Efficiency", "Efficiency"]):
             if key == "efficiency":
                 value = attributes.efficiencyPercentageRangeListAttribute(value)

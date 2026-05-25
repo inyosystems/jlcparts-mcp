@@ -1002,6 +1002,25 @@ def test_conversion_efficiency_values(value, expected, capsys):
     for quantity, percentage in expected.items():
         assert_quantity(values[quantity], percentage, "percentage")
 
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Precision", "±20%", {"percentage min": -20.0, "percentage max": 20.0}),
+        ("Precision", "-20%;+55%", {"percentage min": -20.0, "percentage max": 55.0}),
+        ("Precision", "-40%~+20%", {"percentage min": -40.0, "percentage max": 20.0}),
+        ("Linearity", "1%, 0.3%", {"percentage 1": 1.0, "percentage 2": 0.3}),
+        ("Linearity", "-0.7%", {"percentage": -0.7}),
+        ("Error", "0.25%", {"percentage": 0.25}),
+        ("Degree of Linearity", "±0.012%", {"percentage min": -0.012, "percentage max": 0.012}),
+        ("Degree of Linearity", "-", {"percentage": "NaN"}),
+    ],
+)
+def test_flexible_percentage_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, percentage in expected.items():
+        assert_quantity(values[quantity], percentage, "percentage")
+
 
 @pytest.mark.parametrize(
     ("value", "expected"),
