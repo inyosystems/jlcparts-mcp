@@ -53,7 +53,7 @@ def _assert_normalized(section, raw_value, capsys):
     )
 
 
-def _selected_sections():
+def _sections_from_env():
     sections = os.environ.get("JLC_ATTRIBUTE_SECTION")
     if not sections:
         return []
@@ -68,20 +68,23 @@ def _selected_sections():
     not LUT_PATH.exists(),
     reason="generated attribute LUT is not available",
 )
-def test_selected_attribute_section_normalizes_generated_values(capsys):
-    sections = _selected_sections()
+def test_selected_attribute_section_normalizes_generated_values(pytestconfig, capsys):
+    sections = pytestconfig.getoption("--attribute-section") or _sections_from_env()
     if not sections:
         pytest.skip(
-            "set JLC_ATTRIBUTE_SECTION to scan one generated attribute section; "
-            f"use {SECTION_SEPARATOR!r} to scan a small set of sections"
+            "set JLC_ATTRIBUTE_SECTION or pass --attribute-section to scan one "
+            f"generated attribute section; use {SECTION_SEPARATOR!r} in the "
+            "environment variable or pass --attribute-section multiple times to "
+            "scan a small set of sections"
         )
 
-    limit = (
-        int(os.environ["JLC_ATTRIBUTE_SECTION_LIMIT"])
-        if os.environ.get("JLC_ATTRIBUTE_SECTION_LIMIT")
-        else None
+    limit = pytestconfig.getoption("--attribute-section-limit")
+    if limit is None and os.environ.get("JLC_ATTRIBUTE_SECTION_LIMIT"):
+        limit = int(os.environ["JLC_ATTRIBUTE_SECTION_LIMIT"])
+    value_pattern = (
+        pytestconfig.getoption("--attribute-value-re")
+        or os.environ.get("JLC_ATTRIBUTE_VALUE_RE")
     )
-    value_pattern = os.environ.get("JLC_ATTRIBUTE_VALUE_RE")
 
     for section in sections:
         values = _string_values_for_section(section, value_pattern)
