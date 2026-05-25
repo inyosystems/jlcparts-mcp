@@ -563,7 +563,7 @@ def pitchAttribute(value):
     return lengthAttribute(value)
 
 def lengthRangeListAttribute(value, name="length"):
-    value = str(value).strip()
+    value = str(value).replace(";", ",").strip()
     parts = [x.strip() for x in value.split(",")]
     values = {}
     formats = []

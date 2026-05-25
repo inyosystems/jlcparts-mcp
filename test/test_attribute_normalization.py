@@ -876,6 +876,7 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Length of Mating Pin", "5.84mm", 0.00584),
         ("Operating Height", "8.3mm", 0.0083),
         ("Row Spacing", "2.54mm", 0.00254),
+        ("System Fit Height", "1.5mm", 0.0015),
     ],
 )
 def test_scalar_length_attributes(key, value, expected, capsys):
@@ -914,6 +915,13 @@ def test_interface_length_height_lists(capsys):
 
     assert_quantity(values["length 1"], 0.0085, "length")
     assert_quantity(values["length 2"], 0.0087, "length")
+
+
+def test_system_fit_height_lists(capsys):
+    values = normalized_values("System Fit Height", "3mm;3.5mm", capsys)
+
+    assert_quantity(values["length 1"], 0.003, "length")
+    assert_quantity(values["length 2"], 0.0035, "length")
 
 
 def test_interface_diameter_lists(capsys):
