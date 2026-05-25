@@ -71,3 +71,37 @@ def test_rds_on_multiple_measurements(value, measurements, capsys):
     for index, (rds, vgs) in enumerate(measurements, start=1):
         assert_quantity(values[f"Rds {index}"], rds, "resistance")
         assert_quantity(values[f"Vgs {index}"], vgs, "voltage")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Single Supply", "2V~36V", (2.0, 36.0)),
+        ("Operating Voltage", "±15V", (-15.0, 15.0)),
+        ("Operating Voltage", "-15V~15V", (-15.0, 15.0)),
+        ("Voltage - Input(DC)", "900mV~5.5V", (0.9, 5.5)),
+        ("Voltage - Input(DC)", "45V", 45.0),
+        ("Operating Voltage", "-", "NaN"),
+    ],
+)
+def test_supply_voltage_ranges(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    if isinstance(expected, tuple):
+        assert_quantity(values["voltage min"], expected[0], "voltage")
+        assert_quantity(values["voltage max"], expected[1], "voltage")
+    else:
+        assert_quantity(values["voltage"], expected, "voltage")
+
+
+def test_operating_voltage_multiple_ranges(capsys):
+    values = normalized_values(
+        "Operating Voltage",
+        "1.71V~1.89V;3.135V~3.465V",
+        capsys,
+    )
+
+    assert_quantity(values["voltage 1 min"], 1.71, "voltage")
+    assert_quantity(values["voltage 1 max"], 1.89, "voltage")
+    assert_quantity(values["voltage 2 min"], 3.135, "voltage")
+    assert_quantity(values["voltage 2 max"], 3.465, "voltage")
