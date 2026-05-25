@@ -663,6 +663,7 @@ def continuousTransistorCurrent(value, symbol):
     value = erase(value, ["±"])
     value = value.replace("V", "A") # There are some typos - voltage instead of current
     value = value.replace(";", ",") # Sometimes semicolon is used instead of comma
+    value = re.sub(r"(?<=\d)/(?=\d)", ",", value) # Slash can separate P/N MOSFET currents
     if "," in value:
         # Double P & N MOSFET
         s = value.split(",")
