@@ -251,7 +251,8 @@ def normalizeAttribute(key, value):
         elif key in larr(["Frequency - self resonant", "Output frequency (max)",
                 "Frequency - Switching", "Frequency Range", "Frequency", "Clock Frequency",
                 "Switching Frequency", "Bandwidth", "Gain Bandwidth Product",
-                "Gain Bandwidth Product(GBP)", "Frequency - Center", "Sampling Rate"]):
+                "Gain Bandwidth Product(GBP)", "Frequency - Center", "Sampling Rate",
+                "-3d B Bandwidth"]):
             if isinstance(value, str) and re.search(r"(?:bit/s|bps)\s*$", value, flags=re.IGNORECASE):
                 value = attributes.dataRateAttribute(value)
             else:

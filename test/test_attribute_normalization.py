@@ -180,6 +180,8 @@ def test_voltage_range_list_attributes(key, value, expected, capsys):
     ("key", "value", "quantity", "expected", "unit"),
     [
         ("Sampling Rate", "352800Hz", "frequency", 352800.0, "frequency"),
+        ("-3d B Bandwidth", "14kHz", "frequency", 14000.0, "frequency"),
+        ("-3d B Bandwidth", "1.7GHz", "frequency", 1.7e9, "frequency"),
         ("Non-Repetitive Peak Forward Surge Current", "1.95kA", "current", 1950.0, "current"),
         ("Quiescent Supply Current", "50nA", "current", 50e-9, "current"),
         ("Input Offset Current(IOS)", "8nA", "current", 8e-9, "current"),
