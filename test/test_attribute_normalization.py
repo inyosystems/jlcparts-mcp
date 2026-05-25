@@ -780,6 +780,16 @@ def test_gpio_ports_number_count(capsys):
     assert_quantity(values["count"], "NaN", "count")
 
 
+def test_logic_elements_blocks_count(capsys):
+    values = normalized_values("Number of Logic Elements/Blocks", "2160", capsys)
+
+    assert_quantity(values["count"], 2160, "count")
+
+    values = normalized_values("Number of Logic Elements/Blocks", "-", capsys)
+
+    assert_quantity(values["count"], "NaN", "count")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
