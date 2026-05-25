@@ -473,6 +473,8 @@ def test_insulation_od_lengths(value, expected, capsys):
     [
         ("Insulation Height", "8.51mm", 0.00851),
         ("Interface Length/Height", "11mm", 0.011),
+        ("Height - Seated (Max)", "73.5mm", 0.0735),
+        ("Height - Seated (Max)", "-", "NaN"),
         ("Switch Length", "12.78mm", 0.01278),
         ("Switch Length", "-", "NaN"),
     ],

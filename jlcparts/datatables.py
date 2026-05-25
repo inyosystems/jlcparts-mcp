@@ -193,7 +193,8 @@ def normalizeAttribute(key, value):
         elif key in larr(["Length", "Width", "Height", "Switch Height", "Overall Length",
                 "Height Above Board", "X-Length of Bottom Edge on Board (Spacing Line)",
                 "Y-Width of Bottom Edge on Board", "Z-Height of the Board", "Insulation Od",
-                "Insulation Height", "Switch Length", "Interface Length/Height"]):
+                "Insulation Height", "Switch Length", "Interface Length/Height",
+                "Height - Seated (Max)"]):
             if key in larr(["Insulation Od", "Interface Length/Height"]) and isinstance(value, str) and "," in value:
                 value = attributes.lengthRangeListAttribute(value, "length")
             else:
