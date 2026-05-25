@@ -12,6 +12,7 @@ import click
 from jlcparts.partLib import PartLibraryDb
 from jlcparts.common import sha256file
 from jlcparts import attributes, descriptionAttributes
+from jlcparts.taxonomy import normalize_category_pair
 
 def saveJson(object, filename, hash=False, pretty=False, compress=False):
     openFn = gzip.open if compress else open
@@ -677,6 +678,7 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
 
     files = {}
     categoryEntries = []
+    categoryEntriesByPair = {}
     attributeLut = {}
     lookupBuckets = {}
     trigramCounts = defaultdict(int)
@@ -700,12 +702,41 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
                 if componentCount == 0:
                     continue
 
-                categoryId += 1
+                canonical = normalize_category_pair(catName, subcatName)
+                categoryPair = (canonical.category, canonical.subcategory)
+                categoryEntry = categoryEntriesByPair.get(categoryPair)
+                if categoryEntry is None:
+                    categoryId += 1
+                    categoryEntry = {
+                        "id": categoryId,
+                        "category": canonical.category,
+                        "subcategory": canonical.subcategory,
+                        "componentCount": 0,
+                        "shards": [],
+                        "browseShards": [],
+                        "rawCategories": [],
+                    }
+                    categoryEntriesByPair[categoryPair] = categoryEntry
+                    categoryEntries.append(categoryEntry)
+
+                canonicalCategoryId = categoryEntry["id"]
+                rawCategoryId = lib.getCategoryId(catName, subcatName)
                 categoryKey = _stableComponentFilebase(catName, subcatName)
                 shardNames = []
                 browseShardNames = []
                 totalComponents += componentCount
-                print(f"{((processed - 1) / max(total, 1) * 100):.2f} % {catName}: {subcatName} ({componentCount})")
+                categoryEntry["componentCount"] += componentCount
+                categoryEntry["rawCategories"].append({
+                    "id": rawCategoryId,
+                    "category": catName,
+                    "subcategory": subcatName,
+                    "componentCount": componentCount,
+                })
+                print(
+                    f"{((processed - 1) / max(total, 1) * 100):.2f} % "
+                    f"{catName}: {subcatName} -> "
+                    f"{canonical.category}: {canonical.subcategory} ({componentCount})"
+                )
 
                 chunk = []
                 browseChunk = []
@@ -720,7 +751,7 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
                         shardIndex += 1
                         shardName = f"components-{categoryKey}-{shardIndex:03d}.jsonl.gz"
                         _flushComponentShard(
-                            chunk, shardName, outdir, categoryId, attributeLut,
+                            chunk, shardName, outdir, canonicalCategoryId, attributeLut,
                             files, lookupBuckets, lookup_bucket_size, searchIndexFile,
                             trigramCounts
                         )
@@ -730,7 +761,7 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
                         browseShardIndex += 1
                         browseShardName = f"browse-components-{categoryKey}-{browseShardIndex:03d}.jsonl.gz"
                         _flushComponentShard(
-                            browseChunk, browseShardName, outdir, categoryId, attributeLut,
+                            browseChunk, browseShardName, outdir, canonicalCategoryId, attributeLut,
                             files, kind="browse-components"
                         )
                         browseShardNames.append(browseShardName)
@@ -740,7 +771,7 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
                     shardIndex += 1
                     shardName = f"components-{categoryKey}-{shardIndex:03d}.jsonl.gz"
                     _flushComponentShard(
-                        chunk, shardName, outdir, categoryId, attributeLut,
+                        chunk, shardName, outdir, canonicalCategoryId, attributeLut,
                         files, lookupBuckets, lookup_bucket_size, searchIndexFile,
                         trigramCounts
                     )
@@ -749,19 +780,13 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
                     browseShardIndex += 1
                     browseShardName = f"browse-components-{categoryKey}-{browseShardIndex:03d}.jsonl.gz"
                     _flushComponentShard(
-                        browseChunk, browseShardName, outdir, categoryId, attributeLut,
+                        browseChunk, browseShardName, outdir, canonicalCategoryId, attributeLut,
                         files, kind="browse-components"
                     )
                     browseShardNames.append(browseShardName)
 
-                categoryEntries.append({
-                    "id": categoryId,
-                    "category": catName,
-                    "subcategory": subcatName,
-                    "componentCount": componentCount,
-                    "shards": shardNames,
-                    "browseShards": browseShardNames,
-                })
+                categoryEntry["shards"].extend(shardNames)
+                categoryEntry["browseShards"].extend(browseShardNames)
     finally:
         searchIndexFile.close()
 
