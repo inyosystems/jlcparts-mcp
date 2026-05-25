@@ -136,6 +136,8 @@ def test_impedance_zzk(value, expected, capsys):
         ("Control Voltage", "2.5V~21V", (2.5, 21.0)),
         ("Vcm - Common Mode Voltage", "-300mV~26V", (-0.3, 26.0)),
         ("Vcm - Common Mode Voltage", "48V", 48.0),
+        ("Low Voltage Detection Threshold", "1.71V~5.5V", (1.71, 5.5)),
+        ("Low Voltage Detection Threshold", "3.3V", 3.3),
         ("Low Level Range (VIL)", "700mV~800mV", (0.7, 0.8)),
         ("Low Level Range (VIL)", "0.8V", 0.8),
         ("Operating Voltage", "-", "NaN"),
@@ -208,6 +210,15 @@ def test_common_mode_voltage_multiple_ranges(capsys):
     assert_quantity(values["voltage 1 max"], 76.0, "voltage")
     assert_quantity(values["voltage 2 min"], -2.0, "voltage")
     assert_quantity(values["voltage 2 max"], 42.0, "voltage")
+
+
+def test_low_voltage_detection_threshold_multiple_ranges(capsys):
+    values = normalized_values("Low Voltage Detection Threshold", "1.14V~1.26V;3V~5.5V", capsys)
+
+    assert_quantity(values["voltage 1 min"], 1.14, "voltage")
+    assert_quantity(values["voltage 1 max"], 1.26, "voltage")
+    assert_quantity(values["voltage 2 min"], 3.0, "voltage")
+    assert_quantity(values["voltage 2 max"], 5.5, "voltage")
 
 
 def test_dual_supply_multiple_ranges(capsys):
