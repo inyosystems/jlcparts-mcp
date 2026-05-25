@@ -803,6 +803,24 @@ def test_b_constant_kelvin(capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("130°", {"angle 1": 130.0}),
+        ("±45°", {"angle 1": 45.0}),
+        ("150°, 120°", {"angle 1": 150.0, "angle 2": 120.0}),
+        ("±45°@Horizontal, ±45°@Vertical", {"angle 1": 45.0, "angle 2": 45.0}),
+        ("100°;40°", {"angle 1": 100.0, "angle 2": 40.0}),
+        ("-", {"angle 1": "NaN"}),
+    ],
+)
+def test_viewing_angle_values(value, expected, capsys):
+    values = normalized_values("Viewing Angle", value, capsys)
+
+    for quantity, angle in expected.items():
+        assert_quantity(values[quantity], angle, "angle")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("1.5kW", 1500.0),
         ("150mW", 0.15),
         ("60W@8/20us", 60.0),

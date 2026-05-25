@@ -227,6 +227,14 @@ def readKelvin(value):
         raise ValueError(f"Cannot parse kelvin value {value}")
     return float(match.group(1))
 
+def readAngle(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = value.replace("±", "")
+    value = value.replace("°", "")
+    return float(value)
+
 def readPercentage(value):
     value = value.strip().replace("±", "")
     if value in ["-", "--", "null"]:
@@ -1389,6 +1397,10 @@ def temperatureAttribute(value):
 
 def kelvinAttribute(value):
     return scalarAttribute(value, readKelvin, "kelvin", "temperature")
+
+def angleListAttribute(value):
+    value = str(value).replace(";", ",")
+    return scalarListAttribute(value, readAngle, "angle", "angle")
 
 def capacityAtVoltage(value):
     """
