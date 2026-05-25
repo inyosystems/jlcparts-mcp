@@ -1055,6 +1055,21 @@ def test_block_erase_time(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("50ms", {"time": 0.05}),
+        ("40us", {"time": 40e-6}),
+        ("10.5ms, 5.5ms, 4ms", {"time 1": 0.0105, "time 2": 0.0055, "time 3": 0.004}),
+    ],
+)
+def test_temperature_conversion_time(value, expected, capsys):
+    values = normalized_values("Temperature Conversion Time", value, capsys)
+
+    for quantity, time in expected.items():
+        assert_quantity(values[quantity], time, "time")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("15ns", [15e-9]),
         ("200ps", [200e-12]),
         ("15ns, 30ns", [15e-9, 30e-9]),
