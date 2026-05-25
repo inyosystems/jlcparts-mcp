@@ -1506,6 +1506,10 @@ def test_temperature_coefficient(value, expected, capsys):
         ("Gain Drift", "3ppm/℃", {
             "coefficient": [3.0, "temperature_coefficient"],
         }),
+        ("Temperature Stability", "50ppm/℃, 200ppm/℃", {
+            "coefficient 1": [50.0, "temperature_coefficient"],
+            "coefficient 2": [200.0, "temperature_coefficient"],
+        }),
     ],
 )
 def test_temperature_coefficient_aliases(key, value, expected, capsys):
