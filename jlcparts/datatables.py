@@ -123,6 +123,7 @@ def normalizeAttribute(key, value):
         elif key in larr(["Collector-Emitter Saturation Voltage (VCE(sat) @ Ic, Ib)"]):
             value = attributes.voltageAtConditionAttribute(value, "voltage")
         elif key in larr(["Rated current", "Rated Current", "surge current", "Current - Average Rectified (Io)",
+                    "Average Rectified Current (IO)",
                     "Current - Breakover", "Current - Peak Output", "Current - Peak Pulse (10/1000μs)",
                     "Impulse Discharge Current (8/20us)", "Current - Gate Trigger (Igt) (Max)",
                     "Current - On State (It (AV)) (Max)", "Current - On State (It (RMS)) (Max)",
