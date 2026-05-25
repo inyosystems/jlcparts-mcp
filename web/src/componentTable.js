@@ -48,6 +48,7 @@ const CompressedJsonParam = {
 
 const ComponentQueryParams = {
     q: StringParam,
+    cf: StringParam,
     all: BooleanParam,
     c: DelimitedNumericArrayParam,
     f: CompressedJsonParam,
@@ -144,6 +145,7 @@ function sortedStrings(values = []) {
 function categoryUrlSignature(query = {}) {
     return JSON.stringify({
         q: query.q || "",
+        cf: query.cf || "",
         all: Boolean(query.all),
         c: sortedNumbers(query.c),
     });
@@ -896,6 +898,7 @@ class CategoryFilter extends React.Component {
             categories: {},
             allCategories: false,
             searchString: "",
+            categoryFilterString: "",
             queryProgress: null,
             abort: () => null
         }
@@ -916,28 +919,66 @@ class CategoryFilter extends React.Component {
 
     componentWillUnmount() {
         clearTimeout(this.searchTimeout);
+        clearTimeout(this.categoryFilterTimeout);
     }
 
     collectActiveCategories = () => {
         return Object.values(this.state.categories).flat();
     }
 
+    categoryMatchesFilter = (category, filterString = this.state.categoryFilterString) => {
+        const words = filterString.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+        if (words.length === 0) {
+            return true;
+        }
+        const haystack = [
+            category.category,
+            category.label,
+            ...category.subcategories.flatMap(subcategory => [
+                subcategory.value,
+                subcategory.label
+            ])
+        ].filter(Boolean).join(" ").toLocaleLowerCase();
+        return words.every(word => haystack.includes(word));
+    }
+
+    filteredCategories = (filterString = this.state.categoryFilterString) => {
+        return this.props.categories.filter(category => this.categoryMatchesFilter(category, filterString));
+    }
+
+    applyCategoryFilterToDraft = draft => {
+        const visibleCategories = new Set(this.filteredCategories(draft.categoryFilterString).map(category => category.category));
+        for (const category of this.props.categories) {
+            if (!visibleCategories.has(category.category)) {
+                draft.categories[category.category] = [];
+            } else if (draft.allCategories) {
+                draft.categories[category.category] = category.subcategories.map(subcategory => subcategory.key);
+            } else {
+                draft.categories[category.category] ??= [];
+            }
+        }
+    }
+
     stateFromUrlQuery = query => {
         const searchString = query?.q ?? "";
+        const categoryFilterString = query?.cf ?? "";
         const categoryIds = new Set(sortedNumbers(query?.c));
         const allCategories = Boolean(query?.all) ||
             (categoryIds.size === 0 && searchString.trim().length >= 3);
         const categories = {};
 
         for (const category of this.props.categories) {
-            categories[category.category] = allCategories
+            const visible = this.categoryMatchesFilter(category, categoryFilterString);
+            categories[category.category] = !visible
+                ? []
+                : allCategories
                 ? category.subcategories.map(subcategory => subcategory.key)
                 : category.subcategories
                     .filter(subcategory => categoryIds.has(subcategory.key))
                     .map(subcategory => subcategory.key);
         }
 
-        return { categories, allCategories, searchString };
+        return { categories, allCategories, searchString, categoryFilterString };
     }
 
     applyUrlQuery = (force = false) => {
@@ -954,6 +995,7 @@ class CategoryFilter extends React.Component {
         const activeCategories = sortedNumbers(Object.values(state.categories).flat());
         return {
             q: state.searchString || undefined,
+            cf: state.categoryFilterString || undefined,
             all: state.allCategories ? true : undefined,
             c: state.allCategories || activeCategories.length === 0
                 ? undefined
@@ -992,7 +1034,7 @@ class CategoryFilter extends React.Component {
         try {
             const components = await queryComponents({
                 categoryIds: this.collectActiveCategories(),
-                allCategories: this.state.allCategories,
+                allCategories: this.state.allCategories && this.state.categoryFilterString.trim().length === 0,
                 searchString: this.state.searchString,
                 checkAbort: () => aborted,
                 onProgress: progress => {
@@ -1048,8 +1090,11 @@ class CategoryFilter extends React.Component {
     }
 
     selectAll = state => {
+        const visibleCategories = new Set(this.filteredCategories(state.categoryFilterString).map(category => category.category));
         for (let category of this.props.categories) {
-            state.categories[category.category] = category.subcategories.map( x => x.key );
+            state.categories[category.category] = visibleCategories.has(category.category)
+                ? category.subcategories.map( x => x.key )
+                : [];
         }
         state.allCategories = true;
     }
@@ -1087,6 +1132,17 @@ class CategoryFilter extends React.Component {
         });
     }
 
+    handleCategoryFilterChange = e => {
+        this.setState(produce(this.state, draft => {
+            draft.categoryFilterString = e.target.value;
+            this.applyCategoryFilterToDraft(draft);
+        }), () => {
+            this.updateUrlQuery("replaceIn");
+            clearTimeout(this.categoryFilterTimeout);
+            this.categoryFilterTimeout = setTimeout(this.notifyParent, 350);
+        });
+    }
+
     handleClear = () => {
         this.setState(produce(this.state, draft => {
             draft.searchString = "";
@@ -1100,6 +1156,7 @@ class CategoryFilter extends React.Component {
     }
 
     render() {
+        const filteredCategories = this.filteredCategories();
         return <div className="w-full p-2 border-b-2 border-gray-600 bg-gray-200">
             <div className="flex">
                 <h3 className="block flex-1 text-lg mx-2 font-bold" id="category-select">
@@ -1115,7 +1172,7 @@ class CategoryFilter extends React.Component {
             </div>
             <div className="w-full flex p-2">
                 <label className="flex-none block py-1 mr-2">
-                    Contains text:
+                    Search component by text:
                 </label>
                 <input type="text"
                     className="block flex-1 bg-white appearance-none border-2 border-gray-500 rounded w-full
@@ -1140,9 +1197,28 @@ class CategoryFilter extends React.Component {
                     ↓ <span className="text-bold text-green-500">■</span> Scroll to properties <span className="text-bold text-green-500">■</span> ↓
                 </Link>
             </div>
+            <div className="w-full flex p-2">
+                <label className="flex-none block py-1 mr-2">
+                    Filter categories:
+                </label>
+                <input type="text"
+                    className="block flex-1 bg-white appearance-none border-2 border-gray-500 rounded w-full
+                                py-1 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white
+                                focus:border-blue-500"
+                    placeholder="Category or subcategory text"
+                    value={this.state.categoryFilterString}
+                    onChange={this.handleCategoryFilterChange}/>
+                {this.state.categoryFilterString
+                    ? <button className="flex-none block ml-2 bg-blue-500 hover:bg-blue-700 text-black py-1 px-2 rounded" onClick={() => {
+                        this.handleCategoryFilterChange({target: {value: ""}});
+                    }}>
+                        Clear filter
+                    </button>
+                    : null}
+            </div>
             <QueryProgress progress={this.state.queryProgress}/>
             <div className="flex flex-wrap items-stretch">
-                {this.props.categories.map(item => {
+                {filteredCategories.map(item => {
                     return <MultiSelectBox
                         className="bg-blue-500"
                         key={item.category}
