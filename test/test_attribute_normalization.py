@@ -877,6 +877,7 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Operating Height", "8.3mm", 0.0083),
         ("Row Spacing", "2.54mm", 0.00254),
         ("System Fit Height", "1.5mm", 0.0015),
+        ("Overall Length/Height", "11mm", 0.011),
     ],
 )
 def test_scalar_length_attributes(key, value, expected, capsys):
