@@ -167,6 +167,30 @@ def test_dual_supply_multiple_ranges(capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("30mA", {"current": 0.03}),
+        ("860uA~1.1mA", {"current min": 860e-6, "current max": 1.1e-3}),
+        (
+            "620uA, 980uA, 800uA, 300uA",
+            {
+                "current 1": 620e-6,
+                "current 2": 980e-6,
+                "current 3": 800e-6,
+                "current 4": 300e-6,
+            },
+        ),
+        ("-", {"current": "NaN"}),
+    ],
+)
+def test_current_consumption(value, expected, capsys):
+    values = normalized_values("Current Consumption", value, capsys)
+
+    for quantity, current in expected.items():
+        assert_quantity(values[quantity], current, "current")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("6V", {"voltage": 6.0}),
         ("13.3V;7.5V", {"voltage 1": 13.3, "voltage 2": 7.5}),
     ],
