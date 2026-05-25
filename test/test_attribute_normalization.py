@@ -1234,6 +1234,26 @@ def test_input_offset_voltage_drift(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("9.6uVp-p", {"noise 1 p-p": [9.6e-6, "voltage"]}),
+        ("4.3uVrms", {"noise 1 rms": [4.3e-6, "voltage"]}),
+        ("3.8ppmp-p", {"noise 1 p-p": [3.8, "ppm"]}),
+        ("0.11ppmp-p, 0.275uVp-p", {
+            "noise 1 p-p": [0.11, "ppm"],
+            "noise 2 p-p": [0.275e-6, "voltage"],
+        }),
+        ("-", {"noise 1": ["NaN", "voltage"]}),
+    ],
+)
+def test_low_frequency_noise(value, expected, capsys):
+    values = normalized_values("Noise - 1/10hz to 10hz", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        assert_quantity(values[quantity], expected_value[0], expected_value[1])
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("35ppm/℃", {"coefficient": [35.0, "temperature_coefficient"]}),
         ("±50ppm/℃", {
             "coefficient min": [-50.0, "temperature_coefficient"],

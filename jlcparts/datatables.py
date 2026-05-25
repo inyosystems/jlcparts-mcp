@@ -265,6 +265,8 @@ def normalizeAttribute(key, value):
             value = attributes.voltageNoiseDensityAttribute(value)
         elif key in larr(["Input Offset Voltage Drift(VOS TC)"]):
             value = attributes.voltageTemperatureDriftAttribute(value)
+        elif key in larr(["Noise - 1/10hz to 10hz"]):
+            value = attributes.lowFrequencyNoiseAttribute(value)
         elif key in larr(["Temperature Coefficient"]):
             value = attributes.temperatureCoefficientAttribute(value)
         elif key in larr(["Wavelength - Dominant", "Dominant Wavelength", "Peak Wavelength"]):

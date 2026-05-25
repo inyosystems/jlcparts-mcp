@@ -126,6 +126,13 @@ def readTemperatureCoefficient(value):
     value = re.sub(r"ppm\s*/?\s*(?:℃|°C|K)?", "", value, flags=re.I).strip()
     return float(value)
 
+def readPpm(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"ppm(?:p-p)?$", "", value, flags=re.I).strip()
+    return float(value)
+
 def readPower(value):
     """
     Parse power value (in watts), it can also handle fractions
@@ -729,6 +736,32 @@ def voltageTemperatureDriftAttribute(value):
         "voltage_temperature_drift",
         "drift",
     )
+
+def lowFrequencyNoiseAttribute(value):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        suffix = ""
+        if part.lower().endswith("p-p"):
+            suffix = " p-p"
+            part = part[:-3]
+        elif part.lower().endswith("rms"):
+            suffix = " rms"
+            part = part[:-3]
+        name = f"noise {index}{suffix}"
+        if "ppm" in part.lower():
+            parsed = scalarAttribute(part, readPpm, "ppm", name)
+        else:
+            parsed = scalarAttribute(part, readVoltage, "voltage", name)
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
 
 def _temperatureCoefficientPart(part, name):
     part = part.strip()
