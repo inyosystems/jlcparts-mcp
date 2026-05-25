@@ -142,7 +142,7 @@ def normalizeAttribute(key, value):
                     "Supply Current (Iq)", "Current - Input Bias(Ib)", "Current - Output Low(Iol)",
                     "Current - Output High(Ioh)", "Current - Surge(Itsm@F)", "Send Current",
                     "Current of Transmitting", "Current Consumption", "Current - Leakage",
-                    "Peak Current"]):
+                    "Peak Current", "Peak Non-Repetitive Surge Current (Itsm@F)"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent supply current",
