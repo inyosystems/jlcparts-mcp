@@ -191,7 +191,7 @@ def readSlewRate(value):
     if value in ["-", "--", "null"]:
         return "NaN"
     value = value.replace("µ", "u").replace("μ", "u")
-    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*((?:m|u)?V)\s*/\s*(ns|us|ms|s)", value, re.I)
+    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*((?:m|u|k)?V)\s*/\s*(ns|us|ms|s)", value, re.I)
     if match is None:
         raise ValueError(f"Cannot parse slew rate {value}")
     number = float(match.group(1))
@@ -201,6 +201,7 @@ def readSlewRate(value):
         "uv": 1e-6,
         "mv": 1e-3,
         "v": 1,
+        "kv": 1e3,
     }
     time_scales = {
         "ns": 1e-9,
@@ -927,12 +928,12 @@ def _expandSharedUnitAlternatives(value):
     first, second, voltage_unit, time_unit = match.groups()
     return f"{first}{voltage_unit}/{time_unit}, {second}{voltage_unit}/{time_unit}"
 
-def slewRateAttribute(value):
+def slewRateAttribute(value, name="slew rate"):
     value = _expandSharedUnitAlternatives(str(value))
     if "," in value or ";" in value:
         value = value.replace(";", ",")
-        return scalarListAttribute(value, readSlewRate, "slew_rate", "slew rate")
-    return scalarAttribute(value, readSlewRate, "slew_rate", "slew rate")
+        return scalarListAttribute(value, readSlewRate, "slew_rate", name)
+    return scalarAttribute(value, readSlewRate, "slew_rate", name)
 
 def dataSizeAttribute(value):
     return scalarAttribute(value, readDataSize, "data_size", "data size")

@@ -1218,6 +1218,7 @@ def test_ram_size(value, expected, capsys):
     ("value", "expected"),
     [
         ("24V/us", {"slew rate": 24e6}),
+        ("15kV/us", {"slew rate": 15e9}),
         ("520V/ms", {"slew rate": 520e3}),
         ("1.4V/ns", {"slew rate": 1.4e9}),
         ("0.0015mV/us", {"slew rate": 1.5}),
@@ -1236,6 +1237,18 @@ def test_slew_rate(key, value, expected, capsys):
 
     for quantity, slew_rate in expected.items():
         assert_quantity(values[quantity], slew_rate, "slew_rate")
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("15kV/us", 15e9),
+        ("0.5V/ns", 0.5e9),
+    ],
+)
+def test_cmti(value, expected, capsys):
+    values = normalized_values("Cmti(K V/Us)", value, capsys)
+
+    assert_quantity(values["cmti"], expected, "slew_rate")
 
 
 @pytest.mark.parametrize(
