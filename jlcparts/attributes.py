@@ -111,6 +111,13 @@ def readVoltageNoiseDensity(value):
     value = re.sub(r"/\s*(?:√Hz|sqrt\s*Hz)$", "", value, flags=re.I).strip()
     return readVoltage(value)
 
+def readVoltageTemperatureDrift(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"/\s*(?:℃|°C|C)$", "", value, flags=re.I).strip()
+    return readVoltage(value)
+
 def readPower(value):
     """
     Parse power value (in watts), it can also handle fractions
@@ -681,6 +688,15 @@ def voltageNoiseDensityAttribute(value):
         "primary": next(iter(values)),
         "values": values
     }
+
+def voltageTemperatureDriftAttribute(value):
+    value = str(value).replace(";", ",")
+    return scalarListAttribute(
+        value,
+        readVoltageTemperatureDrift,
+        "voltage_temperature_drift",
+        "drift",
+    )
 
 def dataRateAttribute(value):
     value = str(value)

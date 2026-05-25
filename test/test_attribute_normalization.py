@@ -1165,6 +1165,23 @@ def test_input_voltage_noise_density(key, value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("5uV/℃", {"drift 1": 5e-6}),
+        ("2000nV/℃", {"drift 1": 2000e-9}),
+        ("1.2mV/℃", {"drift 1": 0.0012}),
+        ("2.4uV/℃, 8.8uV/℃", {"drift 1": 2.4e-6, "drift 2": 8.8e-6}),
+        ("-", {"drift 1": "NaN"}),
+    ],
+)
+def test_input_offset_voltage_drift(value, expected, capsys):
+    values = normalized_values("Input Offset Voltage Drift(VOS TC)", value, capsys)
+
+    for quantity, drift in expected.items():
+        assert_quantity(values[quantity], drift, "voltage_temperature_drift")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Energy", "900mJ", 0.9),
