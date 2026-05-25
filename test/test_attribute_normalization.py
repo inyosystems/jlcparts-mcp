@@ -1059,6 +1059,7 @@ def test_junction_capacitance_at_frequency_list(capsys):
         ("Output Capacitance(Coes)", "160pF", 160e-12),
         ("Reverse Transfer Capacitance (Cres)", "25pF", 25e-12),
         ("Reverse Transfer Capacitance (Cres)", "1.1nF", 1.1e-9),
+        ("Reverse Transfer Capacitance (Crss)", "7pF", 7e-12),
         ("Con", "380pF", 380e-12),
     ],
 )
