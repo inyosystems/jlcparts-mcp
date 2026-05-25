@@ -100,10 +100,13 @@ def normalizeAttribute(key, value):
                 "Supply Voltage (Max)", "Supply Voltage (Min)", "Output Voltage",
                 "Voltage - Input (Min)", "Drain Source Voltage (Vdss)",
                 "Drain-Source Voltage (Vdss)", "Voltage - Input Offset(VOS)",
-                "Charging Saturation Voltage", "Isolation Voltage(VRMS)"]):
+                "Charging Saturation Voltage", "Isolation Voltage(VRMS)",
+                "Maximum Power Supply Range (Vdd-Vss)"]):
             if key == "charging saturation voltage" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "isolation voltage(vrms)" and compoundValue(value):
+                value = attributes.voltageListAttribute(value)
+            elif key == "maximum power supply range (vdd-vss)" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             else:
                 value = attributes.voltageAttribute(value)

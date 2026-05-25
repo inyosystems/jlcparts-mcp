@@ -980,6 +980,19 @@ def test_isolation_voltage(value, expected, capsys):
     for quantity, voltage in expected.items():
         assert_quantity(values[quantity], voltage, "voltage")
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("36V", {"voltage": 36.0}),
+        ("10V, 12V", {"voltage 1": 10.0, "voltage 2": 12.0}),
+    ],
+)
+def test_maximum_power_supply_range(value, expected, capsys):
+    values = normalized_values("Maximum Power Supply Range (Vdd-Vss)", value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
 
 def test_gpio_ports_number_count(capsys):
     values = normalized_values("Gpio Ports Number", "34", capsys)
