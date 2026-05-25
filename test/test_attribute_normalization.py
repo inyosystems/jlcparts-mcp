@@ -187,3 +187,17 @@ def test_luminous_intensity(value, expected, capsys):
 
     for quantity, intensity in expected.items():
         assert_quantity(values[quantity], intensity, "luminous_intensity")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Energy", "900mJ", 0.9),
+        ("Energy", "3.5kJ", 3500.0),
+        ("Energy (Max)", "0.05J", 0.05),
+        ("Energy (Max)", "-", "NaN"),
+    ],
+)
+def test_energy_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+    assert_quantity(values["energy"], expected, "energy")

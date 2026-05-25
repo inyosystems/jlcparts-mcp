@@ -117,6 +117,13 @@ def readPower(value):
     value = value.replace("W", "").strip()
     return readWithSiPrefix(value)
 
+def readEnergy(value):
+    value = value.strip()
+    if value in ["-", "--"] or "null" in value:
+        return "NaN"
+    value = value.replace("J", "").strip()
+    return readWithSiPrefix(value)
+
 def readCapacitance(value):
     value = value.replace("F", "").strip()
     if value in ["-", "--"] or "null" in value:
@@ -601,6 +608,9 @@ def voltageRangeListAttribute(value, name="voltage"):
 
 def powerAtConditionAttribute(value, name="power"):
     return scalarAttribute(value, readPower, "power", name)
+
+def energyAttribute(value):
+    return scalarAttribute(value, readEnergy, "energy", "energy")
 
 def capacitanceAtConditionAttribute(value, name="capacitance"):
     return scalarAttribute(value, readCapacitance, "capacitance", name)

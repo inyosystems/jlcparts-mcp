@@ -133,6 +133,8 @@ def normalizeAttribute(key, value):
                           "Dissipation Power (Max)", "Switching Power (Max)",
                           "Power Dissipation", "Peak Pulse Power Dissipation (Ppp)"]):
             value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.powerAtConditionAttribute(value, "power")
+        elif key in larr(["Energy", "Energy (Max)"]):
+            value = attributes.energyAttribute(value)
         elif key in larr(["Number of Pins", "Number of Resistors", "Number of Loop",
                     "Number of Regulators", "Number of Outputs", "Number of Capacitors",
                     "Attrition", "Minimum Order Quantity", "Minimum Placement Quantity",
