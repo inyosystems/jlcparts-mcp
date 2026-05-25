@@ -538,6 +538,21 @@ def dataRateAttribute(value):
 def lengthAttribute(value):
     return rangeOrScalarAttribute(value, readLength, "length", "length")
 
+def lengthRangeListAttribute(value, name="length"):
+    value = str(value).strip()
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        parsed = rangeOrScalarAttribute(part, readLength, "length", f"{name} {i}")
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": f"{name} 1 min" if any(_rangeParts(part) for part in parts) else f"{name} 1",
+        "values": values
+    }
+
 def wavelengthAttribute(value):
     return rangeOrScalarAttribute(value, readLength, "length", "wavelength")
 

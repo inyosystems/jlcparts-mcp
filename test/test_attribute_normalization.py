@@ -248,3 +248,31 @@ def test_decibel_at_frequency_ranges_and_ignored_conditions(capsys):
     values = normalized_values("Power Supply Rejection Ratio (Psrr)", "68dB@(1mA)", capsys)
     assert_quantity(values["level 1"], 68.0, "decibel")
     assert "frequency 1" not in values
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("3.43mm", {"length": 0.00343}),
+        ("1.27mm~1.8mm", {"length min": 0.00127, "length max": 0.0018}),
+        ("-", {"length": "NaN"}),
+    ],
+)
+def test_insulation_od_lengths(value, expected, capsys):
+    values = normalized_values("Insulation Od", value, capsys)
+
+    for quantity, length in expected.items():
+        assert_quantity(values[quantity], length, "length")
+
+
+def test_insulation_od_length_range_lists(capsys):
+    values = normalized_values(
+        "Insulation Od",
+        "0.7366mm~0.889mm, 0.8382mm~0.9652mm",
+        capsys,
+    )
+
+    assert_quantity(values["length 1 min"], 0.0007366, "length")
+    assert_quantity(values["length 1 max"], 0.000889, "length")
+    assert_quantity(values["length 2 min"], 0.0008382, "length")
+    assert_quantity(values["length 2 max"], 0.0009652, "length")
