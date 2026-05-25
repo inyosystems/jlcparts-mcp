@@ -1045,8 +1045,9 @@ def test_wire_gauge_awg(value, expected, capsys):
         ("-", {"field 1": "NaN"}),
     ],
 )
-def test_operation_points(value, expected, capsys):
-    values = normalized_values("Operation Points", value, capsys)
+@pytest.mark.parametrize("key", ["Operation Points", "Release Points"])
+def test_operation_points(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
 
     for quantity, field in expected.items():
         assert_quantity(values[quantity], field, "magnetic_flux_density")
