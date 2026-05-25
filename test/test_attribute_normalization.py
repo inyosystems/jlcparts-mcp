@@ -740,3 +740,21 @@ def test_reset_timeout_times(value, expected, capsys):
     else:
         for index, time in enumerate(expected, start=1):
             assert_quantity(values[f"time {index}"], time, "time")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("50us", [50e-6]),
+        ("500ps", [500e-12]),
+        ("5.4us, 2.9us", [5.4e-6, 2.9e-6]),
+    ],
+)
+def test_settling_time_values(value, expected, capsys):
+    values = normalized_values("Settling Time", value, capsys)
+
+    if len(expected) == 1:
+        assert_quantity(values["time"], expected[0], "time")
+    else:
+        for index, time in enumerate(expected, start=1):
+            assert_quantity(values[f"time {index}"], time, "time")
