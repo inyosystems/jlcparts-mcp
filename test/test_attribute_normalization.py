@@ -108,6 +108,34 @@ def test_operating_voltage_multiple_ranges(capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Output Logic Level - High", "8.3V", {"voltage 1": 8.3}),
+        ("Output Logic Level - Low", "400mV", {"voltage 1": 0.4}),
+        ("Input Logic Level - High", "1.75V~3.5V", {"voltage 1 min": 1.75, "voltage 1 max": 3.5}),
+        ("Input Logic Level - Low", "500mV, 850mV, 750mV", {
+            "voltage 1": 0.5,
+            "voltage 2": 0.85,
+            "voltage 3": 0.75,
+        }),
+        ("Output Logic Level - High", "1.62V~1.65V, 2.34V~2.7V, 4.47V~4.5V", {
+            "voltage 1 min": 1.62,
+            "voltage 1 max": 1.65,
+            "voltage 2 min": 2.34,
+            "voltage 2 max": 2.7,
+            "voltage 3 min": 4.47,
+            "voltage 3 max": 4.5,
+        }),
+    ],
+)
+def test_logic_level_voltage_lists(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "quantity", "expected", "unit"),
     [
         ("Sampling Rate", "352800Hz", "frequency", 352800.0, "frequency"),

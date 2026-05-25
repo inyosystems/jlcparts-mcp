@@ -101,6 +101,9 @@ def normalizeAttribute(key, value):
                 value = attributes.voltageRangeListAttribute(value, "voltage")
             else:
                 value = attributes.stringAttribute(value) if compoundValue(value) or complexVoltageAlternatives else attributes.voltageRangeAttribute(value, "voltage")
+        elif key in larr(["Input Logic Level - High", "Input Logic Level - Low",
+                "Output Logic Level - High", "Output Logic Level - Low"]):
+            value = attributes.voltageRangeListAttribute(value, "voltage")
         elif key in larr(["Breakdown Voltage", "VCE Saturation(VCE(sat))",
                 "Voltage Dropout", "Dropout Voltage"]):
             if key == "breakdown voltage" and isinstance(value, str) and ("," in value or "/" in value):
