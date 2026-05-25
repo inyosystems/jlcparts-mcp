@@ -315,13 +315,15 @@ def normalizeAttribute(key, value):
                 "Turn-Off Time", "Rise Time", "Fall Time", "Reverse Recovery Time (Trr)",
                 "Reset Timeout", "Settling Time", "Response Time (Tr)", "Time to Trip (Max)", "Td(Off)",
                 "Propagation Delay Tp Hl", "Propagation Delay Tp Lh", "Max Propagation Delay",
-                "Maximum Propagation Delay", "Td(on)"]):
+                "Maximum Propagation Delay", "Td(on)", "Block Erase Time(T Be)"]):
             if compoundValue(value) and "@" not in value:
                 if key in larr(["Propagation Delay (TPD)", "Reset Timeout", "Settling Time", "Response Time (Tr)", "Time to Trip (Max)", "Td(Off)",
-                        "Propagation Delay Tp Hl", "Propagation Delay Tp Lh", "Td(on)"]) and isinstance(value, str) and ("," in value or ";" in value):
+                        "Propagation Delay Tp Hl", "Propagation Delay Tp Lh", "Td(on)", "Block Erase Time(T Be)"]) and isinstance(value, str) and ("," in value or ";" in value):
                     value = attributes.timeListAttribute(value)
                 else:
                     value = attributes.stringAttribute(value)
+            elif key == "block erase time(t be)" and isinstance(value, str) and ("," in value or ";" in value):
+                value = attributes.timeListAttribute(value)
             else:
                 value = attributes.timeAtConditionAttribute(value) if isinstance(value, str) and "@" in value else attributes.timeAttribute(value)
         else:

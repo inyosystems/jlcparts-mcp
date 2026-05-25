@@ -1000,6 +1000,21 @@ def test_td_off_times(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("2ms", {"time": 0.002}),
+        ("2s@(64KB)", {"time": 2.0}),
+        ("150ms@(32KB), 250ms@(64KB)", {"time 1": 0.15, "time 2": 0.25}),
+    ],
+)
+def test_block_erase_time(value, expected, capsys):
+    values = normalized_values("Block Erase Time(T Be)", value, capsys)
+
+    for quantity, time in expected.items():
+        assert_quantity(values[quantity], time, "time")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("15ns", [15e-9]),
         ("200ps", [200e-12]),
         ("15ns, 30ns", [15e-9, 30e-9]),
