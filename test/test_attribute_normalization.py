@@ -696,6 +696,7 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Diameter (Φd)", "1.36cm", 0.0136),
         ("Interface Diameter", "7.5mm", 0.0075),
         ("Length of Mating Pin", "5.84mm", 0.00584),
+        ("Operating Height", "8.3mm", 0.0083),
     ],
 )
 def test_scalar_length_attributes(key, value, expected, capsys):
