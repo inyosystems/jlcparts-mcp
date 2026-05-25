@@ -308,6 +308,21 @@ def test_transition_frequency(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("3kHz", {"frequency": 3e3}),
+        ("4kHz~12kHz", {"frequency min": 4e3, "frequency max": 12e3}),
+        ("3.75Hz;15Hz;60Hz", {"frequency 1": 3.75, "frequency 2": 15.0, "frequency 3": 60.0}),
+    ],
+)
+def test_sampling_frequency(value, expected, capsys):
+    values = normalized_values("Sampling Frequency", value, capsys)
+
+    for quantity, frequency in expected.items():
+        assert_quantity(values[quantity], frequency, "frequency")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Non-Repetitive Peak Forward Surge Current", "120A, 240A", [120.0, 240.0]),

@@ -276,15 +276,16 @@ def normalizeAttribute(key, value):
                 "Frequency - Switching", "Frequency Range", "Frequency", "Clock Frequency",
                 "Switching Frequency", "Bandwidth", "Gain Bandwidth Product",
                 "Gain Bandwidth Product(GBP)", "Frequency - Center", "Sampling Rate",
-                "-3d B Bandwidth", "Cut-Off Frequency", "Transition Frequency (F T)"]):
+                "-3d B Bandwidth", "Cut-Off Frequency", "Transition Frequency (F T)",
+                "Sampling Frequency"]):
             if isinstance(value, str) and re.search(r"(?:bit/s|bps)\s*$", value, flags=re.IGNORECASE):
                 value = attributes.dataRateAttribute(value)
             else:
                 if key == "sampling rate" and isinstance(value, str) and re.search(r"\d\s*[munp]?s\b", value, flags=re.IGNORECASE):
                     value = attributes.timeAttribute(value)
-                elif key in ["sampling rate", "frequency - switching", "clock frequency", "transition frequency (f t)"] and isinstance(value, str) and "," in value and "~" in value:
+                elif key in ["sampling rate", "frequency - switching", "clock frequency", "transition frequency (f t)", "sampling frequency"] and isinstance(value, str) and ("," in value or ";" in value) and "~" in value:
                     value = attributes.frequencyRangeListAttribute(value)
-                elif key in ["sampling rate", "frequency - switching", "clock frequency", "transition frequency (f t)"] and isinstance(value, str) and "," in value:
+                elif key in ["sampling rate", "frequency - switching", "clock frequency", "transition frequency (f t)", "sampling frequency"] and isinstance(value, str) and ("," in value or ";" in value):
                     value = attributes.frequencyListAttribute(value)
                 else:
                     value = attributes.stringAttribute(value) if compoundValue(value) else attributes.frequencyAttribute(value)

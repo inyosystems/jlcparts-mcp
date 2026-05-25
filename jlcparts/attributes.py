@@ -501,10 +501,11 @@ def frequencyAttribute(value):
     return rangeOrScalarAttribute(value, readFrequency, "frequency", "frequency")
 
 def frequencyListAttribute(value):
+    value = str(value).replace(";", ",")
     return scalarListAttribute(value, readFrequency, "frequency", "frequency")
 
 def frequencyRangeListAttribute(value):
-    value = str(value)
+    value = str(value).replace(";", ",")
     parts = [x.strip() for x in value.split(",")]
     values = {}
     formats = []
