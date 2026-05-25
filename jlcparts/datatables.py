@@ -273,7 +273,7 @@ def normalizeAttribute(key, value):
             value = attributes.voltageTemperatureDriftAttribute(value)
         elif key in larr(["Noise - 1/10hz to 10hz"]):
             value = attributes.lowFrequencyNoiseAttribute(value)
-        elif key in larr(["Temperature Coefficient"]):
+        elif key in larr(["Temperature Coefficient", "Voltage Reference Drift", "Gain Drift"]):
             value = attributes.temperatureCoefficientAttribute(value)
         elif key in larr(["Wavelength - Dominant", "Dominant Wavelength", "Peak Wavelength"]):
             value = attributes.opticalLengthRangeListAttribute(value) if compoundValue(value) else attributes.wavelengthAttribute(value)

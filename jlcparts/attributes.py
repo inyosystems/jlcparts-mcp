@@ -123,8 +123,12 @@ def readTemperatureCoefficient(value):
     if value in ["-", "--", "null"]:
         return "NaN"
     value = value.replace("±", "").replace("+", "")
-    value = re.sub(r"ppm\s*/?\s*(?:℃|°C|K)?", "", value, flags=re.I).strip()
-    return float(value)
+    ppb = re.search(r"ppb\s*/?\s*(?:℃|°C|K)?$", value, flags=re.I)
+    value = re.sub(r"pp[mb]\s*/?\s*(?:℃|°C|K)?", "", value, flags=re.I).strip()
+    coefficient = float(value)
+    if ppb:
+        return coefficient / 1000
+    return coefficient
 
 def readPpm(value):
     value = value.strip()
@@ -837,7 +841,7 @@ def _temperatureCoefficientPart(part, name):
     part = part.strip()
     if part in ["-", "--", "null"]:
         return scalarAttribute(part, readTemperatureCoefficient, "temperature_coefficient", name)
-    if "ppm" not in part.lower():
+    if not re.search(r"pp[mb]", part, flags=re.I):
         return {
             "format": "${" + name + "}",
             "primary": name,

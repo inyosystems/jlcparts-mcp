@@ -1315,6 +1315,7 @@ def test_low_frequency_noise(value, expected, capsys):
     ("value", "expected"),
     [
         ("35ppm/℃", {"coefficient": [35.0, "temperature_coefficient"]}),
+        ("190ppb/℃", {"coefficient": [0.19, "temperature_coefficient"]}),
         ("±50ppm/℃", {
             "coefficient min": [-50.0, "temperature_coefficient"],
             "coefficient max": [50.0, "temperature_coefficient"],
@@ -1340,7 +1341,31 @@ def test_temperature_coefficient(value, expected, capsys):
     values = normalized_values("Temperature Coefficient", value, capsys)
 
     for quantity, expected_value in expected.items():
-        assert values[quantity] == expected_value
+        if expected_value[1] == "temperature_coefficient_code":
+            assert values[quantity] == expected_value
+        else:
+            assert_quantity(values[quantity], expected_value[0], expected_value[1])
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Voltage Reference Drift", "50ppm/℃, 40ppm/℃", {
+            "coefficient 1": [50.0, "temperature_coefficient"],
+            "coefficient 2": [40.0, "temperature_coefficient"],
+        }),
+        ("Voltage Reference Drift", "500ppb/℃", {
+            "coefficient": [0.5, "temperature_coefficient"],
+        }),
+        ("Gain Drift", "3ppm/℃", {
+            "coefficient": [3.0, "temperature_coefficient"],
+        }),
+    ],
+)
+def test_temperature_coefficient_aliases(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, expected_value in expected.items():
+        assert_quantity(values[quantity], expected_value[0], expected_value[1])
 
 
 @pytest.mark.parametrize(
