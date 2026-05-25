@@ -94,6 +94,7 @@ def readCurrent(value):
 
 def readVoltage(value):
     value = value.replace("v", "V")
+    value = re.sub(r"rms$", "", value, flags=re.I)
     value = value.replace("V-", "V")
     value = value.replace("VDC", "V").replace("VAC", "V")
     value = re.sub(r"\bV(?:DS|GS)\s*=\s*", "", value, flags=re.IGNORECASE)

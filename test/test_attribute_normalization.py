@@ -894,6 +894,22 @@ def test_differential_input_voltage(value, expected, capsys):
     for quantity, voltage in expected.items():
         assert_quantity(values[quantity], voltage, "voltage")
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("5000", {"voltage": 5000.0}),
+        ("4.8kVrms", {"voltage": 4800.0}),
+        ("4kV@AC", {"voltage": 4000.0}),
+        ("6kV, 3.5kV", {"voltage 1": 6000.0, "voltage 2": 3500.0}),
+        ("-", {"voltage": "NaN"}),
+    ],
+)
+def test_isolation_voltage(value, expected, capsys):
+    values = normalized_values("Isolation Voltage(VRMS)", value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
 
 def test_gpio_ports_number_count(capsys):
     values = normalized_values("Gpio Ports Number", "34", capsys)
