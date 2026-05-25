@@ -779,6 +779,20 @@ def decibelListAttribute(value, name="level"):
         "values": values
     }
 
+def decibelTokenListAttribute(value, name="level"):
+    value = str(value)
+    parts = re.findall(r"[+-]?\d+(?:\.\d+)?\s*dB", value, flags=re.IGNORECASE)
+    if not parts and value.strip() in ["-", "--", "null"]:
+        parts = [value.strip()]
+    values = {}
+    for i, part in enumerate(parts, start=1):
+        values[f"{name} {i}"] = [readDecibel(part), "decibel"]
+    return {
+        "format": ", ".join("${" + f"{name} {i}" + "}" for i in range(1, len(parts) + 1)),
+        "primary": f"{name} 1",
+        "values": values
+    }
+
 def decibelMilliwattListAttribute(value, name="level"):
     return scalarListAttribute(value, readDecibelMilliwatt, "decibel_milliwatt", name)
 
