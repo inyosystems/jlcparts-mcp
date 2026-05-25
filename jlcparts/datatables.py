@@ -159,6 +159,8 @@ def normalizeAttribute(key, value):
                     "Peak Output Current(Source)"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
+                "quiescent current (iq)",
+                "quiescent current(iq)",
                 "quiescent supply current",
                 "input offset current(ios)",
                 "receive current",

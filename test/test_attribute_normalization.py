@@ -649,6 +649,8 @@ def test_center_frequency(value, expected, capsys):
     ("key", "value", "expected"),
     [
         ("Non-Repetitive Peak Forward Surge Current", "120A, 240A", [120.0, 240.0]),
+        ("Quiescent Current (Iq)", "7.3mA, 4.5mA", [0.0073, 0.0045]),
+        ("Quiescent Current(Iq)", "2uA, 5uA, 500nA", [2e-6, 5e-6, 500e-9]),
         ("Quiescent Supply Current", "2mA, 1mA, 600uA", [0.002, 0.001, 0.0006]),
         ("Input Offset Current(IOS)", "2nA, 5nA", [2e-9, 5e-9]),
         ("Receive Current", "3.5mA, 5mA", [0.0035, 0.005]),
