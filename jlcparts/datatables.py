@@ -136,6 +136,7 @@ def normalizeAttribute(key, value):
                     "Peak Pulse Current (Ipp)", "Peak Pulse Current (Ipp) @ 10/1000us",
                     "Peak Pulse Current(Ipp)@8/20us",
                     "Quiescent Current", "Quiescent Current (Iq)", "Quiescent Current(Iq)",
+                    "Quiescent Current (Ground Current)",
                     "Ib - Input Bias Current", "Input Bias Current (Ib)", "Standby Current",
                     "Non-Repetitive Peak Forward Surge Current", "Quiescent Supply Current",
                     "Input Offset Current(IOS)", "Receive Current", "Current - Collector(Ic)",
