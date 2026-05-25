@@ -1201,6 +1201,8 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
         ("Max Propagation Delay", "10.6ns@5V,50pF", {"time": 10.6e-9}),
         ("Maximum Propagation Delay", "32ns@6V,150pF", {"time": 32e-9}),
         ("Td(on)", "30ns, 31.6ns", {"time 1": 30e-9, "time 2": 31.6e-9}),
+        ("Setup Time", "6ns", {"time": 6e-9}),
+        ("Setup Time", "20ns, 10ns, 7.5ns", {"time 1": 20e-9, "time 2": 10e-9, "time 3": 7.5e-9}),
     ],
 )
 def test_delay_time_attributes(key, value, expected, capsys):
