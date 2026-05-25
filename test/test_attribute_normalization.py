@@ -197,6 +197,7 @@ def test_voltage_range_list_attributes(key, value, expected, capsys):
         ("Current - Output High(Ioh)", "-6mA", "current", -0.006, "current"),
         ("Current - Surge(Itsm@F)", "284A@60Hz", "current", 284.0, "current"),
         ("Send Current", "266mA", "current", 0.266, "current"),
+        ("Current of Transmitting", "21mA", "current", 0.021, "current"),
     ],
 )
 def test_scalar_frequency_and_current_attributes(key, value, quantity, expected, unit, capsys):
@@ -269,6 +270,7 @@ def test_sampling_rate_time_range(capsys):
         ("Current - Output High(Ioh)", "1mA, 2.6mA, 6.8mA", [0.001, 0.0026, 0.0068]),
         ("Current - Surge(Itsm@F)", "170A@60Hz, 155A@50Hz", [170.0, 155.0]),
         ("Send Current", "9.5mA, 16mA", [0.0095, 0.016]),
+        ("Current of Transmitting", "7.1mA, 3.5mA", [0.0071, 0.0035]),
     ],
 )
 def test_current_lists(key, value, expected, capsys):
