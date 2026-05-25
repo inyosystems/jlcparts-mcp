@@ -565,3 +565,21 @@ def test_td_off_times(value, expected, capsys):
     else:
         for index, time in enumerate(expected, start=1):
             assert_quantity(values[f"time {index}"], time, "time")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("15ns", [15e-9]),
+        ("200ps", [200e-12]),
+        ("15ns, 30ns", [15e-9, 30e-9]),
+    ],
+)
+def test_propagation_delay_tpd_times(value, expected, capsys):
+    values = normalized_values("Propagation Delay (TPD)", value, capsys)
+
+    if len(expected) == 1:
+        assert_quantity(values["time"], expected[0], "time")
+    else:
+        for index, time in enumerate(expected, start=1):
+            assert_quantity(values[f"time {index}"], time, "time")
