@@ -151,6 +151,30 @@ def readDataRate(value):
     value = re.sub(r"([0-9.])([kmg])$", lambda m: m.group(1) + m.group(2).upper(), value)
     return readWithSiPrefix(value)
 
+def readSlewRate(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = value.replace("µ", "u").replace("μ", "u")
+    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*((?:m|u)?V)\s*/\s*(ns|us|ms|s)", value, re.I)
+    if match is None:
+        raise ValueError(f"Cannot parse slew rate {value}")
+    number = float(match.group(1))
+    voltage_unit = match.group(2).lower()
+    time_unit = match.group(3).lower()
+    voltage_scales = {
+        "uv": 1e-6,
+        "mv": 1e-3,
+        "v": 1,
+    }
+    time_scales = {
+        "ns": 1e-9,
+        "us": 1e-6,
+        "ms": 1e-3,
+        "s": 1,
+    }
+    return number * voltage_scales[voltage_unit] / time_scales[time_unit]
+
 def readInductance(value):
     value = value.replace("H", "").strip()
     return readWithSiPrefix(value)
@@ -601,6 +625,24 @@ def luminousIntensityAttribute(value):
 def dataRateAttribute(value):
     value = str(value)
     return rangeOrScalarAttribute(value, readDataRate, "data_rate", "data rate")
+
+def _expandSharedUnitAlternatives(value):
+    match = re.fullmatch(
+        r"\s*([+-]?\d+(?:\.\d+)?)\s*/\s*([+-]?\d+(?:\.\d+)?)\s*((?:m|u|μ|µ)?V)\s*/\s*(ns|us|μs|µs|ms|s)\s*",
+        value,
+        re.I,
+    )
+    if match is None:
+        return value
+    first, second, voltage_unit, time_unit = match.groups()
+    return f"{first}{voltage_unit}/{time_unit}, {second}{voltage_unit}/{time_unit}"
+
+def slewRateAttribute(value):
+    value = _expandSharedUnitAlternatives(str(value))
+    if "," in value or ";" in value:
+        value = value.replace(";", ",")
+        return scalarListAttribute(value, readSlewRate, "slew_rate", "slew rate")
+    return scalarAttribute(value, readSlewRate, "slew_rate", "slew rate")
 
 def dataSizeAttribute(value):
     return scalarAttribute(value, readDataSize, "data_size", "data size")

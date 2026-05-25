@@ -904,6 +904,29 @@ def test_ram_size(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("24V/us", {"slew rate": 24e6}),
+        ("520V/ms", {"slew rate": 520e3}),
+        ("1.4V/ns", {"slew rate": 1.4e9}),
+        ("0.0015mV/us", {"slew rate": 1.5}),
+        ("1.8V/us, 1.4V/us, 1.6V/us", {
+            "slew rate 1": 1.8e6,
+            "slew rate 2": 1.4e6,
+            "slew rate 3": 1.6e6,
+        }),
+        ("220/390V/us", {"slew rate 1": 220e6, "slew rate 2": 390e6}),
+        ("-", {"slew rate": "NaN"}),
+    ],
+)
+def test_slew_rate(value, expected, capsys):
+    values = normalized_values("Slew Rate", value, capsys)
+
+    for quantity, slew_rate in expected.items():
+        assert_quantity(values[quantity], slew_rate, "slew_rate")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("3000K", {"temperature 1": 3000.0}),
         ("1800K~6500K", {"temperature 1 min": 1800.0, "temperature 1 max": 6500.0}),
         (

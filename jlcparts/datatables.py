@@ -330,6 +330,8 @@ def normalizeAttribute(key, value):
             value = attributes.stringAttribute(value) if isinstance(value, str) and value.count(";") != 0 else attributes.chargeAtVoltage(value)
         elif key in larr(["Data Rate"]):
             value = attributes.stringAttribute(value) if compoundValue(value) else attributes.dataRateAttribute(value)
+        elif key in larr(["Slew Rate"]):
+            value = attributes.slewRateAttribute(value)
         elif key in larr(["Program Storage Size", "Ram Size"]):
             value = attributes.dataSizeListAttribute(value) if key == "ram size" and isinstance(value, str) and ("," in value or ";" in value) else attributes.dataSizeAttribute(value)
         elif key in larr(["Frequency - self resonant", "Output frequency (max)",
