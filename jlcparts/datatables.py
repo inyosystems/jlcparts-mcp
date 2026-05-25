@@ -131,13 +131,17 @@ def normalizeAttribute(key, value):
                     "Quiescent Current", "Quiescent Current (Iq)", "Quiescent Current(Iq)",
                     "Ib - Input Bias Current", "Standby Current",
                     "Non-Repetitive Peak Forward Surge Current", "Quiescent Supply Current",
-                    "Input Offset Current(IOS)", "Receive Current", "Current - Collector(Ic)"]):
+                    "Input Offset Current(IOS)", "Receive Current", "Current - Collector(Ic)",
+                    "Supply Current (Iq)", "Current - Input Bias(Ib)", "Current - Output Low(Iol)"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent supply current",
                 "input offset current(ios)",
                 "receive current",
                 "current - collector(ic)",
+                "supply current (iq)",
+                "current - input bias(ib)",
+                "current - output low(iol)",
             ]
             if key in currentListKeys and isinstance(value, str) and "," in value:
                 value = attributes.currentListAttribute(value)

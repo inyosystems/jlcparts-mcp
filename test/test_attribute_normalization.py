@@ -189,6 +189,9 @@ def test_voltage_range_list_attributes(key, value, expected, capsys):
         ("Input Offset Current(IOS)", "8nA", "current", 8e-9, "current"),
         ("Receive Current", "46mA", "current", 0.046, "current"),
         ("Current - Collector(Ic)", "4A", "current", 4.0, "current"),
+        ("Supply Current (Iq)", "1uA", "current", 1e-6, "current"),
+        ("Current - Input Bias(Ib)", "1.2pA", "current", 1.2e-12, "current"),
+        ("Current - Output Low(Iol)", "2.5mA", "current", 0.0025, "current"),
     ],
 )
 def test_scalar_frequency_and_current_attributes(key, value, quantity, expected, unit, capsys):
@@ -242,6 +245,7 @@ def test_sampling_rate_time_range(capsys):
         ("Input Offset Current(IOS)", "2nA, 5nA", [2e-9, 5e-9]),
         ("Receive Current", "3.5mA, 5mA", [0.0035, 0.005]),
         ("Current - Collector(Ic)", "5A, 4.45A", [5.0, 4.45]),
+        ("Current - Output Low(Iol)", "2.6mA, 6.8mA, 1mA", [0.0026, 0.0068, 0.001]),
     ],
 )
 def test_current_lists(key, value, expected, capsys):
