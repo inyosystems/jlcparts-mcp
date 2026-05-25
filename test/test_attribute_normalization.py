@@ -917,8 +917,9 @@ def test_ram_size(value, expected, capsys):
         ("-", {"slew rate": "NaN"}),
     ],
 )
-def test_slew_rate(value, expected, capsys):
-    values = normalized_values("Slew Rate", value, capsys)
+@pytest.mark.parametrize("key", ["Slew Rate", "Slew Rate(Sr)"])
+def test_slew_rate(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
 
     for quantity, slew_rate in expected.items():
         assert_quantity(values[quantity], slew_rate, "slew_rate")
