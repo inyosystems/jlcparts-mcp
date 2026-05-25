@@ -178,6 +178,8 @@ def normalizeAttribute(key, value):
             value = attributes.decibelMilliwattListAttribute(value, "level")
         elif key in larr(["Q @ Frequency"]):
             value = attributes.qAtFrequencyAttribute(value)
+        elif key in larr(["DC Current Gain"]):
+            value = attributes.ratioRangeListAttribute(value, "gain")
         elif key in larr(["Number of Pins", "Number of Resistors", "Number of Loop",
                     "Number of Regulators", "Number of Outputs", "Number of Capacitors",
                     "Number of I/O",

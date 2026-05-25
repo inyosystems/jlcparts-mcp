@@ -630,6 +630,22 @@ def test_q_at_frequency(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("180", {"gain": 180.0}),
+        ("475, 415", {"gain 1": 475.0, "gain 2": 415.0}),
+        ("100, 1000~12000", {"gain 1": 100.0, "gain 2 min": 1000.0, "gain 2 max": 12000.0}),
+        ("300@5A,10V", {"gain": 300.0}),
+    ],
+)
+def test_dc_current_gain_values(value, expected, capsys):
+    values = normalized_values("DC Current Gain", value, capsys)
+
+    for quantity, gain in expected.items():
+        assert_quantity(values[quantity], gain, "ratio")
+
+
+@pytest.mark.parametrize(
     ("value", "capacitance"),
     [
         ("190pF@1kHz", 190e-12),

@@ -762,6 +762,24 @@ def qAtFrequencyAttribute(value):
         "values": values
     }
 
+def ratioRangeListAttribute(value, name="ratio"):
+    value = str(value).strip()
+    if "@" in value:
+        value = value.split("@", 1)[0]
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        parsed = rangeOrScalarAttribute(part, readWithSiPrefix, "ratio", f"{name} {i}" if len(parts) > 1 else name)
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    primary_name = f"{name} 1" if len(parts) > 1 else name
+    return {
+        "format": ", ".join(formats),
+        "primary": primary_name + " min" if any(_rangeParts(part) for part in parts) else primary_name,
+        "values": values
+    }
+
 def capacitanceAtConditionAttribute(value, name="capacitance"):
     return scalarAttribute(value, readCapacitance, "capacitance", name)
 
