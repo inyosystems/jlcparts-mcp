@@ -383,6 +383,13 @@ def test_cpu_maximum_speed_lists(capsys):
     assert_quantity(values["frequency"], "NaN", "frequency")
 
 
+def test_frequency_center_band_lists(capsys):
+    values = normalized_values("Frequency(Center/Band)", "2.4GHz, 5.4GHz", capsys)
+
+    assert_quantity(values["frequency 1"], 2.4e9, "frequency")
+    assert_quantity(values["frequency 2"], 5.4e9, "frequency")
+
+
 def test_sampling_rate_time_range(capsys):
     values = normalized_values("Sampling Rate", "0.1ms~23.5ms", capsys)
 
