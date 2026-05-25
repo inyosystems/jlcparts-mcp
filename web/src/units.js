@@ -5,7 +5,7 @@ export function quantityComparator(quantityName) {
     const numericQuantities = [
         "resistance", "voltage", "current", "power", "count", "capacitance",
         "length", "inductance", "temperature", "charge", "frequency",
-        "percentage", "time", "data_rate", "luminous_intensity", "energy",
+        "percentage", "time", "data_rate", "luminous_intensity", "radiant_intensity", "energy",
         "decibel", "decibel_milliwatt", "ratio", "kelvin", "angle",
         "data_size", "melting_i2t", "slew_rate", "area_mm2"
     ];
@@ -33,6 +33,7 @@ export function quantityFormatter(quantityName) {
         melting_i2t: siFormatter("A²s"),
         area_mm2: x => x === "NaN" ? "-" : `${x} mm²`,
         luminous_intensity: siFormatter("cd"),
+        radiant_intensity: siFormatter("W/sr"),
         length: siFormatter("m"),
         inductance: siFormatter("H"),
         charge: siFormatter("C"),

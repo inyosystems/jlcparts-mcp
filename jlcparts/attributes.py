@@ -186,6 +186,13 @@ def readLuminousIntensity(value):
     value = re.sub(r"cd$", "", value, flags=re.IGNORECASE).strip()
     return readWithSiPrefix(value)
 
+def readRadiantIntensity(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"/\s*sr$", "", value, flags=re.IGNORECASE).strip()
+    return readPower(value)
+
 def readLength(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
@@ -620,6 +627,26 @@ def luminousIntensityAttribute(value):
             label, part = [x.strip() for x in part.split(":", 1)]
         name = f"intensity {label}"
         parsed = rangeOrScalarAttribute(part, readLuminousIntensity, "luminous_intensity", name)
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
+def radiantIntensityAttribute(value):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        parsed = rangeOrScalarAttribute(
+            part,
+            readRadiantIntensity,
+            "radiant_intensity",
+            f"intensity {index}",
+        )
         values.update(parsed["values"])
         formats.append(parsed["format"])
     return {

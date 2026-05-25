@@ -1125,6 +1125,27 @@ def test_luminous_intensity(key, value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("20mW/sr@IF=100mA", {"intensity 1": 0.02}),
+        ("8mW/sr~16mW/sr", {"intensity 1 min": 0.008, "intensity 1 max": 0.016}),
+        ("200mW~260mW", {"intensity 1 min": 0.2, "intensity 1 max": 0.26}),
+        ("420mW/sr, 620mW/sr", {"intensity 1": 0.42, "intensity 2": 0.62}),
+        (
+            "170mW/sr@IF=350mA, 350mW/sr@IF=1000mA",
+            {"intensity 1": 0.17, "intensity 2": 0.35},
+        ),
+        ("-", {"intensity 1": "NaN"}),
+    ],
+)
+def test_radiant_intensity(value, expected, capsys):
+    values = normalized_values("Radiant Intensity", value, capsys)
+
+    for quantity, intensity in expected.items():
+        assert_quantity(values[quantity], intensity, "radiant_intensity")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Energy", "900mJ", 0.9),
