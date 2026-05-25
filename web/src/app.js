@@ -5,6 +5,8 @@ import {
   Route,
   NavLink
 } from "react-router-dom";
+import { QueryParamProvider } from 'use-query-params';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { fas } from '@fortawesome/free-solid-svg-icons'
@@ -280,11 +282,13 @@ function App() {
         <Header/>
         <FirstTimeNote/>
         <Navbar/>
+          <QueryParamProvider adapter={ReactRouter6Adapter}>
             <Routes>
                 <Route path="/" element={<ComponentOverview/>} />
                 <Route path="/history" element={<History/>} />
                 <Route path="*" element={<NoMatch />} />
             </Routes>
+          </QueryParamProvider>
         <Footer/>
       </Container>
     </Router>

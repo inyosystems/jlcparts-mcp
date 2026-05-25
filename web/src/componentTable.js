@@ -9,8 +9,49 @@ import { SortableTable } from "./sortableTable"
 import { quantityComparator, quantityFormatter } from "./units";
 import { AttritionInfo, getQuantityPrice } from "./jlc"
 import { naturalCompare } from '@discoveryjs/natural-compare';
+import {
+    BooleanParam,
+    DelimitedNumericArrayParam,
+    StringParam,
+    useQueryParams,
+} from 'use-query-params';
+import {
+    compressToEncodedURIComponent,
+    decompressFromEncodedURIComponent,
+} from 'lz-string';
 
 enableMapSet();
+
+const CompressedJsonParam = {
+    encode: value => {
+        if (value === undefined || value === null) {
+            return undefined;
+        }
+        return compressToEncodedURIComponent(JSON.stringify(value));
+    },
+    decode: value => {
+        if (Array.isArray(value)) {
+            value = value[0];
+        }
+        if (!value) {
+            return undefined;
+        }
+        try {
+            const decompressed = decompressFromEncodedURIComponent(value);
+            return decompressed ? JSON.parse(decompressed) : undefined;
+        } catch (error) {
+            console.warn("Cannot decode query state from URL", error);
+            return undefined;
+        }
+    }
+};
+
+const ComponentQueryParams = {
+    q: StringParam,
+    all: BooleanParam,
+    c: DelimitedNumericArrayParam,
+    f: CompressedJsonParam,
+};
 
 function getValue(value) {
     return value?.[0];
@@ -85,6 +126,63 @@ export function restoreLcscUrl(slug, lcsc) {
 
 function valueFootprint(value) {
     return JSON.stringify(value);
+}
+
+function sortedNumbers(values = []) {
+    return values
+        .map(value => Number(value))
+        .filter(value => Number.isFinite(value))
+        .sort((a, b) => a - b);
+}
+
+function sortedStrings(values = []) {
+    return [...values]
+        .filter(value => typeof value === "string" && value.length > 0)
+        .sort((a, b) => a.localeCompare(b));
+}
+
+function categoryUrlSignature(query = {}) {
+    return JSON.stringify({
+        q: query.q || "",
+        all: Boolean(query.all),
+        c: sortedNumbers(query.c),
+    });
+}
+
+function filterUrlSignature(query = {}) {
+    return JSON.stringify(query.f ?? {});
+}
+
+function compactFilterState(filterState) {
+    if (!filterState || typeof filterState !== "object") {
+        return undefined;
+    }
+    const result = {};
+    if (filterState.p && typeof filterState.p === "object" && Object.keys(filterState.p).length > 0) {
+        result.p = {};
+        for (const property of sortedStrings(Object.keys(filterState.p))) {
+            const values = filterState.p[property];
+            if (Array.isArray(values) && values.length > 0) {
+                result.p[property] = sortedStrings(values);
+            }
+        }
+        if (Object.keys(result.p).length === 0) {
+            delete result.p;
+        }
+    }
+    if (Array.isArray(filterState.req) && filterState.req.length > 0) {
+        result.req = sortedStrings(filterState.req);
+    }
+    if (Array.isArray(filterState.cols) && filterState.cols.length > 0) {
+        result.cols = sortedStrings(filterState.cols);
+    }
+    if (filterState.qty !== undefined && Number(filterState.qty) !== 1) {
+        result.qty = Number(filterState.qty);
+    }
+    if (filterState.stock) {
+        result.stock = true;
+    }
+    return Object.keys(result).length > 0 ? result : undefined;
 }
 
 function displayText(value) {
@@ -205,22 +303,29 @@ export function ZoomableLazyImage(props) {
     )
 }
 
-export class ComponentOverview extends React.Component {
+export function ComponentOverview() {
+    const [urlQuery, setUrlQuery] = useQueryParams(ComponentQueryParams);
+    return <ComponentOverviewView urlQuery={urlQuery} setUrlQuery={setUrlQuery}/>;
+}
+
+class ComponentOverviewView extends React.Component {
     constructor(props) {
         super(props);
+        const filterState = compactFilterState(props.urlQuery?.f) ?? {};
         this.state = {
             components: [],
             categories: [],
             properties: [],
             activeProperties: {},
-            stockRequired: false,
-            requiredProperties: new Set(),
+            stockRequired: Boolean(filterState.stock),
+            requiredProperties: new Set(filterState.req ?? []),
             expectedComponentsVersion: 0,
             componentsVersion: 0,
-            tableIncludedProperties: new Set(),
+            tableIncludedProperties: new Set(filterState.cols ?? []),
             propertyValueCounts: {},
-            quantity: 1
+            quantity: filterState.qty ?? 1
         };
+        this.lastAppliedFilterSignature = filterUrlSignature(props.urlQuery);
     }
 
     componentDidMount() {
@@ -235,6 +340,12 @@ export class ComponentOverview extends React.Component {
                 rawCategories: normalizedCategories
             });
         });
+    }
+
+    componentDidUpdate(prevProps) {
+        if (filterUrlSignature(prevProps.urlQuery) !== filterUrlSignature(this.props.urlQuery)) {
+            this.applyUrlFilterState();
+        }
     }
 
     prepareCategories(sourceCategories) {
@@ -332,6 +443,7 @@ export class ComponentOverview extends React.Component {
                 draft.activeProperties[property] = properties[property];
             }
             draft.propertyValueCounts = propertyValueCounts;
+            this.applyUrlFilterStateToDraft(draft);
             var t1 = performance.now();
             console.log("Active categories took ", t1 - t0, "ms" );
         }));
@@ -340,7 +452,7 @@ export class ComponentOverview extends React.Component {
     handleActivePropertiesChange = (property, values) => {
         this.setState(produce(this.state, draft => {
             draft.activeProperties[property] = values;
-        }));
+        }), () => this.updateUrlFilterState("pushIn"));
     }
 
     handleIncludeInTable = (property, value) => {
@@ -349,7 +461,7 @@ export class ComponentOverview extends React.Component {
                 draft.tableIncludedProperties.add(property);
             else
                 draft.tableIncludedProperties.delete(property);
-        }));
+        }), () => this.updateUrlFilterState("pushIn"));
     }
 
     handlePropertyRequired = (property, value) => {
@@ -358,7 +470,7 @@ export class ComponentOverview extends React.Component {
                 draft.requiredProperties.add(property);
             else
                 draft.requiredProperties.delete(property);
-        }));
+        }), () => this.updateUrlFilterState("pushIn"));
     }
 
     filterComponents(components, activeProperties, requiredProperties, propertyValueCounts) {
@@ -395,17 +507,84 @@ export class ComponentOverview extends React.Component {
     }
 
     handleQuantityChange = q => {
-        this.setState({quantity: q});
+        this.setState({quantity: q}, () => this.updateUrlFilterState("replaceIn"));
     }
 
     handleStockRequired = stockRequired => {
-        this.setState({stockRequired: stockRequired});
+        this.setState({stockRequired: stockRequired}, () => this.updateUrlFilterState("pushIn"));
+    }
+
+    applyUrlFilterStateToDraft(draft) {
+        const filterState = compactFilterState(this.props.urlQuery?.f) ?? {};
+        draft.quantity = filterState.qty ?? 1;
+        draft.stockRequired = Boolean(filterState.stock);
+        draft.tableIncludedProperties = new Set(filterState.cols ?? []);
+        draft.requiredProperties = new Set(filterState.req ?? []);
+
+        if (draft.properties.length > 0) {
+            const defaults = {};
+            const propertyValues = {};
+            for (const propertyDic of draft.properties) {
+                defaults[propertyDic.property] = propertyDic.values.map(x => x.key);
+                propertyValues[propertyDic.property] = new Set(defaults[propertyDic.property]);
+            }
+            draft.activeProperties = defaults;
+            const propertyFilters = filterState.p ?? {};
+            for (const [property, values] of Object.entries(propertyFilters)) {
+                const availableValues = propertyValues[property];
+                if (!availableValues || !Array.isArray(values)) {
+                    continue;
+                }
+                const selectedValues = values.filter(value => availableValues.has(value));
+                if (selectedValues.length > 0) {
+                    draft.activeProperties[property] = selectedValues;
+                }
+            }
+        }
+    }
+
+    applyUrlFilterState() {
+        const signature = filterUrlSignature(this.props.urlQuery);
+        if (this.lastAppliedFilterSignature === signature) {
+            return;
+        }
+        this.lastAppliedFilterSignature = signature;
+        this.setState(produce(this.state, draft => {
+            this.applyUrlFilterStateToDraft(draft);
+        }));
+    }
+
+    buildUrlFilterState() {
+        const propertyFilters = {};
+        for (const [property, values] of Object.entries(this.state.activeProperties)) {
+            const totalValues = this.state.propertyValueCounts[property];
+            if (totalValues === undefined || !Array.isArray(values) || values.length === totalValues) {
+                continue;
+            }
+            propertyFilters[property] = values;
+        }
+
+        return compactFilterState({
+            p: propertyFilters,
+            req: Array.from(this.state.requiredProperties),
+            cols: Array.from(this.state.tableIncludedProperties),
+            qty: this.state.quantity,
+            stock: this.state.stockRequired,
+        });
+    }
+
+    updateUrlFilterState(updateType) {
+        const filterState = this.buildUrlFilterState();
+        this.lastAppliedFilterSignature = JSON.stringify(filterState ?? {});
+        this.props.setUrlQuery({f: filterState}, updateType);
     }
 
     render() {
         let filterComponents = <>
             <CategoryFilter
                 categories={this.state.categories}
+                urlQuery={this.props.urlQuery}
+                setUrlQuery={this.props.setUrlQuery}
                 onChange={this.handleComponentsChange}
                 onAnnounceChange={this.handleStartComponentsChange}/>
             <PropertySelect
@@ -720,10 +899,75 @@ class CategoryFilter extends React.Component {
             queryProgress: null,
             abort: () => null
         }
+        this.lastAppliedUrlSignature = null;
+    }
+
+    componentDidMount() {
+        this.applyUrlQuery();
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.categories !== this.props.categories) {
+            this.applyUrlQuery(true);
+        } else if (categoryUrlSignature(prevProps.urlQuery) !== categoryUrlSignature(this.props.urlQuery)) {
+            this.applyUrlQuery();
+        }
+    }
+
+    componentWillUnmount() {
+        clearTimeout(this.searchTimeout);
     }
 
     collectActiveCategories = () => {
         return Object.values(this.state.categories).flat();
+    }
+
+    stateFromUrlQuery = query => {
+        const searchString = query?.q ?? "";
+        const categoryIds = new Set(sortedNumbers(query?.c));
+        const allCategories = Boolean(query?.all) ||
+            (categoryIds.size === 0 && searchString.trim().length >= 3);
+        const categories = {};
+
+        for (const category of this.props.categories) {
+            categories[category.category] = allCategories
+                ? category.subcategories.map(subcategory => subcategory.key)
+                : category.subcategories
+                    .filter(subcategory => categoryIds.has(subcategory.key))
+                    .map(subcategory => subcategory.key);
+        }
+
+        return { categories, allCategories, searchString };
+    }
+
+    applyUrlQuery = (force = false) => {
+        const signature = categoryUrlSignature(this.props.urlQuery);
+        if (!force && this.lastAppliedUrlSignature === signature) {
+            return;
+        }
+        this.lastAppliedUrlSignature = signature;
+        clearTimeout(this.searchTimeout);
+        this.setState(this.stateFromUrlQuery(this.props.urlQuery), this.notifyParent);
+    }
+
+    buildUrlQueryPatch(state = this.state) {
+        const activeCategories = sortedNumbers(Object.values(state.categories).flat());
+        return {
+            q: state.searchString || undefined,
+            all: state.allCategories ? true : undefined,
+            c: state.allCategories || activeCategories.length === 0
+                ? undefined
+                : activeCategories,
+        };
+    }
+
+    updateUrlQuery = (updateType) => {
+        const patch = this.buildUrlQueryPatch();
+        this.lastAppliedUrlSignature = categoryUrlSignature({
+            ...this.props.urlQuery,
+            ...patch,
+        });
+        this.props.setUrlQuery?.(patch, updateType);
     }
 
     notifyParent = () => {
@@ -797,7 +1041,10 @@ class CategoryFilter extends React.Component {
         this.setState(produce(this.state, draft => {
             draft.categories[category] = value.map(n => parseInt(n));
             draft.allCategories = false;
-        }), this.notifyParent);
+        }), () => {
+            this.updateUrlQuery("pushIn");
+            this.notifyParent();
+        });
     }
 
     selectAll = state => {
@@ -815,11 +1062,17 @@ class CategoryFilter extends React.Component {
     }
 
     handleSelectAll = () => {
-        this.setState(produce(this.state, this.selectAll), this.notifyParent);
+        this.setState(produce(this.state, this.selectAll), () => {
+            this.updateUrlQuery("pushIn");
+            this.notifyParent();
+        });
     }
 
     handleSelectNone = () => {
-        this.setState(produce(this.state, this.selectNone), this.notifyParent);
+        this.setState(produce(this.state, this.selectNone), () => {
+            this.updateUrlQuery("pushIn");
+            this.notifyParent();
+        });
     }
 
     handleFulltextChange = e => {
@@ -828,6 +1081,7 @@ class CategoryFilter extends React.Component {
             if (!draft.allCategories && this.collectActiveCategories().length === 0)
                 this.selectAll(draft);
         }), () => {
+            this.updateUrlQuery("replaceIn");
             clearTimeout(this.searchTimeout);
             this.searchTimeout = setTimeout(this.notifyParent, 350);
         });
@@ -840,6 +1094,7 @@ class CategoryFilter extends React.Component {
                 this.selectNone(draft);
             }
         }), () => {
+            this.updateUrlQuery("pushIn");
             this.notifyParent();
         });
     }
