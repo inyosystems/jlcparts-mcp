@@ -348,6 +348,25 @@ def test_trip_current(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("5A", [5.0]),
+        ("400mA", [0.4]),
+        ("10uA", [10e-6]),
+        ("25A, 55A", [25.0, 55.0]),
+    ],
+)
+def test_maximum_continuous_current(value, expected, capsys):
+    values = normalized_values("Maximum Continuous Current", value, capsys)
+
+    if len(expected) == 1:
+        assert_quantity(values["current"], expected[0], "current")
+    else:
+        for index, current in enumerate(expected, start=1):
+            assert_quantity(values[f"current {index}"], current, "current")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("35mcd", {"intensity 1": 0.035}),
         ("2.25cd", {"intensity 1": 2.25}),
         ("68mcd~102mcd", {"intensity 1 min": 0.068, "intensity 1 max": 0.102}),
