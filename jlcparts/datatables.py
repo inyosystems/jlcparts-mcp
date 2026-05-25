@@ -210,9 +210,11 @@ def normalizeAttribute(key, value):
         elif key in larr(["Attenuation", "Power Supply Rejection Ratio (Psrr)",
                 "Insertion Loss", "Signal-to-Noise Ratio", "Noise Figure",
                 "Common Mode Rejection Ratio(CMRR)", "Common Mode Rejection Ratio (CMRR)",
-                "Return Loss (Min)", "Sound Pressure Level(Spl)"]):
+                "Return Loss (Min)", "Sound Pressure Level(Spl)", "Peak Gain"]):
             if key == "sound pressure level(spl)":
                 value = attributes.decibelTokenListAttribute(value, "level")
+            elif key == "peak gain":
+                value = attributes.decibelListAttribute(value, "gain")
             else:
                 value = attributes.decibelListAttribute(value, "level")
         elif key in larr(["IP3", "P1d B"]):

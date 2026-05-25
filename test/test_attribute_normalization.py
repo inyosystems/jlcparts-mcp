@@ -1290,6 +1290,23 @@ def test_decibel_lists(key, value, expected, capsys):
         assert_quantity(values[f"level {index}"], level, "decibel")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("4.2dB", [4.2]),
+        ("1.5dBi", [1.5]),
+        ("4dBic", [4.0]),
+        ("0.3dBi, 0.75dBi", [0.3, 0.75]),
+        ("-", ["NaN"]),
+    ],
+)
+def test_peak_gain(value, expected, capsys):
+    values = normalized_values("Peak Gain", value, capsys)
+
+    for index, gain in enumerate(expected, start=1):
+        assert_quantity(values[f"gain {index}"], gain, "decibel")
+
+
 def test_decibel_at_frequency(capsys):
     values = normalized_values(
         "Power Supply Rejection Ratio (Psrr)",

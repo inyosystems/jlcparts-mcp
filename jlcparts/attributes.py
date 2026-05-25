@@ -351,7 +351,7 @@ def readDecibel(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
         return "NaN"
-    value = re.sub(r"dB$", "", value, flags=re.IGNORECASE).strip()
+    value = re.sub(r"dB(?:i|ic)?$", "", value, flags=re.IGNORECASE).strip()
     return float(value)
 
 def readDecibelMilliwatt(value):
