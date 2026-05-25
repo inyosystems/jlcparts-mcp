@@ -133,6 +133,7 @@ def test_impedance_zzk(value, expected, capsys):
         ("Input Voltage(DC)", "6V~58V", (6.0, 58.0)),
         ("Input Voltage(DC)", "24V", 24.0),
         ("Motor Drive Voltage(Vm)", "8V~45V", (8.0, 45.0)),
+        ("Control Voltage", "2.5V~21V", (2.5, 21.0)),
         ("Low Level Range (VIL)", "700mV~800mV", (0.7, 0.8)),
         ("Low Level Range (VIL)", "0.8V", 0.8),
         ("Operating Voltage", "-", "NaN"),
