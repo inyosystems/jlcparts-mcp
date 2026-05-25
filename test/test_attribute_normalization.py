@@ -473,6 +473,8 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Peak Output Current(Sink)", "2mA", "current", 0.002, "current"),
         ("Peak Output Current(Source)", "400uA", "current", 400e-6, "current"),
         ("Hold Current", "750mA", "current", 0.75, "current"),
+        ("Working Current", "500uA", "current", 500e-6, "current"),
+        ("Supply Current Per Channel", "3.6mA", "current", 0.0036, "current"),
     ],
 )
 def test_scalar_frequency_and_current_attributes(key, value, quantity, expected, unit, capsys):
