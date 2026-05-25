@@ -141,7 +141,7 @@ def normalizeAttribute(key, value):
                     "Input Offset Current(IOS)", "Receive Current", "Current - Collector(Ic)",
                     "Supply Current (Iq)", "Current - Input Bias(Ib)", "Current - Output Low(Iol)",
                     "Current - Output High(Ioh)", "Current - Surge(Itsm@F)", "Send Current",
-                    "Current of Transmitting", "Current Consumption"]):
+                    "Current of Transmitting", "Current Consumption", "Current - Leakage"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent supply current",
@@ -161,7 +161,9 @@ def normalizeAttribute(key, value):
                 "current consumption",
                 "peak pulse current(ipp)@8/20us",
             ]
-            if key in ["current range", "current consumption"]:
+            if key in ["current - leakage"]:
+                value = attributes.currentAttribute(value)
+            elif key in ["current range", "current consumption"]:
                 value = attributes.currentRangeListAttribute(value)
             elif key in currentListKeys and isinstance(value, str) and ("," in value or ";" in value):
                 value = attributes.currentListAttribute(value)
