@@ -954,6 +954,28 @@ def test_color_temperature(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("2.5", {"area 1": 2.5}),
+        ("0.5~4", {"area 1 min": 0.5, "area 1 max": 4.0}),
+        ("0.5~4, 0.75~6", {
+            "area 1 min": 0.5,
+            "area 1 max": 4.0,
+            "area 2 min": 0.75,
+            "area 2 max": 6.0,
+        }),
+        ("5, 6", {"area 1": 5.0, "area 2": 6.0}),
+        ("-", {"area 1": "NaN"}),
+    ],
+)
+def test_wire_gauge_mm2(value, expected, capsys):
+    values = normalized_values("Wire Gauge - MM2", value, capsys)
+
+    for quantity, area in expected.items():
+        assert_quantity(values[quantity], area, "area_mm2")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("1080", 1080.0),
         ("0.0004", 0.0004),
         ("-", "NaN"),

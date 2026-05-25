@@ -214,6 +214,12 @@ def readLength(value):
     }
     return number * scales[unit]
 
+def readSquareMillimeter(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    return float(value)
+
 def readTime(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
@@ -675,6 +681,21 @@ def lengthRangeListAttribute(value, name="length"):
     return {
         "format": ", ".join(formats),
         "primary": f"{name} 1 min" if any(_rangeParts(part) for part in parts) else f"{name} 1",
+        "values": values
+    }
+
+def areaMm2RangeListAttribute(value):
+    value = str(value).replace(";", ",").strip()
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        parsed = rangeOrScalarAttribute(part, readSquareMillimeter, "area_mm2", f"area {index}")
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": "area 1 min" if any(_rangeParts(part) for part in parts) else "area 1",
         "values": values
     }
 
