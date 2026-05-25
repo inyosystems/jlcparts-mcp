@@ -103,6 +103,20 @@ def test_resistance_list_attributes(key, value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("500Ω", 500.0),
+        ("1.75kΩ", 1750.0),
+        ("-", "NaN"),
+    ],
+)
+def test_impedance_zzk(value, expected, capsys):
+    values = normalized_values("Impedance(Zzk)", value, capsys)
+
+    assert_quantity(values["impedance"], expected, "resistance")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Single Supply", "2V~36V", (2.0, 36.0)),
