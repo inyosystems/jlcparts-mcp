@@ -385,6 +385,18 @@ def test_switching_frequency_lists(capsys):
     assert_quantity(values["frequency 2 max"], 520e3, "frequency")
 
 
+def test_switch_frequency_values(capsys):
+    values = normalized_values("Switch Frequency", "25kHz;100kHz", capsys)
+
+    assert_quantity(values["frequency 1"], 25e3, "frequency")
+    assert_quantity(values["frequency 2"], 100e3, "frequency")
+
+    values = normalized_values("Switch Frequency", "233kHz~1MHz", capsys)
+
+    assert_quantity(values["frequency min"], 233e3, "frequency")
+    assert_quantity(values["frequency max"], 1e6, "frequency")
+
+
 def test_clock_frequency_lists(capsys):
     values = normalized_values("Clock Frequency", "32MHz, 32kHz, 1MHz", capsys)
 
