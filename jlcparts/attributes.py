@@ -481,6 +481,8 @@ def temperatureRangeAttribute(value):
     value = re.sub(r"\(.*?\)", "", value)
     if _hasCompoundValues(value):
         raise ValueError(f"Compound temperature value cannot be represented as scalar range: {value}")
+    if value.strip().startswith("±"):
+        value = "-" + value.strip()[1:] + "~+" + value.strip()[1:]
     if "~" in value or ".." in value:
         return rangeOrScalarAttribute(value.replace("℃", ""), lambda x: int(float(x)), "temperature", "temperature")
     value = value.strip()
