@@ -223,6 +223,8 @@ def normalizeAttribute(key, value):
             value = attributes.qAtFrequencyAttribute(value)
         elif key in larr(["DC Current Gain"]):
             value = attributes.ratioRangeListAttribute(value, "gain")
+        elif key in larr(["Voltage Reference Value"]):
+            value = attributes.voltageListAttribute(value)
         elif key in larr(["Integral Non - Linearity", "Integral Nonlinearity", "Inl/Dnl(Lsb)"]):
             value = attributes.lsbListAttribute(value)
         elif key in larr(["Number of Channels"]):
