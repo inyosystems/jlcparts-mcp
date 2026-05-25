@@ -4,7 +4,8 @@ import { naturalCompare } from '@discoveryjs/natural-compare';
 export function quantityComparator(quantityName) {
     const numericQuantities = [
         "resistance", "voltage", "current", "power", "count", "capacitance",
-        "length", "inductance", "temperature", "charge"
+        "length", "inductance", "temperature", "charge", "frequency",
+        "percentage", "time", "data_rate"
     ];
     if (numericQuantities.includes(quantityName))
         return numericComparator;
@@ -20,9 +21,12 @@ export function quantityFormatter(quantityName) {
         power: siFormatter("W"),
         capacitance: siFormatter("F"),
         frequency: siFormatter("Hz"),
+        data_rate: siFormatter("bps"),
         length: siFormatter("m"),
         inductance: siFormatter("H"),
         charge: siFormatter("C"),
+        percentage: x => x === "NaN" ? "-" : `${x} %`,
+        time: siFormatter("s"),
         count: x => String(x),
         temperature: x => `${x} °C`
     };

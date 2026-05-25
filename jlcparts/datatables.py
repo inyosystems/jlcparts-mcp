@@ -52,6 +52,9 @@ def normalizeUnicode(value):
 def multiScalarValue(value):
     return isinstance(value, str) and ("," in value or "~" in value)
 
+def compoundValue(value):
+    return isinstance(value, str) and any(separator in value for separator in [",", ";"])
+
 def normalizeAttribute(key, value):
     """
     Takes a name of attribute and its value (usually a string) and returns a
@@ -91,6 +94,16 @@ def normalizeAttribute(key, value):
                 "Voltage - Input (Min)", "Drain Source Voltage (Vdss)",
                 "Drain-Source Voltage (Vdss)"]):
             value = attributes.voltageAttribute(value)
+        elif key in larr(["Input Voltage", "Frequency Input Voltage", "Zener Voltage (Range)"]):
+            complexVoltageAlternatives = isinstance(value, str) and ("/" in value or "、" in value)
+            value = attributes.stringAttribute(value) if compoundValue(value) or complexVoltageAlternatives else attributes.voltageRangeAttribute(value, "voltage")
+        elif key in larr(["Breakdown Voltage", "VCE Saturation(VCE(sat))",
+                "Voltage Dropout", "Dropout Voltage"]):
+            value = attributes.stringAttribute(value) if compoundValue(value) else attributes.voltageAtConditionAttribute(value, "voltage")
+        elif key in larr(["Voltage - Forward(Vf)"]):
+            value = attributes.stringAttribute(value) if compoundValue(value) else attributes.voltageRangeAttribute(value, "voltage")
+        elif key in larr(["Collector-Emitter Saturation Voltage (VCE(sat) @ Ic, Ib)"]):
+            value = attributes.voltageAtConditionAttribute(value, "voltage")
         elif key in larr(["Rated current", "Rated Current", "surge current", "Current - Average Rectified (Io)",
                     "Current - Breakover", "Current - Peak Output", "Current - Peak Pulse (10/1000μs)",
                     "Impulse Discharge Current (8/20us)", "Current - Gate Trigger (Igt) (Max)",
@@ -98,14 +111,18 @@ def normalizeAttribute(key, value):
                     "Current - Supply (Max)", "Supply Current", "Supply Current (Max)",
                     "Output Current", "Output Current (Max)", "Rectified Current",
                     "Output / Channel Current", "Current - Output",
-                    "Saturation Current (Isat)"]):
+                    "Saturation Current (Isat)", "Reverse Leakage Current", "Reverse Leakage Current (Ir)",
+                    "Peak Pulse Current (Ipp)", "Peak Pulse Current (Ipp) @ 10/1000us",
+                    "Quiescent Current", "Quiescent Current (Iq)", "Quiescent Current(Iq)",
+                    "Ib - Input Bias Current", "Standby Current"]):
             if isinstance(value, str) and ("," in value or re.search(r"\d\s*-\s*\d", value)):
                 value = attributes.stringAttribute(value)
             else:
                 value = attributes.currentAttribute(value)
         elif key in larr(["Power", "Power (Max)", "Power Per Element", "Power Dissipation (Pd)",
-                          "Dissipation Power (Max)", "Switching Power (Max)"]):
-            value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.powerAttribute(value)
+                          "Dissipation Power (Max)", "Switching Power (Max)",
+                          "Power Dissipation", "Peak Pulse Power Dissipation (Ppp)"]):
+            value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.powerAtConditionAttribute(value, "power")
         elif key in larr(["Number of Pins", "Number of Resistors", "Number of Loop",
                     "Number of Regulators", "Number of Outputs", "Number of Capacitors",
                     "Attrition", "Minimum Order Quantity", "Minimum Placement Quantity",
@@ -113,18 +130,28 @@ def normalizeAttribute(key, value):
                     "Warehouse Stock - Jiangsu", "Warehouse Stock - Shenzhen",
                     "Warehouse Stock - Hong Kong"]):
             value = attributes.countAttribute(value)
-        elif key in larr(["Capacitance"]):
+        elif key in larr(["Capacitance", "Junction Capacitance", "Input Capacitance(Cies)"]):
             if multiScalarValue(value):
                 value = attributes.stringAttribute(value)
             else:
                 value = attributes.capacitanceAttribute(value)
         elif key in larr(["Inductance"]):
             value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.inductanceAttribute(value)
+        elif key in larr(["Length", "Width", "Height", "Switch Height", "Overall Length",
+                "Height Above Board", "X-Length of Bottom Edge on Board (Spacing Line)",
+                "Y-Width of Bottom Edge on Board", "Z-Height of the Board"]):
+            value = attributes.stringAttribute(value) if compoundValue(value) else attributes.lengthAttribute(value)
+        elif key in larr(["Wavelength - Dominant", "Dominant Wavelength", "Peak Wavelength"]):
+            value = attributes.stringAttribute(value) if compoundValue(value) else attributes.wavelengthAttribute(value)
+        elif key in larr(["Tolerance"]):
+            value = attributes.percentageAttribute(value) if isinstance(value, str) and "%" in value and not compoundValue(value) else attributes.stringAttribute(value)
+        elif key in larr(["Duty Cycle"]):
+            value = attributes.stringAttribute(value) if compoundValue(value) else attributes.percentageAttribute(value)
         elif key == "Rds On (Max) @ Id, Vgs".lower():
             value = attributes.rdsOnMaxAtIdsAtVgs(value)
-        elif key in larr(["Operating Temperature (Max)", "Operating Temperature (Min)"]):
-            value = attributes.temperatureAttribute(value)
-        elif key.startswith("Continuous Drain Current"):
+        elif key in larr(["Operating Temperature", "Operating Temperature (Max)", "Operating Temperature (Min)"]):
+            value = attributes.stringAttribute(value) if compoundValue(value) else attributes.temperatureRangeAttribute(value)
+        elif key.startswith("continuous drain current"):
             value = attributes.continuousTransistorCurrent(value, "Id")
         elif key == "Current - Collector (Ic) (Max)".lower():
             value = attributes.continuousTransistorCurrent(value, "Ic")
@@ -147,6 +174,10 @@ def normalizeAttribute(key, value):
             value = attributes.powerDissipation(value)
         elif key in larr(["Equivalent Series Resistance", "Equivalent Series Resistance (ESR)"]):
             value = attributes.esr(value)
+        elif key in larr(["Resistance - Post Trip (R1) (Max)"]):
+            value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.resistanceAttribute(value)
+        elif key in larr(["Impedance @ Frequency"]):
+            value = attributes.stringAttribute(value) if compoundValue(value) else attributes.impedanceAtFrequency(value)
         elif key == "Ripple Current".lower():
             value = attributes.rippleCurrent(value)
         elif key == "Size(mm)".lower():
@@ -164,12 +195,29 @@ def normalizeAttribute(key, value):
         elif key == "Vce(on) (Max) @ Vge, Ic".lower():
             value = attributes.vceOnMax(value)
         elif key in larr(["Input Capacitance (Ciss@Vds)", "Input Capacitance (Ciss @ Vds)",
+                   "Output Capacitance (Coss @ Vds)",
                    "Reverse Transfer Capacitance (Crss@Vds)", "Reverse Transfer Capacitance (Crss @ Vds)"]):
             value = attributes.stringAttribute(value) if multiScalarValue(value) or (isinstance(value, str) and value.count(";") != 0) else attributes.capacityAtVoltage(value)
         elif key in larr(["Total Gate Charge (Qg@Vgs)", "Total Gate Charge (Qg @ Vgs)"]):
             value = attributes.stringAttribute(value) if isinstance(value, str) and value.count(";") != 0 else attributes.chargeAtVoltage(value)
-        elif key in larr(["Frequency - self resonant", "Output frequency (max)"]):
-            value = attributes.stringAttribute(value) if isinstance(value, str) and "," in value else attributes.frequencyAttribute(value)
+        elif key in larr(["Data Rate"]):
+            value = attributes.stringAttribute(value) if compoundValue(value) else attributes.dataRateAttribute(value)
+        elif key in larr(["Frequency - self resonant", "Output frequency (max)",
+                "Frequency - Switching", "Frequency Range", "Frequency", "Clock Frequency",
+                "Switching Frequency", "Bandwidth", "Gain Bandwidth Product",
+                "Gain Bandwidth Product(GBP)", "Frequency - Center"]):
+            if isinstance(value, str) and re.search(r"(?:bit/s|bps)\s*$", value, flags=re.IGNORECASE):
+                value = attributes.dataRateAttribute(value)
+            else:
+                value = attributes.stringAttribute(value) if compoundValue(value) else attributes.frequencyAttribute(value)
+        elif key in larr(["Inductance @ Frequency"]):
+            value = attributes.stringAttribute(value) if compoundValue(value) else attributes.inductanceAtFrequency(value)
+        elif key in larr(["Propagation Delay", "Propagation Delay Time", "Turn-On Time",
+                "Turn-Off Time", "Rise Time", "Fall Time", "Reverse Recovery Time (Trr)"]):
+            if compoundValue(value) and "@" not in value:
+                value = attributes.stringAttribute(value)
+            else:
+                value = attributes.timeAtConditionAttribute(value) if isinstance(value, str) and "@" in value else attributes.timeAttribute(value)
         else:
             value = attributes.stringAttribute(value)
     except: 

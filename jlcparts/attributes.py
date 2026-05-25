@@ -94,7 +94,9 @@ def readCurrent(value):
 def readVoltage(value):
     value = value.replace("v", "V")
     value = value.replace("V-", "V")
+    value = value.replace("VDC", "V").replace("VAC", "V")
     value = re.sub(r"\bV(?:DS|GS)\s*=\s*", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"\b(?:AC|DC)\s*", "", value, flags=re.IGNORECASE)
     value = value.replace("V", "").strip()
     if value in ["-", "--"] or "null" in value:
         return "NaN"
@@ -126,12 +128,145 @@ def readCharge(value):
     return readWithSiPrefix(value)
 
 def readFrequency(value):
+    if value.strip().upper() == "DC":
+        return 0
     value = erase(value, ["Hz", "HZ", "H"]).strip()
+    return readWithSiPrefix(value)
+
+def readDataRate(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"(?:bit/s|bps)$", "", value, flags=re.IGNORECASE)
+    value = erase(value, ["Hz", "HZ", "H"]).strip()
+    value = re.sub(r"([0-9.])([kmg])$", lambda m: m.group(1) + m.group(2).upper(), value)
     return readWithSiPrefix(value)
 
 def readInductance(value):
     value = value.replace("H", "").strip()
     return readWithSiPrefix(value)
+
+def readLength(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    parenthesizedMetric = re.search(r"\(([^)]*(?:nm|um|mm|cm|m|mil|in|inch|inches))\)", value, re.I)
+    if parenthesizedMetric is not None:
+        value = parenthesizedMetric.group(1)
+    elif value.endswith("'"):
+        return float(value[:-1]) * 0.3048
+    value = value.replace("µ", "u").replace("μ", "u")
+    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(nm|um|mm|cm|m|mil|in|inch|inches)?", value, re.I)
+    if match is None:
+        raise ValueError(f"Cannot parse length {value}")
+    number = float(match.group(1))
+    unit = (match.group(2) or "m").lower()
+    scales = {
+        "nm": 1e-9,
+        "um": 1e-6,
+        "mm": 1e-3,
+        "cm": 1e-2,
+        "m": 1,
+        "mil": 25.4e-6,
+        "in": 0.0254,
+        "inch": 0.0254,
+        "inches": 0.0254,
+    }
+    return number * scales[unit]
+
+def readTime(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = value.replace("µ", "u").replace("μ", "u")
+    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(ps|ns|us|ms|s|sec|secs|min|mins|h|hr|hrs|hour|hours)?", value, re.I)
+    if match is None:
+        raise ValueError(f"Cannot parse time {value}")
+    number = float(match.group(1))
+    unit = (match.group(2) or "s").lower()
+    scales = {
+        "ps": 1e-12,
+        "ns": 1e-9,
+        "us": 1e-6,
+        "ms": 1e-3,
+        "s": 1,
+        "sec": 1,
+        "secs": 1,
+        "min": 60,
+        "mins": 60,
+        "h": 3600,
+        "hr": 3600,
+        "hrs": 3600,
+        "hour": 3600,
+        "hours": 3600,
+    }
+    return number * scales[unit]
+
+def readPercentage(value):
+    value = value.strip().replace("±", "")
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    if "/" in value:
+        numerator, denominator = value.split("/", 1)
+        return float(numerator) / float(denominator) * 100
+    if value.endswith("%"):
+        value = value[:-1]
+    return float(value)
+
+def _stripCondition(value):
+    return value.split("@", 1)[0].strip()
+
+def _hasCompoundValues(value):
+    return any(separator in value for separator in [",", ";"])
+
+def _rangeParts(value):
+    value = value.strip()
+    value = re.sub(r"\(.*?\)", "", value)
+    value = value.replace(" to ", "~")
+    if ".." in value:
+        return value.split("..", 1)
+    if "~" in value:
+        return value.split("~", 1)
+    if re.match(r"^\s*DC\s*-\s*", value, flags=re.IGNORECASE):
+        return re.split(r"\s*-\s*", value, 1)
+    dcSuffix = re.match(r"^\s*(.*?)\s+DC\s*$", value, flags=re.IGNORECASE)
+    if dcSuffix is not None:
+        return ["DC", dcSuffix.group(1)]
+    if re.search(r"\d\s*-\s*\d", value):
+        return re.split(r"\s*-\s*", value, 1)
+    return None
+
+def scalarAttribute(value, reader, unit, name="value"):
+    value = str(value)
+    parsed = reader(_stripCondition(value))
+    return {
+        "format": "${" + name + "}",
+        "primary": name,
+        "values": {
+            name: [parsed, unit]
+        }
+    }
+
+def rangeOrScalarAttribute(value, reader, unit, name="value"):
+    value = str(value)
+    if value in ["-", "--", "null"]:
+        return scalarAttribute(value, reader, unit, name)
+    parts = _rangeParts(value)
+    if parts is None:
+        return scalarAttribute(value, reader, unit, name)
+    if _hasCompoundValues(value):
+        raise ValueError(f"Compound value cannot be represented as scalar range: {value}")
+    low, high = parts
+    low = _stripCondition(low)
+    high = _stripCondition(high)
+    return {
+        "format": "${" + name + " min} ~ ${" + name + " max}",
+        "primary": name + " min",
+        "values": {
+            name + " min": [reader(low), unit],
+            name + " max": [reader(high), unit]
+        }
+    }
 
 def resistanceAttribute(value):
     if ";" in value:
@@ -167,6 +302,7 @@ def impedanceAttribute(value):
 
 
 def voltageAttribute(value):
+    value = str(value)
     value = re.sub(r"\(.*?\)", "", value)
      # Remove multiple current values
     value = value.split("x")[-1]
@@ -174,6 +310,7 @@ def voltageAttribute(value):
     value = value.split(",")[-1]
     value = value.split("~")[-1]
     value = value.split("or")[-1]
+    value = value.split("@")[0]
     value = value.replace("VIN", "V").replace("Vin", "V")
     value = value.replace("VDC", "V").replace("VAC", "V")
     value = value.replace("Vdc", "V").replace("Vac", "V")
@@ -198,6 +335,7 @@ def voltageAttribute(value):
     }
 
 def currentAttribute(value):
+    value = str(value)
     if value.lower().strip() == "adjustable":
         return {
             "format": "${current}",
@@ -219,6 +357,7 @@ def currentAttribute(value):
     else:
         value = erase(value, ["±", "Up to"])
         value = re.sub(r"\(.*?\)", "", value)
+        value = value.split("@")[0]
         # Remove multiple current values
         value = value.split("x")[-1]
         value = value.split("/")[-1]
@@ -237,6 +376,7 @@ def currentAttribute(value):
         }
 
 def powerAttribute(value):
+    value = str(value)
     value = re.sub(r"\(.*?\)", "", value)
     # Replace V/W typo
     value = value.replace("V", "W")
@@ -285,6 +425,7 @@ def countAttribute(value):
 
 
 def capacitanceAttribute(value):
+    value = str(value)
     # There are a handful of components, that feature multiple capacitance
     # values, for the sake of the simplicity, take the last one.
     value = readCapacitance(value.split(";")[-1].split("@")[0].strip())
@@ -297,6 +438,7 @@ def capacitanceAttribute(value):
     }
 
 def inductanceAttribute(value):
+    value = str(value)
     value = readInductance(value)
     return {
         "format": "${inductance}",
@@ -307,12 +449,76 @@ def inductanceAttribute(value):
     }
 
 def frequencyAttribute(value):
-    value = readFrequency(value)
+    value = str(value)
+    return rangeOrScalarAttribute(value, readFrequency, "frequency", "frequency")
+
+def dataRateAttribute(value):
+    value = str(value)
+    return rangeOrScalarAttribute(value, readDataRate, "data_rate", "data rate")
+
+def lengthAttribute(value):
+    return rangeOrScalarAttribute(value, readLength, "length", "length")
+
+def wavelengthAttribute(value):
+    return rangeOrScalarAttribute(value, readLength, "length", "wavelength")
+
+def timeAttribute(value):
+    return rangeOrScalarAttribute(value, readTime, "time", "time")
+
+def timeAtConditionAttribute(value):
+    return scalarAttribute(value, readTime, "time", "time")
+
+def percentageAttribute(value):
+    return rangeOrScalarAttribute(value, readPercentage, "percentage", "percentage")
+
+def temperatureRangeAttribute(value):
+    value = str(value).replace("°C", "℃")
+    if value.strip() in ["-", "--", "null"]:
+        return scalarAttribute("-", lambda x: "NaN", "temperature", "temperature")
+    value = erase(value, ["@"])
+    value = re.sub(r"\(.*?\)", "", value)
+    if _hasCompoundValues(value):
+        raise ValueError(f"Compound temperature value cannot be represented as scalar range: {value}")
+    if "~" in value or ".." in value:
+        return rangeOrScalarAttribute(value.replace("℃", ""), lambda x: int(float(x)), "temperature", "temperature")
+    value = value.strip()
+    if value.endswith("℃"):
+        value = value[:-1]
+    return scalarAttribute(value, lambda x: int(float(x)), "temperature", "temperature")
+
+def impedanceAtFrequency(value):
+    if _hasCompoundValues(str(value)):
+        raise ValueError(f"Compound impedance value cannot be represented as scalar tuple: {value}")
+    return esr(str(value))
+
+def currentAtConditionAttribute(value, name="current"):
+    return scalarAttribute(value, readCurrent, "current", name)
+
+def voltageAtConditionAttribute(value, name="voltage"):
+    return scalarAttribute(value, readVoltage, "voltage", name)
+
+def voltageRangeAttribute(value, name="voltage"):
+    return rangeOrScalarAttribute(value, readVoltage, "voltage", name)
+
+def powerAtConditionAttribute(value, name="power"):
+    return scalarAttribute(value, readPower, "power", name)
+
+def capacitanceAtConditionAttribute(value, name="capacitance"):
+    return scalarAttribute(value, readCapacitance, "capacitance", name)
+
+def inductanceAtFrequency(value):
+    value = str(value)
+    if _hasCompoundValues(value):
+        raise ValueError(f"Compound inductance value cannot be represented as scalar tuple: {value}")
+    parts = value.split("@", 1)
+    inductance = readInductance(parts[0].strip())
+    frequency = readFrequency(parts[1].strip()) if len(parts) == 2 else "NaN"
     return {
-        "format": "${frequency}",
-        "primary": "frequency",
+        "format": "${inductance} @ ${frequency}",
+        "primary": "inductance",
         "values": {
-            "frequency": [value, "frequency"]
+            "inductance": [inductance, "inductance"],
+            "frequency": [frequency, "frequency"]
         }
     }
 
