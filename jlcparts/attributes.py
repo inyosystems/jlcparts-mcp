@@ -549,6 +549,12 @@ def dataRateAttribute(value):
 def lengthAttribute(value):
     return rangeOrScalarAttribute(value, readLength, "length", "length")
 
+def pitchAttribute(value):
+    value = str(value).strip()
+    if re.fullmatch(r"[+-]?\d+(?:\.\d+)?", value):
+        value += "mm"
+    return lengthAttribute(value)
+
 def lengthRangeListAttribute(value, name="length"):
     value = str(value).strip()
     parts = [x.strip() for x in value.split(",")]

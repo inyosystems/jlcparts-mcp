@@ -196,6 +196,8 @@ def normalizeAttribute(key, value):
                 value = attributes.lengthRangeListAttribute(value, "length")
             else:
                 value = attributes.stringAttribute(value) if compoundValue(value) else attributes.lengthAttribute(value)
+        elif key in larr(["Pitch"]):
+            value = attributes.pitchAttribute(value)
         elif key in larr(["Luminous Intensity"]):
             value = attributes.luminousIntensityAttribute(value)
         elif key in larr(["Wavelength - Dominant", "Dominant Wavelength", "Peak Wavelength"]):

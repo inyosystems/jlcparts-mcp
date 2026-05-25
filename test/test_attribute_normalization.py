@@ -445,6 +445,19 @@ def test_scalar_length_attributes(key, value, expected, capsys):
     assert_quantity(values["length"], expected, "length")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("2.54mm", 0.00254),
+        ("0.5", 0.0005),
+        ("-", "NaN"),
+    ],
+)
+def test_pitch_attribute(value, expected, capsys):
+    values = normalized_values("Pitch", value, capsys)
+    assert_quantity(values["length"], expected, "length")
+
+
 def test_insulation_od_length_range_lists(capsys):
     values = normalized_values(
         "Insulation Od",
