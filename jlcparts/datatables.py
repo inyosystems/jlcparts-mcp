@@ -167,12 +167,15 @@ def normalizeAttribute(key, value):
         elif key in larr(["Drain Source On Resistance (RDS(on)@Vgs,Id)",
                           "Drain-Source On Resistance (RDS(on))",
                           "Drain-Source On Resistance (RDS(on) @ Vgs, Id)"]):
-            if isinstance(value, str) and value.count("@") == 1 and ";" in value:
-                value = value.replace(";", ",")
-            malformedRdsValue = isinstance(value, str) and ("/" in value.split("@", 1)[0] or re.search(r",[^,]*Ω", value))
-            if isinstance(value, str):
-                value = re.sub(r"@VGS\s*", "@", value, flags=re.IGNORECASE)
-            value = attributes.stringAttribute(value) if isinstance(value, str) and (malformedRdsValue or value.count("@") > 1 or ("," in value and value.count("@") != 1)) else attributes.rdsOnMaxAtVgsAtIds(value)
+            if key == "drain-source on resistance (rds(on))" and isinstance(value, str) and ("," in value or ";" in value):
+                value = attributes.rdsMeasurementsAtVgs(value)
+            else:
+                if isinstance(value, str) and value.count("@") == 1 and ";" in value:
+                    value = value.replace(";", ",")
+                malformedRdsValue = isinstance(value, str) and ("/" in value.split("@", 1)[0] or re.search(r",[^,]*Ω", value))
+                if isinstance(value, str):
+                    value = re.sub(r"@VGS\s*", "@", value, flags=re.IGNORECASE)
+                value = attributes.stringAttribute(value) if isinstance(value, str) and (malformedRdsValue or value.count("@") > 1 or ("," in value and value.count("@") != 1)) else attributes.rdsOnMaxAtVgsAtIds(value)
         elif key == "Power Dissipation-Max (Ta=25°C)".lower():
             value = attributes.powerDissipation(value)
         elif key in larr(["Equivalent Series Resistance", "Equivalent Series Resistance (ESR)"]):

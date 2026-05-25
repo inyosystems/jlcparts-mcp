@@ -674,6 +674,31 @@ def rdsOnMaxAtVgsAtIds(value):
         }
 
 
+def rdsMeasurementsAtVgs(value):
+    """
+    Parse one or more RDS(on) measurements in the form "Rds@Vgs" or bare "Rds".
+    """
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        if "@" in part:
+            resistance, voltage = part.split("@", 1)
+            voltage = voltage.strip().lstrip("=").strip()
+        else:
+            resistance = part
+            voltage = "-"
+        values[f"Rds {i}"] = [readResistance(resistance.strip()), "resistance"]
+        values[f"Vgs {i}"] = [readVoltage(voltage), "voltage"]
+        formats.append("${Rds " + str(i) + "} @ ${Vgs " + str(i) + "}")
+    return {
+        "format": ", ".join(formats),
+        "primary": "Rds 1",
+        "values": values
+    }
+
+
 def continuousTransistorCurrent(value, symbol):
     """
     Can parse values like '10A', '10A,12A', '1OA(Tc)'
