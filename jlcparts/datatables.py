@@ -187,7 +187,7 @@ def normalizeAttribute(key, value):
                 value = attributes.energyAttribute(value)
         elif key in larr(["Attenuation", "Power Supply Rejection Ratio (Psrr)",
                 "Insertion Loss", "Signal-to-Noise Ratio", "Noise Figure",
-                "Common Mode Rejection Ratio(CMRR)"]):
+                "Common Mode Rejection Ratio(CMRR)", "Return Loss (Min)"]):
             value = attributes.decibelListAttribute(value, "level")
         elif key in larr(["IP3", "P1d B"]):
             value = attributes.decibelMilliwattListAttribute(value, "level")
