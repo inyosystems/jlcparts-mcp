@@ -428,6 +428,24 @@ def test_maximum_continuous_current(value, expected, capsys):
             assert_quantity(values[f"current {index}"], current, "current")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("800uA", [800e-6]),
+        ("40nA", [40e-9]),
+        ("3uA, 5uA", [3e-6, 5e-6]),
+    ],
+)
+def test_operating_current(value, expected, capsys):
+    values = normalized_values("Operating Current", value, capsys)
+
+    if len(expected) == 1:
+        assert_quantity(values["current"], expected[0], "current")
+    else:
+        for index, current in enumerate(expected, start=1):
+            assert_quantity(values[f"current {index}"], current, "current")
+
+
 def test_number_of_io_count(capsys):
     values = normalized_values("Number of I/O", "8", capsys)
 
