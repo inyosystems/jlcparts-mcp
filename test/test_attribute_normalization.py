@@ -808,6 +808,27 @@ def test_number_of_io_count(capsys):
 
     assert_quantity(values["count"], 8, "count")
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("4", {"count": 4}),
+        ("Dual", {"count": 2}),
+        ("Four channels", {"count": 4}),
+        ("QUAD", {"count": 4}),
+        ("Hex", {"count": 6}),
+        ("4;8", {"count 1": 4, "count 2": 8}),
+        ("4, 3", {"count 1": 4, "count 2": 3}),
+        ("3/8", {"count 1": 3, "count 2": 8}),
+        ("1C2A", {"count": 1}),
+        ("-", {"count": "NaN"}),
+    ],
+)
+def test_channel_count(value, expected, capsys):
+    values = normalized_values("Number of Channels", value, capsys)
+
+    for quantity, count in expected.items():
+        assert_quantity(values[quantity], count, "count")
+
 
 def test_gpio_ports_number_count(capsys):
     values = normalized_values("Gpio Ports Number", "34", capsys)

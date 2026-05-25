@@ -611,6 +611,47 @@ def countAttribute(value):
         }
     }
 
+def _readChannelCount(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+
+    named_counts = {
+        "single": 1,
+        "single channel": 1,
+        "single port": 1,
+        "dual": 2,
+        "three channels": 3,
+        "four channels": 4,
+        "quad": 4,
+        "hex": 6,
+        "seven channels": 7,
+    }
+    normalized = value.lower()
+    if normalized in named_counts:
+        return named_counts[normalized]
+
+    value = re.sub(r"\s*channels?$", "", value, flags=re.I).strip()
+    channel_match = re.match(r"^(\d+)C(?:\d+A)?$", value, flags=re.I)
+    if channel_match:
+        return int(channel_match.group(1))
+    return int(value)
+
+def channelCountAttribute(value):
+    value = str(value)
+    parts = [x.strip() for x in re.split(r"[,;/]", value) if x.strip()]
+    if len(parts) <= 1:
+        return scalarAttribute(value, _readChannelCount, "count", "count")
+
+    values = {}
+    for index, part in enumerate(parts, start=1):
+        values[f"count {index}"] = [_readChannelCount(part), "count"]
+    return {
+        "format": ", ".join("${" + f"count {i}" + "}" for i in range(1, len(parts) + 1)),
+        "primary": "count 1",
+        "values": values
+    }
+
 
 def capacitanceAttribute(value):
     value = str(value)
