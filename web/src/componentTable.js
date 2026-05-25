@@ -102,6 +102,13 @@ function displayText(value) {
     return JSON.stringify(value);
 }
 
+function formatCount(value) {
+    if (!Number.isFinite(value)) {
+        return "";
+    }
+    return value.toLocaleString();
+}
+
 export function Spinbox() {
     return <div className="w-full text-center">
         <svg className="animate-spin -ml-1 m-8 h-5 w-5 text-black mx-auto inline-block"
@@ -252,10 +259,13 @@ export class ComponentOverview extends React.Component {
     prepareCategories(sourceCategories) {
         let categories = {};
         for (const category of sourceCategories) {
+            const componentCount = Number(category.componentCount) || 0;
             categories[category.category] ??= [];
             categories[category.category].push({
                 value: category.subcategory,
-                key: category.id
+                label: `${category.subcategory} (${formatCount(componentCount)})`,
+                key: category.id,
+                componentCount
             });
         }
 
@@ -263,8 +273,11 @@ export class ComponentOverview extends React.Component {
         for (const key in categories) {
             let subCats = categories[key];
             subCats.sort((a, b) => a.value.localeCompare(b.value));
+            const componentCount = subCats.reduce((total, subcat) => total + subcat.componentCount, 0);
             sortedCategories.push({
                 category: key,
+                label: `${key} (${formatCount(componentCount)})`,
+                componentCount,
                 subcategories: subCats
             });
         }
@@ -889,6 +902,7 @@ class CategoryFilter extends React.Component {
                         className="bg-blue-500"
                         key={item.category}
                         name={item.category}
+                        label={item.label}
                         options={item.subcategories}
                         value={this.state.categories[item.category]}
                         onChange={value => {
@@ -936,7 +950,10 @@ class MultiSelectBox extends React.Component {
         return <>
             <div className={`rounded flex flex-col flex-1 p-1 m-1 ${this.props.className}`}  style={{minWidth: "200px", maxWidth: "400px"}}>
                 <div className="flex-none flex w-full">
-                    <h5 className="block flex-1 font-bold cursor-default rounded px-1 truncate hover:whitespace-normal">{this.props.name}</h5>
+                    <h5 className="block flex-1 font-bold cursor-default rounded px-1 truncate hover:whitespace-normal"
+                        title={this.props.label ?? this.props.name}>
+                        {this.props.label ?? this.props.name}
+                    </h5>
                     <div className="flex-none">
                         <button onClick={this.handleAllClick} className="mx-2">All</button>
                         <button onClick={this.handleNoneClick} className="mx-2">None</button>
@@ -947,7 +964,7 @@ class MultiSelectBox extends React.Component {
                         value={this.props.value} onChange={this.handleSelectChange}>
                     {this.props.options.map(option => {
                         return <option value={option.key} key={option.key} title={option.value}>
-                                    {option.value}
+                                    {option.label ?? option.value}
                             </option>;
                     })}
                 </select>
