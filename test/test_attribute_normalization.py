@@ -311,6 +311,7 @@ def test_voltage_range_list_attributes(key, value, expected, capsys):
         ("Current - Collector(Ic)", "4A", "current", 4.0, "current"),
         ("Supply Current (Iq)", "1uA", "current", 1e-6, "current"),
         ("Current - Input Bias(Ib)", "1.2pA", "current", 1.2e-12, "current"),
+        ("Input Bias Current (Ib)", "0.25uA", "current", 0.25e-6, "current"),
         ("Current - Output Low(Iol)", "2.5mA", "current", 0.0025, "current"),
         ("Current - Output High(Ioh)", "-6mA", "current", -0.006, "current"),
         ("Current - Surge(Itsm@F)", "284A@60Hz", "current", 284.0, "current"),
