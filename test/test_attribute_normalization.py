@@ -193,6 +193,20 @@ def test_clamping_voltage_ipp(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("240uV", 240e-6),
+        ("250nV", 250e-9),
+        ("1.6V", 1.6),
+    ],
+)
+def test_input_offset_voltage_vos(value, expected, capsys):
+    values = normalized_values("Voltage - Input Offset(VOS)", value, capsys)
+
+    assert_quantity(values["voltage"], expected, "voltage")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Output Logic Level - High", "8.3V", {"voltage 1": 8.3}),
