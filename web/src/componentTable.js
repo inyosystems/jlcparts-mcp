@@ -294,13 +294,22 @@ export class ComponentOverview extends React.Component {
             for (const property in attributes) {
                 properties[property] ??= {};
                 let val = attributes[property];
-                properties[property][valueFootprint(val)] = val;
+                let footprint = valueFootprint(val);
+                properties[property][footprint] ??= {
+                    value: val,
+                    count: 0
+                };
+                properties[property][footprint].count += 1;
             }
         }
 
         let propertiesList = [];
         for (const property in properties) {
-            let values = Object.entries(properties[property]).map(x => ({key: x[0], value: x[1]}));
+            let values = Object.entries(properties[property]).map(([key, item]) => ({
+                key,
+                value: item.value,
+                count: item.count
+            }));
             propertiesList.push({property, values});
         }
         propertiesList.sort((a, b) => a.property.localeCompare(b.property));
@@ -1007,7 +1016,8 @@ class PropertySelector extends React.Component {
         })
         return options.map(x => ({
             key: x.key,
-            value: formatAttribute(x.value)
+            value: formatAttribute(x.value),
+            label: `${formatAttribute(x.value)} (${formatCount(x.count)})`
         }));
     }
 
