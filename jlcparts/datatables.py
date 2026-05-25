@@ -104,6 +104,9 @@ def normalizeAttribute(key, value):
         elif key in larr(["Input Logic Level - High", "Input Logic Level - Low",
                 "Output Logic Level - High", "Output Logic Level - Low"]):
             value = attributes.voltageRangeListAttribute(value, "voltage")
+        elif key in larr(["Reverse Stand-Off Voltage (VRWM)", "Threshold Voltage",
+                "Varistor Voltage", "VOS - Input Offset Voltage"]):
+            value = attributes.voltageRangeListAttribute(value, "voltage")
         elif key in larr(["Breakdown Voltage", "VCE Saturation(VCE(sat))",
                 "Voltage Dropout", "Dropout Voltage"]):
             if key == "breakdown voltage" and isinstance(value, str) and ("," in value or "/" in value):

@@ -136,6 +136,24 @@ def test_logic_level_voltage_lists(key, value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Varistor Voltage", "423V~517V", {"voltage 1 min": 423.0, "voltage 1 max": 517.0}),
+        ("Varistor Voltage", "1.08kV~1.32kV", {"voltage 1 min": 1080.0, "voltage 1 max": 1320.0}),
+        ("Reverse Stand-Off Voltage (VRWM)", "7V, 12V", {"voltage 1": 7.0, "voltage 2": 12.0}),
+        ("VOS - Input Offset Voltage", "800uV, 100uV", {"voltage 1": 800e-6, "voltage 2": 100e-6}),
+        ("Threshold Voltage", "100mV, 325mV", {"voltage 1": 0.1, "voltage 2": 0.325}),
+        ("Threshold Voltage", "-", {"voltage 1": "NaN"}),
+    ],
+)
+def test_voltage_range_list_attributes(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "quantity", "expected", "unit"),
     [
         ("Sampling Rate", "352800Hz", "frequency", 352800.0, "frequency"),
