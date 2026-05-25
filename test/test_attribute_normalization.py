@@ -976,6 +976,23 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Propagation Delay Tp Hl", "105ns", {"time": 105e-9}),
+        ("Propagation Delay Tp Lh", "55ns, 63ns", {"time 1": 55e-9, "time 2": 63e-9}),
+        ("Max Propagation Delay", "10.6ns@5V,50pF", {"time": 10.6e-9}),
+        ("Maximum Propagation Delay", "32ns@6V,150pF", {"time": 32e-9}),
+        ("Td(on)", "30ns, 31.6ns", {"time 1": 30e-9, "time 2": 31.6e-9}),
+    ],
+)
+def test_delay_time_attributes(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, time in expected.items():
+        assert_quantity(values[quantity], time, "time")
+
+
+@pytest.mark.parametrize(
     ("value", "expected"),
     [
         ("240ms", [0.24]),
