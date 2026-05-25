@@ -258,6 +258,8 @@ def normalizeAttribute(key, value):
             value = attributes.rdsOnMaxAtIdsAtVgs(value)
         elif key in larr(["Operating Temperature", "Operating Temperature (Max)", "Operating Temperature (Min)"]):
             value = attributes.stringAttribute(value) if compoundValue(value) else attributes.temperatureRangeAttribute(value)
+        elif key in larr(["B Constant (25°C/85°C)"]):
+            value = attributes.kelvinAttribute(value)
         elif key.startswith("continuous drain current"):
             value = attributes.continuousTransistorCurrent(value, "Id")
         elif key == "Current - Collector (Ic) (Max)".lower():

@@ -218,6 +218,15 @@ def readTime(value):
     }
     return number * scales[unit]
 
+def readKelvin(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*K", value, re.I)
+    if match is None:
+        raise ValueError(f"Cannot parse kelvin value {value}")
+    return float(match.group(1))
+
 def readPercentage(value):
     value = value.strip().replace("±", "")
     if value in ["-", "--", "null"]:
@@ -1377,6 +1386,9 @@ def temperatureAttribute(value):
             "temperature": [v, "temperature"]
         }
     }
+
+def kelvinAttribute(value):
+    return scalarAttribute(value, readKelvin, "kelvin", "temperature")
 
 def capacityAtVoltage(value):
     """

@@ -6,7 +6,7 @@ export function quantityComparator(quantityName) {
         "resistance", "voltage", "current", "power", "count", "capacitance",
         "length", "inductance", "temperature", "charge", "frequency",
         "percentage", "time", "data_rate", "luminous_intensity", "energy",
-        "decibel", "decibel_milliwatt", "ratio"
+        "decibel", "decibel_milliwatt", "ratio", "kelvin"
     ];
     if (numericQuantities.includes(quantityName))
         return numericComparator;
@@ -34,7 +34,8 @@ export function quantityFormatter(quantityName) {
         percentage: x => x === "NaN" ? "-" : `${x} %`,
         time: siFormatter("s"),
         count: x => String(x),
-        temperature: x => `${x} °C`
+        temperature: x => `${x} °C`,
+        kelvin: x => x === "NaN" ? "-" : `${x} K`
     };
 
     let formatter = formatters[quantityName];

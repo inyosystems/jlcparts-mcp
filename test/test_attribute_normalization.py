@@ -790,6 +790,16 @@ def test_logic_elements_blocks_count(capsys):
     assert_quantity(values["count"], "NaN", "count")
 
 
+def test_b_constant_kelvin(capsys):
+    values = normalized_values("B Constant (25°C/85°C)", "3434K", capsys)
+
+    assert_quantity(values["temperature"], 3434.0, "kelvin")
+
+    values = normalized_values("B Constant (25°C/85°C)", "-", capsys)
+
+    assert_quantity(values["temperature"], "NaN", "kelvin")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
