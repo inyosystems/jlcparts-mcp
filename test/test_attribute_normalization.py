@@ -680,6 +680,7 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Switch Width", "6.8mm", 0.0068),
         ("Diameter (Φd)", "30mm", 0.03),
         ("Diameter (Φd)", "1.36cm", 0.0136),
+        ("Interface Diameter", "7.5mm", 0.0075),
     ],
 )
 def test_scalar_length_attributes(key, value, expected, capsys):
@@ -718,6 +719,13 @@ def test_interface_length_height_lists(capsys):
 
     assert_quantity(values["length 1"], 0.0085, "length")
     assert_quantity(values["length 2"], 0.0087, "length")
+
+
+def test_interface_diameter_lists(capsys):
+    values = normalized_values("Interface Diameter", "9.6mm, 6.35mm", capsys)
+
+    assert_quantity(values["length 1"], 0.0096, "length")
+    assert_quantity(values["length 2"], 0.00635, "length")
 
 
 @pytest.mark.parametrize(
