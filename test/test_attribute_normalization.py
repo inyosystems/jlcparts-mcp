@@ -287,6 +287,25 @@ def test_cut_off_frequency(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("40MHz", [40e6]),
+        ("25GHz", [25e9]),
+        ("250MHz, 200MHz", [250e6, 200e6]),
+        ("-", ["NaN"]),
+    ],
+)
+def test_transition_frequency(value, expected, capsys):
+    values = normalized_values("Transition Frequency (F T)", value, capsys)
+
+    if len(expected) == 1:
+        assert_quantity(values["frequency"], expected[0], "frequency")
+    else:
+        for index, frequency in enumerate(expected, start=1):
+            assert_quantity(values[f"frequency {index}"], frequency, "frequency")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Non-Repetitive Peak Forward Surge Current", "120A, 240A", [120.0, 240.0]),
