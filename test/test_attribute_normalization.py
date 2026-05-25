@@ -1109,6 +1109,11 @@ def test_conversion_efficiency_values(value, expected, capsys):
         ("Error", "0.25%", {"percentage": 0.25}),
         ("Degree of Linearity", "±0.012%", {"percentage min": -0.012, "percentage max": 0.012}),
         ("Degree of Linearity", "-", {"percentage": "NaN"}),
+        ("Total Harmonic Distortion + Noise (Thd+N)", "0.15%, 0.11%", {
+            "percentage 1": 0.15,
+            "percentage 2": 0.11,
+        }),
+        ("Total Harmonic Distortion(Thd)", "10%", {"percentage": 10.0}),
     ],
 )
 def test_flexible_percentage_values(key, value, expected, capsys):
