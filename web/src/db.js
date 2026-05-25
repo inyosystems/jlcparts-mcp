@@ -509,7 +509,7 @@ async function queryComponentsFromMatches(manifest, matchesByShard, checkAbort, 
     const shardNamesForPlan = plan => plan.shardNames.map(shardName => [shardName, plan.lcscMatches]);
     const shardItems = chooseHydrationPlans(manifest, matchesByShard).flatMap(shardNamesForPlan);
     const progress = createFileProgressReporter(
-        onProgress, "Loading component shards", shardItems.map(([shardName]) => shardName)
+        onProgress, "Performing component query", shardItems.map(([shardName]) => shardName)
     );
     const shardResults = await mapConcurrent(
         shardItems,
@@ -799,7 +799,7 @@ export async function queryComponents({ categoryIds, allCategories, searchString
 
     const attributeLut = await ensureJsonFile(manifest.attributesLut);
     const uniqueShardNames = Array.from(new Set(shardNames));
-    const progress = createFileProgressReporter(onProgress, "Loading component shards", uniqueShardNames);
+    const progress = createFileProgressReporter(onProgress, "Performing component query", uniqueShardNames);
     const shardResults = await mapConcurrent(uniqueShardNames, SHARD_LOAD_CONCURRENCY, async shardName => {
         const results = [];
         let schema = null;

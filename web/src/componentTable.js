@@ -145,6 +145,7 @@ function QueryProgress(props) {
     if (!progress) {
         return null;
     }
+    const done = progress.done || progress.progress >= 1;
     const percent = Math.max(0, Math.min(100, (progress.progress ?? 0) * 100));
     const fileText = progress.filesTotal
         ? `${progress.filesDone}/${progress.filesTotal} files`
@@ -152,7 +153,9 @@ function QueryProgress(props) {
     const cacheText = progress.cachedFiles
         ? `, ${progress.cachedFiles} cached`
         : "";
-    const etaText = progress.etaSeconds === null
+    const etaText = done
+        ? "Done"
+        : progress.etaSeconds === null
         ? "ETA: estimating"
         : `ETA: ${formatDuration(progress.etaSeconds)}`;
 
@@ -740,7 +743,7 @@ class CategoryFilter extends React.Component {
         this.activeQueryToken = queryToken;
         this.setState({abort: () => aborted = true, queryProgress: null});
         try {
-            return await queryComponents({
+            const components = await queryComponents({
                 categoryIds: this.collectActiveCategories(),
                 allCategories: this.state.allCategories,
                 searchString: this.state.searchString,
@@ -763,9 +766,25 @@ class CategoryFilter extends React.Component {
                     });
                 }
             });
+            if (this.activeQueryToken === queryToken && !aborted) {
+                this.setState({
+                    queryProgress: {
+                        ...(this.pendingQueryProgress ?? {}),
+                        phase: "Performing component query",
+                        progress: 1,
+                        etaSeconds: null,
+                        done: true,
+                    }
+                });
+            }
+            return components;
         } finally {
             if (this.activeQueryToken === queryToken) {
-                this.setState({queryProgress: null});
+                window.setTimeout(() => {
+                    if (this.activeQueryToken === queryToken) {
+                        this.setState({queryProgress: null});
+                    }
+                }, 1500);
             }
         }
     }
