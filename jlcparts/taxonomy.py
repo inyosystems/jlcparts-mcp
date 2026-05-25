@@ -4,17 +4,19 @@ from dataclasses import dataclass
 
 
 ACRONYMS = {
-    "ac", "adc", "afe", "afes", "bjt", "can", "cbb", "cpld", "dac", "dc", "dds",
-    "ddr", "din", "dp", "dsc", "dsp", "dvi", "emc", "emi", "esd",
-    "ffc", "fet", "fpga", "fpc", "gdt", "gnss",
-    "hdmi", "hdsc", "ic", "ics", "idc", "ieee", "igbt", "ir", "irda",
+    "ac", "adc", "afe", "afes", "bjt", "can", "cbb", "cpld", "cmrr", "dac", "dc", "dcr", "dds",
+    "ddr", "din", "dp", "dsc", "dsp", "dvi", "emc", "emi", "esd", "esr",
+    "ffc", "fet", "fpga", "fpc", "gbp", "gdt", "gnss",
+    "hdmi", "hdsc", "ic", "ics", "id", "idc", "ieee", "if", "igbt", "io", "ios", "iq", "ir", "irda",
     "jfet", "lan", "lcd", "lc", "ldo", "led", "lin", "lna",
     "lvds", "mcu", "mcus", "mems", "mlcc", "mos", "mosfet", "mosfets", "mpu",
     "mpus", "ntc", "nxp", "ocxo", "ocxos", "oled", "pcb", "pci", "pcie", "pll", "pmic",
-    "poe", "ptc", "rc", "rf", "rfi", "rfid", "rj11", "rj45", "rlc", "rlcs",
+    "poe", "ptc", "qg", "rc", "rf", "rfi", "rfid", "rj11", "rj45", "rlc", "rlcs",
     "rca", "rms", "rgb", "rs", "rtc", "sas", "sata", "saw", "sbr", "scr", "sd", "sim", "smd", "smt", "soc",
-    "socs", "spi", "spds", "tcxo", "tcxos", "tco", "tss", "tvs", "uart", "usb",
-    "uv", "vco", "vcos", "vcxo", "vcxos", "vfd", "vga", "xlr",
+    "socs", "spi", "spds", "ta", "tc", "tcr", "tcxo", "tcxos", "tco", "tpd", "tss", "tvs", "uart", "usb",
+    "uv", "vbe", "vce", "vceo", "vebo", "vces", "vdss", "vds", "vf", "vga", "vge", "vgs",
+    "vih", "vil", "voh", "vol", "vos", "vr", "vrms", "vrwm", "vz", "vco", "vcos", "vcxo", "vcxos", "vfd", "xlr",
+    "ciss", "coss", "crss", "ipp", "isat", "zzt",
 }
 
 SMALL_WORDS = {"and", "or", "of", "for", "to", "the", "with", "in", "on"}
@@ -36,7 +38,10 @@ SPECIAL_WORDS = {
     "pcis": "PCIs",
     "pcie": "PCIe",
     "pcies": "PCIes",
+    "pd": "Pd",
     "pgas": "PGAs",
+    "ppp": "Ppp",
+    "rds": "RDS",
     "rlcs": "RLCs",
     "mlcc": "MLCC",
     "socs": "SOCs",

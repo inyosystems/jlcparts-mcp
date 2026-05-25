@@ -34,6 +34,7 @@ def readWithSiPrefix(value):
     if value == "-" or value == "" or value == "null":
         return "NaN"
     unitPrexies = {
+        "f": 1e-15,
         "p": 1e-12,
         "n": 1e-9,
         "u": 1e-6,
@@ -80,6 +81,9 @@ def readCurrent(value):
     Given a string, try to parse current and return it as Amperes (float)
     """
     value = erase(value, ["PNP"])
+    value = value.split("@")[0]
+    value = re.sub(r"([0-9.])a\b", r"\1A", value)
+    value = re.sub(r"([0-9])\.A\b", r"\1A", value)
     value = value.replace("A", "").strip()
     value = value.split("..")[-1] # Some transistors give a range for current in Rds
     if value in ["-", "--"] or "null" in value:
@@ -90,6 +94,7 @@ def readCurrent(value):
 def readVoltage(value):
     value = value.replace("v", "V")
     value = value.replace("V-", "V")
+    value = re.sub(r"\bV(?:DS|GS)\s*=\s*", "", value, flags=re.IGNORECASE)
     value = value.replace("V", "").strip()
     if value in ["-", "--"] or "null" in value:
         return "NaN"
@@ -172,6 +177,9 @@ def voltageAttribute(value):
     value = value.replace("VIN", "V").replace("Vin", "V")
     value = value.replace("VDC", "V").replace("VAC", "V")
     value = value.replace("Vdc", "V").replace("Vac", "V")
+    value = value.replace("AC:", "").replace("DC:", "")
+    value = re.sub(r"\bDC\s+", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"\bAC\s+", "", value, flags=re.IGNORECASE)
     value = value.replace("X1:", "")
     value = value.replace("A", "V") # Common typo
     value = erase(value, "±")
@@ -245,6 +253,7 @@ def powerAttribute(value):
     }
 
 def countAttribute(value):
+    value = str(value)
     if value == "-":
         return {
             "format": "${count}",
@@ -278,7 +287,7 @@ def countAttribute(value):
 def capacitanceAttribute(value):
     # There are a handful of components, that feature multiple capacitance
     # values, for the sake of the simplicity, take the last one.
-    value = readCapacitance(value.split(";")[-1].strip())
+    value = readCapacitance(value.split(";")[-1].split("@")[0].strip())
     return {
         "format": "${capacitance}",
         "primary": "capacitance",
@@ -677,7 +686,7 @@ def forwardVoltage(value):
 
     vStr = s[0].replace("A", "V") # Common typo
     v = readVoltage(vStr)
-    i = readCurrent(s[1])
+    i = readCurrent(s[1].replace("pk", "").replace("PK", "")) if len(s) > 1 else "NaN"
     return {
         "format": "${Vf} @ ${If}",
         "default": "Vf",
@@ -747,7 +756,7 @@ def clampingVoltage(value):
     vC = s[0].split(",")[0].split("/")[0].split(";")[0]
     vC = vC.replace("A", "V") # Common typo
     vC = readVoltage(vC)
-    if len(s) == 2:
+    if len(s) == 2 and s[1].strip().lower() not in ["typ", "typ.", "typical"]:
         c = s[1].replace("V", "A") # Common typo
         return {
             "format": "${Vc} @ ${Ic}",
