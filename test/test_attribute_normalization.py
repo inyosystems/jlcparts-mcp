@@ -884,6 +884,32 @@ def test_program_storage_size(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("3000K", {"temperature 1": 3000.0}),
+        ("1800K~6500K", {"temperature 1 min": 1800.0, "temperature 1 max": 6500.0}),
+        (
+            "5300K~5750K, 5750K~6350K, 6350K~7050K",
+            {
+                "temperature 1 min": 5300.0,
+                "temperature 1 max": 5750.0,
+                "temperature 2 min": 5750.0,
+                "temperature 2 max": 6350.0,
+                "temperature 3 min": 6350.0,
+                "temperature 3 max": 7050.0,
+            },
+        ),
+        ("-", {"temperature 1": "NaN"}),
+    ],
+)
+def test_color_temperature(value, expected, capsys):
+    values = normalized_values("Color Temperature", value, capsys)
+
+    for quantity, temperature in expected.items():
+        assert_quantity(values[quantity], temperature, "kelvin")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("1080", 1080.0),
         ("0.0004", 0.0004),
         ("-", "NaN"),

@@ -1480,6 +1480,21 @@ def temperatureAttribute(value):
 def kelvinAttribute(value):
     return scalarAttribute(value, readKelvin, "kelvin", "temperature")
 
+def kelvinRangeListAttribute(value):
+    value = str(value).replace(";", ",").strip()
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        parsed = rangeOrScalarAttribute(part, readKelvin, "kelvin", f"temperature {index}")
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": "temperature 1 min" if any(_rangeParts(part) for part in parts) else "temperature 1",
+        "values": values
+    }
+
 def angleListAttribute(value):
     value = str(value).replace(";", ",")
     return scalarListAttribute(value, readAngle, "angle", "angle")

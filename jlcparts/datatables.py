@@ -272,6 +272,8 @@ def normalizeAttribute(key, value):
             value = attributes.stringAttribute(value) if compoundValue(value) else attributes.temperatureRangeAttribute(value)
         elif key in larr(["B Constant (25°C/85°C)"]):
             value = attributes.kelvinAttribute(value)
+        elif key in larr(["Color Temperature"]):
+            value = attributes.kelvinRangeListAttribute(value)
         elif key in larr(["Viewing Angle"]):
             value = attributes.angleListAttribute(value)
         elif key.startswith("continuous drain current"):
