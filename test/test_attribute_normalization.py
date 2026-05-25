@@ -914,6 +914,24 @@ def test_voltage_reference_value(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("10V", {"voltage 1": 10.0}),
+        ("625mV", {"voltage 1": 0.625}),
+        ("2.5V, 1.25V, 625mV", {
+            "voltage 1": 2.5,
+            "voltage 2": 1.25,
+            "voltage 3": 0.625,
+        }),
+    ],
+)
+def test_full_scale_range(value, expected, capsys):
+    values = normalized_values("Full-Scale Range(Fsr)", value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("±280mV", {"voltage min": -0.28, "voltage max": 0.28}),
         ("2V", {"voltage": 2.0}),
         ("±31.25mV, ±5mV", {
