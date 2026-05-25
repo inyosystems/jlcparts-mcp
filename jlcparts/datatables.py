@@ -342,7 +342,7 @@ def normalizeAttribute(key, value):
             value = attributes.awgRangeListAttribute(value)
         elif key in larr(["Operation Points", "Release Points"]):
             value = attributes.magneticFluxDensityRangeListAttribute(value)
-        elif key in larr(["Viewing Angle"]):
+        elif key in larr(["Viewing Angle", "Differential Phase"]):
             value = attributes.angleListAttribute(value)
         elif key.startswith("continuous drain current"):
             value = attributes.continuousTransistorCurrent(value, "Id")

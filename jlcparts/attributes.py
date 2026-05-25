@@ -329,6 +329,7 @@ def readAngle(value):
     if value in ["-", "--", "null"]:
         return "NaN"
     value = value.replace("±", "")
+    value = re.sub(r"\s*deg$", "", value, flags=re.I)
     value = value.replace("°", "")
     return float(value)
 
