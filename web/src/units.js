@@ -7,7 +7,7 @@ export function quantityComparator(quantityName) {
         "length", "inductance", "temperature", "charge", "frequency",
         "percentage", "time", "data_rate", "luminous_intensity", "energy",
         "decibel", "decibel_milliwatt", "ratio", "kelvin", "angle",
-        "data_size"
+        "data_size", "melting_i2t"
     ];
     if (numericQuantities.includes(quantityName))
         return numericComparator;
@@ -29,6 +29,7 @@ export function quantityFormatter(quantityName) {
         frequency: siFormatter("Hz"),
         data_rate: siFormatter("bps"),
         data_size: dataSizeFormatter,
+        melting_i2t: siFormatter("A²s"),
         luminous_intensity: siFormatter("cd"),
         length: siFormatter("m"),
         inductance: siFormatter("H"),

@@ -884,6 +884,20 @@ def test_program_storage_size(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("1080", 1080.0),
+        ("0.0004", 0.0004),
+        ("-", "NaN"),
+    ],
+)
+def test_melting_i2t(value, expected, capsys):
+    values = normalized_values("Melting I2t", value, capsys)
+
+    assert_quantity(values["melting i2t"], expected, "melting_i2t")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("1.5kW", 1500.0),
         ("150mW", 0.15),
         ("60W@8/20us", 60.0),

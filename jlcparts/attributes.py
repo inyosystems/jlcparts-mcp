@@ -252,6 +252,12 @@ def readDataSize(value):
     }
     return number * scales[unit]
 
+def readMeltingI2t(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    return float(value)
+
 def readPercentage(value):
     value = value.strip().replace("±", "")
     if value in ["-", "--", "null"]:
@@ -598,6 +604,9 @@ def dataRateAttribute(value):
 
 def dataSizeAttribute(value):
     return scalarAttribute(value, readDataSize, "data_size", "data size")
+
+def meltingI2tAttribute(value):
+    return scalarAttribute(value, readMeltingI2t, "melting_i2t", "melting i2t")
 
 def lengthAttribute(value):
     return rangeOrScalarAttribute(value, readLength, "length", "length")
