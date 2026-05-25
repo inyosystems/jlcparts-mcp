@@ -130,6 +130,8 @@ def test_impedance_zzk(value, expected, capsys):
         ("Operating Voltage", "-15V~15V", (-15.0, 15.0)),
         ("Voltage - Input(DC)", "900mV~5.5V", (0.9, 5.5)),
         ("Voltage - Input(DC)", "45V", 45.0),
+        ("Low Level Range (VIL)", "700mV~800mV", (0.7, 0.8)),
+        ("Low Level Range (VIL)", "0.8V", 0.8),
         ("Operating Voltage", "-", "NaN"),
     ],
 )
