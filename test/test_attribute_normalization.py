@@ -1163,6 +1163,7 @@ def test_conversion_efficiency_values(value, expected, capsys):
             "percentage 2": 0.11,
         }),
         ("Total Harmonic Distortion(Thd)", "10%", {"percentage": 10.0}),
+        ("Differential Gain", "0.01%", {"percentage": 0.01}),
     ],
 )
 def test_flexible_percentage_values(key, value, expected, capsys):
