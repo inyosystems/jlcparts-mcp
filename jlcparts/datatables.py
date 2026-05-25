@@ -126,7 +126,7 @@ def normalizeAttribute(key, value):
                     "Current - On State (It (AV)) (Max)", "Current - On State (It (RMS)) (Max)",
                     "Current - Supply (Max)", "Supply Current", "Supply Current (Max)",
                     "Output Current", "Output Current (Max)", "Rectified Current",
-                    "Output / Channel Current", "Current - Output",
+                    "Output / Channel Current", "Current - Output", "Current Range",
                     "Saturation Current (Isat)", "Reverse Leakage Current", "Reverse Leakage Current (Ir)",
                     "Peak Pulse Current (Ipp)", "Peak Pulse Current (Ipp) @ 10/1000us",
                     "Quiescent Current", "Quiescent Current (Iq)", "Quiescent Current(Iq)",
@@ -150,7 +150,9 @@ def normalizeAttribute(key, value):
                 "send current",
                 "current of transmitting",
             ]
-            if key in currentListKeys and isinstance(value, str) and "," in value:
+            if key == "current range":
+                value = attributes.currentRangeListAttribute(value)
+            elif key in currentListKeys and isinstance(value, str) and "," in value:
                 value = attributes.currentListAttribute(value)
             elif isinstance(value, str) and ("," in value or re.search(r"\d\s*-\s*\d", value)):
                 value = attributes.stringAttribute(value)

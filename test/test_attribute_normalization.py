@@ -311,6 +311,28 @@ def test_current_lists(key, value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("20A", {"current": 20.0}),
+        ("0A~200A", {"current min": 0.0, "current max": 200.0}),
+        ("±5.75A", {"current min": -5.75, "current max": 5.75}),
+        ("400/5A", {"current 1": 400.0, "current 2": 5.0}),
+        ("±20A, ±10A", {
+            "current 1 min": -20.0,
+            "current 1 max": 20.0,
+            "current 2 min": -10.0,
+            "current 2 max": 10.0,
+        }),
+    ],
+)
+def test_current_range(value, expected, capsys):
+    values = normalized_values("Current Range", value, capsys)
+
+    for quantity, current in expected.items():
+        assert_quantity(values[quantity], current, "current")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("35mcd", {"intensity 1": 0.035}),
         ("2.25cd", {"intensity 1": 2.25}),
         ("68mcd~102mcd", {"intensity 1 min": 0.068, "intensity 1 max": 0.102}),

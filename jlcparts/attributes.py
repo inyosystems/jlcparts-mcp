@@ -610,6 +610,50 @@ def impedanceAtFrequency(value):
 def currentAtConditionAttribute(value, name="current"):
     return scalarAttribute(value, readCurrent, "current", name)
 
+def _withTrailingCurrentUnit(parts):
+    unit = None
+    for part in parts:
+        match = re.search(r"([munpkMKG]?A)\s*$", part)
+        if match is not None:
+            unit = match.group(1)
+            break
+    if unit is None:
+        return parts
+    return [
+        part if re.search(r"[A]\s*$", part) else part + unit
+        for part in parts
+    ]
+
+def currentRangeAttribute(value, name="current"):
+    value = str(value).strip()
+    if value.startswith("±"):
+        value = "-" + value[1:] + "~+" + value[1:]
+    return rangeOrScalarAttribute(value, readCurrent, "current", name)
+
+def currentRangeListAttribute(value, name="current"):
+    value = str(value).strip()
+    if "/" in value and "," not in value and "~" not in value:
+        return scalarListAttribute(
+            ",".join(_withTrailingCurrentUnit([x.strip() for x in value.split("/")])),
+            readCurrent,
+            "current",
+            name,
+        )
+
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        parsed = currentRangeAttribute(part, f"{name} {i}" if len(parts) > 1 else name)
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    primary_name = f"{name} 1" if len(parts) > 1 else name
+    return {
+        "format": ", ".join(formats),
+        "primary": primary_name + " min" if any(_rangeParts(part) or part.startswith("±") for part in parts) else primary_name,
+        "values": values
+    }
+
 def voltageAtConditionAttribute(value, name="voltage"):
     return scalarAttribute(value, readVoltage, "voltage", name)
 
