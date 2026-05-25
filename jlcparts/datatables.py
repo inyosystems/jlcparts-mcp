@@ -361,7 +361,7 @@ def normalizeAttribute(key, value):
         elif key in larr(["Total Gate Charge (Qg@Vgs)", "Total Gate Charge (Qg @ Vgs)"]):
             value = attributes.stringAttribute(value) if isinstance(value, str) and value.count(";") != 0 else attributes.chargeAtVoltage(value)
         elif key in larr(["Data Rate"]):
-            value = attributes.stringAttribute(value) if compoundValue(value) else attributes.dataRateAttribute(value)
+            value = attributes.dataRateListAttribute(value) if compoundValue(value) else attributes.dataRateAttribute(value)
         elif key in larr(["Slew Rate", "Slew Rate(Sr)"]):
             value = attributes.slewRateAttribute(value)
         elif key in larr(["Program Storage Size", "Ram Size"]):

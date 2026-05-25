@@ -179,7 +179,7 @@ def readFrequency(value):
 
 def readDataRate(value):
     value = value.strip()
-    if value in ["-", "--", "null"]:
+    if value in ["-", "--", "null", "NaN"]:
         return "NaN"
     value = re.sub(r"(?:bit/s|bps)$", "", value, flags=re.IGNORECASE)
     value = erase(value, ["Hz", "HZ", "H"]).strip()
@@ -892,6 +892,10 @@ def temperatureCoefficientAttribute(value):
 def dataRateAttribute(value):
     value = str(value)
     return rangeOrScalarAttribute(value, readDataRate, "data_rate", "data rate")
+
+def dataRateListAttribute(value):
+    value = str(value).replace(";", ",")
+    return scalarListAttribute(value, readDataRate, "data_rate", "data rate")
 
 def _expandSharedUnitAlternatives(value):
     match = re.fullmatch(

@@ -930,6 +930,22 @@ def test_logic_elements_blocks_count(capsys):
 
     assert_quantity(values["count"], "NaN", "count")
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("10Mbit/s", {"data rate": 10e6}),
+        ("8kHz, 32kHz", {"data rate 1": 8e3, "data rate 2": 32e3}),
+        ("2Mbps;50Mbps", {"data rate 1": 2e6, "data rate 2": 50e6}),
+        ("3.75Gbps, 1Gbps", {"data rate 1": 3.75e9, "data rate 2": 1e9}),
+        ("NaN", {"data rate": "NaN"}),
+    ],
+)
+def test_data_rate(value, expected, capsys):
+    values = normalized_values("Data Rate", value, capsys)
+
+    for quantity, rate in expected.items():
+        assert_quantity(values[quantity], rate, "data_rate")
+
 
 def test_b_constant_kelvin(capsys):
     values = normalized_values("B Constant (25°C/85°C)", "3434K", capsys)
