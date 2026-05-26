@@ -1417,22 +1417,55 @@ def efficiencyPercentageRangeListAttribute(value):
         "values": values
     }
 
+def _normalizeTemperatureValue(value):
+    value = str(value).replace("°C", "℃")
+    value = re.sub(r"\s+", " ", value).strip()
+    value = re.sub(r"\(.*?\)", "", value)
+    value = re.sub(r"\s+to\s+", "~", value, flags=re.I)
+    value = re.sub(r"^~(?=\d)", "-", value)
+    value = re.sub(r"(?<=\d)℃?\s*-\s*(?=[+]?\d)", "~", value)
+    return value.strip()
+
+def _readCelsius(value):
+    value = str(value).replace("°C", "℃").strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = value.rstrip("℃").strip()
+    return int(float(value))
+
 def temperatureRangeAttribute(value):
     value = str(value).replace("°C", "℃")
     if value.strip() in ["-", "--", "null"]:
         return scalarAttribute("-", lambda x: "NaN", "temperature", "temperature")
     value = erase(value, ["@"])
-    value = re.sub(r"\(.*?\)", "", value)
+    value = _normalizeTemperatureValue(value)
     if _hasCompoundValues(value):
         raise ValueError(f"Compound temperature value cannot be represented as scalar range: {value}")
     if value.strip().startswith("±"):
         value = "-" + value.strip()[1:] + "~+" + value.strip()[1:]
     if "~" in value or ".." in value:
-        return rangeOrScalarAttribute(value.replace("℃", ""), lambda x: int(float(x)), "temperature", "temperature")
-    value = value.strip()
-    if value.endswith("℃"):
-        value = value[:-1]
-    return scalarAttribute(value, lambda x: int(float(x)), "temperature", "temperature")
+        return rangeOrScalarAttribute(value, _readCelsius, "temperature", "temperature")
+    return scalarAttribute(value, _readCelsius, "temperature", "temperature")
+
+def solderingTemperatureAttribute(value):
+    value = _normalizeTemperatureValue(value)
+    if value.strip() in ["-", "--", "null"]:
+        return scalarAttribute("-", lambda x: "NaN", "temperature", "temperature")
+
+    if "@" not in value:
+        return temperatureRangeAttribute(value)
+
+    temperature, duration = [x.strip() for x in value.split("@", 1)]
+    parsed = temperatureRangeAttribute(temperature)
+    parsed_duration = rangeOrScalarAttribute(duration, readTime, "time", "time")
+
+    values = dict(parsed["values"])
+    values.update(parsed_duration["values"])
+    return {
+        "format": f'{parsed["format"]} @ {parsed_duration["format"]}',
+        "primary": parsed["primary"],
+        "values": values,
+    }
 
 def temperatureListAttribute(value):
     value = str(value).replace("°C", "℃")

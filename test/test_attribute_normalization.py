@@ -1949,6 +1949,59 @@ def test_temperature_limit_values(key, value, expected, capsys):
         assert_quantity(values[quantity], temperature, "temperature")
 
 
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Working Temperature", "-20℃~+70℃", {
+            "temperature min": -20,
+            "temperature max": 70,
+        }),
+        ("Working Temperature", "-20℃-+65℃", {
+            "temperature min": -20,
+            "temperature max": 65,
+        }),
+        ("Working Temperature", "-30℃ to +85℃", {
+            "temperature min": -30,
+            "temperature max": 85,
+        }),
+        ("Working Temperature", "~15℃~+50℃", {
+            "temperature min": -15,
+            "temperature max": 50,
+        }),
+        ("Storage Temperature", "~20℃~+85℃", {
+            "temperature min": -20,
+            "temperature max": 85,
+        }),
+    ],
+)
+def test_additional_temperature_range_attributes(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, temperature in expected.items():
+        assert_quantity(values[quantity], temperature, "temperature")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("260℃", {"temperature": (260, "temperature")}),
+        ("260℃@3S", {"temperature": (260, "temperature"), "time": (3, "time")}),
+        ("260℃@3~5S", {
+            "temperature": (260, "temperature"),
+            "time min": (3, "time"),
+            "time max": (5, "time"),
+        }),
+        ("-", {"temperature": ("NaN", "temperature")}),
+    ],
+)
+def test_soldering_temperature_max_attribute(value, expected, capsys):
+    values = normalized_values("Soldering Temperature (Max)", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        value, unit = expected_value
+        assert_quantity(values[quantity], value, unit)
+
+
 def test_detection_temperature_range(capsys):
     values = normalized_values("Detection Temperature Range", "-55℃~+125℃", capsys)
 
