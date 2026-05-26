@@ -131,6 +131,13 @@ def readVoltageTemperatureDrift(value):
     value = re.sub(r"/\s*(?:℃|°C|C)$", "", value, flags=re.I).strip()
     return readVoltage(value)
 
+def readCurrentTemperatureDrift(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"/\s*(?:℃|°C|C)$", "", value, flags=re.I).strip()
+    return readCurrent(value)
+
 def readTemperatureCoefficient(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
@@ -945,6 +952,15 @@ def voltageTemperatureDriftAttribute(value):
         value,
         readVoltageTemperatureDrift,
         "voltage_temperature_drift",
+        "drift",
+    )
+
+def currentTemperatureDriftAttribute(value):
+    value = str(value).replace(";", ",")
+    return scalarListAttribute(
+        value,
+        readCurrentTemperatureDrift,
+        "current_temperature_drift",
         "drift",
     )
 

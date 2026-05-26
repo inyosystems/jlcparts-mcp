@@ -2019,6 +2019,22 @@ def test_input_offset_voltage_drift(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Input Offset Current Drift (IOS TC)", "10pA/℃", {"drift 1": 10e-12}),
+        ("Input Offset Current Drift (IOS TC)", "0.01uA/℃", {"drift 1": 0.01e-6}),
+        ("Input Offset Current Drift(IOS TC)", "47.4pA/℃", {"drift 1": 47.4e-12}),
+        ("Input Offset Current Drift(IOS TC)", "10uA/℃", {"drift 1": 10e-6}),
+    ],
+)
+def test_input_offset_current_drift(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, drift in expected.items():
+        assert_quantity(values[quantity], drift, "current_temperature_drift")
+
+
+@pytest.mark.parametrize(
     ("value", "expected"),
     [
         ("9.6uVp-p", {"noise 1 p-p": [9.6e-6, "voltage"]}),
