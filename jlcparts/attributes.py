@@ -668,6 +668,7 @@ def _readConnectorCount(value):
     total = 0
     for part in value.split("+"):
         part = part.strip()
+        part = re.sub(r"(?<=\d)AP$", "P", part, flags=re.I)
         match = re.fullmatch(r"(\d+)\s*P?\s*(?:x\s*(\d+))?", part, flags=re.I)
         if match is None:
             raise ValueError(f"Cannot parse connector count {value}")

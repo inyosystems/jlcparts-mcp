@@ -1016,6 +1016,20 @@ def test_number_of_contacts(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("80P", 80),
+        ("14", 14),
+        ("3AP", 3),
+    ],
+)
+def test_number_of_holes(value, expected, capsys):
+    values = normalized_values("Number of Holes", value, capsys)
+
+    assert_quantity(values["count"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("1.2uA", 1.2e-6),
         ("20.8uA@25℃,5min", 20.8e-6),
         ("500nA@25°C,5min", 500e-9),
