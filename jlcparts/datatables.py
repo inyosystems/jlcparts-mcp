@@ -212,7 +212,9 @@ def normalizeAttribute(key, value):
                     "Current - Gate Trigger(Igt)",
                     "Leakage Current(Dcl)", "Balance Current", "Leakage Current",
                     "Reverse Leakage Current (Ir)", "Hold Current(Ih)",
-                    "On - State Current(It)", "Trigger Current"]):
+                    "On - State Current(It)", "Trigger Current",
+                    "Nominal Impulse Discharge Current", "Impulse Discharge Current",
+                    "Surge Current Capacity (8/20us)"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent current",
