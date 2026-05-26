@@ -2078,6 +2078,8 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
         ("Turn Off Delay Time (Td(Off))", "13.5us", {"time": 13.5e-6}),
         ("Thermal Time Constant", "1.43min", {"time": 85.8}),
         ("Thermal Time Constant", "3s, 700ms", {"time 1": 3.0, "time 2": 0.7}),
+        ("Hold Time", "-300ps", {"time": -300e-12}),
+        ("Hold Time", "20ns, 10ns, 7.5ns", {"time 1": 20e-9, "time 2": 10e-9, "time 3": 7.5e-9}),
     ],
 )
 def test_delay_time_attributes(key, value, expected, capsys):
