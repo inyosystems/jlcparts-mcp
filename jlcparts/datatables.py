@@ -303,7 +303,8 @@ def normalizeAttribute(key, value):
                 "Y-Width of Bottom Edge on Board", "Z-Height of the Board", "Diameter (Φd)", "Insulation Od",
                 "Insulation Height", "Switch Length", "Switch Width", "Interface Length/Height", "Interface Diameter",
                 "Height - Seated (Max)", "Length of Mating Pin", "Operating Height", "Operational Height", "L", "Row Spacing",
-                "System Fit Height", "Overall Length/Height", "Head Width", "Center Height"]):
+                "System Fit Height", "Overall Length/Height", "Head Width", "Center Height",
+                "Outside Contact Diameter"]):
             if key == "diameter" and isinstance(value, str) and re.fullmatch(r"M\s*\d+(?:\.\d+)?", value, re.I):
                 value = re.sub(r"^M\s*", "", value, flags=re.I) + "mm"
             if key in larr(["Insulation Od", "Interface Length/Height", "Interface Diameter", "System Fit Height"]) and isinstance(value, str) and ("," in value or ";" in value):
