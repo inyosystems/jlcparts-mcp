@@ -645,6 +645,8 @@ def test_capacitive_load_max(value, expected, capsys):
         ("Electrostatic Capacitance", "0.8pF", {"capacitance": 0.8e-12}),
         ("Input Capacitance", "1.8pF", {"capacitance": 1.8e-12}),
         ("Input Capacitance", "-", {"capacitance": "NaN"}),
+        ("Capacitance-Input", "1.5pF", {"capacitance": 1.5e-12}),
+        ("Input Capacitiance(Ci)", "15pF", {"capacitance": 15e-12}),
         ("Electrostatic Capacity", "30pF~60pF", {"capacitance min": 30e-12, "capacitance max": 60e-12}),
     ],
 )
