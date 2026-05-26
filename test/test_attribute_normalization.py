@@ -1823,6 +1823,8 @@ def test_holding_temperature(capsys):
         ("Holding Temperature Limit", "76℃", {"temperature": 76}),
         ("Holding Temperature Limit", "72/61℃", {"temperature 1": 72, "temperature 2": 61}),
         ("Rated Functioning Temperature", "102℃", {"temperature": 102}),
+        ("Operating Temperatue", "-40℃~+85℃", {"temperature min": -40, "temperature max": 85}),
+        ("Operating Temperatue", "-", {"temperature": "NaN"}),
     ],
 )
 def test_temperature_limit_values(key, value, expected, capsys):
