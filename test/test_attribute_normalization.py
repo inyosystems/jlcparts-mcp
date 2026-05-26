@@ -2073,6 +2073,8 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
         ("Setup Time", "20ns, 10ns, 7.5ns", {"time 1": 20e-9, "time 2": 10e-9, "time 3": 7.5e-9}),
         ("Acquisition Time", "20us", {"time": 20e-6}),
         ("Hold Settling Time", "0.165us", {"time": 0.165e-6}),
+        ("Page Programming Time (Tpp)", "90ns", {"time": 90e-9}),
+        ("Page Programming Time (Tpp)", "4ms, 8ms", {"time 1": 0.004, "time 2": 0.008}),
     ],
 )
 def test_delay_time_attributes(key, value, expected, capsys):
