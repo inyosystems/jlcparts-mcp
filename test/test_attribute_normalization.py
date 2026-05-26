@@ -119,6 +119,7 @@ def test_resistance_list_attributes(key, value, expected, capsys):
         ("Insulation Resistance", "-", "NaN"),
         ("Insulation Resistance(Ir)", "10MΩ", 10e6),
         ("Insulation Resistance(Ir)", "10mΩ", 0.01),
+        ("Insulation Resistance (Min)", "100MΩ", 100e6),
         ("Nominal Cold Resistance", "2.52mΩ", 0.00252),
     ],
 )
