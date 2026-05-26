@@ -2080,6 +2080,8 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
         ("Thermal Time Constant", "3s, 700ms", {"time 1": 3.0, "time 2": 0.7}),
         ("Hold Time", "-300ps", {"time": -300e-12}),
         ("Hold Time", "20ns, 10ns, 7.5ns", {"time 1": 20e-9, "time 2": 10e-9, "time 3": 7.5e-9}),
+        ("Phase Jitter", "500fs", {"time": 500e-15}),
+        ("Phase Jitter", "1ps, 200fs", {"time 1": 1e-12, "time 2": 200e-15}),
     ],
 )
 def test_delay_time_attributes(key, value, expected, capsys):

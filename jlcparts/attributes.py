@@ -304,12 +304,13 @@ def readTime(value):
     if value in ["-", "--", "null"]:
         return "NaN"
     value = value.replace("µ", "u").replace("μ", "u")
-    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(ps|ns|us|ms|s|sec|secs|min|mins|h|hr|hrs|hour|hours)?", value, re.I)
+    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(fs|ps|ns|us|ms|s|sec|secs|min|mins|h|hr|hrs|hour|hours)?", value, re.I)
     if match is None:
         raise ValueError(f"Cannot parse time {value}")
     number = float(match.group(1))
     unit = (match.group(2) or "s").lower()
     scales = {
+        "fs": 1e-15,
         "ps": 1e-12,
         "ns": 1e-9,
         "us": 1e-6,
