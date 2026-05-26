@@ -852,6 +852,18 @@ def test_peak_output_current_sink_list(capsys):
         ("Standby Current (Max)", "150nA", {"current": 150e-9}),
         ("Trigger Current", "5A~15A", {"current min": 5.0, "current max": 15.0}),
         ("Trigger Current", "650mA", {"current": 0.65}),
+        ("Contact Current", "3A, 6A", {"current 1": 3.0, "current 2": 6.0}),
+        ("Contact Current", "-", {"current": "NaN"}),
+        ("Signal Current Rating", "500mA", {"current": 0.5}),
+        ("Breaking Capacity", "50A;300A", {"current 1": 50.0, "current 2": 300.0}),
+        ("Breaking Capacity", "50A@125V", {"current": 50.0}),
+        ("Interrupt Rating", "1kA@32V", {"current": 1000.0}),
+        ("Interrupt Rating", "100A@125VDC, 200A@250VAC", {
+            "current 1": 100.0,
+            "current 2": 200.0,
+        }),
+        ("Interrupting Rating", "2000A@32V", {"current": 2000.0}),
+        ("Rated Ripple Curren", "2.3A@100kHz", {"current": 2.3}),
     ],
 )
 def test_additional_current_values(key, value, expected, capsys):

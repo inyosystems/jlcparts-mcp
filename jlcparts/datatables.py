@@ -233,7 +233,10 @@ def normalizeAttribute(key, value):
                     "Forward Current(If)", "Output Source Current",
                     "Output Sink Current", "Output Leakage Current(Icex)",
                     "Input Current(Off)", "Input Current(on)",
-                    "Source Current", "Sink Current", "Refresh Current"]):
+                    "Source Current", "Sink Current", "Refresh Current",
+                    "Contact Current", "Signal Current Rating",
+                    "Breaking Capacity", "Interrupt Rating",
+                    "Interrupting Rating", "Rated Ripple Curren"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent current",
@@ -273,6 +276,10 @@ def normalizeAttribute(key, value):
                 "source current",
                 "sink current",
                 "refresh current",
+                "contact current",
+                "breaking capacity",
+                "interrupt rating",
+                "interrupting rating",
             ]
             if key in ["current - leakage", "leakage current(dcl)"]:
                 value = attributes.currentAttribute(value)

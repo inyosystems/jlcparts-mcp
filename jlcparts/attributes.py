@@ -615,7 +615,7 @@ def currentAttribute(value):
             }
         }
     if ";" in value:
-        values = value.split(value)
+        values = value.split(";")
         values = [readCurrent(x.strip()) for x in values]
         values = { "current" + (str(i + 1) if i != 0 else ""): [x, "current"] for i, x in enumerate(values)}
         format = ", ".join(values.keys())
