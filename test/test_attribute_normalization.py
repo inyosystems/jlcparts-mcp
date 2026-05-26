@@ -877,6 +877,20 @@ def test_gate_trigger_current(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("1.2uA", 1.2e-6),
+        ("20.8uA@25℃,5min", 20.8e-6),
+        ("500nA@25°C,5min", 500e-9),
+    ],
+)
+def test_leakage_current_dcl(value, expected, capsys):
+    values = normalized_values("Leakage Current(Dcl)", value, capsys)
+
+    assert_quantity(values["current"], expected, "current")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("11A", 11.0),
         ("250mA", 0.25),
         ("null", "NaN"),
