@@ -95,7 +95,7 @@ def normalizeAttribute(key, value):
                 "Supply Voltage", "Supply Voltage (Max)", "Supply Voltage (Min)",
                 "Varistor Voltage(Max)", "Varistor Voltage(Typ)",
                 "Varistor Voltage(Min)", "Voltage - DC Reverse (Vr) (Max)",
-                "Reverse Voltage (Vr)",
+                "Reverse Voltage", "Reverse Voltage (Vr)",
                 "Voltage - DC Spark Over (Nom)", "Voltage - Peak Reverse (Max)",
                 "Voltage - Reverse Standoff (Typ)", "Voltage - Gate Trigger (Vgt) (Max)",
                 "Voltage - Off State (Max)", "Voltage - Input", "Voltage - Input (Max)", "Voltage - Output (Max)",
@@ -223,7 +223,8 @@ def normalizeAttribute(key, value):
                     "Nominal Impulse Discharge Current", "Impulse Discharge Current",
                     "Surge Current Capacity (8/20us)", "Off State Current",
                     "Off-State Current", "On-State Current (It)",
-                    "Supply Current (Icc)", "Standby Current (Max)"]):
+                    "Supply Current (Icc)", "Standby Current (Max)",
+                    "Forward Current(If)"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent current",

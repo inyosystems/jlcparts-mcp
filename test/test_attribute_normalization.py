@@ -343,6 +343,7 @@ def test_dc_spark_over_voltage(value, expected, capsys):
         ("Input Voltage (Vin)", "2.7V~5.5V", {"voltage min": 2.7, "voltage max": 5.5}),
         ("Voltage - Supply(Input)", "±18V", {"voltage min": -18.0, "voltage max": 18.0}),
         ("Voltage - Supply(Output)", "3V~20V", {"voltage min": 3.0, "voltage max": 20.0}),
+        ("Reverse Voltage", "6V", {"voltage": 6.0}),
         ("Input Voltage Range", "-3V~3V, 0.06V~10V", {
             "voltage 1 min": -3.0,
             "voltage 1 max": 3.0,
@@ -780,6 +781,7 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Minimum Cathode Current for Regulation", "400uA", "current", 400e-6, "current"),
         ("Holding Current (Ih)", "40mA", "current", 0.04, "current"),
         ("Current - Max", "100A", "current", 100.0, "current"),
+        ("Forward Current(If)", "50mA", "current", 0.05, "current"),
         ("Rated Speed", "8500RPM", "speed", 8500.0, "rotational_speed"),
         ("Rated Speed", "-", "speed", "NaN", "rotational_speed"),
     ],
