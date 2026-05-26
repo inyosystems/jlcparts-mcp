@@ -219,7 +219,9 @@ def normalizeAttribute(key, value):
                     "Reverse Leakage Current (Ir)", "Hold Current(Ih)",
                     "On - State Current(It)", "Trigger Current",
                     "Nominal Impulse Discharge Current", "Impulse Discharge Current",
-                    "Surge Current Capacity (8/20us)"]):
+                    "Surge Current Capacity (8/20us)", "Off State Current",
+                    "Off-State Current", "On-State Current (It)",
+                    "Supply Current (Icc)", "Standby Current (Max)"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent current",
@@ -255,6 +257,7 @@ def normalizeAttribute(key, value):
                 "leakage current",
                 "reverse leakage current (ir)",
                 "hold current(ih)",
+                "supply current (icc)",
             ]
             if key in ["current - leakage", "leakage current(dcl)"]:
                 value = attributes.currentAttribute(value)
