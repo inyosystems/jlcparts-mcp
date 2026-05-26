@@ -395,7 +395,10 @@ def normalizeAttribute(key, value):
                 "Lead Spacing", "Φd", "Pin Spacing", "Capacitor Length", "Pin Spaceing",
                 "Capacitor Diameter", "Size/Dimension", "Body Thickness", "Body Height",
                 "Body Length", "Body Width", "Thickness", "Fuse Length",
-                "Fuse Diameter (Φd)", "Fuse Width"]):
+                "Fuse Diameter (Φd)", "Fuse Width", "Inside Contact Diameter",
+                "Hole/Pin Spacing", "(For Insertion) Insertion Piece Thickness",
+                "Length of Copper Pipe", "Tail Width", "Spacing", "Slice Width",
+                "Needle Diameter", "Full Length of Copper Pipe"]):
             if key == "diameter" and isinstance(value, str) and re.fullmatch(r"M\s*\d+(?:\.\d+)?", value, re.I):
                 value = re.sub(r"^M\s*", "", value, flags=re.I) + "mm"
             if key in larr(["Insulation Od", "Interface Length/Height", "Interface Diameter",

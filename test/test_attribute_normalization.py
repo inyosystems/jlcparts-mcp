@@ -2794,6 +2794,16 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Fuse Length", "20mm", 0.02),
         ("Fuse Diameter (Φd)", "5.2mm", 0.0052),
         ("Fuse Width", "3.8mm", 0.0038),
+        ("Inside Contact Diameter", "1.3mm", 0.0013),
+        ("Hole/Pin Spacing", "2.54mm", 0.00254),
+        ("(For Insertion) Insertion Piece Thickness", "0.81mm", 0.00081),
+        ("Length of Copper Pipe", "8mm", 0.008),
+        ("Tail Width", "3.7mm", 0.0037),
+        ("Spacing", "5.08mm", 0.00508),
+        ("Spacing", "-", "NaN"),
+        ("Slice Width", "2.8mm", 0.0028),
+        ("Needle Diameter", "1.78mm", 0.00178),
+        ("Full Length of Copper Pipe", "9.525mm", 0.009525),
     ],
 )
 def test_scalar_length_attributes(key, value, expected, capsys):
