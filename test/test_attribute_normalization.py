@@ -1061,6 +1061,20 @@ def test_number_of_positions(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Frequency Registers(Bit)", "48", 48),
+        ("Tuning Word Width(Bits)", "24b", 24),
+        ("Tuning Word Width (Max)", "48b", 48),
+    ],
+)
+def test_bit_width_counts(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    assert_quantity(values["count"], expected, "count")
+
+
+@pytest.mark.parametrize(
     ("value", "expected"),
     [
         ("1.2uA", 1.2e-6),

@@ -674,7 +674,7 @@ def _readConnectorCount(value):
         part = part.strip()
         part = re.sub(r"(?<=\d)AP$", "P", part, flags=re.I)
         part = re.sub(r"(\d+)\s*-\s*bit$", r"\1bit", part, flags=re.I)
-        match = re.fullmatch(r"(\d+)\s*(?:P|bits?|digits?)?\s*(?:x\s*(\d+))?", part, flags=re.I)
+        match = re.fullmatch(r"(\d+)\s*(?:P|b|bits?|digits?)?\s*(?:x\s*(\d+))?", part, flags=re.I)
         if match is None:
             match = re.fullmatch(r"(\d+)\s*x\s*(\d+)\s*P?", part, flags=re.I)
             if match is not None:
