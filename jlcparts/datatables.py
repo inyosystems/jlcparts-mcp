@@ -295,7 +295,8 @@ def normalizeAttribute(key, value):
                     "Attrition", "Minimum Order Quantity", "Minimum Placement Quantity",
                     "Minimum Purchase Quantity", "Order Multiple", "Packaging Quantity",
                     "Warehouse Stock - Jiangsu", "Warehouse Stock - Shenzhen",
-                    "Warehouse Stock - Hong Kong"]):
+                    "Warehouse Stock - Hong Kong",
+                    "Logic Array Blocks"]):
             value = attributes.countAttribute(value)
         elif key in larr(["Capacitance", "Junction Capacitance", "Input Capacitance(Cies)",
                 "CISS-Input Capacitance", "Output Capacitance(Coes)",

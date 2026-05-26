@@ -987,6 +987,20 @@ def test_gate_trigger_current(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("1270", 1270),
+        ("2", 2),
+        ("56480", 56480),
+    ],
+)
+def test_logic_array_blocks(value, expected, capsys):
+    values = normalized_values("Logic Array Blocks", value, capsys)
+
+    assert_quantity(values["count"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("1.2uA", 1.2e-6),
         ("20.8uA@25℃,5min", 20.8e-6),
         ("500nA@25°C,5min", 500e-9),
