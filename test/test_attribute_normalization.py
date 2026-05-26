@@ -1992,6 +1992,19 @@ def test_memory_size(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("8KB", 8 * 1024),
+        ("384KB", 384 * 1024),
+    ],
+)
+def test_memory_space(value, expected, capsys):
+    values = normalized_values("Memory Space", value, capsys)
+
+    assert_quantity(values["data size"], expected, "data_size")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("24V/us", {"slew rate": 24e6}),
         ("15kV/us", {"slew rate": 15e9}),
         ("520V/ms", {"slew rate": 520e3}),
