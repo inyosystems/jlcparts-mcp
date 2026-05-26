@@ -118,7 +118,7 @@ def normalizeAttribute(key, value):
                 "Peak Off - State Voltage(Vdrm)", "On State Voltage",
                 "Trigger Voltage", "Operating Voltage (Max)", "Switching Voltage (Vs)",
                 "Peak Off-State Voltage", "Reset Voltage", "Peak Impulse Voltage",
-                "On-State Voltage (Vt)", "Lag of Receiver"]):
+                "On-State Voltage (Vt)", "Lag of Receiver", "End-Off Voltage"]):
             if key == "charging saturation voltage" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "isolation voltage(vrms)" and compoundValue(value):
