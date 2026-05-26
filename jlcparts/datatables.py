@@ -337,8 +337,13 @@ def normalizeAttribute(key, value):
         elif key in larr(["Number of Bits Per Element", "Timer Number", "Numberof Drivers",
                 "Numberof Receivers", "Number of Receivers", "Number of Drivers",
                 "Number of Ports", "Number of Supporting Devices",
-                "Number of Receiver", "Number of Driver", "Input Number"]):
+                "Number of Receiver", "Number of Driver", "Input Number",
+                "Number of Pins Per Row"]):
             value = attributes.countListAttribute(value)
+        elif key in larr(["Number of Rows", "Rows"]):
+            value = attributes.rowCountAttribute(value)
+        elif key in larr(["Number of Data Pins", "Number of Conductors"]):
+            value = attributes.connectorCountAttribute(value)
         elif key in larr(["Number of Pins", "Number of Resistors", "Number of Loop",
                     "Number of Regulators", "Number of Outputs", "Number of Capacitors",
                     "Number of I/O", "Gpio Ports Number", "Number of Logic Elements/Blocks",
@@ -354,7 +359,10 @@ def normalizeAttribute(key, value):
                     "Number of Forward Channels", "Number of Reverse Channels",
                     "Number of Forward Channels Groups", "Number of Reverse Channels Groups",
                     "Number of Input Channels", "Number of Non-Differential Input Channels",
-                    "Numberof Channels", "Mac Address Support", "Vlan Support"]):
+                    "Numberof Channels", "Mac Address Support", "Vlan Support",
+                    "Pin Number Per Port", "Number of Inserts", "Number of Leg",
+                    "Connection Number (Max)", "Connectable Bits",
+                    "Pin Number in Each Row", "Needle Number"]):
             value = attributes.countAttribute(value)
         elif key in larr(["Number of Cells"]):
             value = attributes.countRangeAttribute(value)

@@ -1319,9 +1319,51 @@ def test_logic_array_blocks(value, expected, capsys):
         ("Numberof Channels", "6", {"count": 6}),
         ("Number of Cells", "3~16", {"count min": 3, "count max": 16}),
         ("Number of Cells", "12", {"count": 12}),
+        ("Pin Number Per Port", "3", {"count": 3}),
+        ("Number of Inserts", "2", {"count": 2}),
+        ("Number of Leg", "-", {"count": "NaN"}),
+        ("Connection Number (Max)", "8", {"count": 8}),
+        ("Connectable Bits", "-", {"count": "NaN"}),
+        ("Pin Number in Each Row", "18", {"count": 18}),
+        ("Needle Number", "12", {"count": 12}),
     ],
 )
 def test_extra_count_attributes(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, count in expected.items():
+        assert_quantity(values[quantity], count, "count")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Number of Pins Per Row", "4", {"count": 4}),
+        ("Number of Pins Per Row", "1, 3", {"count 1": 1, "count 2": 3}),
+        ("Number of Pins Per Row", "-", {"count": "NaN"}),
+        ("Number of Rows", "Double Row", {"count": 2}),
+        ("Number of Rows", "Single Row", {"count": 1}),
+        ("Number of Rows", "3, 2", {"count 1": 3, "count 2": 2}),
+        ("Rows", "1, -", {"count 1": 1, "count 2": "NaN"}),
+    ],
+)
+def test_row_count_attributes(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, count in expected.items():
+        assert_quantity(values[quantity], count, "count")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Number of Data Pins", "36P", {"count": 36}),
+        ("Number of Data Pins", "-", {"count": "NaN"}),
+        ("Number of Conductors", "4P", {"count": 4}),
+        ("Number of Conductors", "22", {"count": 22}),
+    ],
+)
+def test_connector_count_attributes(key, value, expected, capsys):
     values = normalized_values(key, value, capsys)
 
     for quantity, count in expected.items():

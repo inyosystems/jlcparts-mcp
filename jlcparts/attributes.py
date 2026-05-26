@@ -800,7 +800,41 @@ def countListAttribute(value):
         return countAttribute(value)
     values = {}
     for index, part in enumerate(parts, start=1):
-        values[f"count {index}"] = [sum(map(int, part.split("+"))), "count"]
+        counts = [_readCount(x) for x in part.split("+")]
+        if any(x == "NaN" for x in counts):
+            count = "NaN"
+        else:
+            count = sum(counts)
+        values[f"count {index}"] = [count, "count"]
+    return {
+        "format": ", ".join("${" + f"count {i}" + "}" for i in range(1, len(parts) + 1)),
+        "primary": "count 1",
+        "values": values
+    }
+
+def _readRowCount(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    named_counts = {
+        "single row": 1,
+        "double row": 2,
+    }
+    normalized = value.lower()
+    if normalized in named_counts:
+        return named_counts[normalized]
+    value = re.sub(r"\s*rows?$", "", value, flags=re.I).strip()
+    return _readCount(value)
+
+def rowCountAttribute(value):
+    value = str(value)
+    parts = [x.strip() for x in re.split(r"[,;/]", value) if x.strip()]
+    if len(parts) <= 1:
+        return scalarAttribute(value, _readRowCount, "count", "count")
+
+    values = {}
+    for index, part in enumerate(parts, start=1):
+        values[f"count {index}"] = [_readRowCount(part), "count"]
     return {
         "format": ", ".join("${" + f"count {i}" + "}" for i in range(1, len(parts) + 1)),
         "primary": "count 1",
