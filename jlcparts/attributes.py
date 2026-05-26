@@ -154,8 +154,22 @@ def readPpm(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
         return "NaN"
-    value = re.sub(r"ppm(?:p-p)?$", "", value, flags=re.I).strip()
-    return float(value)
+    ppb = re.search(r"ppb$", value, flags=re.I)
+    value = re.sub(r"pp[mb](?:p-p)?$", "", value, flags=re.I).strip()
+    parsed = float(value)
+    return parsed / 1000 if ppb else parsed
+
+def ppmRangeAttribute(value, name="ppm"):
+    value = str(value).strip()
+    if value.startswith("±"):
+        value = "-" + value[1:] + "~+" + value[1:]
+    return rangeOrScalarAttribute(value, readPpm, "ppm", name)
+
+def frequencyStabilityAttribute(value):
+    value = str(value).strip()
+    if "%" in value:
+        return percentageRangeAttribute(value, "stability")
+    return ppmRangeAttribute(value, "stability")
 
 def readPower(value):
     """

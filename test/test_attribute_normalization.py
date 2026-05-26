@@ -2444,6 +2444,28 @@ def test_temperature_coefficient(value, expected, capsys):
         else:
             assert_quantity(values[quantity], expected_value[0], expected_value[1])
 
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("±4ppm", {"stability min": -4.0, "stability max": 4.0}),
+        ("±280ppb", {"stability min": -0.28, "stability max": 0.28}),
+        ("±0.2%", {"stability min": [-0.2, "percentage"], "stability max": [0.2, "percentage"]}),
+        ("-120ppm~+10ppm", {"stability min": -120.0, "stability max": 10.0}),
+        ("50ppm", {"stability": 50.0}),
+        ("-", {"stability": "NaN"}),
+    ],
+)
+def test_frequency_stability(value, expected, capsys):
+    values = normalized_values("Frequency Stability", value, capsys)
+
+    for quantity, stability in expected.items():
+        if isinstance(stability, list):
+            assert_quantity(values[quantity], stability[0], stability[1])
+        else:
+            assert_quantity(values[quantity], stability, "ppm")
+
+
 @pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
