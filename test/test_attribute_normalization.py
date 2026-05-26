@@ -1780,6 +1780,8 @@ def test_conversion_efficiency_values(value, expected, capsys):
             "percentage 2": 0.11,
         }),
         ("Total Harmonic Distortion(Thd)", "10%", {"percentage": 10.0}),
+        ("Total Harmonic Distortion", "10%", {"percentage": 10.0}),
+        ("Total Harmonic Distortion", "-", {"percentage": "NaN"}),
         ("Differential Gain", "0.01%", {"percentage": 0.01}),
         ("Capacitance Tolerance", "±20%", {"percentage min": -20.0, "percentage max": 20.0}),
         ("Capacitance Tolerance", "-20%~+50%", {"percentage min": -20.0, "percentage max": 50.0}),

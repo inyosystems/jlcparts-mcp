@@ -384,7 +384,7 @@ def normalizeAttribute(key, value):
             value = attributes.percentageAttribute(value) if isinstance(value, str) and "%" in value and not compoundValue(value) else attributes.stringAttribute(value)
         elif key in larr(["Precision", "Linearity", "Error", "Degree of Linearity",
                 "Total Harmonic Distortion + Noise (Thd+N)", "Total Harmonic Distortion(Thd)",
-                "Differential Gain", "Capacitance Tolerance"]):
+                "Total Harmonic Distortion", "Differential Gain", "Capacitance Tolerance"]):
             value = attributes.flexiblePercentageAttribute(value)
         elif key in larr(["Duty Cycle", "Conversion Efficiency", "Efficiency"]):
             if key == "efficiency":
