@@ -616,6 +616,11 @@ def test_capacitive_load_max(value, expected, capsys):
         ("Nominal Capacitance", "1uF", {"capacitance": 1e-6}),
         ("Capacitance @ VR, F", "120pF", {"capacitance": 120e-12}),
         ("Off-State Capacitance (Co)", "100pF", {"capacitance": 100e-12}),
+        ("Maximum Capacitance @ 1mhz", "1pF", {"capacitance": 1e-12}),
+        ("Maximum Capacitance @ 1mhz", "680nF", {"capacitance": 680e-9}),
+        ("Maximum Capacitance @ 1mhz", "-", {"capacitance": "NaN"}),
+        ("Inter-Electrode Capacitance", "0.45pF", {"capacitance": 0.45e-12}),
+        ("Electrostatic Capacitance", "0.8pF", {"capacitance": 0.8e-12}),
         ("Electrostatic Capacity", "30pF~60pF", {"capacitance min": 30e-12, "capacitance max": 60e-12}),
     ],
 )

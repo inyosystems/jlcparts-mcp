@@ -335,7 +335,9 @@ def normalizeAttribute(key, value):
                 "CISS-Input Capacitance", "Output Capacitance(Coes)",
                 "Reverse Transfer Capacitance (Cres)", "Reverse Transfer Capacitance (Crss)",
                 "Con", "Capacitive Load (Max)", "Nominal Capacitance",
-                "Capacitance @ VR, F", "Off-State Capacitance (Co)"]):
+                "Capacitance @ VR, F", "Off-State Capacitance (Co)",
+                "Maximum Capacitance @ 1mhz", "Inter-Electrode Capacitance",
+                "Electrostatic Capacitance"]):
             if key in ["junction capacitance", "capacitive load (max)"] and compoundValue(value):
                 value = attributes.capacitanceListAttribute(value)
             elif multiScalarValue(value):
