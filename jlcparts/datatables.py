@@ -329,6 +329,16 @@ def normalizeAttribute(key, value):
             value = attributes.qAtFrequencyAttribute(value)
         elif key in larr(["DC Current Gain"]):
             value = attributes.ratioRangeListAttribute(value, "gain")
+        elif key in larr(["Gain"]):
+            value = attributes.gainListAttribute(value)
+        elif key in larr(["Dynamic Range"]):
+            value = attributes.dynamicRangeAttribute(value)
+        elif key in larr(["Clock to Corner Frequency Ratio"]):
+            value = attributes.colonRatioListAttribute(value, "ratio")
+        elif key in larr(["Switch Circuit"]):
+            value = attributes.switchCircuitAttribute(value)
+        elif key in larr(["Swr"]):
+            value = attributes.ratioRangeListAttribute(value, "swr")
         elif key in larr(["Voltage Reference Value", "Full-Scale Range(Fsr)"]):
             value = attributes.voltageListAttribute(value)
         elif key in larr(["Integral Non - Linearity", "Integral Nonlinearity", "Inl/Dnl(Lsb)", "Gain Error"]):

@@ -3032,6 +3032,48 @@ def test_dc_current_gain_values(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Dynamic Range", "1000:1", {"dynamic range": (1000.0, "ratio")}),
+        ("Dynamic Range", "1000:1, 3000:1", {
+            "dynamic range 1": (1000.0, "ratio"),
+            "dynamic range 2": (3000.0, "ratio"),
+        }),
+        ("Dynamic Range", "120dB", {"dynamic range 1": (120.0, "decibel")}),
+        ("Clock to Corner Frequency Ratio", "100:1", {"ratio": (100.0, "ratio")}),
+        ("Clock to Corner Frequency Ratio", "-", {"ratio": ("NaN", "ratio")}),
+        ("Switch Circuit", "2:1", {"ratio": (2.0, "ratio")}),
+        ("Switch Circuit", "-", {"ratio": ("NaN", "ratio")}),
+        ("Swr", "1.25", {"swr": (1.25, "ratio")}),
+    ],
+)
+def test_additional_ratio_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, expected_value in expected.items():
+        value, unit = expected_value
+        assert_quantity(values[quantity], value, unit)
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("20V/V", {"gain": (20.0, "ratio")}),
+        ("7.6~8.4", {"gain min": (7.6, "ratio"), "gain max": (8.4, "ratio")}),
+        ("-22dB~20dB", {"gain min": (-22.0, "decibel"), "gain max": (20.0, "decibel")}),
+        ("50V/V, 100V/V", {"gain 1": (50.0, "ratio"), "gain 2": (100.0, "ratio")}),
+        ("-", {"gain": ("NaN", "ratio")}),
+    ],
+)
+def test_gain_values(value, expected, capsys):
+    values = normalized_values("Gain", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        value, unit = expected_value
+        assert_quantity(values[quantity], value, unit)
+
+
+@pytest.mark.parametrize(
     ("value", "capacitance"),
     [
         ("190pF@1kHz", 190e-12),

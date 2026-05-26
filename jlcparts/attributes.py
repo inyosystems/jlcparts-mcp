@@ -461,6 +461,22 @@ def readDecibelMilliwatt(value):
     value = re.sub(r"dBm$", "", value, flags=re.IGNORECASE).strip()
     return float(value)
 
+def readRatio(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = value.replace("CT", "")
+    value = re.sub(r"V\s*/\s*V$", "", value, flags=re.I).strip()
+    if ":" in value:
+        parts = [x.strip() for x in value.split(":")]
+        if len(parts) == 2:
+            numerator = readWithSiPrefix(parts[0])
+            denominator = readWithSiPrefix(parts[1])
+            if numerator == "NaN" or denominator == "NaN":
+                return "NaN"
+            return numerator / denominator
+    return readWithSiPrefix(value)
+
 def _stripCondition(value):
     return value.split("@", 1)[0].strip()
 
@@ -1719,6 +1735,54 @@ def ratioRangeListAttribute(value, name="ratio"):
         "primary": primary_name + " min" if any(_rangeParts(part) for part in parts) else primary_name,
         "values": values
     }
+
+def gainListAttribute(value):
+    value = str(value).strip()
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    has_range = False
+    for i, part in enumerate(parts, start=1):
+        name = f"gain {i}" if len(parts) > 1 else "gain"
+        if "db" in part.lower():
+            parsed = rangeOrScalarAttribute(part, readDecibel, "decibel", name)
+        else:
+            parsed = rangeOrScalarAttribute(part, readRatio, "ratio", name)
+        has_range = has_range or bool(_rangeParts(part))
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    primary_name = "gain 1" if len(parts) > 1 else "gain"
+    return {
+        "format": ", ".join(formats),
+        "primary": primary_name + " min" if has_range else primary_name,
+        "values": values
+    }
+
+def colonRatioListAttribute(value, name="ratio"):
+    value = str(value).strip()
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    for i, part in enumerate(parts, start=1):
+        value_name = f"{name} {i}" if len(parts) > 1 else name
+        values[value_name] = [readRatio(part), "ratio"]
+    primary_name = f"{name} 1" if len(parts) > 1 else name
+    return {
+        "format": ", ".join("${" + (f"{name} {i}" if len(parts) > 1 else name) + "}" for i in range(1, len(parts) + 1)),
+        "primary": primary_name,
+        "values": values
+    }
+
+def dynamicRangeAttribute(value):
+    value = str(value).strip()
+    if "db" in value.lower():
+        return decibelTokenListAttribute(value, "dynamic range")
+    return colonRatioListAttribute(value, "dynamic range")
+
+def switchCircuitAttribute(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"] or re.fullmatch(r"\d+(?:\.\d+)?\s*:\s*\d+(?:\.\d+)?", value):
+        return colonRatioListAttribute(value, "ratio")
+    return stringAttribute(value)
 
 def capacitanceAtConditionAttribute(value, name="capacitance"):
     return scalarAttribute(value, readCapacitance, "capacitance", name)
