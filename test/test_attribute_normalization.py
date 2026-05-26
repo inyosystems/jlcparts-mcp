@@ -831,6 +831,25 @@ def test_absolute_bandwidth_values(capsys):
     assert_quantity(values["frequency 2 max"], 5.95e9, "frequency")
 
 
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Bandwidth (-3d B)", "85MHz", {"frequency": 85e6}),
+        ("-3db Bandwidth(G=1)", "60kHz", {"frequency": 60e3}),
+        ("Frequency - Cutoff or Center", "1MHz", {"frequency": 1e6}),
+        ("Frequency - Cutoff or Center", "900MHz~2GHz", {
+            "frequency min": 900e6,
+            "frequency max": 2e9,
+        }),
+    ],
+)
+def test_additional_frequency_aliases(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, frequency in expected.items():
+        assert_quantity(values[quantity], frequency, "frequency")
+
+
 def test_clock_frequency_lists(capsys):
     values = normalized_values("Clock Frequency", "32MHz, 32kHz, 1MHz", capsys)
 
