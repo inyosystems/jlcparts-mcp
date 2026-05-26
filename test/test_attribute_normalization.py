@@ -1154,6 +1154,13 @@ def test_detection_temperature_range(capsys):
     assert_quantity(values["temperature max"], 125, "temperature")
 
 
+def test_operating_junction_temperature_range(capsys):
+    values = normalized_values("Operating Junction Temperature Range", "-55℃~+150℃@(Tj)", capsys)
+
+    assert_quantity(values["temperature min"], -55, "temperature")
+    assert_quantity(values["temperature max"], 150, "temperature")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
