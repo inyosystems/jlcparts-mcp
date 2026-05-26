@@ -859,6 +859,24 @@ def test_on_state_rms_current(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("50mA", [0.05]),
+        ("50uA", [50e-6]),
+        ("2mA, 1mA, 4mA", [0.002, 0.001, 0.004]),
+    ],
+)
+def test_gate_trigger_current(value, expected, capsys):
+    values = normalized_values("Current - Gate Trigger(Igt)", value, capsys)
+
+    if len(expected) == 1:
+        assert_quantity(values["current"], expected[0], "current")
+    else:
+        for index, current in enumerate(expected, start=1):
+            assert_quantity(values[f"current {index}"], current, "current")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("11A", 11.0),
         ("250mA", 0.25),
         ("null", "NaN"),

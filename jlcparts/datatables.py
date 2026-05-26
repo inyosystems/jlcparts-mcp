@@ -190,7 +190,8 @@ def normalizeAttribute(key, value):
                     "Supply Current Per Channel",
                     "Standby Supply Current",
                     "Standby Current (Iq)",
-                    "Current - on State(It(RMS))"]):
+                    "Current - on State(It(RMS))",
+                    "Current - Gate Trigger(Igt)"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent current",
@@ -221,6 +222,7 @@ def normalizeAttribute(key, value):
                 "holding current (ih)",
                 "current - max",
                 "standby current (iq)",
+                "current - gate trigger(igt)",
             ]
             if key in ["current - leakage"]:
                 value = attributes.currentAttribute(value)
