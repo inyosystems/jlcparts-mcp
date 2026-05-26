@@ -665,13 +665,16 @@ def _readConnectorCount(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
         return "NaN"
+    base_value = re.sub(r"\(.*?\)", "", value).strip()
     missing = sum(int(x) for x in re.findall(r"missing\s+(\d+)\s*P?", value, flags=re.I))
-    value = re.sub(r"\(.*?\)", "", value).strip()
+    subtract_missing = missing and "x" in base_value.lower()
+    value = base_value
     total = 0
     for part in value.split("+"):
         part = part.strip()
         part = re.sub(r"(?<=\d)AP$", "P", part, flags=re.I)
-        match = re.fullmatch(r"(\d+)\s*P?\s*(?:x\s*(\d+))?", part, flags=re.I)
+        part = re.sub(r"(\d+)\s*-\s*bit$", r"\1bit", part, flags=re.I)
+        match = re.fullmatch(r"(\d+)\s*(?:P|bits?|digits?)?\s*(?:x\s*(\d+))?", part, flags=re.I)
         if match is None:
             match = re.fullmatch(r"(\d+)\s*x\s*(\d+)\s*P?", part, flags=re.I)
             if match is not None:
@@ -682,7 +685,7 @@ def _readConnectorCount(value):
         count = int(match.group(1))
         multiplier = int(match.group(2) or 1)
         total += count * multiplier
-    return total - missing
+    return total - missing if subtract_missing else total
 
 def connectorCountAttribute(value):
     return scalarAttribute(value, _readConnectorCount, "count", "count")
