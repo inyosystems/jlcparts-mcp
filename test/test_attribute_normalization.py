@@ -1001,6 +1001,21 @@ def test_logic_array_blocks(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("51P", 51),
+        ("8P+16P", 24),
+        ("4Px2", 8),
+        ("9Px2+12P", 30),
+    ],
+)
+def test_number_of_contacts(value, expected, capsys):
+    values = normalized_values("Number of Contacts", value, capsys)
+
+    assert_quantity(values["count"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("1.2uA", 1.2e-6),
         ("20.8uA@25℃,5min", 20.8e-6),
         ("500nA@25°C,5min", 500e-9),

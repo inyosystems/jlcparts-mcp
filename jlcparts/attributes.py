@@ -661,6 +661,24 @@ def countAttribute(value):
         }
     }
 
+def _readConnectorCount(value):
+    value = re.sub(r"\(.*?\)", "", str(value)).strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    total = 0
+    for part in value.split("+"):
+        part = part.strip()
+        match = re.fullmatch(r"(\d+)\s*P?\s*(?:x\s*(\d+))?", part, flags=re.I)
+        if match is None:
+            raise ValueError(f"Cannot parse connector count {value}")
+        count = int(match.group(1))
+        multiplier = int(match.group(2) or 1)
+        total += count * multiplier
+    return total
+
+def connectorCountAttribute(value):
+    return scalarAttribute(value, _readConnectorCount, "count", "count")
+
 def _readChannelCount(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
