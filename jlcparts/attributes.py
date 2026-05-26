@@ -77,6 +77,18 @@ def readResistance(value):
         value = float(value)
     return value
 
+def readRotationalSpeed(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*rpm", value, flags=re.I)
+    if match is None:
+        raise ValueError(f"Cannot parse rotational speed {value}")
+    return float(match.group(1))
+
+def rotationalSpeedAttribute(value):
+    return scalarAttribute(value, readRotationalSpeed, "rotational_speed", "speed")
+
 def readCurrent(value):
     """
     Given a string, try to parse current and return it as Amperes (float)

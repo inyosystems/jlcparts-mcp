@@ -478,6 +478,8 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Supply Current Per Channel", "3.6mA", "current", 0.0036, "current"),
         ("Collector Cut-Off Current (Icbo)", "100nA", "current", 100e-9, "current"),
         ("Current - Collector Cutoff", "50uA", "current", 50e-6, "current"),
+        ("Rated Speed", "8500RPM", "speed", 8500.0, "rotational_speed"),
+        ("Rated Speed", "-", "speed", "NaN", "rotational_speed"),
     ],
 )
 def test_scalar_frequency_and_current_attributes(key, value, quantity, expected, unit, capsys):
