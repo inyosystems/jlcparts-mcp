@@ -662,20 +662,27 @@ def countAttribute(value):
     }
 
 def _readConnectorCount(value):
-    value = re.sub(r"\(.*?\)", "", str(value)).strip()
+    value = str(value).strip()
     if value in ["-", "--", "null"]:
         return "NaN"
+    missing = sum(int(x) for x in re.findall(r"missing\s+(\d+)\s*P?", value, flags=re.I))
+    value = re.sub(r"\(.*?\)", "", value).strip()
     total = 0
     for part in value.split("+"):
         part = part.strip()
         part = re.sub(r"(?<=\d)AP$", "P", part, flags=re.I)
         match = re.fullmatch(r"(\d+)\s*P?\s*(?:x\s*(\d+))?", part, flags=re.I)
         if match is None:
+            match = re.fullmatch(r"(\d+)\s*x\s*(\d+)\s*P?", part, flags=re.I)
+            if match is not None:
+                total += int(match.group(1)) * int(match.group(2))
+                continue
+        if match is None:
             raise ValueError(f"Cannot parse connector count {value}")
         count = int(match.group(1))
         multiplier = int(match.group(2) or 1)
         total += count * multiplier
-    return total
+    return total - missing
 
 def connectorCountAttribute(value):
     return scalarAttribute(value, _readConnectorCount, "count", "count")

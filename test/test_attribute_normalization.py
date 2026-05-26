@@ -1030,6 +1030,22 @@ def test_number_of_holes(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("2x7P", 14),
+        ("1x5P", 5),
+        ("2x10P (missing 1P)", 19),
+        ("1x3P (Missing 1P)", 2),
+        ("2x4", 8),
+    ],
+)
+def test_number_of_positions_or_pins(value, expected, capsys):
+    values = normalized_values("Number of Positions or Pins", value, capsys)
+
+    assert_quantity(values["count"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("1.2uA", 1.2e-6),
         ("20.8uA@25℃,5min", 20.8e-6),
         ("500nA@25°C,5min", 500e-9),
