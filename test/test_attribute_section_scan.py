@@ -24,6 +24,16 @@ def _values_from_env():
     ]
 
 
+def _values_from_file(path):
+    if not path:
+        return []
+    return [
+        value.strip()
+        for value in Path(path).read_text(encoding="utf-8").splitlines()
+        if value.strip()
+    ]
+
+
 def _string_values_for_section(section, value_pattern=None):
     with gzip.open(LUT_PATH, "rt", encoding="utf-8") as lut_file:
         attributes = json.load(lut_file)
@@ -93,6 +103,10 @@ def test_selected_attribute_section_normalizes_generated_values(pytestconfig, ca
         or os.environ.get("JLC_ATTRIBUTE_VALUE_RE")
     )
     direct_values = pytestconfig.getoption("--attribute-value") or _values_from_env()
+    value_file = pytestconfig.getoption("--attribute-value-file") or os.environ.get(
+        "JLC_ATTRIBUTE_VALUE_FILE"
+    )
+    direct_values.extend(_values_from_file(value_file))
 
     for section in sections:
         if direct_values:

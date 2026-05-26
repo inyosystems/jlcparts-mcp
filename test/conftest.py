@@ -26,6 +26,16 @@ def pytest_addoption(parser):
         ),
     )
     parser.addoption(
+        "--attribute-value-file",
+        default=None,
+        help=(
+            "Optional newline-delimited file with raw attribute values to test "
+            "directly with --attribute-section. This avoids rebuilding "
+            "generated datatables and avoids scanning the SQLite cache during "
+            "pytest."
+        ),
+    )
+    parser.addoption(
         "--attribute-section-limit",
         type=int,
         default=None,
