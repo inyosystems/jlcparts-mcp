@@ -187,6 +187,22 @@ def test_allowable_voltage_ac(value, expected, capsys):
     assert_quantity(values["voltage"], expected, "voltage")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("35V", {"voltage": 35.0}),
+        ("0V~600V", {"voltage min": 0.0, "voltage max": 600.0}),
+        ("220V, 110V", {"voltage 1": 220.0, "voltage 2": 110.0}),
+        ("1.8kV", {"voltage": 1800.0}),
+    ],
+)
+def test_load_voltage(value, expected, capsys):
+    values = normalized_values("Load Voltage", value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
+
 def test_charging_saturation_voltage(capsys):
     values = normalized_values("Charging Saturation Voltage", "4.2V", capsys)
 
