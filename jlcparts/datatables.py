@@ -324,7 +324,7 @@ def normalizeAttribute(key, value):
             value = attributes.voltageListAttribute(value)
         elif key in larr(["Integral Non - Linearity", "Integral Nonlinearity", "Inl/Dnl(Lsb)", "Gain Error"]):
             value = attributes.lsbListAttribute(value, "gain error" if key == "gain error" else "linearity")
-        elif key in larr(["Number of Channels", "Number of Elements"]):
+        elif key in larr(["Number of Channels", "Number of Elements", "Number of Lines"]):
             value = attributes.channelCountAttribute(value)
         elif key in larr(["Resolution", "Resolution (Bits)", "Resolution(Bits)"]):
             value = attributes.resolutionAttribute(value)
@@ -332,7 +332,8 @@ def normalizeAttribute(key, value):
             value = attributes.filterOrderAttribute(value)
         elif key in larr(["Number of Bits Per Element", "Timer Number", "Numberof Drivers",
                 "Numberof Receivers", "Number of Receivers", "Number of Drivers",
-                "Number of Ports", "Number of Supporting Devices"]):
+                "Number of Ports", "Number of Supporting Devices",
+                "Number of Receiver", "Number of Driver", "Input Number"]):
             value = attributes.countListAttribute(value)
         elif key in larr(["Number of Pins", "Number of Resistors", "Number of Loop",
                     "Number of Regulators", "Number of Outputs", "Number of Capacitors",
@@ -349,7 +350,7 @@ def normalizeAttribute(key, value):
                     "Number of Forward Channels", "Number of Reverse Channels",
                     "Number of Forward Channels Groups", "Number of Reverse Channels Groups",
                     "Number of Input Channels", "Number of Non-Differential Input Channels",
-                    "Numberof Channels"]):
+                    "Numberof Channels", "Mac Address Support", "Vlan Support"]):
             value = attributes.countAttribute(value)
         elif key in larr(["Number of Cells"]):
             value = attributes.countRangeAttribute(value)

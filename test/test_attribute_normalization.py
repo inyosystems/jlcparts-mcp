@@ -1277,6 +1277,8 @@ def test_logic_array_blocks(value, expected, capsys):
         ("Number of Nodes", "256", {"count": 256}),
         ("Unidirectional Channels", "8", {"count": 8}),
         ("Bidirectional Channels", "0", {"count": 0}),
+        ("Mac Address Support", "4096", {"count": 4096}),
+        ("Vlan Support", "128", {"count": 128}),
         ("Forward Channel", "0", {"count": 0}),
         ("Reverse Channel", "4", {"count": 4}),
         ("Number of Forward Channels", "8", {"count": 8}),
@@ -1575,6 +1577,9 @@ def test_number_of_bits_per_element_count(capsys):
         ("Number of Drivers", "2, 1", {"count 1": 2, "count 2": 1}),
         ("Number of Ports", "28", {"count": 28}),
         ("Number of Supporting Devices", "126", {"count": 126}),
+        ("Number of Receiver", "5", {"count": 5}),
+        ("Number of Driver", "4", {"count": 4}),
+        ("Input Number", "2, 1", {"count 1": 2, "count 2": 1}),
     ],
 )
 def test_driver_receiver_count_values(key, value, expected, capsys):
@@ -1595,6 +1600,8 @@ def test_driver_receiver_count_values(key, value, expected, capsys):
         ("4;8", {"count 1": 4, "count 2": 8}),
         ("4, 3", {"count 1": 4, "count 2": 3}),
         ("3/8", {"count 1": 3, "count 2": 8}),
+        ("Five Channels", {"count": 5}),
+        ("4/7", {"count 1": 4, "count 2": 7}),
         ("1C2A", {"count": 1}),
         ("-", {"count": "NaN"}),
     ],

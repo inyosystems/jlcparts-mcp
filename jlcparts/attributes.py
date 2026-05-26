@@ -761,7 +761,10 @@ def _readChannelCount(value):
         "dual channel": 2,
         "three channels": 3,
         "four channels": 4,
+        "five-way": 5,
+        "five channels": 5,
         "quad": 4,
+        "triple": 3,
         "hex": 6,
         "seven channels": 7,
     }
