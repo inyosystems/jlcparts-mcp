@@ -452,6 +452,7 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
     [
         ("Sampling Rate", "352800Hz", "frequency", 352800.0, "frequency"),
         ("Resonant Frequency", "1.2kHz", "frequency", 1200.0, "frequency"),
+        ("Count Rate", "8MHz", "frequency", 8e6, "frequency"),
         ("-3d B Bandwidth", "14kHz", "frequency", 14000.0, "frequency"),
         ("-3d B Bandwidth", "1.7GHz", "frequency", 1.7e9, "frequency"),
         ("Non-Repetitive Peak Forward Surge Current", "1.95kA", "current", 1950.0, "current"),
@@ -566,6 +567,14 @@ def test_frequency_output_values(capsys):
     values = normalized_values("Frequency Output", "450MHz", capsys)
 
     assert_quantity(values["frequency"], 450e6, "frequency")
+
+
+def test_count_rate_list(capsys):
+    values = normalized_values("Count Rate", "16MHz, 32MHz", capsys)
+
+    assert_quantity(values["frequency 1"], 16e6, "frequency")
+    assert_quantity(values["frequency 2"], 32e6, "frequency")
+
 
 def test_gain_bandwidth_product_values(capsys):
     values = normalized_values("Gain Bandwidth Product", "85MHz, 115MHz", capsys)
