@@ -1828,6 +1828,7 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Head Width", "19.05mm", 0.01905),
         ("Center Height", "1.68mm", 0.00168),
         ("Outside Contact Diameter", "6.4mm", 0.0064),
+        ("Length of End Connection Pin", "2mm", 0.002),
     ],
 )
 def test_scalar_length_attributes(key, value, expected, capsys):
