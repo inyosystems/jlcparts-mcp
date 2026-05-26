@@ -1756,11 +1756,17 @@ def test_logic_elements_blocks_count(capsys):
         ("8kHz, 32kHz", {"data rate 1": 8e3, "data rate 2": 32e3}),
         ("2Mbps;50Mbps", {"data rate 1": 2e6, "data rate 2": 50e6}),
         ("3.75Gbps, 1Gbps", {"data rate 1": 3.75e9, "data rate 2": 1e9}),
+        (("Data Rate (Max)", "24Mbps"), {"data rate": 24e6}),
+        (("Data Rate (Max)", "40ksps, 100ksps"), {"data rate 1": 40e3, "data rate 2": 100e3}),
         ("NaN", {"data rate": "NaN"}),
     ],
 )
 def test_data_rate(value, expected, capsys):
-    values = normalized_values("Data Rate", value, capsys)
+    if isinstance(value, tuple):
+        key, value = value
+    else:
+        key = "Data Rate"
+    values = normalized_values(key, value, capsys)
 
     for quantity, rate in expected.items():
         assert_quantity(values[quantity], rate, "data_rate")

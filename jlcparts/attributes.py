@@ -207,7 +207,7 @@ def readDataRate(value):
     value = value.strip()
     if value in ["-", "--", "null", "NaN"]:
         return "NaN"
-    value = re.sub(r"(?:bit/s|bps)$", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"(?:bit/s|bps|sps)$", "", value, flags=re.IGNORECASE)
     value = erase(value, ["Hz", "HZ", "H"]).strip()
     value = re.sub(r"([0-9.])([kmg])$", lambda m: m.group(1) + m.group(2).upper(), value)
     return readWithSiPrefix(value)
