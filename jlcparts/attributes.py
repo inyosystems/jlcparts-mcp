@@ -690,6 +690,32 @@ def _readConnectorCount(value):
 def connectorCountAttribute(value):
     return scalarAttribute(value, _readConnectorCount, "count", "count")
 
+def _readCycleCount(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    normalized = value.replace(",", "").lower()
+    chinese = re.fullmatch(r"(\d+(?:\.\d+)?)\s*(千|万)?\s*次", normalized)
+    if chinese is not None:
+        multiplier = {
+            None: 1,
+            "千": 1000,
+            "万": 10000,
+        }[chinese.group(2)]
+        return int(float(chinese.group(1)) * multiplier)
+    english = re.fullmatch(r"(\d+(?:\.\d+)?)\s*(thousand|million)?\s*(?:cycles?|times?)", normalized)
+    if english is None:
+        raise ValueError(f"Cannot parse cycle count {value}")
+    multiplier = {
+        None: 1,
+        "thousand": 1000,
+        "million": 1000000,
+    }[english.group(2)]
+    return int(float(english.group(1)) * multiplier)
+
+def cycleCountAttribute(value):
+    return scalarAttribute(value, _readCycleCount, "count", "count")
+
 def _readChannelCount(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:

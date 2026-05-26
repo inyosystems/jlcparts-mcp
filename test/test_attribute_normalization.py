@@ -1113,6 +1113,22 @@ def test_bit_width_counts(key, value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Life", "100,000 cycles", 100000),
+        ("Life", "4 million cycles", 4000000),
+        ("Mechanical Life", "1万次", 10000),
+        ("Mechanical Life", "5千次", 5000),
+        ("Mechanical Life", "5 Million Times", 5000000),
+    ],
+)
+def test_cycle_life_counts(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    assert_quantity(values["count"], expected, "count")
+
+
+@pytest.mark.parametrize(
     ("value", "expected"),
     [
         ("1.2uA", 1.2e-6),

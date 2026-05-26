@@ -308,6 +308,8 @@ def normalizeAttribute(key, value):
         elif key in larr(["Frequency Registers(Bit)", "Tuning Word Width(Bits)",
                 "Tuning Word Width (Max)"]):
             value = attributes.connectorCountAttribute(value)
+        elif key in larr(["Life", "Mechanical Life"]):
+            value = attributes.cycleCountAttribute(value)
         elif key in larr(["Capacitance", "Junction Capacitance", "Input Capacitance(Cies)",
                 "CISS-Input Capacitance", "Output Capacitance(Coes)",
                 "Reverse Transfer Capacitance (Cres)", "Reverse Transfer Capacitance (Crss)",
