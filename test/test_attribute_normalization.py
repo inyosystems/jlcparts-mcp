@@ -507,6 +507,22 @@ def test_capacitive_load_max(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Nominal Capacitance", "1uF", {"capacitance": 1e-6}),
+        ("Capacitance @ VR, F", "120pF", {"capacitance": 120e-12}),
+        ("Off-State Capacitance (Co)", "100pF", {"capacitance": 100e-12}),
+        ("Electrostatic Capacity", "30pF~60pF", {"capacitance min": 30e-12, "capacitance max": 60e-12}),
+    ],
+)
+def test_extra_capacitance_attributes(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, capacitance in expected.items():
+        assert_quantity(values[quantity], capacitance, "capacitance")
+
+
+@pytest.mark.parametrize(
     ("value", "expected"),
     [
         ("240uV", 240e-6),
@@ -1550,6 +1566,8 @@ def test_conversion_efficiency_values(value, expected, capsys):
         }),
         ("Total Harmonic Distortion(Thd)", "10%", {"percentage": 10.0}),
         ("Differential Gain", "0.01%", {"percentage": 0.01}),
+        ("Capacitance Tolerance", "±20%", {"percentage min": -20.0, "percentage max": 20.0}),
+        ("Capacitance Tolerance", "-20%~+50%", {"percentage min": -20.0, "percentage max": 50.0}),
     ],
 )
 def test_flexible_percentage_values(key, value, expected, capsys):

@@ -813,6 +813,24 @@ def capacitanceListAttribute(value):
     value = str(value).replace(";", ",")
     return scalarListAttribute(value, readCapacitance, "capacitance", "capacitance")
 
+def capacitanceRangeAttribute(value):
+    return rangeOrScalarAttribute(value, readCapacitance, "capacitance", "capacitance")
+
+def capacitanceRangeListAttribute(value):
+    value = str(value).replace(";", ",").strip()
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        parsed = rangeOrScalarAttribute(part, readCapacitance, "capacitance", f"capacitance {index}")
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": "capacitance 1 min" if any(_rangeParts(part) for part in parts) else "capacitance 1",
+        "values": values
+    }
+
 def inductanceAttribute(value):
     value = str(value)
     value = readInductance(value)

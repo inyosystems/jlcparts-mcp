@@ -313,13 +313,16 @@ def normalizeAttribute(key, value):
         elif key in larr(["Capacitance", "Junction Capacitance", "Input Capacitance(Cies)",
                 "CISS-Input Capacitance", "Output Capacitance(Coes)",
                 "Reverse Transfer Capacitance (Cres)", "Reverse Transfer Capacitance (Crss)",
-                "Con", "Capacitive Load (Max)"]):
+                "Con", "Capacitive Load (Max)", "Nominal Capacitance",
+                "Capacitance @ VR, F", "Off-State Capacitance (Co)"]):
             if key in ["junction capacitance", "capacitive load (max)"] and compoundValue(value):
                 value = attributes.capacitanceListAttribute(value)
             elif multiScalarValue(value):
                 value = attributes.stringAttribute(value)
             else:
                 value = attributes.capacitanceAttribute(value)
+        elif key in larr(["Electrostatic Capacity"]):
+            value = attributes.capacitanceRangeListAttribute(value) if compoundValue(value) else attributes.capacitanceRangeAttribute(value)
         elif key in larr(["Inductance"]):
             value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.inductanceAttribute(value)
         elif key in larr(["Length", "Width", "Height", "Diameter", "Switch Height", "Overall Length",
@@ -362,7 +365,7 @@ def normalizeAttribute(key, value):
             value = attributes.percentageAttribute(value) if isinstance(value, str) and "%" in value and not compoundValue(value) else attributes.stringAttribute(value)
         elif key in larr(["Precision", "Linearity", "Error", "Degree of Linearity",
                 "Total Harmonic Distortion + Noise (Thd+N)", "Total Harmonic Distortion(Thd)",
-                "Differential Gain"]):
+                "Differential Gain", "Capacitance Tolerance"]):
             value = attributes.flexiblePercentageAttribute(value)
         elif key in larr(["Duty Cycle", "Conversion Efficiency", "Efficiency"]):
             if key == "efficiency":
