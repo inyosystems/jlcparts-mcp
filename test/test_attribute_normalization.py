@@ -698,6 +698,25 @@ def test_peak_output_current_sink_list(capsys):
     assert_quantity(values["current 2"], 0.016, "current")
 
 
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Balance Current", "100mA", {"current": 0.1}),
+        ("Leakage Current", "400uA, 700uA", {"current 1": 400e-6, "current 2": 700e-6}),
+        ("Reverse Leakage Current (Ir)", "10uA@6kV, 10uA@1.7kV", {"current 1": 10e-6, "current 2": 10e-6}),
+        ("Hold Current(Ih)", "350mA, 125mA", {"current 1": 0.35, "current 2": 0.125}),
+        ("On - State Current(It)", "2.2A", {"current": 2.2}),
+        ("Trigger Current", "5A~15A", {"current min": 5.0, "current max": 15.0}),
+        ("Trigger Current", "650mA", {"current": 0.65}),
+    ],
+)
+def test_additional_current_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, current in expected.items():
+        assert_quantity(values[quantity], current, "current")
+
+
 def test_sampling_rate_lists(capsys):
     values = normalized_values("Sampling Rate", "48000Hz, 32000Hz, 44100Hz", capsys)
 
