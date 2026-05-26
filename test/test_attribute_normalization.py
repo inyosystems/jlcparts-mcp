@@ -1149,6 +1149,12 @@ def test_extra_count_attributes(key, value, expected, capsys):
             "frequency 3": (96e3, "frequency"),
             "frequency 4": (192e3, "frequency"),
         }),
+        ("1MHz;14", {"frequency": (1e6, "frequency"), "resolution": (14, "count")}),
+        ("10Hz;24;80Hz", {
+            "frequency 1": (10.0, "frequency"),
+            "resolution": (24, "count"),
+            "frequency 2": (80.0, "frequency"),
+        }),
         ("±0.5℃", {"resolution min": (-0.5, "temperature"), "resolution max": (0.5, "temperature")}),
         ("±2%RH", {"resolution min": (-2.0, "percentage"), "resolution max": (2.0, "percentage")}),
         ("±5%RH;±1℃", {
@@ -1168,6 +1174,10 @@ def test_resolution_values(value, expected, capsys):
 
 def test_resolution_bits_values(capsys):
     values = normalized_values("Resolution (Bits)", "16", capsys)
+
+    assert_quantity(values["resolution"], 16, "count")
+
+    values = normalized_values("Resolution(Bits)", "16-Bit", capsys)
 
     assert_quantity(values["resolution"], 16, "count")
 

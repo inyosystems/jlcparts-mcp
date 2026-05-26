@@ -833,8 +833,10 @@ def resolutionAttribute(value):
         parsed_parts.append((part, _resolutionBase(part)))
 
     base_counts = {base: sum(1 for _, candidate in parsed_parts if candidate == base) for _, base in parsed_parts}
-    for index, (part, base) in enumerate(parsed_parts, start=1):
-        name = f"{base} {index}" if base_counts[base] > 1 else base
+    base_indexes = {}
+    for part, base in parsed_parts:
+        base_indexes[base] = base_indexes.get(base, 0) + 1
+        name = f"{base} {base_indexes[base]}" if base_counts[base] > 1 else base
         parsed = _resolutionPartAttribute(part, name)
         values.update(parsed["values"])
         formats.append(parsed["format"])
