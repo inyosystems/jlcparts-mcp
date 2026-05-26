@@ -344,7 +344,7 @@ def normalizeAttribute(key, value):
             value = attributes.connectorCountAttribute(value)
         elif key in larr(["Life", "Mechanical Life"]):
             value = attributes.cycleCountAttribute(value)
-        elif key in larr(["Capacitance", "Junction Capacitance", "Input Capacitance(Cies)",
+        elif key in larr(["Capacitance", "Junction Capacitance", "Input Capacitance", "Input Capacitance(Cies)",
                 "CISS-Input Capacitance", "Output Capacitance(Coes)",
                 "Reverse Transfer Capacitance (Cres)", "Reverse Transfer Capacitance (Crss)",
                 "Con", "Capacitive Load (Max)", "Nominal Capacitance",
