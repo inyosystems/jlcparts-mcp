@@ -451,6 +451,7 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
     ("key", "value", "quantity", "expected", "unit"),
     [
         ("Sampling Rate", "352800Hz", "frequency", 352800.0, "frequency"),
+        ("Resonant Frequency", "1.2kHz", "frequency", 1200.0, "frequency"),
         ("-3d B Bandwidth", "14kHz", "frequency", 14000.0, "frequency"),
         ("-3d B Bandwidth", "1.7GHz", "frequency", 1.7e9, "frequency"),
         ("Non-Repetitive Peak Forward Surge Current", "1.95kA", "current", 1950.0, "current"),
