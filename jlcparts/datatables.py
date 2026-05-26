@@ -109,7 +109,8 @@ def normalizeAttribute(key, value):
                 "Gate-Source Breakdown Voltage (Vgss)",
                 "Gate-Source Cutoff Voltage (Vgs(Off))",
                 "Impulse Breakdown Voltage(Vimp)", "DC Rated Voltage",
-                "Voltage(AC)", "Overload Voltage (Max)", "Voltage Drop"]):
+                "Voltage(AC)", "Overload Voltage (Max)", "Voltage Drop",
+                "Voltage Withstand"]):
             if key == "charging saturation voltage" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "isolation voltage(vrms)" and compoundValue(value):
@@ -125,6 +126,7 @@ def normalizeAttribute(key, value):
                     "gate-source breakdown voltage (vgss)",
                     "gate-source cutoff voltage (vgs(off))",
                     "voltage(ac)",
+                    "voltage withstand",
                 ] and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             else:

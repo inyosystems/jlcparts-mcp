@@ -342,6 +342,7 @@ def test_tripping_voltage(value, expected, capsys):
         ("Voltage(AC)", "275V, 310V", {"voltage 1": 275.0, "voltage 2": 310.0}),
         ("Overload Voltage (Max)", "2kV", {"voltage": 2000.0}),
         ("Voltage Drop", "92mV", {"voltage": 0.092}),
+        ("Voltage Withstand", "15kV, 8kV", {"voltage 1": 15000.0, "voltage 2": 8000.0}),
     ],
 )
 def test_extra_scalar_voltages(key, value, expected, capsys):
