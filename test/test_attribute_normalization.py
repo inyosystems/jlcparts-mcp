@@ -1135,6 +1135,11 @@ def test_b_constant_kelvin(capsys):
 
     assert_quantity(values["temperature"], "NaN", "kelvin")
 
+    values = normalized_values("B Constant (25°C/50°C)", "3450K, 3950K", capsys)
+
+    assert_quantity(values["temperature 1"], 3450.0, "kelvin")
+    assert_quantity(values["temperature 2"], 3950.0, "kelvin")
+
 
 @pytest.mark.parametrize(
     ("value", "expected"),

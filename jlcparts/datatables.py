@@ -346,8 +346,8 @@ def normalizeAttribute(key, value):
             value = attributes.rdsOnMaxAtIdsAtVgs(value)
         elif key in larr(["Operating Temperature", "Operating Temperature (Max)", "Operating Temperature (Min)"]):
             value = attributes.stringAttribute(value) if compoundValue(value) else attributes.temperatureRangeAttribute(value)
-        elif key in larr(["B Constant (25°C/85°C)"]):
-            value = attributes.kelvinAttribute(value)
+        elif key in larr(["B Constant (25°C/85°C)", "B Constant (25°C/50°C)"]):
+            value = attributes.kelvinRangeListAttribute(value) if isinstance(value, str) and ("," in value or ";" in value) else attributes.kelvinAttribute(value)
         elif key in larr(["Color Temperature"]):
             value = attributes.kelvinRangeListAttribute(value)
         elif key in larr(["Wire Gauge - MM2", "Wire Gauge - Sqmm"]):
