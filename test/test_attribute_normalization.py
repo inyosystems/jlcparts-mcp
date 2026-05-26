@@ -1249,6 +1249,7 @@ def test_logic_array_blocks(value, expected, capsys):
         ("Circuits", "2", {"count": 2}),
         ("Number of Poles", "3", {"count": 3}),
         ("Number of Poles", "-", {"count": "NaN"}),
+        ("Number of Nodes", "256", {"count": 256}),
         ("Unidirectional Channels", "8", {"count": 8}),
         ("Bidirectional Channels", "0", {"count": 0}),
         ("Number of Cells", "3~16", {"count min": 3, "count max": 16}),
