@@ -983,6 +983,17 @@ def test_absolute_bandwidth_values(capsys):
             "frequency min": 900e6,
             "frequency max": 2e9,
         }),
+        ("Typical Application Frequency", "5GHz", {"frequency": 5e9}),
+        ("Typical Application Frequency", "433MHz, 868MHz, 915MHz", {
+            "frequency 1": 433e6,
+            "frequency 2": 868e6,
+            "frequency 3": 915e6,
+        }),
+        ("Clock Frequency (Fc)", "166MHz", {"frequency": 166e6}),
+        ("Clock Frequency (Fc)", "400kHz~1MHz", {
+            "frequency min": 400e3,
+            "frequency max": 1e6,
+        }),
     ],
 )
 def test_additional_frequency_aliases(key, value, expected, capsys):
