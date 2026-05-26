@@ -268,6 +268,21 @@ def test_impulse_breakdown_voltage(value, expected, capsys):
     assert_quantity(values["voltage"], expected, "voltage")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("230V", {"voltage": 230.0}),
+        ("72V~108V", {"voltage min": 72.0, "voltage max": 108.0}),
+        ("2.5kV", {"voltage": 2500.0}),
+    ],
+)
+def test_dc_spark_over_voltage(value, expected, capsys):
+    values = normalized_values("DC Spark-Over Voltage", value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
+
 def test_charging_saturation_voltage(capsys):
     values = normalized_values("Charging Saturation Voltage", "4.2V", capsys)
 
