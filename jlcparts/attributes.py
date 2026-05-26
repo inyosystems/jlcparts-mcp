@@ -350,16 +350,23 @@ def readDataSize(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
         return "NaN"
-    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(Byte|B|KB|MB)", value, re.I)
+    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(bit|Kbit|Mbit|Gbit|Tbit|Byte|B|KB|MB|GB|TB)", value, re.I)
     if match is None:
         raise ValueError(f"Cannot parse data size {value}")
     number = float(match.group(1))
     unit = match.group(2).lower()
     scales = {
+        "bit": 1 / 8,
+        "kbit": 1024 / 8,
+        "mbit": 1024 * 1024 / 8,
+        "gbit": 1024 * 1024 * 1024 / 8,
+        "tbit": 1024 * 1024 * 1024 * 1024 / 8,
         "byte": 1,
         "b": 1,
         "kb": 1024,
         "mb": 1024 * 1024,
+        "gb": 1024 * 1024 * 1024,
+        "tb": 1024 * 1024 * 1024 * 1024,
     }
     return number * scales[unit]
 
