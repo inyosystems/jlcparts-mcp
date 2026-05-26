@@ -772,6 +772,15 @@ def countListAttribute(value):
         "values": values
     }
 
+def _readCount(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    return int(value)
+
+def countRangeAttribute(value):
+    return rangeOrScalarAttribute(value, _readCount, "count", "count")
+
 def filterOrderAttribute(value):
     value = re.sub(r"(\d+)(?:st|nd|rd|th)\s+Order", r"\1", str(value), flags=re.I)
     return countListAttribute(value)

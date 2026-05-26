@@ -1053,6 +1053,23 @@ def test_logic_array_blocks(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Number of Circuits", "16", {"count": 16}),
+        ("Number of Filters", "4", {"count": 4}),
+        ("Circuits", "2", {"count": 2}),
+        ("Number of Cells", "3~16", {"count min": 3, "count max": 16}),
+        ("Number of Cells", "12", {"count": 12}),
+    ],
+)
+def test_extra_count_attributes(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, count in expected.items():
+        assert_quantity(values[quantity], count, "count")
+
+
+@pytest.mark.parametrize(
     ("value", "expected"),
     [
         ("51P", 51),
