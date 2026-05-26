@@ -351,6 +351,22 @@ def test_dc_spark_over_voltage(value, expected, capsys):
         ("Integrated Power Output Voltage", "3V~3.5V", {"voltage min": 3.0, "voltage max": 3.5}),
         ("Supply Voltage(Vcc)", "4.5V~5.5V", {"voltage min": 4.5, "voltage max": 5.5}),
         ("ESD Protect", "±15000V", {"voltage min": -15000.0, "voltage max": 15000.0}),
+        ("Supply Voltage(Single)", "2V~5.5V", {"voltage min": 2.0, "voltage max": 5.5}),
+        ("Mains Input", "3V~3.6V;4.5V~5.5V", {
+            "voltage 1 min": 3.0,
+            "voltage 1 max": 3.6,
+            "voltage 2 min": 4.5,
+            "voltage 2 max": 5.5,
+        }),
+        ("Receiver Hysteresis", "50mV", {"voltage": 0.05}),
+        ("High Level Range (VIH)", "1.75V~3.5V", {"voltage min": 1.75, "voltage max": 3.5}),
+        ("Input Logic Level -Low", "750mV~1.5V", {"voltage min": 0.75, "voltage max": 1.5}),
+        ("Input Logic Level -Low", "900mV, 300mV, 600mV, 1.1V", {
+            "voltage 1": 0.9,
+            "voltage 2": 0.3,
+            "voltage 3": 0.6,
+            "voltage 4": 1.1,
+        }),
         ("Input Voltage Range", "-3V~3V, 0.06V~10V", {
             "voltage 1 min": -3.0,
             "voltage 1 max": 3.0,

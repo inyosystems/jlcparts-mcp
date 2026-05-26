@@ -153,7 +153,9 @@ def normalizeAttribute(key, value):
                 "voltage - supply (driver)", "dc spark-over voltage",
                 "voltage - supply (bus)", "voltage - supply (logic)",
                 "integrated power output voltage", "supply voltage(vcc)",
-                "esd protect"]:
+                "esd protect", "supply voltage(single)", "mains input",
+                "receiver hysteresis", "high level range (vih)",
+                "input logic level -low"]:
             value = attributes.voltageRangeListAttribute(value) if compoundValue(value) else attributes.voltageRangeAttribute(value, "voltage")
         elif key in larr(["Human Body Model", "Contact Discharge Vesd"]):
             value = attributes.voltageRangeAttribute(value, "voltage")
