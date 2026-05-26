@@ -172,6 +172,13 @@ def readPower(value):
     value = re.sub(r"w", "", value, flags=re.I).strip()
     return readWithSiPrefix(value)
 
+def readPowerTemperatureDrift(value):
+    value = value.strip()
+    if value in ["-", "--"] or "null" in value:
+        return "NaN"
+    value = re.sub(r"/\s*(?:℃|°C|C)$", "", value, flags=re.I).strip()
+    return readPower(value)
+
 def readEnergy(value):
     value = value.strip()
     if value in ["-", "--"] or "null" in value:
@@ -1327,6 +1334,21 @@ def flexiblePercentageAttribute(value):
     if signed_range:
         return percentageRangeAttribute("~".join(signed_range.groups()))
     return percentageRangeListAttribute(value) if _hasCompoundValues(value) else percentageRangeAttribute(value)
+
+def powerTemperatureDriftListAttribute(value, name="power drift"):
+    value = str(value).replace(";", ",")
+    return scalarListAttribute(value, readPowerTemperatureDrift, "power_temperature_drift", name)
+
+def dissipationFactorAttribute(value):
+    value = str(value).strip()
+    if "%" in value or value in ["-", "--", "null"]:
+        return flexiblePercentageAttribute(value)
+    return powerTemperatureDriftListAttribute(value) if _hasCompoundValues(value) else scalarAttribute(
+        value,
+        readPowerTemperatureDrift,
+        "power_temperature_drift",
+        "power drift",
+    )
 
 def efficiencyPercentageRangeListAttribute(value):
     value = str(value).replace(";", ",")

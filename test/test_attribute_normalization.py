@@ -1797,6 +1797,26 @@ def test_flexible_percentage_values(key, value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("6%", {"percentage": [6.0, "percentage"]}),
+        ("16%", {"percentage": [16.0, "percentage"]}),
+        ("1mW/℃", {"power drift": [0.001, "power_temperature_drift"]}),
+        ("0.212mW/℃", {"power drift": [0.000212, "power_temperature_drift"]}),
+        ("7mW/℃, 8.5mW/℃", {
+            "power drift 1": [0.007, "power_temperature_drift"],
+            "power drift 2": [0.0085, "power_temperature_drift"],
+        }),
+    ],
+)
+def test_dissipation_factor_values(value, expected, capsys):
+    values = normalized_values("Dissipation Factor", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        assert_quantity(values[quantity], expected_value[0], expected_value[1])
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("47.6%", {"percentage 1": 47.6}),
         ("87%, 83%", {"percentage 1": 87.0, "percentage 2": 83.0}),
         ("0.89", {"percentage 1": 89.0}),

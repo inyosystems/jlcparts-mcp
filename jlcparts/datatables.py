@@ -386,6 +386,8 @@ def normalizeAttribute(key, value):
                 "Total Harmonic Distortion + Noise (Thd+N)", "Total Harmonic Distortion(Thd)",
                 "Total Harmonic Distortion", "Differential Gain", "Capacitance Tolerance"]):
             value = attributes.flexiblePercentageAttribute(value)
+        elif key in larr(["Dissipation Factor"]):
+            value = attributes.dissipationFactorAttribute(value)
         elif key in larr(["Duty Cycle", "Conversion Efficiency", "Efficiency"]):
             if key == "efficiency":
                 value = attributes.efficiencyPercentageRangeListAttribute(value)
