@@ -2082,6 +2082,21 @@ def test_memory_space(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Cache Size", "0.094KB", 0.094 * 1024),
+        ("Cache Size", "1536Byte", 1536),
+        ("Cache Size", "-", "NaN"),
+        ("Fifo'S", "64Byte", 64),
+    ],
+)
+def test_additional_data_size_aliases(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    assert_quantity(values["data size"], expected, "data_size")
+
+
+@pytest.mark.parametrize(
     ("value", "expected"),
     [
         ("24V/us", {"slew rate": 24e6}),
