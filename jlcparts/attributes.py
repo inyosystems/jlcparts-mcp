@@ -165,11 +165,11 @@ def ppmRangeAttribute(value, name="ppm"):
         value = "-" + value[1:] + "~+" + value[1:]
     return rangeOrScalarAttribute(value, readPpm, "ppm", name)
 
-def frequencyStabilityAttribute(value):
+def frequencyStabilityAttribute(value, name="stability"):
     value = str(value).strip()
     if "%" in value:
-        return percentageRangeAttribute(value, "stability")
-    return ppmRangeAttribute(value, "stability")
+        return percentageRangeAttribute(value, name)
+    return ppmRangeAttribute(value, name)
 
 def readPower(value):
     """

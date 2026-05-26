@@ -2481,6 +2481,22 @@ def test_frequency_stability(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("±20ppm", {"tolerance min": -20.0, "tolerance max": 20.0}),
+        ("-6ppm~+8ppm", {"tolerance min": -6.0, "tolerance max": 8.0}),
+        ("3000ppm", {"tolerance": 3000.0}),
+        ("-", {"tolerance": "NaN"}),
+    ],
+)
+def test_normal_temperature_frequency_tolerance(value, expected, capsys):
+    values = normalized_values("Normal Temperature Frequency Tolerance", value, capsys)
+
+    for quantity, tolerance in expected.items():
+        assert_quantity(values[quantity], tolerance, "ppm")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Voltage Reference Drift", "50ppm/℃, 40ppm/℃", {

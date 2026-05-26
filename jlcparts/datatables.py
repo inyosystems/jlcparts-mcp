@@ -413,6 +413,8 @@ def normalizeAttribute(key, value):
             value = attributes.temperatureCoefficientAttribute(value)
         elif key in larr(["Frequency Stability"]):
             value = attributes.frequencyStabilityAttribute(value)
+        elif key in larr(["Normal Temperature Frequency Tolerance"]):
+            value = attributes.frequencyStabilityAttribute(value, "tolerance")
         elif key in larr(["Wavelength - Dominant", "Dominant Wavelength", "Peak Wavelength"]):
             value = attributes.opticalLengthRangeListAttribute(value) if compoundValue(value) else attributes.wavelengthAttribute(value)
         elif key in larr(["Tolerance"]):
