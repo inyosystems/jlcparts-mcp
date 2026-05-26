@@ -2484,6 +2484,9 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
         ("Hold Time", "20ns, 10ns, 7.5ns", {"time 1": 20e-9, "time 2": 10e-9, "time 3": 7.5e-9}),
         ("Phase Jitter", "500fs", {"time": 500e-15}),
         ("Phase Jitter", "1ps, 200fs", {"time 1": 1e-12, "time 2": 200e-15}),
+        ("Lifetime", "18000hrs@85℃", {"time": 18000 * 3600}),
+        ("Lifetime @ Temperature", "10000hrs@105℃", {"time": 10000 * 3600}),
+        ("Load Life", "4000hrs@125℃", {"time": 4000 * 3600}),
     ],
 )
 def test_delay_time_attributes(key, value, expected, capsys):

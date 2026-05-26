@@ -481,7 +481,8 @@ def normalizeAttribute(key, value):
                 "Hold Settling Time", "High Level Delay Time", "Low Level Delay Time",
                 "Diode Reverse Recovery Time (Trr)", "Page Programming Time (Tpp)",
                 "Turn Off Delay Time (Td(Off))", "Thermal Time Constant",
-                "Hold Time", "Phase Jitter"]):
+                "Hold Time", "Phase Jitter", "Lifetime", "Lifetime @ Temperature",
+                "Load Life"]):
             if compoundValue(value) and "@" not in value:
                 if key in larr(["Propagation Delay (TPD)", "Propagation Delay Time", "Reset Timeout", "Settling Time", "Response Time (Tr)", "Time to Trip (Max)", "Td(Off)",
                         "Propagation Delay Tp Hl", "Propagation Delay Tp Lh", "Td(on)", "Block Erase Time(T Be)",
