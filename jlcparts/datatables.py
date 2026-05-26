@@ -184,6 +184,7 @@ def normalizeAttribute(key, value):
                     "Current - Collector Cutoff",
                     "Load Current",
                     "Steady State Current (Max)",
+                    "Minimum Cathode Current for Regulation",
                     "Supply Current Per Channel"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
@@ -211,6 +212,7 @@ def normalizeAttribute(key, value):
                 "current - collector cutoff",
                 "load current",
                 "steady state current (max)",
+                "minimum cathode current for regulation",
             ]
             if key in ["current - leakage"]:
                 value = attributes.currentAttribute(value)
