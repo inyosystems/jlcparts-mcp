@@ -17,6 +17,15 @@ def pytest_addoption(parser):
         ),
     )
     parser.addoption(
+        "--attribute-value",
+        action="append",
+        default=[],
+        help=(
+            "Raw attribute value to test directly with --attribute-section. "
+            "May be passed multiple times; avoids reading generated datatables."
+        ),
+    )
+    parser.addoption(
         "--attribute-section-limit",
         type=int,
         default=None,

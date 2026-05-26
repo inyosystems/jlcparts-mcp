@@ -13,6 +13,17 @@ LUT_PATH = Path("web/public/data/attributes-lut.json.gz")
 SECTION_SEPARATOR = "||"
 
 
+def _values_from_env():
+    values = os.environ.get("JLC_ATTRIBUTE_VALUE")
+    if not values:
+        return []
+    return [
+        value.strip()
+        for value in values.split(SECTION_SEPARATOR)
+        if value.strip()
+    ]
+
+
 def _string_values_for_section(section, value_pattern=None):
     with gzip.open(LUT_PATH, "rt", encoding="utf-8") as lut_file:
         attributes = json.load(lut_file)
@@ -64,10 +75,6 @@ def _sections_from_env():
     ]
 
 
-@pytest.mark.skipif(
-    not LUT_PATH.exists(),
-    reason="generated attribute LUT is not available",
-)
 def test_selected_attribute_section_normalizes_generated_values(pytestconfig, capsys):
     sections = pytestconfig.getoption("--attribute-section") or _sections_from_env()
     if not sections:
@@ -85,9 +92,15 @@ def test_selected_attribute_section_normalizes_generated_values(pytestconfig, ca
         pytestconfig.getoption("--attribute-value-re")
         or os.environ.get("JLC_ATTRIBUTE_VALUE_RE")
     )
+    direct_values = pytestconfig.getoption("--attribute-value") or _values_from_env()
 
     for section in sections:
-        values = _string_values_for_section(section, value_pattern)
+        if direct_values:
+            values = direct_values
+        else:
+            if not LUT_PATH.exists():
+                pytest.skip("generated attribute LUT is not available")
+            values = _string_values_for_section(section, value_pattern)
         assert values, f"no generated numeric string values found for {section!r}"
 
         if limit:
