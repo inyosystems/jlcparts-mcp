@@ -448,7 +448,7 @@ def normalizeAttribute(key, value):
                 "Propagation Delay Tp Hl", "Propagation Delay Tp Lh", "Max Propagation Delay",
                 "Maximum Propagation Delay", "Td(on)", "Block Erase Time(T Be)",
                 "Temperature Conversion Time", "Setup Time", "Acquisition Time",
-                "Hold Settling Time", "High Level Delay Time"]):
+                "Hold Settling Time", "High Level Delay Time", "Low Level Delay Time"]):
             if compoundValue(value) and "@" not in value:
                 if key in larr(["Propagation Delay (TPD)", "Propagation Delay Time", "Reset Timeout", "Settling Time", "Response Time (Tr)", "Time to Trip (Max)", "Td(Off)",
                         "Propagation Delay Tp Hl", "Propagation Delay Tp Lh", "Td(on)", "Block Erase Time(T Be)",
