@@ -334,7 +334,11 @@ def normalizeAttribute(key, value):
                     "Warehouse Stock - Hong Kong",
                     "Logic Array Blocks", "Number of Circuits", "Number of Filters",
                     "Circuits", "Number of Poles", "Number of Nodes", "Unidirectional Channels",
-                    "Bidirectional Channels"]):
+                    "Bidirectional Channels", "Forward Channel", "Reverse Channel",
+                    "Number of Forward Channels", "Number of Reverse Channels",
+                    "Number of Forward Channels Groups", "Number of Reverse Channels Groups",
+                    "Number of Input Channels", "Number of Non-Differential Input Channels",
+                    "Numberof Channels"]):
             value = attributes.countAttribute(value)
         elif key in larr(["Number of Cells"]):
             value = attributes.countRangeAttribute(value)
