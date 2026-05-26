@@ -254,6 +254,20 @@ def test_supply_voltage_driver(value, expected, capsys):
         assert_quantity(values[quantity], voltage, "voltage")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("700V", 700.0),
+        ("4.2kV", 4200.0),
+        ("1.05kV", 1050.0),
+    ],
+)
+def test_impulse_breakdown_voltage(value, expected, capsys):
+    values = normalized_values("Impulse Breakdown Voltage(Vimp)", value, capsys)
+
+    assert_quantity(values["voltage"], expected, "voltage")
+
+
 def test_charging_saturation_voltage(capsys):
     values = normalized_values("Charging Saturation Voltage", "4.2V", capsys)
 

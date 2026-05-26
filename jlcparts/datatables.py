@@ -107,7 +107,8 @@ def normalizeAttribute(key, value):
                 "Collector-Emitter Voltage (VCEO)", "Emitter-Base Voltage (VEBO)",
                 "Input Offset Voltage (VOS)", "Input Hysteresis Voltage (Vhys)",
                 "Gate-Source Breakdown Voltage (Vgss)",
-                "Gate-Source Cutoff Voltage (Vgs(Off))"]):
+                "Gate-Source Cutoff Voltage (Vgs(Off))",
+                "Impulse Breakdown Voltage(Vimp)"]):
             if key == "charging saturation voltage" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "isolation voltage(vrms)" and compoundValue(value):
