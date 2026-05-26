@@ -1498,6 +1498,23 @@ def test_embedded_block_ram(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("64Kbit", {"data size": 64 * 1024 / 8}),
+        ("8GB", {"data size": 8 * 1024 * 1024 * 1024}),
+        ("1536Byte, 2048Byte", {"data size 1": 1536, "data size 2": 2048}),
+        ("4096x18", {"data size": 4096 * 18 / 8}),
+        ("4Kx9", {"data size": 4 * 1024 * 9 / 8}),
+    ],
+)
+def test_memory_size(value, expected, capsys):
+    values = normalized_values("Memory Size", value, capsys)
+
+    for quantity, data_size in expected.items():
+        assert_quantity(values[quantity], data_size, "data_size")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("24V/us", {"slew rate": 24e6}),
         ("15kV/us", {"slew rate": 15e9}),
         ("520V/ms", {"slew rate": 520e3}),

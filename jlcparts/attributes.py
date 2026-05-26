@@ -350,6 +350,19 @@ def readDataSize(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
         return "NaN"
+    organization = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*([KMGT]?)\s*x\s*(\d+(?:\.\d+)?)", value, re.I)
+    if organization is not None:
+        words = float(organization.group(1))
+        word_unit = organization.group(2).lower()
+        width = float(organization.group(3))
+        word_scales = {
+            "": 1,
+            "k": 1024,
+            "m": 1024 * 1024,
+            "g": 1024 * 1024 * 1024,
+            "t": 1024 * 1024 * 1024 * 1024,
+        }
+        return words * word_scales[word_unit] * width / 8
     match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(bit|Kbit|Mbit|Gbit|Tbit|Byte|B|KB|MB|GB|TB)", value, re.I)
     if match is None:
         raise ValueError(f"Cannot parse data size {value}")
