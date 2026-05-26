@@ -283,6 +283,44 @@ def test_dc_spark_over_voltage(value, expected, capsys):
         assert_quantity(values[quantity], voltage, "voltage")
 
 
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Input Voltage (Vin)", "2.7V~5.5V", {"voltage min": 2.7, "voltage max": 5.5}),
+        ("Voltage - Supply(Input)", "±18V", {"voltage min": -18.0, "voltage max": 18.0}),
+        ("Voltage - Supply(Output)", "3V~20V", {"voltage min": 3.0, "voltage max": 20.0}),
+        ("Input Voltage Range", "-3V~3V, 0.06V~10V", {
+            "voltage 1 min": -3.0,
+            "voltage 1 max": 3.0,
+            "voltage 2 min": 0.06,
+            "voltage 2 max": 10.0,
+        }),
+        ("Common Mode Voltage", "0V~76V", {"voltage min": 0.0, "voltage max": 76.0}),
+    ],
+)
+def test_extra_voltage_ranges(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("DC Rated Voltage", "50V", {"voltage": 50.0}),
+        ("Voltage(AC)", "275V, 310V", {"voltage 1": 275.0, "voltage 2": 310.0}),
+        ("Overload Voltage (Max)", "2kV", {"voltage": 2000.0}),
+        ("Voltage Drop", "92mV", {"voltage": 0.092}),
+    ],
+)
+def test_extra_scalar_voltages(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
+
 def test_charging_saturation_voltage(capsys):
     values = normalized_values("Charging Saturation Voltage", "4.2V", capsys)
 

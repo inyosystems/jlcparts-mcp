@@ -108,7 +108,8 @@ def normalizeAttribute(key, value):
                 "Input Offset Voltage (VOS)", "Input Hysteresis Voltage (Vhys)",
                 "Gate-Source Breakdown Voltage (Vgss)",
                 "Gate-Source Cutoff Voltage (Vgs(Off))",
-                "Impulse Breakdown Voltage(Vimp)"]):
+                "Impulse Breakdown Voltage(Vimp)", "DC Rated Voltage",
+                "Voltage(AC)", "Overload Voltage (Max)", "Voltage Drop"]):
             if key == "charging saturation voltage" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "isolation voltage(vrms)" and compoundValue(value):
@@ -123,6 +124,7 @@ def normalizeAttribute(key, value):
                     "input hysteresis voltage (vhys)",
                     "gate-source breakdown voltage (vgss)",
                     "gate-source cutoff voltage (vgs(off))",
+                    "voltage(ac)",
                 ] and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             else:
@@ -130,7 +132,9 @@ def normalizeAttribute(key, value):
         elif key in ["input voltage(dc)", "motor drive voltage(vm)", "control voltage",
                 "vcm - common mode voltage", "low voltage detection threshold",
                 "differential input voltage",
-                "operating voltage range", "load voltage",
+                "operating voltage range", "load voltage", "input voltage (vin)",
+                "voltage - supply(input)", "voltage - supply(output)",
+                "input voltage range", "common mode voltage",
                 "voltage - supply(vcca)", "voltage - supply(vccb)",
                 "voltage - supply (driver)", "dc spark-over voltage"]:
             value = attributes.voltageRangeListAttribute(value) if compoundValue(value) else attributes.voltageRangeAttribute(value, "voltage")
