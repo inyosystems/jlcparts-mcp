@@ -1358,6 +1358,27 @@ def voltageListAttribute(value, name="voltage"):
         "values": values
     }
 
+def voltageSemicolonListAttribute(value, name="voltage"):
+    value = str(value)
+    parts = [x.strip() for x in value.split(";")]
+    if len(parts) <= 1:
+        parsed = readVoltage(_stripCondition(value))
+        return {
+            "format": "${" + name + "}",
+            "primary": name,
+            "values": {
+                name: [parsed, "voltage"]
+            }
+        }
+    values = {}
+    for i, part in enumerate(parts, start=1):
+        values[f"{name} {i}"] = [readVoltage(_stripCondition(part)), "voltage"]
+    return {
+        "format": ", ".join("${" + f"{name} {i}" + "}" for i in range(1, len(parts) + 1)),
+        "primary": f"{name} 1",
+        "values": values
+    }
+
 def voltageRangeAttribute(value, name="voltage"):
     value = str(value).strip()
     if value.startswith("±"):
