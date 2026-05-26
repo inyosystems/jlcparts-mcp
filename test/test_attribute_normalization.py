@@ -367,6 +367,17 @@ def test_extra_voltage_ranges(key, value, expected, capsys):
         ("Human Body Model", "-", {"voltage": "NaN"}),
         ("Contact Discharge Vesd", "±8kV", {"voltage min": -8000.0, "voltage max": 8000.0}),
         ("Contact Discharge Vesd", "30kV", {"voltage": 30000.0}),
+        ("On State Voltage", "1V", {"voltage": 1.0}),
+        ("Trigger Voltage", "7.5V", {"voltage": 7.5}),
+        ("Operating Voltage (Max)", "250V;60V", {"voltage 1": 250.0, "voltage 2": 60.0}),
+        ("Switching Voltage (Vs)", "25V", {"voltage": 25.0}),
+        ("Peak Off-State Voltage", "6V", {"voltage": 6.0}),
+        ("Reset Voltage", "620mV", {"voltage": 0.62}),
+        ("Peak Impulse Voltage", "650V", {"voltage": 650.0}),
+        ("Output Low Voltage", "0.2V~0.5V", {"voltage 1 min": 0.2, "voltage 1 max": 0.5}),
+        ("Output High Voltage", "700mV", {"voltage 1": 0.7}),
+        ("Input Low Voltage", "500mV~800mV", {"voltage 1 min": 0.5, "voltage 1 max": 0.8}),
+        ("Intput High Voltage", "2V~5.5V", {"voltage 1 min": 2.0, "voltage 1 max": 5.5}),
     ],
 )
 def test_additional_voltage_aliases(key, value, expected, capsys):

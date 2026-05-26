@@ -113,7 +113,9 @@ def normalizeAttribute(key, value):
                 "Voltage(AC)", "Overload Voltage (Max)", "Voltage Drop",
                 "Voltage Withstand", "Withstanding Voltage",
                 "On - State Voltage(Vt)", "Switching Voltage(Vs)",
-                "Peak Off - State Voltage(Vdrm)"]):
+                "Peak Off - State Voltage(Vdrm)", "On State Voltage",
+                "Trigger Voltage", "Operating Voltage (Max)", "Switching Voltage (Vs)",
+                "Peak Off-State Voltage", "Reset Voltage", "Peak Impulse Voltage"]):
             if key == "charging saturation voltage" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "isolation voltage(vrms)" and compoundValue(value):
@@ -132,6 +134,7 @@ def normalizeAttribute(key, value):
                     "gate-source cutoff voltage (vgs(off))",
                     "voltage(ac)",
                     "voltage withstand",
+                    "operating voltage (max)",
                 ] and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             else:
@@ -157,7 +160,9 @@ def normalizeAttribute(key, value):
             else:
                 value = attributes.stringAttribute(value) if compoundValue(value) or complexVoltageAlternatives else attributes.voltageRangeAttribute(value, "voltage")
         elif key in larr(["Input Logic Level - High", "Input Logic Level - Low",
-                "Output Logic Level - High", "Output Logic Level - Low"]):
+                "Output Logic Level - High", "Output Logic Level - Low",
+                "Output Low Voltage", "Output High Voltage", "Input Low Voltage",
+                "Intput High Voltage"]):
             value = attributes.voltageRangeListAttribute(value, "voltage")
         elif key in larr(["Reverse Stand-Off Voltage (VRWM)", "Threshold Voltage",
                 "Varistor Voltage", "VOS - Input Offset Voltage"]):
