@@ -112,6 +112,22 @@ def test_resistance_list_attributes(key, value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Insulation Resistance", "100MΩ", 100e6),
+        ("Insulation Resistance", "1.011kΩ", 1011.0),
+        ("Insulation Resistance", "-", "NaN"),
+        ("Insulation Resistance(Ir)", "10MΩ", 10e6),
+        ("Insulation Resistance(Ir)", "10mΩ", 0.01),
+    ],
+)
+def test_insulation_resistance_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    assert_quantity(values["resistance"], expected, "resistance")
+
+
+@pytest.mark.parametrize(
     ("value", "expected"),
     [
         ("500Ω", 500.0),
