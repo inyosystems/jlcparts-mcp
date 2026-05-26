@@ -96,7 +96,7 @@ def normalizeAttribute(key, value):
                 "Reverse Voltage (Vr)",
                 "Voltage - DC Spark Over (Nom)", "Voltage - Peak Reverse (Max)",
                 "Voltage - Reverse Standoff (Typ)", "Voltage - Gate Trigger (Vgt) (Max)",
-                "Voltage - Off State (Max)", "Voltage - Input (Max)", "Voltage - Output (Max)",
+                "Voltage - Off State (Max)", "Voltage - Input", "Voltage - Input (Max)", "Voltage - Output (Max)",
                 "Input Voltage (Max)", "Input Voltage (Min)",
                 "Voltage - Output (Fixed)", "Voltage - Output (Min/Fixed)",
                 "Supply Voltage (Max)", "Supply Voltage (Min)", "Output Voltage",

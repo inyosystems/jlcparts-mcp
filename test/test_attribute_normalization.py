@@ -348,6 +348,7 @@ def test_dc_spark_over_voltage(value, expected, capsys):
             "voltage 2 max": 10.0,
         }),
         ("Common Mode Voltage", "0V~76V", {"voltage min": 0.0, "voltage max": 76.0}),
+        ("Voltage - Input", "250V", {"voltage": 250.0}),
     ],
 )
 def test_extra_voltage_ranges(key, value, expected, capsys):
