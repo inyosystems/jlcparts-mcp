@@ -358,6 +358,25 @@ def test_extra_voltage_ranges(key, value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("On - State Voltage(Vt)", "4V", {"voltage": 4.0}),
+        ("Switching Voltage(Vs)", "1kV", {"voltage": 1000.0}),
+        ("Peak Off - State Voltage(Vdrm)", "1.2kV", {"voltage": 1200.0}),
+        ("Human Body Model", "±30kV", {"voltage min": -30000.0, "voltage max": 30000.0}),
+        ("Human Body Model", "-", {"voltage": "NaN"}),
+        ("Contact Discharge Vesd", "±8kV", {"voltage min": -8000.0, "voltage max": 8000.0}),
+        ("Contact Discharge Vesd", "30kV", {"voltage": 30000.0}),
+    ],
+)
+def test_additional_voltage_aliases(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
+
+@pytest.mark.parametrize(
     ("value", "expected"),
     [
         ("±0.5V", {"voltage min": -0.5, "voltage max": 0.5}),

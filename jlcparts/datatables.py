@@ -111,7 +111,9 @@ def normalizeAttribute(key, value):
                 "Gate-Source Cutoff Voltage (Vgs(Off))",
                 "Impulse Breakdown Voltage(Vimp)", "DC Rated Voltage",
                 "Voltage(AC)", "Overload Voltage (Max)", "Voltage Drop",
-                "Voltage Withstand", "Withstanding Voltage"]):
+                "Voltage Withstand", "Withstanding Voltage",
+                "On - State Voltage(Vt)", "Switching Voltage(Vs)",
+                "Peak Off - State Voltage(Vdrm)"]):
             if key == "charging saturation voltage" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "isolation voltage(vrms)" and compoundValue(value):
@@ -144,6 +146,8 @@ def normalizeAttribute(key, value):
                 "voltage - supply(vcca)", "voltage - supply(vccb)",
                 "voltage - supply (driver)", "dc spark-over voltage"]:
             value = attributes.voltageRangeListAttribute(value) if compoundValue(value) else attributes.voltageRangeAttribute(value, "voltage")
+        elif key in larr(["Human Body Model", "Contact Discharge Vesd"]):
+            value = attributes.voltageRangeAttribute(value, "voltage")
         elif key in larr(["Input Voltage", "Frequency Input Voltage", "Zener Voltage (Range)",
                 "Single Supply", "Dual Supply", "Operating Voltage", "Voltage - Input(DC)",
                 "Low Level Range (VIL)"]):
