@@ -2968,6 +2968,20 @@ def test_block_erase_time(value, expected, capsys):
     for quantity, time in expected.items():
         assert_quantity(values[quantity], time, "time")
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("2ms", {"time": 0.002}),
+        ("500ms@(64KB)", {"time": 0.5}),
+        ("2ms;3ms", {"time 1": 0.002, "time 2": 0.003}),
+    ],
+)
+def test_block_erase_time_spaced(value, expected, capsys):
+    values = normalized_values("Block Erase Time (T Be)", value, capsys)
+
+    for quantity, time in expected.items():
+        assert_quantity(values[quantity], time, "time")
+
 
 @pytest.mark.parametrize(
     ("value", "expected"),
@@ -3020,6 +3034,10 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
         ("Hold Settling Time", "0.165us", {"time": 0.165e-6}),
         ("Page Programming Time (Tpp)", "90ns", {"time": 90e-9}),
         ("Page Programming Time (Tpp)", "4ms, 8ms", {"time 1": 0.004, "time 2": 0.008}),
+        ("Page Program Time (Tprog)", "250us", {"time": 250e-6}),
+        ("Page Program Time (Tprog)", "0.35ms", {"time": 0.00035}),
+        ("Page Program Time (Tpp)", "700us", {"time": 700e-6}),
+        ("Page Program Time (Tpp)", "20ns", {"time": 20e-9}),
         ("Turn Off Delay Time (Td(Off))", "13.5us", {"time": 13.5e-6}),
         ("Thermal Time Constant", "1.43min", {"time": 85.8}),
         ("Thermal Time Constant", "3s, 700ms", {"time 1": 3.0, "time 2": 0.7}),
