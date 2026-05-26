@@ -306,6 +306,21 @@ def test_extra_voltage_ranges(key, value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("±0.5V", {"voltage min": -0.5, "voltage max": 0.5}),
+        ("-40V~2V", {"voltage min": -40.0, "voltage max": 2.0}),
+        ("±500mV", {"voltage min": -0.5, "voltage max": 0.5}),
+    ],
+)
+def test_differential_voltage(value, expected, capsys):
+    values = normalized_values("Differential Voltage", value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("DC Rated Voltage", "50V", {"voltage": 50.0}),

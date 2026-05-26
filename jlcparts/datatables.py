@@ -131,7 +131,7 @@ def normalizeAttribute(key, value):
                 value = attributes.voltageAttribute(value)
         elif key in ["input voltage(dc)", "motor drive voltage(vm)", "control voltage",
                 "vcm - common mode voltage", "low voltage detection threshold",
-                "differential input voltage",
+                "differential input voltage", "differential voltage",
                 "operating voltage range", "load voltage", "input voltage (vin)",
                 "voltage - supply(input)", "voltage - supply(output)",
                 "input voltage range", "common mode voltage",
