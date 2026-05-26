@@ -436,7 +436,7 @@ def normalizeAttribute(key, value):
                 value = attributes.stringAttribute(value) if isinstance(value, str) and (malformedRdsValue or value.count("@") > 1 or ("," in value and value.count("@") != 1)) else attributes.rdsOnMaxAtVgsAtIds(value)
         elif key == "Power Dissipation-Max (Ta=25°C)".lower():
             value = attributes.powerDissipation(value)
-        elif key in larr(["Equivalent Series Resistance", "Equivalent Series Resistance (ESR)"]):
+        elif key in larr(["Equivalent Series Resistance", "Equivalent Series Resistance (ESR)", "ESR"]):
             value = attributes.esr(value)
         elif key in larr(["Resistance - Post Trip (R1) (Max)"]):
             value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.resistanceAttribute(value)

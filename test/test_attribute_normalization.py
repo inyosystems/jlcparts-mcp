@@ -130,6 +130,21 @@ def test_insulation_resistance_values(key, value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("27mΩ@100kHz", {"esr": (0.027, "resistance"), "frequency": (100e3, "frequency")}),
+        ("20mΩ", {"esr": (0.02, "resistance")}),
+        ("-", {"esr": ("NaN", "resistance"), "frequency": ("NaN", "frequency")}),
+    ],
+)
+def test_esr_values(value, expected, capsys):
+    values = normalized_values("ESR", value, capsys)
+
+    for quantity, (amount, unit) in expected.items():
+        assert_quantity(values[quantity], amount, unit)
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("500Ω", 500.0),
         ("1.75kΩ", 1750.0),
         ("-", "NaN"),
