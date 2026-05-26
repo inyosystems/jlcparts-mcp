@@ -239,6 +239,21 @@ def test_supply_voltage_vccb(value, expected, capsys):
         assert_quantity(values[quantity], voltage, "voltage")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("14V~30V", {"voltage min": 14.0, "voltage max": 30.0}),
+        ("-500mV~35V", {"voltage min": -0.5, "voltage max": 35.0}),
+        ("30V", {"voltage": 30.0}),
+    ],
+)
+def test_supply_voltage_driver(value, expected, capsys):
+    values = normalized_values("Voltage - Supply (Driver)", value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
+
 def test_charging_saturation_voltage(capsys):
     values = normalized_values("Charging Saturation Voltage", "4.2V", capsys)
 
