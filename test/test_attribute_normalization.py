@@ -2067,6 +2067,7 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
         ("Maximum Propagation Delay", "32ns@6V,150pF", {"time": 32e-9}),
         ("High Level Delay Time", "200ns", {"time": 200e-9}),
         ("Low Level Delay Time", "200ns", {"time": 200e-9}),
+        ("Diode Reverse Recovery Time (Trr)", "44ns", {"time": 44e-9}),
         ("Td(on)", "30ns, 31.6ns", {"time 1": 30e-9, "time 2": 31.6e-9}),
         ("Setup Time", "6ns", {"time": 6e-9}),
         ("Setup Time", "20ns, 10ns, 7.5ns", {"time 1": 20e-9, "time 2": 10e-9, "time 3": 7.5e-9}),
