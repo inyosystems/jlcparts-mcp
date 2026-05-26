@@ -321,6 +321,21 @@ def test_differential_voltage(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("16mV", {"voltage": 0.016}),
+        ("11.5mV~13.86mV", {"voltage min": 0.0115, "voltage max": 0.01386}),
+        ("2.8V", {"voltage": 2.8}),
+    ],
+)
+def test_tripping_voltage(value, expected, capsys):
+    values = normalized_values("Tripping Voltage", value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("DC Rated Voltage", "50V", {"voltage": 50.0}),

@@ -133,6 +133,7 @@ def normalizeAttribute(key, value):
                 "vcm - common mode voltage", "low voltage detection threshold",
                 "differential input voltage", "differential voltage",
                 "operating voltage range", "load voltage", "input voltage (vin)",
+                "tripping voltage",
                 "voltage - supply(input)", "voltage - supply(output)",
                 "input voltage range", "common mode voltage",
                 "voltage - supply(vcca)", "voltage - supply(vccb)",
