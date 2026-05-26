@@ -298,6 +298,8 @@ def normalizeAttribute(key, value):
             value = attributes.lsbListAttribute(value, "gain error" if key == "gain error" else "linearity")
         elif key in larr(["Number of Channels", "Number of Elements"]):
             value = attributes.channelCountAttribute(value)
+        elif key in larr(["Resolution"]):
+            value = attributes.resolutionAttribute(value)
         elif key in larr(["Filter Order"]):
             value = attributes.filterOrderAttribute(value)
         elif key in larr(["Number of Bits Per Element"]):

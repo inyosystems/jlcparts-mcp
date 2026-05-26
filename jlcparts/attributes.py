@@ -779,6 +779,68 @@ def countListAttribute(value):
         "values": values
     }
 
+def _readResolutionCount(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"(\d+)\s*-\s*bit$", r"\1bit", value, flags=re.I)
+    value = re.sub(r"\s*(?:bits?|positions?|digits?)$", "", value, flags=re.I).strip()
+    number = float(value)
+    return int(number) if number.is_integer() else number
+
+def _temperatureResolutionAttribute(value, name):
+    value = str(value).replace("°C", "℃").strip()
+    if value.startswith("±"):
+        value = "-" + value[1:] + "~+" + value[1:]
+    value = value.replace("℃", "")
+    return rangeOrScalarAttribute(value, float, "temperature", name)
+
+def _resolutionBase(value):
+    value = str(value).strip()
+    if "℃" in value or "°C" in value:
+        return "temperature"
+    if "%" in value:
+        return "percentage"
+    if re.search(r"\d\s*(?:fs|ps|ns|us|ms|s)\s*$", value, flags=re.I):
+        return "time"
+    return "resolution"
+
+def _resolutionPartAttribute(value, name):
+    value = str(value).strip()
+    base = _resolutionBase(value)
+    if base == "temperature":
+        return _temperatureResolutionAttribute(value, name)
+    if base == "percentage":
+        return percentageRangeAttribute(re.sub(r"\s*RH$", "", value, flags=re.I), name)
+    if base == "time":
+        return scalarAttribute(value, readTime, "time", name)
+    return scalarAttribute(value, _readResolutionCount, "count", name)
+
+def resolutionAttribute(value):
+    value = str(value).strip()
+    parts = [x.strip() for x in re.split(r"[,;]", value) if x.strip()]
+    if len(parts) <= 1:
+        return _resolutionPartAttribute(value, "resolution")
+
+    values = {}
+    formats = []
+    parsed_parts = []
+    for part in parts:
+        parsed_parts.append((part, _resolutionBase(part)))
+
+    base_counts = {base: sum(1 for _, candidate in parsed_parts if candidate == base) for _, base in parsed_parts}
+    for index, (part, base) in enumerate(parsed_parts, start=1):
+        name = f"{base} {index}" if base_counts[base] > 1 else base
+        parsed = _resolutionPartAttribute(part, name)
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
 def _readCount(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
