@@ -126,6 +126,27 @@ def test_impedance_zzk(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("400kΩ", {"impedance": 400e3}),
+        ("80mΩ", {"impedance": 0.08}),
+        ("113kΩ;256kΩ;7.8MΩ", {
+            "impedance 1": 113e3,
+            "impedance 2": 256e3,
+            "impedance 3": 7.8e6,
+        }),
+        ("50Ω, 80Ω", {"impedance 1": 50.0, "impedance 2": 80.0}),
+        ("-", {"impedance": "NaN"}),
+    ],
+)
+def test_impedance_values(value, expected, capsys):
+    values = normalized_values("Impedance", value, capsys)
+
+    for quantity, resistance in expected.items():
+        assert_quantity(values[quantity], resistance, "resistance")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Single Supply", "2V~36V", (2.0, 36.0)),

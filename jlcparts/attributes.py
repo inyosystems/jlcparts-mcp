@@ -545,6 +545,10 @@ def impedanceAttribute(value):
         }
     }
 
+def impedanceListAttribute(value):
+    value = str(value).replace(";", ",")
+    return scalarListAttribute(value, readResistance, "resistance", "impedance")
+
 
 def voltageAttribute(value):
     value = str(value)
