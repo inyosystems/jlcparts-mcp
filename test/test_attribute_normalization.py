@@ -407,6 +407,7 @@ def test_extra_voltage_ranges(key, value, expected, capsys):
         ("Output High Voltage", "700mV", {"voltage 1": 0.7}),
         ("Input Low Voltage", "500mV~800mV", {"voltage 1 min": 0.5, "voltage 1 max": 0.8}),
         ("Intput High Voltage", "2V~5.5V", {"voltage 1 min": 2.0, "voltage 1 max": 5.5}),
+        ("Dielectric Withstand Voltage", "500V", {"voltage": 500.0}),
     ],
 )
 def test_additional_voltage_aliases(key, value, expected, capsys):
@@ -414,6 +415,31 @@ def test_additional_voltage_aliases(key, value, expected, capsys):
 
     for quantity, voltage in expected.items():
         assert_quantity(values[quantity], voltage, "voltage")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Coil Voltage", "DC12V", {"voltage": (12.0, "voltage")}),
+        ("Coil Voltage", "220V, 240V", {
+            "voltage 1": (220.0, "voltage"),
+            "voltage 2": (240.0, "voltage"),
+        }),
+        ("Switching Voltage (Max)", "400V@AC", {"voltage": (400.0, "voltage")}),
+        ("Switching Voltage (Max)", "250V@AC, 220V@DC", {
+            "voltage 1": (250.0, "voltage"),
+            "voltage 2": (220.0, "voltage"),
+        }),
+        ("Switching Voltage (Max)", "50A", {"current": (50.0, "current")}),
+        ("Switching Voltage (Max)", "-", {"voltage": ("NaN", "voltage")}),
+    ],
+)
+def test_additional_voltage_or_current_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, expected_value in expected.items():
+        value, unit = expected_value
+        assert_quantity(values[quantity], value, unit)
 
 
 @pytest.mark.parametrize(

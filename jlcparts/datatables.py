@@ -118,11 +118,17 @@ def normalizeAttribute(key, value):
                 "Peak Off - State Voltage(Vdrm)", "On State Voltage",
                 "Trigger Voltage", "Operating Voltage (Max)", "Switching Voltage (Vs)",
                 "Peak Off-State Voltage", "Reset Voltage", "Peak Impulse Voltage",
-                "On-State Voltage (Vt)", "Lag of Receiver", "End-Off Voltage"]):
+                "On-State Voltage (Vt)", "Lag of Receiver", "End-Off Voltage",
+                "Dielectric Withstand Voltage", "Coil Voltage",
+                "Switching Voltage (Max)"]):
             if key == "charging saturation voltage" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "isolation voltage(vrms)" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
+            elif key in larr(["Coil Voltage", "Switching Voltage (Max)"]):
+                value = attributes.voltageOrCurrentListAttribute(value)
+            elif key in larr(["Dielectric Withstand Voltage"]):
+                value = attributes.voltageAttribute(value)
             elif key == "maximum power supply range (vdd-vss)" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "withstanding voltage":

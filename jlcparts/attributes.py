@@ -1616,6 +1616,27 @@ def voltageListAttribute(value, name="voltage"):
         "values": values
     }
 
+def voltageOrCurrentListAttribute(value):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        value_part = _stripCondition(part)
+        is_current = bool(re.search(r"\d\s*(?:[fpnumkKMGT]?A)\b", value_part))
+        unit = "current" if is_current else "voltage"
+        name = unit if len(parts) == 1 else f"{unit} {index}"
+        reader = readCurrent if is_current else readVoltage
+        values[name] = [reader(value_part), unit]
+        formats.append("${" + name + "}")
+    first_unit = "current" if next(iter(values)).startswith("current") else "voltage"
+    primary = first_unit if len(parts) == 1 else f"{first_unit} 1"
+    return {
+        "format": ", ".join(formats),
+        "primary": primary,
+        "values": values
+    }
+
 def voltageSemicolonListAttribute(value, name="voltage"):
     value = str(value)
     parts = [x.strip() for x in value.split(";")]
