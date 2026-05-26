@@ -801,6 +801,8 @@ def _resolutionBase(value):
         return "temperature"
     if "%" in value:
         return "percentage"
+    if re.search(r"\d\s*(?:Hz|kHz|MHz|GHz)\s*$", value, flags=re.I):
+        return "frequency"
     if re.search(r"\d\s*(?:fs|ps|ns|us|ms|s)\s*$", value, flags=re.I):
         return "time"
     return "resolution"
@@ -812,6 +814,8 @@ def _resolutionPartAttribute(value, name):
         return _temperatureResolutionAttribute(value, name)
     if base == "percentage":
         return percentageRangeAttribute(re.sub(r"\s*RH$", "", value, flags=re.I), name)
+    if base == "frequency":
+        return rangeOrScalarAttribute(value, readFrequency, "frequency", name)
     if base == "time":
         return scalarAttribute(value, readTime, "time", name)
     return scalarAttribute(value, _readResolutionCount, "count", name)

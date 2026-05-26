@@ -1134,9 +1134,21 @@ def test_extra_count_attributes(key, value, expected, capsys):
             "resolution 4": (16, "count"),
         }),
         ("12bit, 15bit", {"resolution 1": (12, "count"), "resolution 2": (15, "count")}),
+        ("12, 16, 10, 14", {
+            "resolution 1": (12, "count"),
+            "resolution 2": (16, "count"),
+            "resolution 3": (10, "count"),
+            "resolution 4": (14, "count"),
+        }),
         ("6 digits", {"resolution": (6, "count")}),
         ("13.8", {"resolution": (13.8, "count")}),
         ("19ps", {"resolution": (19e-12, "time")}),
+        ("44.1kHz;48kHz;96kHz;192kHz", {
+            "frequency 1": (44.1e3, "frequency"),
+            "frequency 2": (48e3, "frequency"),
+            "frequency 3": (96e3, "frequency"),
+            "frequency 4": (192e3, "frequency"),
+        }),
         ("±0.5℃", {"resolution min": (-0.5, "temperature"), "resolution max": (0.5, "temperature")}),
         ("±2%RH", {"resolution min": (-2.0, "percentage"), "resolution max": (2.0, "percentage")}),
         ("±5%RH;±1℃", {
@@ -1152,6 +1164,12 @@ def test_resolution_values(value, expected, capsys):
 
     for quantity, (amount, unit) in expected.items():
         assert_quantity(values[quantity], amount, unit)
+
+
+def test_resolution_bits_values(capsys):
+    values = normalized_values("Resolution (Bits)", "16", capsys)
+
+    assert_quantity(values["resolution"], 16, "count")
 
 
 @pytest.mark.parametrize(
