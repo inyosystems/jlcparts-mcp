@@ -242,7 +242,7 @@ def normalizeAttribute(key, value):
                 "S/N Ratio", "Common Mode Rejection Ratio(CMRR)", "Common Mode Rejection Ratio (CMRR)",
                 "Return Loss (Min)", "Sound Pressure Level(Spl)", "Peak Gain",
                 "Snr(Signal to Noise Ratio)", "Signal to Noise Ratio",
-                "Output Return Loss"]):
+                "Output Return Loss", "Input Return Loss"]):
             if key == "sound pressure level(spl)":
                 value = attributes.decibelTokenListAttribute(value, "level")
             elif key == "peak gain":

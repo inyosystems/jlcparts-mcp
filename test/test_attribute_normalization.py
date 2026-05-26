@@ -1688,6 +1688,7 @@ def test_switching_energy_lists(capsys):
         ("Common Mode Rejection Ratio (CMRR)", "100dB, 90dB, 86dB", [100.0, 90.0, 86.0]),
         ("Return Loss (Min)", "9.5dB", [9.5]),
         ("Output Return Loss", "13.5dB", [13.5]),
+        ("Input Return Loss", "12.5dB", [12.5]),
         ("Sound Pressure Level(Spl)", "95dB", [95.0]),
         ("Sound Pressure Level(Spl)", "83dB@0.1W,10cm", [83.0]),
     ],
