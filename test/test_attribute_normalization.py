@@ -785,6 +785,20 @@ def test_frequency_output_values(capsys):
     assert_quantity(values["frequency"], 450e6, "frequency")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("1GHz", 1e9),
+        ("16.776MHz", 16.776e6),
+        ("-", "NaN"),
+    ],
+)
+def test_main_fclk_values(value, expected, capsys):
+    values = normalized_values("The Main Fclk", value, capsys)
+
+    assert_quantity(values["frequency"], expected, "frequency")
+
+
 def test_count_rate_list(capsys):
     values = normalized_values("Count Rate", "16MHz, 32MHz", capsys)
 
