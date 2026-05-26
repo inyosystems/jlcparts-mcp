@@ -1445,6 +1445,20 @@ def test_rated_power(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("700mW", {"power": 0.7}),
+        ("1.6W, 1.8W", {"power 1": 1.6, "power 2": 1.8}),
+    ],
+)
+def test_coil_rated_power(value, expected, capsys):
+    values = normalized_values("Coil Rated Power", value, capsys)
+
+    for quantity, power in expected.items():
+        assert_quantity(values[quantity], power, "power")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("470mW, 294mW", {"power 1": 0.47, "power 2": 0.294}),
         ("500mW@UVA, 240mW@UVC", {"power 1": 0.5, "power 2": 0.24}),
         ("330mW, 400mW, 580mW", {"power 1": 0.33, "power 2": 0.4, "power 3": 0.58}),
