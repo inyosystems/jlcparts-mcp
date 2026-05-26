@@ -1382,6 +1382,24 @@ def temperatureRangeAttribute(value):
         value = value[:-1]
     return scalarAttribute(value, lambda x: int(float(x)), "temperature", "temperature")
 
+def temperatureListAttribute(value):
+    value = str(value).replace("°C", "℃")
+    parts = [x.strip() for x in re.split(r"[,;/]", value) if x.strip()]
+    unit = next((re.search(r"℃", part).group(0) for part in parts if "℃" in part), "℃")
+    parts = [part if "℃" in part else part + unit for part in parts]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        parsed = temperatureRangeAttribute(part)
+        for name, parsed_value in parsed["values"].items():
+            values[f"{name} {index}"] = parsed_value
+        formats.append(parsed["format"].replace("${temperature", "${temperature " + str(index)))
+    return {
+        "format": ", ".join(formats),
+        "primary": "temperature 1",
+        "values": values,
+    }
+
 def impedanceAtFrequency(value):
     if _hasCompoundValues(str(value)):
         raise ValueError(f"Compound impedance value cannot be represented as scalar tuple: {value}")

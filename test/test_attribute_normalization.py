@@ -1748,6 +1748,23 @@ def test_holding_temperature(capsys):
     assert_quantity(values["temperature"], 76, "temperature")
 
 
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Maximum Temperature Limit", "180℃", {"temperature": 180}),
+        ("Maximum Temperature Limit", "-", {"temperature": "NaN"}),
+        ("Holding Temperature Limit", "76℃", {"temperature": 76}),
+        ("Holding Temperature Limit", "72/61℃", {"temperature 1": 72, "temperature 2": 61}),
+        ("Rated Functioning Temperature", "102℃", {"temperature": 102}),
+    ],
+)
+def test_temperature_limit_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, temperature in expected.items():
+        assert_quantity(values[quantity], temperature, "temperature")
+
+
 def test_detection_temperature_range(capsys):
     values = normalized_values("Detection Temperature Range", "-55℃~+125℃", capsys)
 

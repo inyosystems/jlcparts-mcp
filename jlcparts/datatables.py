@@ -412,8 +412,13 @@ def normalizeAttribute(key, value):
         elif key in larr(["Operating Junction Temperature Range"]):
             value = attributes.temperatureRangeAttribute(value)
         elif key in larr(["Operating Temperature", "Operating Temperature (Max)", "Operating Temperature (Min)",
-                "Holding Temperature", "Detection Temperature Range"]):
-            value = attributes.stringAttribute(value) if compoundValue(value) else attributes.temperatureRangeAttribute(value)
+                "Holding Temperature", "Detection Temperature Range",
+                "Maximum Temperature Limit", "Holding Temperature Limit",
+                "Rated Functioning Temperature"]):
+            if key in larr(["Holding Temperature Limit"]) and isinstance(value, str) and ("/" in value or "," in value or ";" in value):
+                value = attributes.temperatureListAttribute(value)
+            else:
+                value = attributes.stringAttribute(value) if compoundValue(value) else attributes.temperatureRangeAttribute(value)
         elif key in larr(["B Constant (25°C/85°C)", "B Constant (25°C/50°C)"]):
             value = attributes.kelvinRangeListAttribute(value) if isinstance(value, str) and ("," in value or ";" in value) else attributes.kelvinAttribute(value)
         elif key in larr(["Color Temperature"]):
