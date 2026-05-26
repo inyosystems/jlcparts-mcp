@@ -2911,6 +2911,12 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Slice Width", "2.8mm", 0.0028),
         ("Needle Diameter", "1.78mm", 0.00178),
         ("Full Length of Copper Pipe", "9.525mm", 0.009525),
+        ("Length of Fit", "11.94m", 0.01194),
+        ("Tail Diameter", "6.6mm", 0.0066),
+        ("Head Diameter", "5", 0.005),
+        ("Blade Width", "6.4mm", 0.0064),
+        ("Pin Spacing(Adjacent)", "8.75m", 0.00875),
+        ("Insert Thickness", "0.303mm", 0.000303),
     ],
 )
 def test_scalar_length_attributes(key, value, expected, capsys):
@@ -2928,6 +2934,46 @@ def test_scalar_length_attributes(key, value, expected, capsys):
 )
 def test_toleranced_thickness(value, expected, capsys):
     values = normalized_values("Thickness", value, capsys)
+
+    for quantity, length in expected.items():
+        assert_quantity(values[quantity], length, "length")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("FFC, Fcb Thickness", "0.13mm~0.38mm", {
+            "length min": 0.00013,
+            "length max": 0.00038,
+        }),
+        ("FFC, Fcb Thickness", "0.3mm;0.33mm", {
+            "length 1": 0.0003,
+            "length 2": 0.00033,
+        }),
+        ("Tail Diameter", "3.2mm, 4mm", {
+            "length 1": 0.0032,
+            "length 2": 0.004,
+        }),
+        ("Total Length", "5cm", {"length 1": 0.05}),
+    ],
+)
+def test_additional_length_lists(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, length in expected.items():
+        assert_quantity(values[quantity], length, "length")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("3.2mmx1.6mm", {"length 1": 0.0032, "length 2": 0.0016}),
+        ("2.5mm", {"length": 0.0025}),
+        ("-", {"length": "NaN"}),
+    ],
+)
+def test_board_space_dimensions(value, expected, capsys):
+    values = normalized_values("Board Space (Diameter Φ/Length X Width)", value, capsys)
 
     for quantity, length in expected.items():
         assert_quantity(values[quantity], length, "length")

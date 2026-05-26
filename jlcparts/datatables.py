@@ -423,17 +423,33 @@ def normalizeAttribute(key, value):
                 "Fuse Diameter (Φd)", "Fuse Width", "Inside Contact Diameter",
                 "Hole/Pin Spacing", "(For Insertion) Insertion Piece Thickness",
                 "Length of Copper Pipe", "Tail Width", "Spacing", "Slice Width",
-                "Needle Diameter", "Full Length of Copper Pipe"]):
+                "Needle Diameter", "Full Length of Copper Pipe",
+                "Length of Fit", "FFC, Fcb Thickness", "Tail Diameter",
+                "Head Diameter", "Blade Width", "Pin Spacing(Adjacent)",
+                "Total Length", "Insert Thickness"]):
             if key == "diameter" and isinstance(value, str) and re.fullmatch(r"M\s*\d+(?:\.\d+)?", value, re.I):
                 value = re.sub(r"^M\s*", "", value, flags=re.I) + "mm"
             if key in larr(["Insulation Od", "Interface Length/Height", "Interface Diameter",
                     "System Fit Height", "Fuse Length", "Fuse Diameter (Φd)",
-                    "Fuse Width"]) and isinstance(value, str) and ("," in value or ";" in value):
+                    "Fuse Width", "FFC, Fcb Thickness", "Tail Diameter"]) and isinstance(value, str) and ("," in value or ";" in value):
+                if key in larr(["FFC, Fcb Thickness", "Tail Diameter"]):
+                    value = attributes.mechanicalLengthRangeListAttribute(value, "length")
+                else:
+                    value = attributes.lengthRangeListAttribute(value, "length")
+            elif key in larr(["Length of Fit", "FFC, Fcb Thickness", "Tail Diameter",
+                    "Head Diameter", "Blade Width", "Pin Spacing(Adjacent)",
+                    "Insert Thickness"]):
+                value = attributes.mechanicalLengthAttribute(value)
+            elif key in larr(["Board Space (Diameter Φ/Length X Width)"]):
+                value = attributes.boardSpaceAttribute(value)
+            elif key in larr(["Total Length"]):
                 value = attributes.lengthRangeListAttribute(value, "length")
             elif key == "thickness" and isinstance(value, str) and "±" in value:
                 value = attributes.tolerancedLengthAttribute(value)
             else:
                 value = attributes.stringAttribute(value) if compoundValue(value) else attributes.lengthAttribute(value)
+        elif key in larr(["Board Space (Diameter Φ/Length X Width)"]):
+            value = attributes.boardSpaceAttribute(value)
         elif key in larr(["Pitch"]):
             value = attributes.pitchAttribute(value)
         elif key in larr(["Luminous Intensity", "Light Intensity"]):

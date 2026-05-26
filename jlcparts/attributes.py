@@ -1227,6 +1227,51 @@ def meltingI2tAttribute(value):
 def lengthAttribute(value):
     return rangeOrScalarAttribute(value, readLength, "length", "length")
 
+def _readMechanicalLength(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    if re.fullmatch(r"[+-]?\d+(?:\.\d+)?", value):
+        value += "mm"
+    elif re.fullmatch(r"[+-]?\d+(?:\.\d+)?\s*m", value, flags=re.I):
+        value += "m"
+    return readLength(value)
+
+def mechanicalLengthAttribute(value):
+    return rangeOrScalarAttribute(value, _readMechanicalLength, "length", "length")
+
+def mechanicalLengthRangeListAttribute(value, name="length"):
+    value = str(value).replace(";", ",").strip()
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        parsed = rangeOrScalarAttribute(part, _readMechanicalLength, "length", f"{name} {i}")
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": f"{name} 1 min" if any(_rangeParts(part) for part in parts) else f"{name} 1",
+        "values": values
+    }
+
+def boardSpaceAttribute(value):
+    value = str(value).strip()
+    if "x" not in value.lower():
+        return mechanicalLengthAttribute(value)
+    parts = [x.strip() for x in re.split(r"\s*x\s*", value, flags=re.I) if x.strip()]
+    unit = next((re.search(r"(nm|um|mm|cm|m|mil|in|inch|inches)\s*$", part, flags=re.I).group(1) for part in parts if re.search(r"(nm|um|mm|cm|m|mil|in|inch|inches)\s*$", part, flags=re.I)), "mm")
+    values = {}
+    for index, part in enumerate(parts, start=1):
+        if re.search(r"(nm|um|mm|cm|m|mil|in|inch|inches)\s*$", part, flags=re.I) is None:
+            part += unit
+        values[f"length {index}"] = [_readMechanicalLength(part), "length"]
+    return {
+        "format": " x ".join("${" + f"length {i}" + "}" for i in range(1, len(parts) + 1)),
+        "primary": "length 1",
+        "values": values
+    }
+
 def tolerancedLengthAttribute(value):
     value = str(value).strip()
     if "±" not in value:
