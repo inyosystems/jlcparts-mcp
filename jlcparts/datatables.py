@@ -117,7 +117,8 @@ def normalizeAttribute(key, value):
                 "On - State Voltage(Vt)", "Switching Voltage(Vs)",
                 "Peak Off - State Voltage(Vdrm)", "On State Voltage",
                 "Trigger Voltage", "Operating Voltage (Max)", "Switching Voltage (Vs)",
-                "Peak Off-State Voltage", "Reset Voltage", "Peak Impulse Voltage"]):
+                "Peak Off-State Voltage", "Reset Voltage", "Peak Impulse Voltage",
+                "On-State Voltage (Vt)", "Lag of Receiver"]):
             if key == "charging saturation voltage" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "isolation voltage(vrms)" and compoundValue(value):
@@ -149,7 +150,10 @@ def normalizeAttribute(key, value):
                 "voltage - supply(input)", "voltage - supply(output)",
                 "input voltage range", "common mode voltage",
                 "voltage - supply(vcca)", "voltage - supply(vccb)",
-                "voltage - supply (driver)", "dc spark-over voltage"]:
+                "voltage - supply (driver)", "dc spark-over voltage",
+                "voltage - supply (bus)", "voltage - supply (logic)",
+                "integrated power output voltage", "supply voltage(vcc)",
+                "esd protect"]:
             value = attributes.voltageRangeListAttribute(value) if compoundValue(value) else attributes.voltageRangeAttribute(value, "voltage")
         elif key in larr(["Human Body Model", "Contact Discharge Vesd"]):
             value = attributes.voltageRangeAttribute(value, "voltage")
