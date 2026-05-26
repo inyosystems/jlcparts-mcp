@@ -70,11 +70,10 @@ $ source venv/bin/activate
 $ pip install -e .
 ```
 
-Then to download the cached parts list and process it, run:
+Download the cached parts database as shown in the [GitHub Actions workflow](https://github.com/yaqwsx/jlcparts/blob/master/.github/workflows/update_components.yaml),
+then process it:
 
 ```
-$ wget https://yaqwsx.github.io/jlcparts/data/cache.zip https://yaqwsx.github.io/jlcparts/data/cache.z0{1..8}
-$ 7z x cache.zip
 $ mkdir -p web/public/data/
 $ jlcparts buildtables --jobs 0 --ignoreoldstock 30 cache.sqlite3 web/public/data
 ```
