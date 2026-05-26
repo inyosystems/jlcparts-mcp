@@ -130,7 +130,7 @@ def normalizeAttribute(key, value):
                 "vcm - common mode voltage", "low voltage detection threshold",
                 "differential input voltage",
                 "operating voltage range", "load voltage",
-                "voltage - supply(vcca)"]:
+                "voltage - supply(vcca)", "voltage - supply(vccb)"]:
             value = attributes.voltageRangeListAttribute(value) if compoundValue(value) else attributes.voltageRangeAttribute(value, "voltage")
         elif key in larr(["Input Voltage", "Frequency Input Voltage", "Zener Voltage (Range)",
                 "Single Supply", "Dual Supply", "Operating Voltage", "Voltage - Input(DC)",
