@@ -4,7 +4,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { naturalCompare } from '@discoveryjs/natural-compare';
 
-import { getCategories, getComponentsByLcscList } from './db';
+import { getCategories, getComponentsByLcscList, subscribeToComponentLibraryChanges } from './db';
 import { getQuantityPrice } from './jlc';
 import { SortableTable } from './sortableTable';
 import {
@@ -125,13 +125,16 @@ export function CompareParts() {
 
     useEffect(() => {
         let cancelled = false;
-        getCategories().then(nextCategories => {
+        const loadCategories = () => getCategories().then(nextCategories => {
             if (!cancelled) {
                 setCategories(nextCategories);
             }
         });
+        const unsubscribe = subscribeToComponentLibraryChanges(loadCategories);
+        loadCategories();
         return () => {
             cancelled = true;
+            unsubscribe();
         };
     }, []);
 

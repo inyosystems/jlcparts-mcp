@@ -28,6 +28,7 @@ const SMALL_SHARD_ESTIMATED_ROWS = 1000;
 const BROWSE_SHARD_ESTIMATED_ROWS = 20000;
 const parsedFileCache = new Map();
 let manifestCache = undefined;
+const libraryChangeListeners = new Set();
 
 function dataUrl(name) {
     return `${SOURCE_PATH}/${name}`;
@@ -587,6 +588,20 @@ async function storeManifest(manifest) {
         setSetting("lastUpdate", manifest.created),
         setSetting("formatVersion", manifest.version),
     ]);
+    notifyComponentLibraryChange();
+}
+
+function notifyComponentLibraryChange() {
+    for (const listener of libraryChangeListeners) {
+        listener(manifestCache);
+    }
+}
+
+export function subscribeToComponentLibraryChanges(listener) {
+    libraryChangeListeners.add(listener);
+    return () => {
+        libraryChangeListeners.delete(listener);
+    };
 }
 
 async function fetchRemoteManifest() {

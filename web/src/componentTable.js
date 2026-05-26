@@ -1,4 +1,4 @@
-import { getCategories, queryComponents } from "./db";
+import { getCategories, queryComponents, subscribeToComponentLibraryChanges } from "./db";
 import React, { useEffect, useMemo, useState } from "react";
 import { produce, enableMapSet } from "immer";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -333,7 +333,25 @@ class ComponentOverviewView extends React.Component {
     }
 
     componentDidMount() {
+        this.mounted = true;
+        this.unsubscribeFromLibraryChanges = subscribeToComponentLibraryChanges(() => {
+            this.loadCategories();
+        });
+        this.loadCategories();
+    }
+
+    componentWillUnmount() {
+        this.mounted = false;
+        this.unsubscribeFromLibraryChanges?.();
+    }
+
+    loadCategories() {
+        const loadId = Symbol();
+        this.activeCategoryLoad = loadId;
         getCategories().then(categories => {
+            if (!this.mounted || this.activeCategoryLoad !== loadId) {
+                return;
+            }
             const normalizedCategories = categories.map(category => ({
                 ...category,
                 category: displayText(category.category),
