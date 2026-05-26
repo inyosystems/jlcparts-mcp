@@ -2242,6 +2242,20 @@ def test_rated_power(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("400mW", 0.4),
+        ("30.4W", 30.4),
+        ("-", "NaN"),
+    ],
+)
+def test_rated_wattage(value, expected, capsys):
+    values = normalized_values("Rated Wattage", value, capsys)
+
+    assert_quantity(values["power"], expected, "power")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("700mW", {"power": 0.7}),
         ("1.6W, 1.8W", {"power 1": 1.6, "power 2": 1.8}),
     ],
