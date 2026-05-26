@@ -480,6 +480,7 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Collector Cut-Off Current (Icbo)", "100nA", "current", 100e-9, "current"),
         ("Current - Collector Cutoff", "50uA", "current", 50e-6, "current"),
         ("Load Current", "130mA", "current", 0.13, "current"),
+        ("Steady State Current (Max)", "100uA", "current", 100e-6, "current"),
         ("Rated Speed", "8500RPM", "speed", 8500.0, "rotational_speed"),
         ("Rated Speed", "-", "speed", "NaN", "rotational_speed"),
     ],
@@ -710,6 +711,7 @@ def test_center_frequency(value, expected, capsys):
         ("Current of Transmitting", "7.1mA, 3.5mA", [0.0071, 0.0035]),
         ("Current - Collector Cutoff", "100uA, 500uA", [100e-6, 500e-6]),
         ("Load Current", "900mA, 1.2A", [0.9, 1.2]),
+        ("Steady State Current (Max)", "440uA, 400uA", [440e-6, 400e-6]),
     ],
 )
 def test_current_lists(key, value, expected, capsys):
