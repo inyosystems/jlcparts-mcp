@@ -2627,6 +2627,20 @@ def test_td_off_times(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("3ms", {"time": 0.003}),
+        ("1ms~4ms", {"time min": 0.001, "time max": 0.004}),
+    ],
+)
+def test_action_time_ton_values(value, expected, capsys):
+    values = normalized_values("Action Time (Ton)", value, capsys)
+
+    for quantity, time in expected.items():
+        assert_quantity(values[quantity], time, "time")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("2ms", {"time": 0.002}),
         ("2s@(64KB)", {"time": 2.0}),
         ("150ms@(32KB), 250ms@(64KB)", {"time 1": 0.15, "time 2": 0.25}),
