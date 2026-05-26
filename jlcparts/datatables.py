@@ -187,7 +187,8 @@ def normalizeAttribute(key, value):
                     "Minimum Cathode Current for Regulation",
                     "Holding Current (Ih)",
                     "Current - Max",
-                    "Supply Current Per Channel"]):
+                    "Supply Current Per Channel",
+                    "Standby Supply Current"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent current",

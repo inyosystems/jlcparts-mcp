@@ -813,6 +813,20 @@ def test_operating_current(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("200nA", 200e-9),
+        ("8uA", 8e-6),
+        ("0.2mA", 0.0002),
+    ],
+)
+def test_standby_supply_current(value, expected, capsys):
+    values = normalized_values("Standby Supply Current", value, capsys)
+
+    assert_quantity(values["current"], expected, "current")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("11A", 11.0),
         ("250mA", 0.25),
         ("null", "NaN"),
