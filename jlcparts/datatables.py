@@ -340,7 +340,7 @@ def normalizeAttribute(key, value):
                 value = attributes.capacitanceAttribute(value)
         elif key in larr(["Electrostatic Capacity"]):
             value = attributes.capacitanceRangeListAttribute(value) if compoundValue(value) else attributes.capacitanceRangeAttribute(value)
-        elif key in larr(["Inductance"]):
+        elif key in larr(["Inductance", "Equivalent Series Inductance"]):
             value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.inductanceAttribute(value)
         elif key in larr(["Length", "Width", "Height", "Diameter", "Switch Height", "Overall Length",
                 "Height Above Board", "X-Length of Bottom Edge on Board (Spacing Line)",

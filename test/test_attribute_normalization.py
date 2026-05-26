@@ -607,6 +607,12 @@ def test_extra_capacitance_attributes(key, value, expected, capsys):
         assert_quantity(values[quantity], capacitance, "capacitance")
 
 
+def test_equivalent_series_inductance_values(capsys):
+    values = normalized_values("Equivalent Series Inductance", "0.1nH", capsys)
+
+    assert_quantity(values["inductance"], 0.1e-9, "inductance")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
