@@ -1345,6 +1345,7 @@ def test_extra_count_attributes(key, value, expected, capsys):
             "resolution 3": (10, "count"),
             "resolution 4": (14, "count"),
         }),
+        ("16/32 Bit", {"resolution 1": (16, "count"), "resolution 2": (32, "count")}),
         ("6 digits", {"resolution": (6, "count")}),
         ("13.8", {"resolution": (13.8, "count")}),
         ("19ps", {"resolution": (19e-12, "time")}),
@@ -1385,6 +1386,29 @@ def test_resolution_bits_values(capsys):
     values = normalized_values("Resolution(Bits)", "16-Bit", capsys)
 
     assert_quantity(values["resolution"], 16, "count")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Output Bits", "8bit", {"resolution": (8, "count")}),
+        ("Output Bits", "12bit, 14bit, 10bit, 8bit", {
+            "resolution 1": (12, "count"),
+            "resolution 2": (14, "count"),
+            "resolution 3": (10, "count"),
+            "resolution 4": (8, "count"),
+        }),
+        ("DAC (Bit)", "12bit;7bit", {"resolution 1": (12, "count"), "resolution 2": (7, "count")}),
+        ("ADC (Bit)", "24bit", {"resolution": (24, "count")}),
+        ("Pwm (Bit)", "8bit;32bit", {"resolution 1": (8, "count"), "resolution 2": (32, "count")}),
+        ("Core Size", "16/32 Bit", {"resolution 1": (16, "count"), "resolution 2": (32, "count")}),
+    ],
+)
+def test_resolution_alias_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, (amount, unit) in expected.items():
+        assert_quantity(values[quantity], amount, unit)
 
 
 @pytest.mark.parametrize(

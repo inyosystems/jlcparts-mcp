@@ -850,6 +850,7 @@ def _resolutionPartAttribute(value, name):
 
 def resolutionAttribute(value):
     value = str(value).strip()
+    value = re.sub(r"(\d+)\s*/\s*(\d+)\s*[Bb]its?$", r"\1bit,\2bit", value)
     parts = [x.strip() for x in re.split(r"[,;]", value) if x.strip()]
     if len(parts) <= 1:
         return _resolutionPartAttribute(value, "resolution")
