@@ -2520,6 +2520,9 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Body Length", "168mm", 0.168),
         ("Body Width", "76mm", 0.076),
         ("Thickness", "0.06mm", 0.00006),
+        ("Fuse Length", "20mm", 0.02),
+        ("Fuse Diameter (Φd)", "5.2mm", 0.0052),
+        ("Fuse Width", "3.8mm", 0.0038),
     ],
 )
 def test_scalar_length_attributes(key, value, expected, capsys):
@@ -2587,6 +2590,20 @@ def test_interface_diameter_lists(capsys):
 
     assert_quantity(values["length 1"], 0.0096, "length")
     assert_quantity(values["length 2"], 0.00635, "length")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Fuse Length", "20mm, 30mm, 25mm", [0.02, 0.03, 0.025]),
+        ("Fuse Diameter (Φd)", "6.3mm, 5mm", [0.0063, 0.005]),
+    ],
+)
+def test_fuse_dimension_lists(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for index, length in enumerate(expected, start=1):
+        assert_quantity(values[f"length {index}"], length, "length")
 
 
 @pytest.mark.parametrize(

@@ -352,10 +352,13 @@ def normalizeAttribute(key, value):
                 "Pin Length", "Diameter(Φd)", "Lead Pitch", "Inner Diameter Φ/Inner Width D",
                 "Lead Spacing", "Φd", "Pin Spacing", "Capacitor Length", "Pin Spaceing",
                 "Capacitor Diameter", "Size/Dimension", "Body Thickness", "Body Height",
-                "Body Length", "Body Width", "Thickness"]):
+                "Body Length", "Body Width", "Thickness", "Fuse Length",
+                "Fuse Diameter (Φd)", "Fuse Width"]):
             if key == "diameter" and isinstance(value, str) and re.fullmatch(r"M\s*\d+(?:\.\d+)?", value, re.I):
                 value = re.sub(r"^M\s*", "", value, flags=re.I) + "mm"
-            if key in larr(["Insulation Od", "Interface Length/Height", "Interface Diameter", "System Fit Height"]) and isinstance(value, str) and ("," in value or ";" in value):
+            if key in larr(["Insulation Od", "Interface Length/Height", "Interface Diameter",
+                    "System Fit Height", "Fuse Length", "Fuse Diameter (Φd)",
+                    "Fuse Width"]) and isinstance(value, str) and ("," in value or ";" in value):
                 value = attributes.lengthRangeListAttribute(value, "length")
             elif key == "thickness" and isinstance(value, str) and "±" in value:
                 value = attributes.tolerancedLengthAttribute(value)
