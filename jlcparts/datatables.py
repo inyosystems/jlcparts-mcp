@@ -327,7 +327,10 @@ def normalizeAttribute(key, value):
                 "Height - Seated (Max)", "Length of Mating Pin", "Operating Height", "Operational Height", "L", "Row Spacing",
                 "System Fit Height", "Overall Length/Height", "Head Width", "Center Height",
                 "Outside Contact Diameter", "Length of End Connection Pin", "Diameter of Bolt Mouth",
-                "Pin Length"]):
+                "Pin Length", "Diameter(Φd)", "Lead Pitch", "Inner Diameter Φ/Inner Width D",
+                "Lead Spacing", "Φd", "Pin Spacing", "Capacitor Length", "Pin Spaceing",
+                "Capacitor Diameter", "Size/Dimension", "Body Thickness", "Body Height",
+                "Body Length", "Body Width"]):
             if key == "diameter" and isinstance(value, str) and re.fullmatch(r"M\s*\d+(?:\.\d+)?", value, re.I):
                 value = re.sub(r"^M\s*", "", value, flags=re.I) + "mm"
             if key in larr(["Insulation Od", "Interface Length/Height", "Interface Diameter", "System Fit Height"]) and isinstance(value, str) and ("," in value or ";" in value):
