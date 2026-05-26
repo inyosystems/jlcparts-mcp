@@ -2226,11 +2226,27 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Body Height", "0.3mm", 0.0003),
         ("Body Length", "168mm", 0.168),
         ("Body Width", "76mm", 0.076),
+        ("Thickness", "0.06mm", 0.00006),
     ],
 )
 def test_scalar_length_attributes(key, value, expected, capsys):
     values = normalized_values(key, value, capsys)
     assert_quantity(values["length"], expected, "length")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("1.0mm±0.03mm", {"length": 0.001, "length tolerance": 0.00003, "length min": 0.00097, "length max": 0.00103}),
+        ("0.8±0.1mm", {"length": 0.0008, "length tolerance": 0.0001, "length min": 0.0007, "length max": 0.0009}),
+        ("1.5mm ± 0.02mm", {"length": 0.0015, "length tolerance": 0.00002, "length min": 0.00148, "length max": 0.00152}),
+    ],
+)
+def test_toleranced_thickness(value, expected, capsys):
+    values = normalized_values("Thickness", value, capsys)
+
+    for quantity, length in expected.items():
+        assert_quantity(values[quantity], length, "length")
 
 
 @pytest.mark.parametrize(

@@ -1011,6 +1011,30 @@ def meltingI2tAttribute(value):
 def lengthAttribute(value):
     return rangeOrScalarAttribute(value, readLength, "length", "length")
 
+def tolerancedLengthAttribute(value):
+    value = str(value).strip()
+    if "±" not in value:
+        return lengthAttribute(value)
+    nominal, tolerance = [x.strip() for x in value.split("±", 1)]
+    nominal_unit = re.search(r"(nm|um|mm|cm|m|mil|in|inch|inches)\s*$", nominal, flags=re.I)
+    tolerance_unit = re.search(r"(nm|um|mm|cm|m|mil|in|inch|inches)\s*$", tolerance, flags=re.I)
+    if nominal_unit is None and tolerance_unit is not None:
+        nominal += tolerance_unit.group(1)
+    elif tolerance_unit is None and nominal_unit is not None:
+        tolerance += nominal_unit.group(1)
+    length = readLength(nominal)
+    tolerance_value = readLength(tolerance)
+    return {
+        "format": "${length} ± ${length tolerance}",
+        "primary": "length",
+        "values": {
+            "length": [length, "length"],
+            "length tolerance": [tolerance_value, "length"],
+            "length min": [length - tolerance_value, "length"],
+            "length max": [length + tolerance_value, "length"],
+        }
+    }
+
 def pitchAttribute(value):
     value = str(value).strip()
     if re.fullmatch(r"[+-]?\d+(?:\.\d+)?", value):
