@@ -1431,6 +1431,19 @@ def test_peak_pulse_power_dissipation_at_pulse(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("500mW", 0.5),
+        ("21.6w", 21.6),
+    ],
+)
+def test_rated_power(value, expected, capsys):
+    values = normalized_values("Rated Power", value, capsys)
+
+    assert_quantity(values["power"], expected, "power")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("470mW, 294mW", {"power 1": 0.47, "power 2": 0.294}),
         ("500mW@UVA, 240mW@UVC", {"power 1": 0.5, "power 2": 0.24}),
         ("330mW, 400mW, 580mW", {"power 1": 0.33, "power 2": 0.4, "power 3": 0.58}),

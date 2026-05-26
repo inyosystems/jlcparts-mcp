@@ -162,7 +162,7 @@ def readPower(value):
         # Fraction
         numerator, denominator, unit = re.fullmatch(r"(\d+)/(\d+)\s*(\w+)", value).groups()
         value = str(float(numerator) / float(denominator)) + unit
-    value = value.replace("W", "").strip()
+    value = re.sub(r"w", "", value, flags=re.I).strip()
     return readWithSiPrefix(value)
 
 def readEnergy(value):

@@ -222,7 +222,7 @@ def normalizeAttribute(key, value):
                           "Dissipation Power (Max)", "Switching Power (Max)",
                           "Power Dissipation", "Peak Pulse Power Dissipation (Ppp)",
                           "Peak Pulse Power Dissipation (Ppp)@10/1000us",
-                          "Peak Pulse Power(Ppp)@8/20us"]):
+                          "Peak Pulse Power(Ppp)@8/20us", "Rated Power"]):
             if key == "peak pulse power(ppp)@8/20us" and isinstance(value, str) and ("," in value or ";" in value):
                 value = attributes.powerListAttribute(value, "power")
             elif key == "power dissipation (pd)" and compoundValue(value):
