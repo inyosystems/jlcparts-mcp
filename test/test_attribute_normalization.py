@@ -845,6 +845,20 @@ def test_standby_current_iq(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("1A", 1.0),
+        ("700mA", 0.7),
+        ("1.25A", 1.25),
+    ],
+)
+def test_on_state_rms_current(value, expected, capsys):
+    values = normalized_values("Current - on State(It(RMS))", value, capsys)
+
+    assert_quantity(values["current"], expected, "current")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("11A", 11.0),
         ("250mA", 0.25),
         ("null", "NaN"),

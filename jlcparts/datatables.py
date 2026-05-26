@@ -189,7 +189,8 @@ def normalizeAttribute(key, value):
                     "Current - Max",
                     "Supply Current Per Channel",
                     "Standby Supply Current",
-                    "Standby Current (Iq)"]):
+                    "Standby Current (Iq)",
+                    "Current - on State(It(RMS))"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent current",
