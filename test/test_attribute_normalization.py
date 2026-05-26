@@ -1521,6 +1521,27 @@ def test_number_of_bits_per_element_count(capsys):
     assert_quantity(values["count 1"], 4, "count")
     assert_quantity(values["count 2"], 2, "count")
 
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Timer Number", "3", {"count": 3}),
+        ("Timer Number", "-", {"count": "NaN"}),
+        ("Numberof Drivers", "24", {"count": 24}),
+        ("Numberof Receivers", "5", {"count": 5}),
+        ("Number of Receivers", "2, 1", {"count 1": 2, "count 2": 1}),
+        ("Number of Drivers", "2, 1", {"count 1": 2, "count 2": 1}),
+        ("Number of Ports", "28", {"count": 28}),
+        ("Number of Supporting Devices", "126", {"count": 126}),
+    ],
+)
+def test_driver_receiver_count_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, count in expected.items():
+        assert_quantity(values[quantity], count, "count")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [

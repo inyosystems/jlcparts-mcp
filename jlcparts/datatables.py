@@ -314,7 +314,9 @@ def normalizeAttribute(key, value):
             value = attributes.resolutionAttribute(value)
         elif key in larr(["Filter Order"]):
             value = attributes.filterOrderAttribute(value)
-        elif key in larr(["Number of Bits Per Element"]):
+        elif key in larr(["Number of Bits Per Element", "Timer Number", "Numberof Drivers",
+                "Numberof Receivers", "Number of Receivers", "Number of Drivers",
+                "Number of Ports", "Number of Supporting Devices"]):
             value = attributes.countListAttribute(value)
         elif key in larr(["Number of Pins", "Number of Resistors", "Number of Loop",
                     "Number of Regulators", "Number of Outputs", "Number of Capacitors",
