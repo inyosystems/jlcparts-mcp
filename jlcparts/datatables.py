@@ -344,7 +344,8 @@ def normalizeAttribute(key, value):
                 value = attributes.stringAttribute(value) if compoundValue(value) else attributes.percentageAttribute(value)
         elif key == "Rds On (Max) @ Id, Vgs".lower():
             value = attributes.rdsOnMaxAtIdsAtVgs(value)
-        elif key in larr(["Operating Temperature", "Operating Temperature (Max)", "Operating Temperature (Min)"]):
+        elif key in larr(["Operating Temperature", "Operating Temperature (Max)", "Operating Temperature (Min)",
+                "Holding Temperature"]):
             value = attributes.stringAttribute(value) if compoundValue(value) else attributes.temperatureRangeAttribute(value)
         elif key in larr(["B Constant (25°C/85°C)", "B Constant (25°C/50°C)"]):
             value = attributes.kelvinRangeListAttribute(value) if isinstance(value, str) and ("," in value or ";" in value) else attributes.kelvinAttribute(value)
