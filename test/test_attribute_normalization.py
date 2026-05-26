@@ -827,6 +827,24 @@ def test_standby_supply_current(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("3mA", [0.003]),
+        ("330uA, 360uA", [330e-6, 360e-6]),
+        ("600nA", [600e-9]),
+    ],
+)
+def test_standby_current_iq(value, expected, capsys):
+    values = normalized_values("Standby Current (Iq)", value, capsys)
+
+    if len(expected) == 1:
+        assert_quantity(values["current"], expected[0], "current")
+    else:
+        for index, current in enumerate(expected, start=1):
+            assert_quantity(values[f"current {index}"], current, "current")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("11A", 11.0),
         ("250mA", 0.25),
         ("null", "NaN"),
