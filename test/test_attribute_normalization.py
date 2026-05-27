@@ -844,6 +844,7 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Sink Current", "12mA", "current", 0.012, "current"),
         ("Refresh Current", "8mA", "current", 0.008, "current"),
         ("Frequency (Max)", "6GHz", "frequency", 6e9, "frequency"),
+        ("Voltage", "600 V", "voltage", 600.0, "voltage"),
         ("Rated Speed", "8500RPM", "speed", 8500.0, "rotational_speed"),
         ("Rated Speed", "-", "speed", "NaN", "rotational_speed"),
     ],
@@ -892,6 +893,8 @@ def test_peak_output_current_sink_list(capsys):
         ("Interrupting Rating", "2000A@32V", {"current": 2000.0}),
         ("Rated Ripple Curren", "2.3A@100kHz", {"current": 2.3}),
         ("Drain Current (Idss)", "57mA", {"current": 0.057}),
+        ("Current Rating (AC)", "3A", {"current": 3.0}),
+        ("Current Rating (DC)", "50mA", {"current": 0.05}),
     ],
 )
 def test_additional_current_values(key, value, expected, capsys):
@@ -2350,9 +2353,10 @@ def test_color_temperature(value, expected, capsys):
         }),
         ("5, 6", {"area 1": 5.0, "area 2": 6.0}),
         ("-", {"area 1": "NaN"}),
+        ("0.3~0.4", {"area 1 min": 0.3, "area 1 max": 0.4}),
     ],
 )
-@pytest.mark.parametrize("key", ["Wire Gauge - MM2", "Wire Gauge - Sqmm"])
+@pytest.mark.parametrize("key", ["Wire Gauge - MM2", "Wire Gauge - Sqmm", "Wire Gauge - Sqmm (Per)", "Wire Gauge - MM2 (Not Stranded Wire)"])
 def test_wire_gauge_mm2(key, value, expected, capsys):
     values = normalized_values(key, value, capsys)
 
@@ -2375,11 +2379,14 @@ def test_wire_gauge_mm2(key, value, expected, capsys):
         ("1/0", {"awg 1": 0}),
         ("2/0~10", {"awg 1 min": -1, "awg 1 max": 10.0}),
         ("3/0~500", {"awg 1 min": -2, "awg 1 max": 500.0}),
+        ("22 AWG", {"awg 1": 22.0}),
+        ("26~28", {"awg 1 min": 26.0, "awg 1 max": 28.0}),
         ("-", {"awg 1": "NaN"}),
     ],
 )
-def test_wire_gauge_awg(value, expected, capsys):
-    values = normalized_values("Wire Gauge - Awg", value, capsys)
+@pytest.mark.parametrize("key", ["Wire Gauge - Awg", "Wire Gauge", "Wire Gauge - Awg (Per)", "Wire Gauge - Awg (Not Stranded Wire)"])
+def test_wire_gauge_awg(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
 
     for quantity, awg in expected.items():
         assert_quantity(values[quantity], awg, "awg")
@@ -3067,6 +3074,9 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Blade Width", "6.4mm", 0.0064),
         ("Pin Spacing(Adjacent)", "8.75m", 0.00875),
         ("Insert Thickness", "0.303mm", 0.000303),
+        ("Spacing - Connector", "0.118\"(3.00mm)", 0.003),
+        ("Sheath (Insulation) Diameter", "0.200\"(5.08mm)", 0.00508),
+        ("Wire Diameter", "2.5mm", 0.0025),
     ],
 )
 def test_scalar_length_attributes(key, value, expected, capsys):
@@ -3105,6 +3115,11 @@ def test_toleranced_thickness(value, expected, capsys):
             "length 2": 0.004,
         }),
         ("Total Length", "5cm", {"length 1": 0.05}),
+        ("Line Length", "30cm, 23cm", {"length 1": 0.3, "length 2": 0.23}),
+        ("Wire Diameter", "1.6mm, Rib Line Diameter 1.8MM", {
+            "length 1": 0.0016,
+            "length 2": 0.0018,
+        }),
     ],
 )
 def test_additional_length_lists(key, value, expected, capsys):

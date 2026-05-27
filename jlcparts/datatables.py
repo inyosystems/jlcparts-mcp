@@ -120,7 +120,7 @@ def normalizeAttribute(key, value):
                 "Peak Off-State Voltage", "Reset Voltage", "Peak Impulse Voltage",
                 "On-State Voltage (Vt)", "Lag of Receiver", "End-Off Voltage",
                 "Dielectric Withstand Voltage", "Coil Voltage",
-                "Switching Voltage (Max)"]):
+                "Switching Voltage (Max)", "Voltage"]):
             if key == "charging saturation voltage" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "isolation voltage(vrms)" and compoundValue(value):
@@ -243,7 +243,8 @@ def normalizeAttribute(key, value):
                     "Contact Current", "Signal Current Rating",
                     "Breaking Capacity", "Interrupt Rating",
                     "Interrupting Rating", "Rated Ripple Curren",
-                    "Drain Current (Idss)"]):
+                    "Drain Current (Idss)", "Current Rating (AC)",
+                    "Current Rating (DC)"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent current",
@@ -439,23 +440,27 @@ def normalizeAttribute(key, value):
                 "Needle Diameter", "Full Length of Copper Pipe",
                 "Length of Fit", "FFC, Fcb Thickness", "Tail Diameter",
                 "Head Diameter", "Blade Width", "Pin Spacing(Adjacent)",
-                "Total Length", "Insert Thickness"]):
+                "Total Length", "Insert Thickness", "Spacing - Connector",
+                "Sheath (Insulation) Diameter", "Line Length",
+                "Wire Diameter"]):
             if key == "diameter" and isinstance(value, str) and re.fullmatch(r"M\s*\d+(?:\.\d+)?", value, re.I):
                 value = re.sub(r"^M\s*", "", value, flags=re.I) + "mm"
             if key in larr(["Insulation Od", "Interface Length/Height", "Interface Diameter",
                     "System Fit Height", "Fuse Length", "Fuse Diameter (Φd)",
-                    "Fuse Width", "FFC, Fcb Thickness", "Tail Diameter"]) and isinstance(value, str) and ("," in value or ";" in value):
-                if key in larr(["FFC, Fcb Thickness", "Tail Diameter"]):
+                    "Fuse Width", "FFC, Fcb Thickness", "Tail Diameter",
+                    "Line Length", "Wire Diameter"]) and isinstance(value, str) and ("," in value or ";" in value):
+                if key in larr(["FFC, Fcb Thickness", "Tail Diameter", "Line Length", "Wire Diameter"]):
                     value = attributes.mechanicalLengthRangeListAttribute(value, "length")
                 else:
                     value = attributes.lengthRangeListAttribute(value, "length")
             elif key in larr(["Length of Fit", "FFC, Fcb Thickness", "Tail Diameter",
                     "Head Diameter", "Blade Width", "Pin Spacing(Adjacent)",
-                    "Insert Thickness"]):
+                    "Insert Thickness", "Spacing - Connector",
+                    "Sheath (Insulation) Diameter", "Wire Diameter"]):
                 value = attributes.mechanicalLengthAttribute(value)
             elif key in larr(["Board Space (Diameter Φ/Length X Width)"]):
                 value = attributes.boardSpaceAttribute(value)
-            elif key in larr(["Total Length"]):
+            elif key in larr(["Total Length", "Line Length"]):
                 value = attributes.lengthRangeListAttribute(value, "length")
             elif key == "thickness" and isinstance(value, str) and "±" in value:
                 value = attributes.tolerancedLengthAttribute(value)
@@ -524,9 +529,11 @@ def normalizeAttribute(key, value):
             value = attributes.kelvinRangeListAttribute(value) if isinstance(value, str) and ("," in value or ";" in value) else attributes.kelvinAttribute(value)
         elif key in larr(["Color Temperature"]):
             value = attributes.kelvinRangeListAttribute(value)
-        elif key in larr(["Wire Gauge - MM2", "Wire Gauge - Sqmm"]):
+        elif key in larr(["Wire Gauge - MM2", "Wire Gauge - Sqmm",
+                "Wire Gauge - Sqmm (Per)", "Wire Gauge - MM2 (Not Stranded Wire)"]):
             value = attributes.areaMm2RangeListAttribute(value)
-        elif key in larr(["Wire Gauge - Awg"]):
+        elif key in larr(["Wire Gauge - Awg", "Wire Gauge", "Wire Gauge - Awg (Per)",
+                "Wire Gauge - Awg (Not Stranded Wire)"]):
             value = attributes.awgRangeListAttribute(value)
         elif key in larr(["Operation Points", "Release Points"]):
             value = attributes.magneticFluxDensityRangeListAttribute(value)

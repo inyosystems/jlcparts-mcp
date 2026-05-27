@@ -1365,6 +1365,9 @@ def _readMechanicalLength(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
         return "NaN"
+    labeled = re.search(r"([+-]?\d+(?:\.\d+)?)\s*(nm|um|mm|cm|m|mil|in|inch|inches)\s*$", value, flags=re.I)
+    if labeled is not None and labeled.group(0).strip() != value:
+        value = labeled.group(0)
     if re.fullmatch(r"[+-]?\d+(?:\.\d+)?", value):
         value += "mm"
     elif re.fullmatch(r"[+-]?\d+(?:\.\d+)?\s*m", value, flags=re.I):
@@ -1468,6 +1471,7 @@ def areaMm2RangeListAttribute(value):
 
 def awgRangeListAttribute(value):
     value = str(value).replace(";", ",").strip()
+    value = re.sub(r"\s*AWG$", "", value, flags=re.I)
     if value == "~":
         value = "-"
     parts = [x.strip() for x in value.split(",")]
