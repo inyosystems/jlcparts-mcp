@@ -742,7 +742,10 @@ def _readCycleCount(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
         return "NaN"
-    normalized = value.replace(",", "").lower()
+    normalized = value.replace(",", "").replace("×", "x").lower()
+    scientific = re.fullmatch(r"(\d+(?:\.\d+)?)\s*x\s*10\^(\d+)\s*(?:cycles?|times?|cuts?)", normalized)
+    if scientific is not None:
+        return int(float(scientific.group(1)) * 10 ** int(scientific.group(2)))
     chinese = re.fullmatch(r"(\d+(?:\.\d+)?)\s*(千|万)?\s*次", normalized)
     if chinese is not None:
         multiplier = {
@@ -751,18 +754,39 @@ def _readCycleCount(value):
             "万": 10000,
         }[chinese.group(2)]
         return int(float(chinese.group(1)) * multiplier)
-    english = re.fullmatch(r"(\d+(?:\.\d+)?)\s*(thousand|million)?\s*(?:cycles?|times?)", normalized)
+    english = re.fullmatch(r"(\d+(?:\.\d+)?)\s*(thousand|million|trillion)?\s*(?:cycles?|times?|cuts?)", normalized)
     if english is None:
         raise ValueError(f"Cannot parse cycle count {value}")
     multiplier = {
         None: 1,
         "thousand": 1000,
         "million": 1000000,
+        "trillion": 1000000000000,
     }[english.group(2)]
     return int(float(english.group(1)) * multiplier)
 
 def cycleCountAttribute(value):
     return scalarAttribute(value, _readCycleCount, "count", "count")
+
+def cycleCountListAttribute(value):
+    value = str(value).replace(";", ",")
+    tokens = re.findall(
+        r"\d+(?:,\d{3})*(?:\.\d+)?\s*(?:[x×]\s*10\^\d+|thousand|million|trillion)?\s*(?:cycles?|times?|cuts?)|"
+        r"\d+(?:\.\d+)?\s*(?:千|万)?\s*次|"
+        r"-|--|null",
+        value,
+        flags=re.I,
+    )
+    if len(tokens) <= 1:
+        return cycleCountAttribute(value)
+    values = {}
+    for i, token in enumerate(tokens, start=1):
+        values[f"count {i}"] = [_readCycleCount(token), "count"]
+    return {
+        "format": ", ".join("${" + f"count {i}" + "}" for i in range(1, len(tokens) + 1)),
+        "primary": "count 1",
+        "values": values
+    }
 
 def _readChannelCount(value):
     value = str(value).strip()
@@ -1416,6 +1440,16 @@ def timeListAttribute(value):
 
 def timeAtConditionAttribute(value):
     return scalarAttribute(value, readTime, "time", "time")
+
+def readYearDuration(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"\s*years?$", "", value, flags=re.I).strip()
+    return float(value) * 365 * 24 * 3600
+
+def yearDurationAttribute(value):
+    return rangeOrScalarAttribute(value, readYearDuration, "time", "time")
 
 def percentageAttribute(value):
     return rangeOrScalarAttribute(value, readPercentage, "percentage", "percentage")

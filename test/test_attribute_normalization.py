@@ -1577,12 +1577,23 @@ def test_bit_width_counts(key, value, expected, capsys):
         ("Mechanical Life", "1万次", 10000),
         ("Mechanical Life", "5千次", 5000),
         ("Mechanical Life", "5 Million Times", 5000000),
+        ("Elastic Life", "10000 times", 10000),
+        ("Operating Life", "2万次", 20000),
+        ("Program/Erase Cycles", "1×10^15 Cycles", 1000000000000000),
+        ("Program/Erase Cycles", "1 Trillion Cycles", 1000000000000),
     ],
 )
 def test_cycle_life_counts(key, value, expected, capsys):
     values = normalized_values(key, value, capsys)
 
     assert_quantity(values["count"], expected, "count")
+
+
+def test_cycle_life_count_lists(capsys):
+    values = normalized_values("Connect-Disconnect Life", "5,000 cycles, 1,500 Cycles", capsys)
+
+    assert_quantity(values["count 1"], 5000, "count")
+    assert_quantity(values["count 2"], 1500, "count")
 
 
 @pytest.mark.parametrize(
@@ -3385,9 +3396,12 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
         ("Access Time", "-", {"time": "NaN"}),
         ("Delay Time", "250ns", {"time": 250e-9}),
         ("Switch Time(Toff)", "40ns", {"time": 40e-9}),
+        ("Operate Time", "2.5min", {"time": 150.0}),
+        ("Release Time", "5ms, 15ms", {"time 1": 0.005, "time 2": 0.015}),
         ("Lifetime", "18000hrs@85℃", {"time": 18000 * 3600}),
         ("Lifetime @ Temperature", "10000hrs@105℃", {"time": 10000 * 3600}),
         ("Load Life", "4000hrs@125℃", {"time": 4000 * 3600}),
+        ("Data Retention - Tdr (Year)", "40.2 Years", {"time": 40.2 * 365 * 24 * 3600}),
     ],
 )
 def test_delay_time_attributes(key, value, expected, capsys):
