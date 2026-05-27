@@ -1855,6 +1855,45 @@ def test_detents_pulses(capsys):
     assert_quantity(values["pulses"], 12, "count")
 
 
+@pytest.mark.parametrize("key", ["Screw Specification", "Socket Specification", "Screw Hole Size"])
+def test_metric_thread_attributes(key, capsys):
+    values = normalized_values(key, "M3.5", capsys)
+
+    assert_quantity(values["thread diameter"], 0.0035, "length")
+
+
+def test_barrier_type_sides(capsys):
+    values = normalized_values("Barrier Type", "2-Side", capsys)
+
+    assert_quantity(values["sides"], 2, "count")
+
+
+def test_connector_structure(capsys):
+    values = normalized_values("Structure", "2x24P", capsys)
+
+    assert_quantity(values["rows"], 2, "count")
+    assert_quantity(values["positions per row"], 24, "count")
+    assert_quantity(values["positions"], 48, "count")
+
+
+def test_pin_and_stitch_counts(capsys):
+    values = normalized_values("Pin", "12", capsys)
+    assert_quantity(values["count"], 12, "count")
+
+    values = normalized_values("Number of Stitches", "28P", capsys)
+    assert_quantity(values["count"], 28, "count")
+
+    values = normalized_values("Number of Stitches", "2.54mm", capsys)
+    assert_quantity(values["pitch"], 0.00254, "length")
+
+
+def test_wire_strands(capsys):
+    values = normalized_values("Number of Wire Strands", "42/0.0039\"", capsys)
+
+    assert_quantity(values["strands"], 42, "count")
+    assert_quantity(values["strand diameter"], 0.0039 * 0.0254, "length")
+
+
 @pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
@@ -3701,6 +3740,7 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Size/Dimension", "18mm", 0.018),
         ("Body Thickness", "5mm", 0.005),
         ("Body Height", "0.3mm", 0.0003),
+        ("Body Height (Max)", "1.18mm", 0.00118),
         ("Body Length", "168mm", 0.168),
         ("Body Width", "76mm", 0.076),
         ("Thickness", "0.06mm", 0.00006),
@@ -3727,6 +3767,7 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Sheath (Insulation) Diameter", "0.200\"(5.08mm)", 0.00508),
         ("Wire Diameter", "2.5mm", 0.0025),
         ("Digit/Alpha Size(Inch)", "0.56", 0.014224),
+        ("Thread Length", "30cm", 0.3),
     ],
 )
 def test_scalar_length_attributes(key, value, expected, capsys):
@@ -3744,6 +3785,31 @@ def test_scalar_length_attributes(key, value, expected, capsys):
 )
 def test_toleranced_thickness(value, expected, capsys):
     values = normalized_values("Thickness", value, capsys)
+
+    for quantity, length in expected.items():
+        assert_quantity(values[quantity], length, "length")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Inner Diameter After Contraction", "≤6.5mm", {"length": 0.0065}),
+        ("Inner Diameter After Contraction", "14.0±0.1(mm)", {
+            "length": 0.014,
+            "length tolerance": 0.0001,
+            "length min": 0.0139,
+            "length max": 0.0141,
+        }),
+        ("Undeclared Tolerance", "±0.1mm", {
+            "length": 0.0,
+            "length tolerance": 0.0001,
+            "length min": -0.0001,
+            "length max": 0.0001,
+        }),
+    ],
+)
+def test_additional_toleranced_lengths(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
 
     for quantity, length in expected.items():
         assert_quantity(values[quantity], length, "length")

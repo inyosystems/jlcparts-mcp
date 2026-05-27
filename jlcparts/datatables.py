@@ -456,6 +456,20 @@ def normalizeAttribute(key, value):
             value = attributes.scrTypeAttribute(value)
         elif key in larr(["Number of Detents/Pulses (Incremental)"]):
             value = attributes.detentsPulsesAttribute(value)
+        elif key in larr(["Screw Specification", "Socket Specification", "Screw Hole Size"]):
+            value = attributes.metricThreadAttribute(value)
+        elif key in larr(["Barrier Type"]):
+            value = attributes.barrierSideAttribute(value)
+        elif key in larr(["Structure"]):
+            value = attributes.connectorStructureAttribute(value)
+        elif key in larr(["Pin"]):
+            value = attributes.countAttribute(value)
+        elif key in larr(["Number of Stitches"]):
+            value = attributes.pinCountOrPitchAttribute(value)
+        elif key in larr(["Thickness of Contact Surface Treatment"]):
+            value = attributes.contactTreatmentThicknessAttribute(value)
+        elif key in larr(["Number of Wire Strands"]):
+            value = attributes.wireStrandsAttribute(value)
         elif key in larr(["Number of Channels", "Number of Elements", "Number of Lines"]):
             value = attributes.channelCountAttribute(value)
         elif key in larr(["Resolution", "Resolution (Bits)", "Resolution(Bits)",
@@ -549,7 +563,8 @@ def normalizeAttribute(key, value):
         elif key in larr(["Inductor", "Inductor(100khz,1/10v/8m A) (Min)"]):
             value = attributes.inductanceListAttribute(value) if compoundValue(value) else attributes.inductanceAttribute(value)
         elif key in larr(["Length", "Width", "Height", "Diameter", "Switch Height", "Overall Length",
-                "Height Above Board", "X-Length of Bottom Edge on Board (Spacing Line)",
+                "Height Above Board", "Body Height (Max)", "Inner Diameter After Contraction",
+                "Undeclared Tolerance", "X-Length of Bottom Edge on Board (Spacing Line)",
                 "Y-Width of Bottom Edge on Board", "Z-Height of the Board", "Diameter (Φd)", "Insulation Od",
                 "Insulation Height", "Switch Length", "Switch Width", "Interface Length/Height", "Interface Diameter",
                 "Height - Seated (Max)", "Length of Mating Pin", "Operating Height", "Operational Height", "L", "Row Spacing",
@@ -566,7 +581,7 @@ def normalizeAttribute(key, value):
                 "Length of Fit", "FFC, Fcb Thickness", "Tail Diameter",
                 "Head Diameter", "Blade Width", "Pin Spacing(Adjacent)",
                 "Total Length", "Insert Thickness", "Spacing - Connector",
-                "Sheath (Insulation) Diameter", "Line Length",
+                "Sheath (Insulation) Diameter", "Line Length", "Thread Length",
                 "Wire Diameter", "Module Size", "Display Range", "Linear Range",
                 "Pixel Size", "Communication Distance", "Half Wave Width",
                 "Spectral Range", "Digit/Alpha Size(Inch)"]):
@@ -600,6 +615,8 @@ def normalizeAttribute(key, value):
             elif key in larr(["Total Length", "Line Length"]):
                 value = attributes.lengthRangeListAttribute(value, "length")
             elif key == "thickness" and isinstance(value, str) and "±" in value:
+                value = attributes.tolerancedLengthAttribute(value)
+            elif key in larr(["Inner Diameter After Contraction", "Undeclared Tolerance"]):
                 value = attributes.tolerancedLengthAttribute(value)
             else:
                 value = attributes.stringAttribute(value) if compoundValue(value) else attributes.lengthAttribute(value)

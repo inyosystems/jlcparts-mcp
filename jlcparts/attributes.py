@@ -965,6 +965,86 @@ def detentsPulsesAttribute(value):
         "values": values
     }
 
+def metricThreadAttribute(value, name="thread diameter"):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return scalarAttribute(value, readLength, "length", name)
+    match = re.fullmatch(r"M\s*([0-9]+(?:\.[0-9]+)?)", value, flags=re.I)
+    if match is None:
+        raise ValueError(f"Cannot parse metric thread {value}")
+    return scalarAttribute(match.group(1) + "mm", readLength, "length", name)
+
+def barrierSideAttribute(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        count = "NaN"
+    else:
+        match = re.match(r"(\d+)-Side", value, flags=re.I)
+        if match is None:
+            count = "NaN"
+        else:
+            count = float(match.group(1))
+    return {
+        "format": "${sides}",
+        "primary": "sides",
+        "values": {"sides": [count, "count"]}
+    }
+
+def connectorStructureAttribute(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        values = {"rows": ["NaN", "count"], "positions": ["NaN", "count"]}
+    else:
+        match = re.fullmatch(r"(\d+)\s*x\s*(\d+)\s*P?", value, flags=re.I)
+        if match is None:
+            raise ValueError(f"Cannot parse connector structure {value}")
+        rows, positions_per_row = [float(x) for x in match.groups()]
+        values = {
+            "rows": [rows, "count"],
+            "positions per row": [positions_per_row, "count"],
+            "positions": [rows * positions_per_row, "count"],
+        }
+    return {
+        "format": "${rows} x ${positions per row}",
+        "primary": "positions",
+        "values": values
+    }
+
+def pinCountOrPitchAttribute(value):
+    value = str(value).strip()
+    if re.search(r"mm$", value, flags=re.I):
+        return scalarAttribute(value, readLength, "length", "pitch")
+    if value in ["-", "--", "null"]:
+        count = "NaN"
+    else:
+        value = re.sub(r"P$", "", value, flags=re.I).strip()
+        count = float(value)
+    return {
+        "format": "${count}",
+        "primary": "count",
+        "values": {"count": [count, "count"]}
+    }
+
+def contactTreatmentThicknessAttribute(value):
+    return scalarAttribute(value, readLength, "length", "thickness")
+
+def wireStrandsAttribute(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        values = {"strands": ["NaN", "count"], "strand diameter": ["NaN", "length"]}
+    else:
+        strands, diameter = [x.strip() for x in value.split("/", 1)]
+        diameter = diameter.replace('"', "in")
+        values = {
+            "strands": [float(strands), "count"],
+            "strand diameter": [readLength(diameter), "length"],
+        }
+    return {
+        "format": "${strands} / ${strand diameter}",
+        "primary": "strands",
+        "values": values
+    }
+
 def _readConnectorCount(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
@@ -1806,9 +1886,13 @@ def boardSpaceAttribute(value):
 
 def tolerancedLengthAttribute(value):
     value = str(value).strip()
+    value = value.replace("≤", "")
+    value = re.sub(r"\((mm|cm|m|um|µm|μm|nm|in|inch|inches|mil)\)$", r"\1", value, flags=re.I)
     if "±" not in value:
         return lengthAttribute(value)
     nominal, tolerance = [x.strip() for x in value.split("±", 1)]
+    if nominal == "":
+        nominal = "0"
     nominal_unit = re.search(r"(nm|um|mm|cm|m|mil|in|inch|inches)\s*$", nominal, flags=re.I)
     tolerance_unit = re.search(r"(nm|um|mm|cm|m|mil|in|inch|inches)\s*$", tolerance, flags=re.I)
     if nominal_unit is None and tolerance_unit is not None:
