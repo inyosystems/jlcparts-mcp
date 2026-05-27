@@ -86,6 +86,24 @@ $ npm install
 $ npm start
 ```
 
+### Attribute Normalization Tests
+
+When changing one attribute normalization rule, use the focused section scan
+instead of rebuilding the whole generated database:
+
+```
+$ PYTHONPATH=. pytest -q test/test_attribute_section_scan.py --attribute-section 'Peak Forward Surge Current'
+```
+
+Pass `--attribute-section` multiple times to test a small batch. To test raw
+values before rebuilding datatables, pass them directly:
+
+```
+$ PYTHONPATH=. pytest -q test/test_attribute_section_scan.py \
+    --attribute-section 'Vbo (Range Value)' \
+    --attribute-value '35V~45V'
+```
+
 ## The Page Is Broken!
 
 Feel free to open an issue on GitHub.

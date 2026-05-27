@@ -85,6 +85,7 @@ def _sections_from_env():
     ]
 
 
+@pytest.mark.attribute_section
 def test_selected_attribute_section_normalizes_generated_values(pytestconfig, capsys):
     sections = pytestconfig.getoption("--attribute-section") or _sections_from_env()
     if not sections:
