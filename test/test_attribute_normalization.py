@@ -184,6 +184,13 @@ def test_impedance_values(value, expected, capsys):
         assert_quantity(values[quantity], resistance, "resistance")
 
 
+@pytest.mark.parametrize("key", ["Characteristic Impedance", "Resonant Impedance"])
+def test_impedance_alias_values(key, capsys):
+    values = normalized_values(key, "50Ω", capsys)
+
+    assert_quantity(values["impedance"], 50.0, "resistance")
+
+
 @pytest.mark.parametrize("key", ["Impedance Ratio-Unbalanced/Balanced", "Impedance - Unbalanced/Balanced"])
 def test_impedance_ratio_aliases(key, capsys):
     values = normalized_values(key, "50Ω:100Ω", capsys)
@@ -1020,6 +1027,13 @@ def test_additional_current_values(key, value, expected, capsys):
 
     for quantity, current in expected.items():
         assert_quantity(values[quantity], current, "current")
+
+
+def test_switching_current_max(capsys):
+    values = normalized_values("Switching Current (Max)", "2A, 5A", capsys)
+
+    assert_quantity(values["current 1"], 2.0, "current")
+    assert_quantity(values["current 2"], 5.0, "current")
 
 
 def test_sampling_rate_lists(capsys):
@@ -1887,6 +1901,24 @@ def test_pin_and_stitch_counts(capsys):
     assert_quantity(values["pitch"], 0.00254, "length")
 
 
+def test_additional_text_counts(capsys):
+    values = normalized_values("Number of Incoming Lines Per Route", "2", capsys)
+    assert_quantity(values["count"], 2, "count")
+
+    values = normalized_values("Number of Independent Circuits", "1 channel", capsys)
+    assert_quantity(values["circuits"], 1, "count")
+
+    values = normalized_values("Line Number", "4.0", capsys)
+    assert_quantity(values["count"], 4, "count")
+
+
+def test_attachment_counts(capsys):
+    values = normalized_values("Attachment", "1 plastic shell, 4 terminals", capsys)
+
+    assert_quantity(values["plastic shells"], 1, "count")
+    assert_quantity(values["terminals"], 4, "count")
+
+
 def test_wire_strands(capsys):
     values = normalized_values("Number of Wire Strands", "42/0.0039\"", capsys)
 
@@ -2380,6 +2412,7 @@ def test_holding_temperature(capsys):
         ("Holding Temperature Limit", "76℃", {"temperature": 76}),
         ("Holding Temperature Limit", "72/61℃", {"temperature 1": 72, "temperature 2": 61}),
         ("Rated Functioning Temperature", "102℃", {"temperature": 102}),
+        ("Shrinkage Temperature", "90°C (initial)", {"temperature": 90}),
         ("Operating Temperatue", "-40℃~+85℃", {"temperature min": -40, "temperature max": 85}),
         ("Operating Temperatue", "-", {"temperature": "NaN"}),
     ],
@@ -2519,7 +2552,17 @@ def test_rotation_angle(capsys):
 def test_press_force(value, expected, capsys):
     values = normalized_values("Press Force", value, capsys)
 
-    assert_quantity(values["force"], expected, "force")
+    assert_quantity(values["force 1"], expected, "force")
+
+
+def test_operating_force(capsys):
+    values = normalized_values("Operating Force", "0N~15N", capsys)
+
+    assert_quantity(values["force 1 min"], 0.0, "force")
+    assert_quantity(values["force 1 max"], 15.0, "force")
+
+    values = normalized_values("Operating Force", "260gf@±50gf", capsys)
+    assert_quantity(values["force 1"], 260 * 0.00980665, "force")
 
 
 def test_acceleration_measurement_range(capsys):
@@ -3656,6 +3699,19 @@ def test_output_power(value, expected, capsys):
         assert_quantity(values[quantity], value, unit)
 
 
+def test_contact_rating(capsys):
+    values = normalized_values("Contact Rating", "6A@250VAC, 6A@30VDC", capsys)
+
+    assert_quantity(values["current 1"], 6.0, "current")
+    assert_quantity(values["voltage 1"], 250.0, "voltage")
+    assert_quantity(values["current 2"], 6.0, "current")
+    assert_quantity(values["voltage 2"], 30.0, "voltage")
+
+    values = normalized_values("Contact Rating", "5A@250AC", capsys)
+    assert_quantity(values["current 1"], 5.0, "current")
+    assert_quantity(values["voltage 1"], 250.0, "voltage")
+
+
 @pytest.mark.parametrize(
     ("value", "quantity", "expected", "unit"),
     [
@@ -4055,6 +4111,33 @@ def test_magnetic_conductivity_frequency(key, capsys):
 
     assert_quantity(values["magnetic conductivity 1"], 1.3, "ratio")
     assert_quantity(values["frequency 1"], 13.56e6, "frequency")
+
+
+def test_turns_ratio(capsys):
+    values = normalized_values("Turns Ratio", "1CT:1CT, 1CT:2.4CT", capsys)
+
+    assert_quantity(values["ratio 1.1"], 1.0, "ratio")
+    assert_quantity(values["ratio 1.2"], 1.0, "ratio")
+    assert_quantity(values["ratio 2.1"], 1.0, "ratio")
+    assert_quantity(values["ratio 2.2"], 2.4, "ratio")
+
+
+def test_ethernet_rate(capsys):
+    values = normalized_values("Rate", "1G/2.5G/5G Base-T", capsys)
+
+    assert_quantity(values["data rate 1"], 1e9, "data_rate")
+    assert_quantity(values["data rate 2"], 2.5e9, "data_rate")
+    assert_quantity(values["data rate 3"], 5e9, "data_rate")
+
+
+def test_shrinkage_ratio(capsys):
+    values = normalized_values("Shrinkage Ratio", "2:1, -", capsys)
+    assert_quantity(values["ratio 1"], 2.0, "ratio")
+    assert_quantity(values["ratio 2"], "NaN", "ratio")
+
+    values = normalized_values("Shrinkage Ratio", "Lateral Shrinkage ≥50%, Longitudinal Shrinkage ≤8%", capsys)
+    assert_quantity(values["lateral shrinkage min"], 50.0, "percentage")
+    assert_quantity(values["longitudinal shrinkage max"], 8.0, "percentage")
 
 
 def test_resistor_ratio_values(capsys):

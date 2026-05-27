@@ -89,7 +89,8 @@ def normalizeAttribute(key, value):
         elif key in larr(["Series Resistance (RS)", "Input Resistor",
                 "Current Terminal Resistance"]):
             value = attributes.resistanceAttribute(value)
-        elif key in larr(["Balance Port Impedence", "Unbalance Port Impedence", "Impedance(Zzk)", "Impedance"]):
+        elif key in larr(["Balance Port Impedence", "Unbalance Port Impedence", "Impedance(Zzk)",
+                "Impedance", "Characteristic Impedance", "Resonant Impedance"]):
             value = attributes.impedanceListAttribute(value) if compoundValue(value) else attributes.impedanceAttribute(value)
         elif key in larr(["Impedance Ratio-Unbalanced/Balanced",
                 "Impedance - Unbalanced/Balanced"]):
@@ -303,7 +304,7 @@ def normalizeAttribute(key, value):
                     "RMS on-State Current(It (RMS))", "Gate Trigger Current(Igt)",
                     "Collector Cut-Off Current (Ices)", "Limiting Current",
                     "Contact Current (DC)", "Current - DC Forward(If)",
-                    "Dark Current"]):
+                    "Dark Current", "Switching Current (Max)"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent current",
@@ -355,6 +356,7 @@ def normalizeAttribute(key, value):
                 "iout",
                 "gate trigger current(igt)",
                 "current - dc forward(if)",
+                "switching current (max)",
             ]
             if key in ["current - leakage", "leakage current(dcl)"]:
                 value = attributes.currentAttribute(value)
@@ -428,6 +430,14 @@ def normalizeAttribute(key, value):
             value = attributes.ratioRangeListAttribute(value, "gain")
         elif key in larr(["Magnetic Conductivity-U''", "Magnetic Conductivity-U'"]):
             value = attributes.ratioAtFrequencyAttribute(value, "magnetic conductivity")
+        elif key in larr(["Turns Ratio"]):
+            value = attributes.turnsRatioAttribute(value)
+        elif key in larr(["Rate"]):
+            value = attributes.ethernetRateAttribute(value)
+        elif key in larr(["Contact Rating"]):
+            value = attributes.contactRatingAttribute(value)
+        elif key in larr(["Shrinkage Ratio"]):
+            value = attributes.shrinkageRatioAttribute(value)
         elif key in larr(["Driver/Receiver"]):
             value = attributes.driverReceiverAttribute(value)
         elif key in larr(["Gain"]):
@@ -456,6 +466,14 @@ def normalizeAttribute(key, value):
             value = attributes.scrTypeAttribute(value)
         elif key in larr(["Number of Detents/Pulses (Incremental)"]):
             value = attributes.detentsPulsesAttribute(value)
+        elif key in larr(["Number of Incoming Lines Per Route"]):
+            value = attributes.countAttribute(value)
+        elif key in larr(["Number of Independent Circuits"]):
+            value = attributes.channelCountTextAttribute(value, "circuits")
+        elif key in larr(["Line Number"]):
+            value = attributes.countAttribute(value)
+        elif key in larr(["Attachment"]):
+            value = attributes.attachmentCountsAttribute(value)
         elif key in larr(["Screw Specification", "Socket Specification", "Screw Hole Size"]):
             value = attributes.metricThreadAttribute(value)
         elif key in larr(["Barrier Type"]):
@@ -697,8 +715,8 @@ def normalizeAttribute(key, value):
             value = attributes.pressureTemperatureDriftAttribute(value)
         elif key in larr(["Rotation Angle"]):
             value = attributes.angleRangeListAttribute(value)
-        elif key in larr(["Press Force"]):
-            value = attributes.forceAttribute(value)
+        elif key in larr(["Press Force", "Operating Force"]):
+            value = attributes.forceRangeListAttribute(value)
         elif key in larr(["Acceleration Measurement Range (Max)"]):
             value = attributes.accelerationRangeAttribute(value)
         elif key in larr(["Humidity", "Humidity Tolerance"]):
@@ -709,7 +727,7 @@ def normalizeAttribute(key, value):
                 "Operating Temperatue", "Holding Temperature", "Detection Temperature Range",
                 "Maximum Temperature Limit", "Holding Temperature Limit",
                 "Rated Functioning Temperature", "Working Temperature",
-                "Storage Temperature", "Temperature Tolerance"]):
+                "Storage Temperature", "Temperature Tolerance", "Shrinkage Temperature"]):
             if key in larr(["Holding Temperature Limit"]) and isinstance(value, str) and ("/" in value or "," in value or ";" in value):
                 value = attributes.temperatureListAttribute(value)
             else:

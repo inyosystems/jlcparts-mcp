@@ -124,6 +124,7 @@ def readVoltage(value):
     value = re.sub(r"\([^)]*\)", "", value)
     value = value.replace("V-", "V")
     value = value.replace("VDC", "V").replace("VAC", "V")
+    value = re.sub(r"(?<=\d)(?:AC|DC)$", "V", value, flags=re.I)
     value = re.sub(r"\bV(?:DS|GS)\s*=\s*", "", value, flags=re.IGNORECASE)
     value = re.sub(r"\b(?:AC|DC)\s*", "", value, flags=re.IGNORECASE)
     value = value.replace("V", "").strip()
@@ -301,6 +302,14 @@ def readForce(value):
         "gf": 0.00980665,
     }
     return float(match.group(1)) * scales[match.group(2).lower()]
+
+def readRatioTerm(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"CT", "", value, flags=re.I)
+    value = re.sub(r"±.*$", "", value).strip()
+    return readWithSiPrefix(value)
 
 def readInductance(value):
     value = value.replace("H", "").strip()
@@ -1042,6 +1051,41 @@ def wireStrandsAttribute(value):
     return {
         "format": "${strands} / ${strand diameter}",
         "primary": "strands",
+        "values": values
+    }
+
+def channelCountTextAttribute(value, name="count"):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        count = "NaN"
+    else:
+        match = re.search(r"\d+(?:\.\d+)?", value)
+        if match is None:
+            raise ValueError(f"Cannot parse count {value}")
+        count = float(match.group(0))
+    return {
+        "format": "${" + name + "}",
+        "primary": name,
+        "values": {name: [count, "count"]}
+    }
+
+def attachmentCountsAttribute(value):
+    value = str(value).strip()
+    values = {}
+    for number, label in re.findall(r"(\d+)\s*(plastic shells?|housings?|terminals?)", value, flags=re.I):
+        label = label.lower()
+        if label.startswith("plastic shell"):
+            name = "plastic shells"
+        elif label.startswith("housing"):
+            name = "housings"
+        else:
+            name = "terminals"
+        values[name] = [float(number), "count"]
+    if not values:
+        values["count"] = ["NaN", "count"]
+    return {
+        "format": ", ".join("${" + name + "}" for name in values),
+        "primary": next(iter(values)),
         "values": values
     }
 
@@ -2596,6 +2640,90 @@ def ratioAtFrequencyAttribute(value, name="ratio"):
         "values": values
     }
 
+def turnsRatioAttribute(value):
+    value = str(value).replace(";", ",").strip()
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        terms = [x.strip() for x in part.split(":")]
+        for j, term in enumerate(terms, start=1):
+            values[f"ratio {i}.{j}"] = [readRatioTerm(term), "ratio"]
+        formats.append(":".join("${" + f"ratio {i}.{j}" + "}" for j in range(1, len(terms) + 1)))
+    return {
+        "format": ", ".join(formats),
+        "primary": "ratio 1.1",
+        "values": values
+    }
+
+def ethernetRateAttribute(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        values = {"data rate 1": ["NaN", "data_rate"]}
+    else:
+        rates = []
+        for number, suffix in re.findall(r"(\d+(?:\.\d+)?)\s*(G|M)?(?=\s*Base|-|/|\b)", value, flags=re.I):
+            scale = 1e9 if suffix.lower() == "g" else 1e6
+            rates.append(float(number) * scale)
+        if not rates:
+            raise ValueError(f"Cannot parse Ethernet rate {value}")
+        values = {
+            f"data rate {i}": [rate, "data_rate"]
+            for i, rate in enumerate(rates, start=1)
+        }
+    return {
+        "format": ", ".join("${" + name + "}" for name in values),
+        "primary": "data rate 1",
+        "values": values
+    }
+
+def contactRatingAttribute(value):
+    value = str(value).replace(";", ",").strip()
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        if part in ["-", "--", "null"]:
+            values[f"current {i}"] = ["NaN", "current"]
+            formats.append("${" + f"current {i}" + "}")
+            continue
+        if "@" in part:
+            current, voltage = [x.strip() for x in part.split("@", 1)]
+            values[f"current {i}"] = [readCurrent(current), "current"]
+            values[f"voltage {i}"] = [readVoltage(voltage), "voltage"]
+            formats.append("${" + f"current {i}" + "} @ ${" + f"voltage {i}" + "}")
+        else:
+            values[f"current {i}"] = [readCurrent(part), "current"]
+            formats.append("${" + f"current {i}" + "}")
+    return {
+        "format": ", ".join(formats),
+        "primary": "current 1",
+        "values": values
+    }
+
+def shrinkageRatioAttribute(value):
+    value = str(value).strip()
+    values = {}
+    if ":" in value:
+        parts = [x.strip() for x in value.replace(";", ",").split(",")]
+        for i, part in enumerate(parts, start=1):
+            if part in ["-", "--", "null"]:
+                values[f"ratio {i}"] = ["NaN", "ratio"]
+            else:
+                numerator, denominator = [readRatioTerm(x) for x in part.split(":", 1)]
+                values[f"ratio {i}"] = [numerator / denominator, "ratio"]
+    else:
+        for label, sign, number in re.findall(r"(Lateral|Longitudinal)\s+Shrinkage\s*([≥≤])\s*([0-9.]+)%", value, flags=re.I):
+            name = f"{label.lower()} shrinkage {'min' if sign == '≥' else 'max'}"
+            values[name] = [float(number), "percentage"]
+    if not values:
+        values["ratio"] = ["NaN", "ratio"]
+    return {
+        "format": ", ".join("${" + name + "}" for name in values),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
 def ratioRangeListAttribute(value, name="ratio"):
     value = str(value).strip()
     if "@" in value:
@@ -3352,6 +3480,24 @@ def angleOrDecibelListAttribute(value, name="angle"):
 
 def forceAttribute(value):
     return scalarAttribute(value, readForce, "force", "force")
+
+def forceRangeListAttribute(value):
+    value = str(value).replace(";", ",").strip()
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        signal = part.split("@", 1)[0].strip()
+        if signal.startswith("±"):
+            signal = "-" + signal[1:] + "~+" + signal[1:]
+        parsed = rangeOrScalarAttribute(signal, readForce, "force", f"force {i}")
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": "force 1 min" if any(_rangeParts(part.split("@", 1)[0]) or part.startswith("±") for part in parts) else "force 1",
+        "values": values
+    }
 
 def humidityAttribute(value):
     value = str(value).strip()
