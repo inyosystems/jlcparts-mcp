@@ -262,6 +262,13 @@ def readLuminousIntensity(value):
     value = re.sub(r"cd$", "", value, flags=re.IGNORECASE).strip()
     return readWithSiPrefix(value)
 
+def readLuminance(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"cd\s*/\s*m2$", "", value, flags=re.IGNORECASE).strip()
+    return readWithSiPrefix(value)
+
 def readRadiantIntensity(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
@@ -434,6 +441,8 @@ def readPercentage(value):
     if "/" in value:
         numerator, denominator = value.split("/", 1)
         return float(numerator) / float(denominator) * 100
+    if value.endswith("‰"):
+        return float(value[:-1]) / 10
     if value.endswith("%"):
         value = value[:-1]
     return float(value)
@@ -852,6 +861,31 @@ def countListAttribute(value):
         "values": values
     }
 
+def matrixCountAttribute(value):
+    value = str(value).strip()
+    if "x" not in value.lower() and "," not in value:
+        return countAttribute(value)
+
+    parts = [re.sub(r"\s*bits?$", "", x.strip(), flags=re.I) for x in value.split(",")]
+    values = {}
+    formats = []
+    multiple = len(parts) > 1
+    for index, part in enumerate(parts, start=1):
+        axes = [x.strip() for x in re.split(r"\s*x\s*", part, flags=re.I) if x.strip()]
+        if len(axes) != 2:
+            raise ValueError(f"Cannot parse matrix count {value}")
+        suffix = f" {index}" if multiple else ""
+        columns_name = f"columns{suffix}"
+        rows_name = f"rows{suffix}"
+        values[columns_name] = [_readCount(axes[0]), "count"]
+        values[rows_name] = [_readCount(axes[1]), "count"]
+        formats.append("${" + columns_name + "} x ${" + rows_name + "}")
+    return {
+        "format": ", ".join(formats),
+        "primary": "columns 1" if multiple else "columns",
+        "values": values
+    }
+
 def _readRowCount(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
@@ -1208,6 +1242,9 @@ def noiseAttribute(value):
         "values": values
     }
 
+def luminanceAttribute(value):
+    return scalarAttribute(value, readLuminance, "luminance", "luminance")
+
 def _readSensitivityRatio(value):
     value = str(value).strip()
     match = re.fullmatch(
@@ -1376,6 +1413,12 @@ def _readMechanicalLength(value):
 
 def mechanicalLengthAttribute(value):
     return rangeOrScalarAttribute(value, _readMechanicalLength, "length", "length")
+
+def inchLengthAttribute(value):
+    value = str(value).strip()
+    if value not in ["-", "--", "null"] and not re.search(r"[a-z\"]\s*$", value, flags=re.I):
+        value += "in"
+    return lengthAttribute(value)
 
 def mechanicalLengthRangeListAttribute(value, name="length"):
     value = str(value).replace(";", ",").strip()

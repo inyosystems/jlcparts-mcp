@@ -416,6 +416,11 @@ def test_extra_voltage_ranges(key, value, expected, capsys):
         ("Input Voltage (Vi(on)@IC,VCE)", "1.4V@1mA,0.3V", {"voltage": 1.4}),
         ("Output Voltage(Vo(on))", "300mV@5mA,0.25mA", {"voltage": 0.3}),
         ("Voltage - Isolation", "1.6 kV", {"voltage": 1600.0}),
+        ("Forward Voltage Drop", "1.8V, 1.7V, 1.6V", {
+            "voltage 1": 1.8,
+            "voltage 2": 1.7,
+            "voltage 3": 1.6,
+        }),
         ("Output Low Voltage", "0.2V~0.5V", {"voltage 1 min": 0.2, "voltage 1 max": 0.5}),
         ("Output High Voltage", "700mV", {"voltage 1": 0.7}),
         ("Input Low Voltage", "500mV~800mV", {"voltage 1 min": 0.5, "voltage 1 max": 0.8}),
@@ -868,6 +873,9 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Vbo (Range Value)", "35V~45V", "voltage min", 35.0, "voltage"),
         ("Breakover Voltage Vbo(Range Value)", "95V~110V", "voltage min", 95.0, "voltage"),
         ("High-Side Bias Voltage(Vbs)", "13.5V~16.5V", "voltage min", 13.5, "voltage"),
+        ("Voltage - Input(AC)", "85VAC~265VAC", "voltage min", 85.0, "voltage"),
+        ("Input Voltage(Vac)", "85VAC~305VAC", "voltage min", 85.0, "voltage"),
+        ("Voltage - Supply for Logic", "1.65V~3.3V", "voltage min", 1.65, "voltage"),
         ("Rated Speed", "8500RPM", "speed", 8500.0, "rotational_speed"),
         ("Rated Speed", "-", "speed", "NaN", "rotational_speed"),
     ],
@@ -925,6 +933,7 @@ def test_peak_output_current_sink_list(capsys):
         ("Leak Current", "10uA", {"current": 10e-6}),
         ("Continuous Current (Imax)", "4A", {"current": 4.0}),
         ("Segment Drive Current", "45mA, 60mA", {"current 1": 0.045, "current 2": 0.06}),
+        ("Digit Drive Current", "320mA", {"current": 0.32}),
     ],
 )
 def test_additional_current_values(key, value, expected, capsys):
@@ -1414,9 +1423,32 @@ def test_logic_array_blocks(value, expected, capsys):
         ("Connectable Bits", "-", {"count": "NaN"}),
         ("Pin Number in Each Row", "18", {"count": 18}),
         ("Needle Number", "12", {"count": 12}),
+        ("Channels", "16", {"count": 16}),
+        ("Number of Characters", "4", {"count": 4}),
     ],
 )
 def test_extra_count_attributes(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, count in expected.items():
+        assert_quantity(values[quantity], count, "count")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Dot Matrix Number", "8x8", {"columns": 8, "rows": 8}),
+        ("Number of Digits", "9", {"count": 9}),
+        ("Number of Digits", "5x7", {"columns": 5, "rows": 7}),
+        ("Display Configurations(Bit)", "20x4 bit, 16x8 bit", {
+            "columns 1": 20,
+            "rows 1": 4,
+            "columns 2": 16,
+            "rows 2": 8,
+        }),
+    ],
+)
+def test_matrix_count_attributes(key, value, expected, capsys):
     values = normalized_values(key, value, capsys)
 
     for quantity, count in expected.items():
@@ -2177,6 +2209,11 @@ def test_conversion_efficiency_values(value, expected, capsys):
         ("Differential Gain", "0.01%", {"percentage": 0.01}),
         ("Capacitance Tolerance", "±20%", {"percentage min": -20.0, "percentage max": 20.0}),
         ("Capacitance Tolerance", "-20%~+50%", {"percentage min": -20.0, "percentage max": 50.0}),
+        ("Constant Current Accuracy", "3‰", {"percentage": 0.3}),
+        ("Constant Current Accuracy", "5%, 15%", {"percentage 1": 5.0, "percentage 2": 15.0}),
+        ("Output Voltage Accuracy", "±1.5%", {"percentage min": -1.5, "percentage max": 1.5}),
+        ("Output Voltage Accuracy", "±5‰", {"percentage min": -0.5, "percentage max": 0.5}),
+        ("Duty Cycle", "1/4,1/3", {"percentage 1": 25.0, "percentage 2": 100 / 3}),
     ],
 )
 def test_flexible_percentage_values(key, value, expected, capsys):
@@ -2633,6 +2670,12 @@ def test_luminous_intensity(key, value, expected, capsys):
 
     for quantity, intensity in expected.items():
         assert_quantity(values[quantity], intensity, "luminous_intensity")
+
+
+def test_luminance_values(capsys):
+    values = normalized_values("Luminance", "180cd/m2", capsys)
+
+    assert_quantity(values["luminance"], 180.0, "luminance")
 
 
 @pytest.mark.parametrize(
@@ -3146,6 +3189,7 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Spacing - Connector", "0.118\"(3.00mm)", 0.003),
         ("Sheath (Insulation) Diameter", "0.200\"(5.08mm)", 0.00508),
         ("Wire Diameter", "2.5mm", 0.0025),
+        ("Digit/Alpha Size(Inch)", "0.56", 0.014224),
     ],
 )
 def test_scalar_length_attributes(key, value, expected, capsys):
@@ -3208,6 +3252,27 @@ def test_additional_length_lists(key, value, expected, capsys):
 )
 def test_board_space_dimensions(value, expected, capsys):
     values = normalized_values("Board Space (Diameter Φ/Length X Width)", value, capsys)
+
+    for quantity, length in expected.items():
+        assert_quantity(values[quantity], length, "length")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Module Size", "19mmx12.6mmx8mm", {
+            "length 1": 0.019,
+            "length 2": 0.0126,
+            "length 3": 0.008,
+        }),
+        ("Display Range", "43.2x57.6mm", {
+            "length 1": 0.0432,
+            "length 2": 0.0576,
+        }),
+    ],
+)
+def test_display_dimensions(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
 
     for quantity, length in expected.items():
         assert_quantity(values[quantity], length, "length")
