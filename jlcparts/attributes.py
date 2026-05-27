@@ -276,6 +276,22 @@ def readRadiantIntensity(value):
     value = re.sub(r"/\s*sr$", "", value, flags=re.IGNORECASE).strip()
     return readPower(value)
 
+def readPressure(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(pa|hpa|kpa|mpa|bar)", value, flags=re.I)
+    if match is None:
+        raise ValueError(f"Cannot parse pressure {value}")
+    scales = {
+        "pa": 1,
+        "hpa": 100,
+        "kpa": 1e3,
+        "mpa": 1e6,
+        "bar": 1e5,
+    }
+    return float(match.group(1)) * scales[match.group(2).lower()]
+
 def readLength(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
@@ -594,6 +610,13 @@ def impedanceAttribute(value):
 def impedanceListAttribute(value):
     value = str(value).replace(";", ",")
     return scalarListAttribute(value, readResistance, "resistance", "impedance")
+
+def impedanceRatioAttribute(value):
+    value = str(value).strip()
+    if ":" not in value:
+        return impedanceAttribute(value)
+    value = value.replace("Ω", "")
+    return colonRatioListAttribute(value, "ratio")
 
 
 def voltageAttribute(value):
@@ -1420,6 +1443,35 @@ def meltingI2tAttribute(value):
 
 def lengthAttribute(value):
     return rangeOrScalarAttribute(value, readLength, "length", "length")
+
+def pressureAttribute(value):
+    value = str(value).strip()
+    if value.startswith("±"):
+        value = "-" + value[1:] + "~+" + value[1:]
+    return rangeOrScalarAttribute(value, readPressure, "pressure", "pressure")
+
+def pressureRangeListAttribute(value):
+    value = str(value).replace(";", ",").strip()
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        parsed = pressureAttribute(part)
+        name_map = {
+            name: name.replace("pressure", f"pressure {i}", 1)
+            for name in parsed["values"]
+        }
+        for name, parsed_value in parsed["values"].items():
+            values[name_map[name]] = parsed_value
+        format = parsed["format"]
+        for old, new in name_map.items():
+            format = format.replace("${" + old + "}", "${" + new + "}")
+        formats.append(format)
+    return {
+        "format": ", ".join(formats),
+        "primary": "pressure 1 min" if any(_rangeParts(part) or part.startswith("±") for part in parts) else "pressure 1",
+        "values": values
+    }
 
 def _readMechanicalLength(value):
     value = str(value).strip()
@@ -2761,6 +2813,30 @@ def kelvinRangeListAttribute(value):
 def angleListAttribute(value):
     value = str(value).replace(";", ",")
     return scalarListAttribute(value, readAngle, "angle", "angle")
+
+def accuracyAttribute(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return scalarAttribute(value, readLength, "length", "accuracy")
+    if "db" in value.lower():
+        parsed = percentageRangeAttribute(value.replace("dB", "%").replace("db", "%"), "accuracy")
+        values = {
+            name: [amount, "decibel"]
+            for name, (amount, _unit) in parsed["values"].items()
+        }
+        return {
+            "format": parsed["format"],
+            "primary": parsed["primary"],
+            "values": values
+        }
+    grade = re.fullmatch(r"(?:Grade|Level)\s+(\d+(?:\.\d+)?)", value, flags=re.I)
+    if grade is not None:
+        return {
+            "format": "${accuracy grade}",
+            "primary": "accuracy grade",
+            "values": {"accuracy grade": [float(grade.group(1)), "ratio"]}
+        }
+    return scalarAttribute(value, readLength, "length", "accuracy")
 
 def capacityAtVoltage(value):
     """

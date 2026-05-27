@@ -105,6 +105,7 @@ def test_rds_on_multiple_measurements(value, measurements, capsys):
         ("Series Resistance (RS)", "650mΩ", {"resistance": 0.65}),
         ("Input Resistor", "10kΩ", {"resistance": 10000.0}),
         ("Input Resistor", "-", {"resistance": "NaN"}),
+        ("Current Terminal Resistance", "1mΩ", {"resistance": 0.001}),
     ],
 )
 def test_resistance_list_attributes(key, value, expected, capsys):
@@ -180,6 +181,13 @@ def test_impedance_values(value, expected, capsys):
 
     for quantity, resistance in expected.items():
         assert_quantity(values[quantity], resistance, "resistance")
+
+
+@pytest.mark.parametrize("key", ["Impedance Ratio-Unbalanced/Balanced", "Impedance - Unbalanced/Balanced"])
+def test_impedance_ratio_aliases(key, capsys):
+    values = normalized_values(key, "50Ω:100Ω", capsys)
+
+    assert_quantity(values["ratio"], 0.5, "ratio")
 
 
 @pytest.mark.parametrize(
@@ -883,6 +891,8 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Sink Current", "12mA", "current", 0.012, "current"),
         ("Refresh Current", "8mA", "current", 0.008, "current"),
         ("Frequency (Max)", "6GHz", "frequency", 6e9, "frequency"),
+        ("Band Width", "45Hz~2kHz", "frequency min", 45.0, "frequency"),
+        ("Band Width", "80kHz, 20kHz", "frequency 1", 80000.0, "frequency"),
         ("Voltage", "600 V", "voltage", 600.0, "voltage"),
         ("Control Voltage Range/Center", "0V~3.3V", "voltage min", 0.0, "voltage"),
         ("Vbo (Range Value)", "35V~45V", "voltage min", 35.0, "voltage"),
@@ -959,6 +969,8 @@ def test_peak_output_current_sink_list(capsys):
         ("Output Current(It(RMS))", "100mA", {"current": 0.1}),
         ("Current - Surge(Itsm)", "120A, 115A", {"current 1": 120.0, "current 2": 115.0}),
         ("Quiescent Current (Max)", "2uA", {"current": 2e-6}),
+        ("Sleep Mode Current (Izz)", "3uA", {"current": 3e-6}),
+        ("Standby Current(Isb)", "5uA, 15uA", {"current 1": 5e-6, "current 2": 15e-6}),
     ],
 )
 def test_additional_current_values(key, value, expected, capsys):
@@ -1453,6 +1465,7 @@ def test_logic_array_blocks(value, expected, capsys):
         ("Number of Terminals", "4", {"count": 4}),
         ("Turns", "11", {"count": 11}),
         ("Number of Turns", "25", {"count": 25}),
+        ("Number of Coded Gears", "10", {"count": 10}),
     ],
 )
 def test_extra_count_attributes(key, value, expected, capsys):
@@ -1702,6 +1715,12 @@ def test_cycle_life_counts(key, value, expected, capsys):
 
 def test_write_cycle_endurance(capsys):
     values = normalized_values("Write Cycle Endurance", "1,000,000 cycles", capsys)
+
+    assert_quantity(values["count"], 1000000, "count")
+
+
+def test_store_cycles(capsys):
+    values = normalized_values("Store Cycles", "1,000,000 cycles", capsys)
 
     assert_quantity(values["count"], 1000000, "count")
 
@@ -2024,6 +2043,27 @@ def test_maximum_power_supply_range(value, expected, capsys):
             "voltage 2": 1.5,
             "voltage 3": 0.7,
         }),
+        ("Controller Operating Voltage (Vccq)", "1.7V~1.95V, 2.7V~3.6V", {
+            "voltage 1 min": 1.7,
+            "voltage 1 max": 1.95,
+            "voltage 2 min": 2.7,
+            "voltage 2 max": 3.6,
+        }),
+        ("Nand Operating Voltage (Vccf)", "3.3V, 1.8V", {
+            "voltage 1": 3.3,
+            "voltage 2": 1.8,
+        }),
+        ("Upply Voltage (Vcc)", "2.2V~3.6V;4.5V~5.5V", {
+            "voltage 1 min": 2.2,
+            "voltage 1 max": 3.6,
+            "voltage 2 min": 4.5,
+            "voltage 2 max": 5.5,
+        }),
+        ("Vin", "3V~36V", {"voltage min": 3.0, "voltage max": 36.0}),
+        ("Vout", "5V, -5V", {"voltage 1": 5.0, "voltage 2": -5.0}),
+        ("Hi-Pot", "1.5kV", {"voltage": 1500.0}),
+        ("Isolation Voltage(RMS)", "3.75kV;5kV", {"voltage 1": 3750.0, "voltage 2": 5000.0}),
+        ("Isolation Voltage", "5kV", {"voltage": 5000.0}),
     ],
 )
 def test_voltage_alias_values(key, value, expected, capsys):
@@ -2202,6 +2242,14 @@ def test_angle_values(key, value, expected, capsys):
         assert_quantity(values[quantity], angle, "angle")
 
 
+@pytest.mark.parametrize("key", ["Phase Balance", "Phase Difference"])
+def test_phase_angle_aliases(key, capsys):
+    values = normalized_values(key, "180°@±10°, 180°@±15°", capsys)
+
+    assert_quantity(values["angle 1"], 180.0, "angle")
+    assert_quantity(values["angle 2"], 180.0, "angle")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
@@ -2342,6 +2390,20 @@ def test_ram_size(value, expected, capsys):
 )
 def test_embedded_block_ram(value, expected, capsys):
     values = normalized_values("Embedded Block Ram", value, capsys)
+
+    assert_quantity(values["data size"], expected, "data_size")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Eeprom", "2KB", 2 * 1024),
+        ("Memory Size of Flash", "256Mbit", 256 * 1024 * 1024 / 8),
+        ("Memory Size of Ram", "64Mbit", 64 * 1024 * 1024 / 8),
+    ],
+)
+def test_additional_memory_size_aliases(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
 
     assert_quantity(values["data size"], expected, "data_size")
 
@@ -2730,6 +2792,47 @@ def test_luminance_values(capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("±7Kpa", {"pressure min": -7000.0, "pressure max": 7000.0}),
+        ("30Kpa~1.25bar", {"pressure min": 30000.0, "pressure max": 125000.0}),
+        ("-1Kpa~1Kpa, -10Kpa~10Kpa", {
+            "pressure 1 min": -1000.0,
+            "pressure 1 max": 1000.0,
+            "pressure 2 min": -10000.0,
+            "pressure 2 max": 10000.0,
+        }),
+    ],
+)
+def test_pressure_range(value, expected, capsys):
+    values = normalized_values("Pressure Range", value, capsys)
+
+    for quantity, pressure in expected.items():
+        assert_quantity(values[quantity], pressure, "pressure")
+
+
+def test_ripple_noise_voltage(capsys):
+    values = normalized_values("Ripple Noise", "150mVp-p, 70mVp-p", capsys)
+
+    assert_quantity(values["noise 1"], 0.15, "voltage")
+    assert_quantity(values["noise 2"], 0.07, "voltage")
+
+
+@pytest.mark.parametrize(
+    ("value", "quantity", "expected", "unit"),
+    [
+        ("2.5m", "accuracy", 2.5, "length"),
+        ("Grade 2.5", "accuracy grade", 2.5, "ratio"),
+        ("±0.25dB", "accuracy min", -0.25, "decibel"),
+    ],
+)
+def test_accuracy_values(value, quantity, expected, unit, capsys):
+    values = normalized_values("Accuracy", value, capsys)
+
+    assert_quantity(values[quantity], expected, unit)
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("20mW/sr@IF=100mA", {"intensity 1": 0.02}),
         ("8mW/sr~16mW/sr", {"intensity 1 min": 0.008, "intensity 1 max": 0.016}),
         ("200mW~260mW", {"intensity 1 min": 0.2, "intensity 1 max": 0.26}),
@@ -3049,6 +3152,13 @@ def test_decibel_lists(key, value, expected, capsys):
 
     for index, level in enumerate(expected, start=1):
         assert_quantity(values[f"level {index}"], level, "decibel")
+
+
+def test_insertion_loss_db_max(capsys):
+    values = normalized_values("Insertion Loss (dB Max)", "1.6dB, 1.1dB", capsys)
+
+    assert_quantity(values["level 1"], 1.6, "decibel")
+    assert_quantity(values["level 2"], 1.1, "decibel")
 
 
 @pytest.mark.parametrize(
@@ -3687,6 +3797,7 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
         ("Write Cycle Time (Tw)", "5ms", {"time": 0.005}),
         ("Write Cycle Time(Tw)", "480us", {"time": 480e-6}),
         ("Write Cycle Time (T Wc)", "70ns", {"time": 70e-9}),
+        ("Time to First Fix", "30s, 5.5s", {"time 1": 30.0, "time 2": 5.5}),
         ("Switch Time(Toff)", "40ns", {"time": 40e-9}),
         ("Operate Time", "2.5min", {"time": 150.0}),
         ("Release Time", "5ms, 15ms", {"time 1": 0.005, "time 2": 0.015}),
