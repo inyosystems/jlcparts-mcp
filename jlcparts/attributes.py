@@ -303,6 +303,30 @@ def readForce(value):
     }
     return float(match.group(1)) * scales[match.group(2).lower()]
 
+def readAirFlow(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*CFM", value, flags=re.I)
+    if match is None:
+        raise ValueError(f"Cannot parse air flow {value}")
+    return float(match.group(1)) * 0.00047194745
+
+def readPercentageTemperatureDrift(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = value.replace("±", "")
+    value = re.sub(r"%\s*/\s*(?:℃|°C|C)$", "", value, flags=re.I).strip()
+    return float(value)
+
+def readDecibelMilliwattPerHertz(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"dBm\s*/\s*Hz$", "", value, flags=re.I).strip()
+    return float(value)
+
 def readRatioTerm(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
@@ -1928,6 +1952,33 @@ def boardSpaceAttribute(value):
         "values": values
     }
 
+def mechanicalDimensionsAttribute(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return mechanicalLengthAttribute(value)
+    value = value.replace("×", "x").replace("*", "x").replace("φ", "")
+    parts = [x.strip() for x in re.split(r"\s*x\s*", value, flags=re.I) if x.strip()]
+    if len(parts) == 1:
+        return mechanicalLengthAttribute(parts[0])
+    unit = next(
+        (
+            re.search(r"(nm|um|mm|cm|m|mil|in|inch|inches)\s*$", part, flags=re.I).group(1)
+            for part in parts
+            if re.search(r"(nm|um|mm|cm|m|mil|in|inch|inches)\s*$", part, flags=re.I)
+        ),
+        "mm",
+    )
+    values = {}
+    for index, part in enumerate(parts, start=1):
+        if re.search(r"(nm|um|mm|cm|m|mil|in|inch|inches)\s*$", part, flags=re.I) is None:
+            part += unit
+        values[f"length {index}"] = [_readMechanicalLength(part), "length"]
+    return {
+        "format": " x ".join("${" + f"length {i}" + "}" for i in range(1, len(parts) + 1)),
+        "primary": "length 1",
+        "values": values
+    }
+
 def tolerancedLengthAttribute(value):
     value = str(value).strip()
     value = value.replace("≤", "")
@@ -2758,6 +2809,41 @@ def fractionListAttribute(value, name="ratio"):
         "values": values
     }
 
+def voltageRatioAttribute(value):
+    value = str(value).replace(";", ",").strip()
+    values = {}
+    formats = []
+    for i, part in enumerate([x.strip() for x in value.split(",")], start=1):
+        if "/" in part:
+            numerator, denominator = [x.strip() for x in part.split("/", 1)]
+            values[f"voltage {i}.1"] = [readVoltage(numerator), "voltage"]
+            values[f"voltage {i}.2"] = [readVoltage(denominator), "voltage"]
+            formats.append("${" + f"voltage {i}.1" + "}/${" + f"voltage {i}.2" + "}")
+        else:
+            parsed = voltageRangeAttribute(part, f"voltage {i}")
+            values.update(parsed["values"])
+            formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
+def frequencyOrVoltageRangeAttribute(value):
+    value = str(value).strip()
+    if re.search(r"Hz", value, flags=re.I):
+        value = re.sub(r"(?<=\d)-(?=\d)", "~", value)
+        return frequencyRangeListAttribute(value)
+    return voltageRatioAttribute(value)
+
+def decibelMilliwattRangeAttribute(value, name="level"):
+    value = str(value).strip()
+    return rangeOrScalarAttribute(value, readDecibelMilliwatt, "decibel_milliwatt", name)
+
+def decibelMilliwattPerHertzListAttribute(value, name="noise"):
+    value = str(value).replace(";", ",")
+    return scalarListAttribute(value, readDecibelMilliwattPerHertz, "decibel_milliwatt_per_hertz", name)
+
 def ratioRangeListAttribute(value, name="ratio"):
     value = str(value).strip()
     if "@" in value:
@@ -3550,6 +3636,23 @@ def forceRangeListAttribute(value):
         "primary": "force 1 min" if any(_rangeParts(part.split("@", 1)[0]) or part.startswith("±") for part in parts) else "force 1",
         "values": values
     }
+
+def airFlowAttribute(value):
+    return scalarAttribute(value, readAirFlow, "air_flow", "air flow")
+
+def percentageTemperatureDriftAttribute(value):
+    value = str(value).strip()
+    if value.startswith("±"):
+        parsed = readPercentageTemperatureDrift(value)
+        return {
+            "format": "${drift min} ~ ${drift max}",
+            "primary": "drift min",
+            "values": {
+                "drift min": [-parsed, "percentage_per_temperature"],
+                "drift max": [parsed, "percentage_per_temperature"],
+            }
+        }
+    return scalarAttribute(value, readPercentageTemperatureDrift, "percentage_per_temperature", "drift")
 
 def humidityAttribute(value):
     value = str(value).strip()

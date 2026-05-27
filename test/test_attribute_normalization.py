@@ -1029,6 +1029,15 @@ def test_additional_current_values(key, value, expected, capsys):
         assert_quantity(values[quantity], current, "current")
 
 
+def test_additional_current_aliases(capsys):
+    values = normalized_values("Rated Output Current", "2mA", capsys)
+    assert_quantity(values["current"], 0.002, "current")
+
+    values = normalized_values("Setting Current", "0.63-1A", capsys)
+    assert_quantity(values["current min"], 0.63, "current")
+    assert_quantity(values["current max"], 1.0, "current")
+
+
 def test_switching_current_max(capsys):
     values = normalized_values("Switching Current (Max)", "2A, 5A", capsys)
 
@@ -2431,6 +2440,18 @@ def test_temperature_range_alias(capsys):
     assert_quantity(values["temperature max"], 85, "temperature")
 
 
+def test_misc_numeric_aliases(capsys):
+    values = normalized_values("Air Volume", "1.01CFM", capsys)
+    assert_quantity(values["air flow"], 1.01 * 0.00047194745, "air_flow")
+
+    values = normalized_values("Sensitivity Temperature Bleaching", "±3%/℃", capsys)
+    assert_quantity(values["drift min"], -3.0, "percentage_per_temperature")
+    assert_quantity(values["drift max"], 3.0, "percentage_per_temperature")
+
+    values = normalized_values("Aperture Jitter", "25ns", capsys)
+    assert_quantity(values["time"], 25e-9, "time")
+
+
 @pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
@@ -3688,6 +3709,15 @@ def test_transmit_receive_rf_aliases(capsys):
     assert_quantity(values["level 1"], 21.5, "decibel_milliwatt")
 
 
+def test_rf_range_aliases(capsys):
+    values = normalized_values("Noise Floor", "-162dBm/Hz", capsys)
+    assert_quantity(values["noise 1"], -162.0, "decibel_milliwatt_per_hertz")
+
+    values = normalized_values("Input Range", "-29dBm~17dBm", capsys)
+    assert_quantity(values["level min"], -29.0, "decibel_milliwatt")
+    assert_quantity(values["level max"], 17.0, "decibel_milliwatt")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
@@ -3732,6 +3762,13 @@ def test_contact_rating(capsys):
 
     values = normalized_values("Contact Rating", "5A@250AC", capsys)
     assert_quantity(values["current 1"], 5.0, "current")
+    assert_quantity(values["voltage 1"], 250.0, "voltage")
+
+
+def test_breaking_ability(capsys):
+    values = normalized_values("Breaking Ability", "80A@250VAC", capsys)
+
+    assert_quantity(values["current 1"], 80.0, "current")
     assert_quantity(values["voltage 1"], 250.0, "voltage")
 
 
@@ -4006,6 +4043,17 @@ def test_distance_aliases(capsys):
     assert_quantity(values["length 1 max"], 0.3, "length")
 
 
+def test_mechanical_dimension_aliases(capsys):
+    values = normalized_values("Product Size", "16.5*16*25MM", capsys)
+
+    assert_quantity(values["length 1"], 0.0165, "length")
+    assert_quantity(values["length 2"], 0.016, "length")
+    assert_quantity(values["length 3"], 0.025, "length")
+
+    values = normalized_values("Metal Size", "φ4mm", capsys)
+    assert_quantity(values["length"], 0.004, "length")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
@@ -4181,6 +4229,16 @@ def test_fraction_list_attributes(capsys):
 
     values = normalized_values("Capacitance Ratio", "2@C1V/C4V", capsys)
     assert_quantity(values["ratio 1"], 2.0, "ratio")
+
+
+def test_voltage_and_frequency_range_aliases(capsys):
+    values = normalized_values("Voltage Range", "1000/100V", capsys)
+    assert_quantity(values["voltage 1.1"], 1000.0, "voltage")
+    assert_quantity(values["voltage 1.2"], 100.0, "voltage")
+
+    values = normalized_values("Range", "45-65Hz", capsys)
+    assert_quantity(values["frequency 1 min"], 45.0, "frequency")
+    assert_quantity(values["frequency 1 max"], 65.0, "frequency")
 
 
 def test_resistor_ratio_values(capsys):
