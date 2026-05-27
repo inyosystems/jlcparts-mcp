@@ -732,6 +732,21 @@ def test_equivalent_series_inductance_values(capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Inductor", "350uH", {"inductance": 350e-6}),
+        ("Inductor", "150uH;450uH", {"inductance 1": 150e-6, "inductance 2": 450e-6}),
+        ("Inductor(100khz,1/10v/8m A) (Min)", "325uH", {"inductance": 325e-6}),
+    ],
+)
+def test_inductor_aliases(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, inductance in expected.items():
+        assert_quantity(values[quantity], inductance, "inductance")
+
+
+@pytest.mark.parametrize(
     ("value", "expected"),
     [
         ("240uV", 240e-6),
@@ -876,6 +891,7 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Voltage - Input(AC)", "85VAC~265VAC", "voltage min", 85.0, "voltage"),
         ("Input Voltage(Vac)", "85VAC~305VAC", "voltage min", 85.0, "voltage"),
         ("Voltage - Supply for Logic", "1.65V~3.3V", "voltage min", 1.65, "voltage"),
+        ("The Power Supply Voltage", "4.75V~5.25V", "voltage min", 4.75, "voltage"),
         ("Rated Speed", "8500RPM", "speed", 8500.0, "rotational_speed"),
         ("Rated Speed", "-", "speed", "NaN", "rotational_speed"),
     ],
@@ -934,6 +950,15 @@ def test_peak_output_current_sink_list(capsys):
         ("Continuous Current (Imax)", "4A", {"current": 4.0}),
         ("Segment Drive Current", "45mA, 60mA", {"current 1": 0.045, "current 2": 0.06}),
         ("Digit Drive Current", "320mA", {"current": 0.32}),
+        ("Forward Current", "R:20mA, G:20mA, B:10mA", {
+            "current R": 0.02,
+            "current G": 0.02,
+            "current B": 0.01,
+        }),
+        ("Forward Current", "200mA@UVA, 30mA@UVC", {"current 1": 0.2, "current 2": 0.03}),
+        ("Output Current(It(RMS))", "100mA", {"current": 0.1}),
+        ("Current - Surge(Itsm)", "120A, 115A", {"current 1": 120.0, "current 2": 115.0}),
+        ("Quiescent Current (Max)", "2uA", {"current": 2e-6}),
     ],
 )
 def test_additional_current_values(key, value, expected, capsys):
@@ -1425,6 +1450,9 @@ def test_logic_array_blocks(value, expected, capsys):
         ("Needle Number", "12", {"count": 12}),
         ("Channels", "16", {"count": 16}),
         ("Number of Characters", "4", {"count": 4}),
+        ("Number of Terminals", "4", {"count": 4}),
+        ("Turns", "11", {"count": 11}),
+        ("Number of Turns", "25", {"count": 25}),
     ],
 )
 def test_extra_count_attributes(key, value, expected, capsys):
@@ -1670,6 +1698,12 @@ def test_cycle_life_counts(key, value, expected, capsys):
     values = normalized_values(key, value, capsys)
 
     assert_quantity(values["count"], expected, "count")
+
+
+def test_write_cycle_endurance(capsys):
+    values = normalized_values("Write Cycle Endurance", "1,000,000 cycles", capsys)
+
+    assert_quantity(values["count"], 1000000, "count")
 
 
 def test_cycle_life_count_lists(capsys):
@@ -2214,6 +2248,9 @@ def test_conversion_efficiency_values(value, expected, capsys):
         ("Output Voltage Accuracy", "±1.5%", {"percentage min": -1.5, "percentage max": 1.5}),
         ("Output Voltage Accuracy", "±5‰", {"percentage min": -0.5, "percentage max": 0.5}),
         ("Duty Cycle", "1/4,1/3", {"percentage 1": 25.0, "percentage 2": 100 / 3}),
+        ("Duty Cycle (Max)", "85%, 90%", {"percentage 1": 85.0, "percentage 2": 90.0}),
+        ("Current Transfer Ratio (Ctr) Maximum/Saturation Value", "400%", {"percentage": 400.0}),
+        ("Current Transfer Ratio (Ctr) Minimum", "0.25%", {"percentage": 0.25}),
     ],
 )
 def test_flexible_percentage_values(key, value, expected, capsys):
@@ -2394,6 +2431,12 @@ def test_cmti(value, expected, capsys):
     values = normalized_values("Cmti(K V/Us)", value, capsys)
 
     assert_quantity(values["cmti"], expected, "slew_rate")
+
+
+def test_static_dv_dt(capsys):
+    values = normalized_values("Static Dv/Dt", "7kV/us", capsys)
+
+    assert_quantity(values["dv/dt"], 7e9, "slew_rate")
 
 
 @pytest.mark.parametrize(
@@ -2622,6 +2665,12 @@ def test_pd_power_dissipation_alias(capsys):
     values = normalized_values("Pd - Power Dissipation(Pd)", "200mW", capsys)
 
     assert_quantity(values["power"], 0.2, "power")
+
+
+def test_total_power_dissipation_alias(capsys):
+    values = normalized_values("Total Power Dissipation(Pd)", "150mW", capsys)
+
+    assert_quantity(values["power"], 0.15, "power")
 
 
 @pytest.mark.parametrize(
@@ -3281,6 +3330,20 @@ def test_display_dimensions(key, value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("15mm~150mm", {"length min": 0.015, "length max": 0.15}),
+        ("350cm", {"length": 3.5}),
+    ],
+)
+def test_linear_range_lengths(value, expected, capsys):
+    values = normalized_values("Linear Range", value, capsys)
+
+    for quantity, length in expected.items():
+        assert_quantity(values[quantity], length, "length")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("2.54mm", 0.00254),
         ("0.5", 0.0005),
         ("-", "NaN"),
@@ -3621,6 +3684,9 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
         ("Delay Time", "250ns", {"time": 250e-9}),
         ("Rise Time(Tr)", "2us", {"time": 2e-6}),
         ("Rise Time (Tr)", "1.5us", {"time": 1.5e-6}),
+        ("Write Cycle Time (Tw)", "5ms", {"time": 0.005}),
+        ("Write Cycle Time(Tw)", "480us", {"time": 480e-6}),
+        ("Write Cycle Time (T Wc)", "70ns", {"time": 70e-9}),
         ("Switch Time(Toff)", "40ns", {"time": 40e-9}),
         ("Operate Time", "2.5min", {"time": 150.0}),
         ("Release Time", "5ms, 15ms", {"time 1": 0.005, "time 2": 0.015}),

@@ -1063,6 +1063,10 @@ def inductanceAttribute(value):
         }
     }
 
+def inductanceListAttribute(value):
+    value = str(value).replace(";", ",")
+    return scalarListAttribute(value, readInductance, "inductance", "inductance")
+
 def frequencyAttribute(value):
     value = str(value)
     return rangeOrScalarAttribute(value, readFrequency, "frequency", "frequency")
@@ -1089,6 +1093,25 @@ def frequencyRangeListAttribute(value):
 def currentListAttribute(value):
     value = str(value).replace(";", ",")
     return scalarListAttribute(value, readCurrent, "current", "current")
+
+def labeledCurrentListAttribute(value, name="current"):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    multiple = len(parts) > 1
+    for index, part in enumerate(parts, start=1):
+        value_name = f"{name} {index}" if multiple else name
+        if ":" in part:
+            label, part = [x.strip() for x in part.split(":", 1)]
+            value_name = f"{name} {label}"
+        values[value_name] = [readCurrent(_stripCondition(part)), "current"]
+        formats.append("${" + value_name + "}")
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
 
 def luminousIntensityAttribute(value):
     value = str(value)
