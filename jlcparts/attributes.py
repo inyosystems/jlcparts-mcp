@@ -1194,6 +1194,69 @@ def noiseAttribute(value):
         "values": values
     }
 
+def _readSensitivityRatio(value):
+    value = str(value).strip()
+    match = re.fullmatch(
+        r"([+-]?\d+(?:\.\d+)?)\s*([munpμµ]?V|[munpμµ]?A)\s*/\s*(A|mT|Gs|g)",
+        value,
+        flags=re.I,
+    )
+    if match is None:
+        raise ValueError(f"Cannot parse sensitivity {value}")
+    number, numerator_unit, denominator_unit = match.groups()
+    numerator_unit = numerator_unit.replace("μ", "u").replace("µ", "u")
+    denominator_unit = denominator_unit.lower()
+    if numerator_unit.lower().endswith("v"):
+        numerator = readVoltage(f"{number}{numerator_unit}")
+        if denominator_unit == "a":
+            return numerator, "voltage_per_current"
+        if denominator_unit == "mt":
+            return numerator / 1e-3, "voltage_per_magnetic_flux_density"
+        if denominator_unit == "gs":
+            return numerator / 1e-4, "voltage_per_magnetic_flux_density"
+        if denominator_unit == "g":
+            return numerator, "voltage_per_g"
+    numerator = readCurrent(f"{number}{numerator_unit}")
+    if denominator_unit == "a":
+        return numerator, "current_per_current"
+    raise ValueError(f"Cannot parse sensitivity {value}")
+
+def sensitivityAttribute(value):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        name = f"sensitivity {index}" if len(parts) > 1 else "sensitivity"
+        if part in ["-", "--", "null"]:
+            values[name] = ["NaN", "decibel"]
+            formats.append("${" + name + "}")
+        elif "dbm" in part.lower():
+            values[name] = [readDecibelMilliwatt(part), "decibel_milliwatt"]
+            formats.append("${" + name + "}")
+        elif "db" in part.lower():
+            signal = part
+            tolerance = None
+            if "@" in part:
+                signal, tolerance = [x.strip() for x in part.split("@", 1)]
+            values[name] = [readDecibel(signal), "decibel"]
+            format_parts = ["${" + name + "}"]
+            if tolerance:
+                tolerance_name = f"{name} tolerance"
+                tolerance = tolerance.replace("±", "")
+                values[tolerance_name] = [readDecibel(tolerance), "decibel"]
+                format_parts.append("± ${" + tolerance_name + "}")
+            formats.append(" ".join(format_parts))
+        else:
+            parsed_value, unit = _readSensitivityRatio(part)
+            values[name] = [parsed_value, unit]
+            formats.append("${" + name + "}")
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
 def _temperatureCoefficientPart(part, name):
     part = part.strip()
     if part in ["-", "--", "null"]:

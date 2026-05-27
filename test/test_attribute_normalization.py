@@ -2681,6 +2681,34 @@ def test_noise_values(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("-38dB", {"sensitivity": [-38.0, "decibel"]}),
+        ("-25dB@±3dB", {
+            "sensitivity": [-25.0, "decibel"],
+            "sensitivity tolerance": [3.0, "decibel"],
+        }),
+        ("-95.5dBm", {"sensitivity": [-95.5, "decibel_milliwatt"]}),
+        ("100mV/A", {"sensitivity": [0.1, "voltage_per_current"]}),
+        ("40V/A", {"sensitivity": [40.0, "voltage_per_current"]}),
+        ("1500mV/mT", {"sensitivity": [1500.0, "voltage_per_magnetic_flux_density"]}),
+        ("2.25mV/Gs, 3.8mV/Gs", {
+            "sensitivity 1": [22.5, "voltage_per_magnetic_flux_density"],
+            "sensitivity 2": [38.0, "voltage_per_magnetic_flux_density"],
+        }),
+        ("10mV/g", {"sensitivity": [0.01, "voltage_per_g"]}),
+        ("0.5mA/A", {"sensitivity": [0.0005, "current_per_current"]}),
+        ("-", {"sensitivity": ["NaN", "decibel"]}),
+    ],
+)
+def test_sensitivity_values(value, expected, capsys):
+    values = normalized_values("Sensitivity", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        assert_quantity(values[quantity], expected_value[0], expected_value[1])
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("35ppm/℃", {"coefficient": [35.0, "temperature_coefficient"]}),
         ("190ppb/℃", {"coefficient": [0.19, "temperature_coefficient"]}),
         ("±50ppm/℃", {
