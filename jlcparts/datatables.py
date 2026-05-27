@@ -86,6 +86,8 @@ def normalizeAttribute(key, value):
         elif key in larr(["Coil Resistance", "Ron", "Resistor on-State", "On-State Resistance (Max)", "Zener Impedance (ZZT)",
                 "Resistance - Initial (Ri) (Min)"]):
             value = attributes.resistanceListAttribute(value) if compoundValue(value) else attributes.resistanceAttribute(value)
+        elif key in larr(["Series Resistance (RS)", "Input Resistor"]):
+            value = attributes.resistanceAttribute(value)
         elif key in larr(["Balance Port Impedence", "Unbalance Port Impedence", "Impedance(Zzk)", "Impedance"]):
             value = attributes.impedanceListAttribute(value) if compoundValue(value) else attributes.impedanceAttribute(value)
         elif key in larr(["Voltage - Rated", "Voltage Rating - DC", "Allowable Voltage", "Allowable Voltage (DC)",
@@ -122,11 +124,16 @@ def normalizeAttribute(key, value):
                 "Dielectric Withstand Voltage", "Coil Voltage",
                 "Switching Voltage (Max)", "Vbo (Typ)",
                 "Breakover Voltage Vbo (Typ)", "Breakover Voltage Symmetry",
-                "Dynamic Breakover Voltage", "Voltage"]):
+                "Dynamic Breakover Voltage", "DC Reverse Voltage(Vr)",
+                "Voltage - Input (Max)(Vi(Off))", "Input Voltage (Vi(on)@IC,VCE)",
+                "Output Voltage(Vo(on))", "Voltage - Isolation", "Voltage"]):
             if key == "charging saturation voltage" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "isolation voltage(vrms)" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
+            elif key in larr(["Voltage - Input (Max)(Vi(Off))",
+                    "Input Voltage (Vi(on)@IC,VCE)", "Output Voltage(Vo(on))"]):
+                value = attributes.voltageAtConditionAttribute(value, "voltage")
             elif key in larr(["Coil Voltage", "Switching Voltage (Max)"]):
                 value = attributes.voltageOrCurrentListAttribute(value)
             elif key in larr(["Dielectric Withstand Voltage"]):
@@ -168,6 +175,8 @@ def normalizeAttribute(key, value):
                 "receiver hysteresis", "high level range (vih)",
                 "input logic level -low"]:
             value = attributes.voltageRangeListAttribute(value) if compoundValue(value) else attributes.voltageRangeAttribute(value, "voltage")
+        elif key in larr(["High-Side Bias Voltage(Vbs)"]):
+            value = attributes.voltageRangeAttribute(value, "voltage")
         elif key in larr(["Human Body Model", "Contact Discharge Vesd"]):
             value = attributes.voltageRangeAttribute(value, "voltage")
         elif key in larr(["Input Voltage", "Frequency Input Voltage", "Zener Voltage (Range)",
@@ -251,7 +260,8 @@ def normalizeAttribute(key, value):
                     "Drain Current (Idss)", "Current Rating (AC)",
                     "Current Rating (DC)", "IR - Reverse Current",
                     "Peak Forward Surge Current", "Breakover Current (Ibo)",
-                    "Repetitive Peak on-State Current (Itrm)"]):
+                    "Repetitive Peak on-State Current (Itrm)", "Leak Current",
+                    "Continuous Current (Imax)", "Segment Drive Current"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent current",
@@ -295,6 +305,7 @@ def normalizeAttribute(key, value):
                 "breaking capacity",
                 "interrupt rating",
                 "interrupting rating",
+                "segment drive current",
             ]
             if key in ["current - leakage", "leakage current(dcl)"]:
                 value = attributes.currentAttribute(value)
@@ -311,7 +322,8 @@ def normalizeAttribute(key, value):
                           "Power Dissipation", "Peak Pulse Power Dissipation (Ppp)",
                           "Peak Pulse Power Dissipation (Ppp)@10/1000us",
                           "Peak Pulse Power(Ppp)@8/20us", "Rated Power",
-                          "Rated Wattage", "Coil Rated Power"]):
+                          "Rated Wattage", "Coil Rated Power",
+                          "Pd - Power Dissipation(Pd)"]):
             if key == "peak pulse power(ppp)@8/20us" and isinstance(value, str) and ("," in value or ";" in value):
                 value = attributes.powerListAttribute(value, "power")
             elif key in ["power dissipation (pd)", "coil rated power"] and compoundValue(value):
@@ -355,6 +367,8 @@ def normalizeAttribute(key, value):
             value = attributes.dynamicRangeAttribute(value)
         elif key in larr(["Clock to Corner Frequency Ratio"]):
             value = attributes.colonRatioListAttribute(value, "ratio")
+        elif key in larr(["Resistor Ratio"]):
+            value = attributes.ratioRangeListAttribute(value, "ratio")
         elif key in larr(["Switch Circuit"]):
             value = attributes.switchCircuitAttribute(value)
         elif key in larr(["Swr"]):
@@ -421,8 +435,10 @@ def normalizeAttribute(key, value):
                 "Electrostatic Capacitance", "Capacitance-Input",
                 "Input Capacitiance(Ci)", "Built-in Load Capacitance",
                 "Built - in Load Capacitance", "Load Capacitor",
-                "Load Capacitance", "Static Capacitance"]):
-            if key in ["junction capacitance", "capacitive load (max)"] and compoundValue(value):
+                "Load Capacitance", "Static Capacitance", "Diode Capacitance"]):
+            if key == "diode capacitance":
+                value = attributes.diodeCapacitanceAttribute(value)
+            elif key in ["junction capacitance", "capacitive load (max)"] and compoundValue(value):
                 value = attributes.capacitanceListAttribute(value)
             elif multiScalarValue(value):
                 value = attributes.stringAttribute(value)
@@ -642,7 +658,8 @@ def normalizeAttribute(key, value):
         elif key in larr(["Inductance @ Frequency"]):
             value = attributes.stringAttribute(value) if compoundValue(value) else attributes.inductanceAtFrequency(value)
         elif key in larr(["Propagation Delay", "Propagation Delay (TPD)", "Propagation Delay Time", "Turn-On Time",
-                "Turn-Off Time", "Rise Time", "Rise Time(Tr)", "Fall Time", "Reverse Recovery Time (Trr)",
+                "Turn-Off Time", "Rise Time", "Rise Time(Tr)", "Rise Time (Tr)",
+                "Fall Time", "Reverse Recovery Time (Trr)",
                 "Reset Timeout", "Settling Time", "Response Time (Tr)", "Time to Trip (Max)", "Td(Off)",
                 "Propagation Delay Tp Hl", "Propagation Delay Tp Lh", "Max Propagation Delay",
                 "Maximum Propagation Delay", "Td(on)", "Block Erase Time(T Be)",

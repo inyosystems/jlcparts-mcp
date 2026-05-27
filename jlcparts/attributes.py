@@ -2079,6 +2079,49 @@ def capacitanceAtFrequencyAttribute(value):
         "values": values
     }
 
+def diodeCapacitanceAttribute(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return scalarAttribute(value, readCapacitance, "capacitance", "capacitance")
+
+    measurement_re = re.compile(
+        r"(?P<cap>[+-]?\d+(?:\.\d+)?\s*[fpnumkKMGT]?F)"
+        r"(?:\s*@\s*(?P<conditions>.*?))?"
+        r"(?=,\s*[+-]?\d+(?:\.\d+)?\s*[fpnumkKMGT]?F|$)",
+        flags=re.I,
+    )
+    matches = list(measurement_re.finditer(value))
+    if not matches:
+        raise ValueError(f"Cannot parse diode capacitance {value}")
+
+    values = {}
+    formats = []
+    multiple = len(matches) > 1
+    for index, match in enumerate(matches, start=1):
+        suffix = f" {index}" if multiple else ""
+        cap_name = f"capacitance{suffix}"
+        values[cap_name] = [readCapacitance(match.group("cap")), "capacitance"]
+        format_parts = ["${" + cap_name + "}"]
+
+        conditions = match.group("conditions")
+        if conditions:
+            for condition in [x.strip() for x in conditions.split(",") if x.strip()]:
+                if re.search(r"V\s*$", condition, flags=re.I):
+                    voltage_name = f"voltage{suffix}"
+                    values[voltage_name] = [readVoltage(condition), "voltage"]
+                    format_parts.append("@ ${" + voltage_name + "}")
+                elif re.search(r"Hz\s*$", condition, flags=re.I):
+                    frequency_name = f"frequency{suffix}"
+                    values[frequency_name] = [readFrequency(condition), "frequency"]
+                    format_parts.append("@ ${" + frequency_name + "}")
+        formats.append(" ".join(format_parts))
+
+    return {
+        "format": ", ".join(formats),
+        "primary": "capacitance 1" if multiple else "capacitance",
+        "values": values
+    }
+
 def inductanceAtFrequency(value):
     value = str(value)
     if _hasCompoundValues(value):

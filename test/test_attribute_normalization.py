@@ -102,6 +102,9 @@ def test_rds_on_multiple_measurements(value, measurements, capsys):
         ("Resistor on-State", "10mΩ;30mΩ", {"resistance 1": 0.01, "resistance 2": 0.03}),
         ("On-State Resistance (Max)", "3.5kΩ", {"resistance": 3500.0}),
         ("On-State Resistance (Max)", "4.6Ω;5.7Ω", {"resistance 1": 4.6, "resistance 2": 5.7}),
+        ("Series Resistance (RS)", "650mΩ", {"resistance": 0.65}),
+        ("Input Resistor", "10kΩ", {"resistance": 10000.0}),
+        ("Input Resistor", "-", {"resistance": "NaN"}),
     ],
 )
 def test_resistance_list_attributes(key, value, expected, capsys):
@@ -408,6 +411,11 @@ def test_extra_voltage_ranges(key, value, expected, capsys):
         ("Breakover Voltage Vbo (Typ)", "110V", {"voltage": 110.0}),
         ("Breakover Voltage Symmetry", "3V", {"voltage": 3.0}),
         ("Dynamic Breakover Voltage", "5V", {"voltage": 5.0}),
+        ("DC Reverse Voltage(Vr)", "20V", {"voltage": 20.0}),
+        ("Voltage - Input (Max)(Vi(Off))", "300mV@100uA,5V", {"voltage": 0.3}),
+        ("Input Voltage (Vi(on)@IC,VCE)", "1.4V@1mA,0.3V", {"voltage": 1.4}),
+        ("Output Voltage(Vo(on))", "300mV@5mA,0.25mA", {"voltage": 0.3}),
+        ("Voltage - Isolation", "1.6 kV", {"voltage": 1600.0}),
         ("Output Low Voltage", "0.2V~0.5V", {"voltage 1 min": 0.2, "voltage 1 max": 0.5}),
         ("Output High Voltage", "700mV", {"voltage 1": 0.7}),
         ("Input Low Voltage", "500mV~800mV", {"voltage 1 min": 0.5, "voltage 1 max": 0.8}),
@@ -859,6 +867,7 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Control Voltage Range/Center", "0V~3.3V", "voltage min", 0.0, "voltage"),
         ("Vbo (Range Value)", "35V~45V", "voltage min", 35.0, "voltage"),
         ("Breakover Voltage Vbo(Range Value)", "95V~110V", "voltage min", 95.0, "voltage"),
+        ("High-Side Bias Voltage(Vbs)", "13.5V~16.5V", "voltage min", 13.5, "voltage"),
         ("Rated Speed", "8500RPM", "speed", 8500.0, "rotational_speed"),
         ("Rated Speed", "-", "speed", "NaN", "rotational_speed"),
     ],
@@ -913,6 +922,9 @@ def test_peak_output_current_sink_list(capsys):
         ("Peak Forward Surge Current", "1.95kA", {"current": 1950.0}),
         ("Breakover Current (Ibo)", "50uA", {"current": 50e-6}),
         ("Repetitive Peak on-State Current (Itrm)", "2A", {"current": 2.0}),
+        ("Leak Current", "10uA", {"current": 10e-6}),
+        ("Continuous Current (Imax)", "4A", {"current": 4.0}),
+        ("Segment Drive Current", "45mA, 60mA", {"current 1": 0.045, "current 2": 0.06}),
     ],
 )
 def test_additional_current_values(key, value, expected, capsys):
@@ -928,6 +940,21 @@ def test_sampling_rate_lists(capsys):
     assert_quantity(values["frequency 1"], 48000.0, "frequency")
     assert_quantity(values["frequency 2"], 32000.0, "frequency")
     assert_quantity(values["frequency 3"], 44100.0, "frequency")
+
+
+def test_diode_capacitance_conditions(capsys):
+    values = normalized_values(
+        "Diode Capacitance",
+        "2.85pF@25V,1MHz, 2.6pF@28V,1MHz",
+        capsys,
+    )
+
+    assert_quantity(values["capacitance 1"], 2.85e-12, "capacitance")
+    assert_quantity(values["voltage 1"], 25.0, "voltage")
+    assert_quantity(values["frequency 1"], 1e6, "frequency")
+    assert_quantity(values["capacitance 2"], 2.6e-12, "capacitance")
+    assert_quantity(values["voltage 2"], 28.0, "voltage")
+    assert_quantity(values["frequency 2"], 1e6, "frequency")
 
 
 def test_sampling_rate_range_lists(capsys):
@@ -2554,6 +2581,12 @@ def test_power_dissipation_pd_list(value, expected, capsys):
         assert_quantity(values[quantity], power, "power")
 
 
+def test_pd_power_dissipation_alias(capsys):
+    values = normalized_values("Pd - Power Dissipation(Pd)", "200mW", capsys)
+
+    assert_quantity(values["power"], 0.2, "power")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
@@ -3278,6 +3311,12 @@ def test_dc_current_gain_values(value, expected, capsys):
         assert_quantity(values[quantity], gain, "ratio")
 
 
+def test_resistor_ratio_values(capsys):
+    values = normalized_values("Resistor Ratio", "4.7", capsys)
+
+    assert_quantity(values["ratio"], 4.7, "ratio")
+
+
 @pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
@@ -3516,6 +3555,7 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
         ("Access Time", "-", {"time": "NaN"}),
         ("Delay Time", "250ns", {"time": 250e-9}),
         ("Rise Time(Tr)", "2us", {"time": 2e-6}),
+        ("Rise Time (Tr)", "1.5us", {"time": 1.5e-6}),
         ("Switch Time(Toff)", "40ns", {"time": 40e-9}),
         ("Operate Time", "2.5min", {"time": 150.0}),
         ("Release Time", "5ms, 15ms", {"time 1": 0.005, "time 2": 0.015}),
