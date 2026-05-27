@@ -120,7 +120,9 @@ def normalizeAttribute(key, value):
                 "Peak Off-State Voltage", "Reset Voltage", "Peak Impulse Voltage",
                 "On-State Voltage (Vt)", "Lag of Receiver", "End-Off Voltage",
                 "Dielectric Withstand Voltage", "Coil Voltage",
-                "Switching Voltage (Max)", "Voltage"]):
+                "Switching Voltage (Max)", "Vbo (Typ)",
+                "Breakover Voltage Vbo (Typ)", "Breakover Voltage Symmetry",
+                "Dynamic Breakover Voltage", "Voltage"]):
             if key == "charging saturation voltage" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "isolation voltage(vrms)" and compoundValue(value):
@@ -148,7 +150,8 @@ def normalizeAttribute(key, value):
                 value = attributes.voltageListAttribute(value)
             else:
                 value = attributes.voltageAttribute(value)
-        elif key in larr(["Control Voltage Range/Center"]):
+        elif key in larr(["Control Voltage Range/Center", "Vbo (Range Value)",
+                "Breakover Voltage Vbo(Range Value)"]):
             value = attributes.voltageRangeAttribute(value, "voltage")
         elif key in ["input voltage(dc)", "motor drive voltage(vm)", "control voltage",
                 "vcm - common mode voltage", "low voltage detection threshold",
@@ -246,7 +249,9 @@ def normalizeAttribute(key, value):
                     "Breaking Capacity", "Interrupt Rating",
                     "Interrupting Rating", "Rated Ripple Curren",
                     "Drain Current (Idss)", "Current Rating (AC)",
-                    "Current Rating (DC)"]):
+                    "Current Rating (DC)", "IR - Reverse Current",
+                    "Peak Forward Surge Current", "Breakover Current (Ibo)",
+                    "Repetitive Peak on-State Current (Itrm)"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent current",
@@ -314,7 +319,7 @@ def normalizeAttribute(key, value):
             else:
                 value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.powerAtConditionAttribute(value, "power")
         elif key in larr(["Energy", "Energy (Max)", "Turn-on Energy (Eon)",
-                "Switching Energy(Eoff)"]):
+                "Switching Energy(Eoff)", "Avalanche Energy"]):
             if key in ["turn-on energy (eon)", "switching energy(eoff)"] and compoundValue(value):
                 value = attributes.energyListAttribute(value)
             else:
@@ -637,7 +642,7 @@ def normalizeAttribute(key, value):
         elif key in larr(["Inductance @ Frequency"]):
             value = attributes.stringAttribute(value) if compoundValue(value) else attributes.inductanceAtFrequency(value)
         elif key in larr(["Propagation Delay", "Propagation Delay (TPD)", "Propagation Delay Time", "Turn-On Time",
-                "Turn-Off Time", "Rise Time", "Fall Time", "Reverse Recovery Time (Trr)",
+                "Turn-Off Time", "Rise Time", "Rise Time(Tr)", "Fall Time", "Reverse Recovery Time (Trr)",
                 "Reset Timeout", "Settling Time", "Response Time (Tr)", "Time to Trip (Max)", "Td(Off)",
                 "Propagation Delay Tp Hl", "Propagation Delay Tp Lh", "Max Propagation Delay",
                 "Maximum Propagation Delay", "Td(on)", "Block Erase Time(T Be)",

@@ -404,6 +404,10 @@ def test_extra_voltage_ranges(key, value, expected, capsys):
         ("Peak Off-State Voltage", "6V", {"voltage": 6.0}),
         ("Reset Voltage", "620mV", {"voltage": 0.62}),
         ("Peak Impulse Voltage", "650V", {"voltage": 650.0}),
+        ("Vbo (Typ)", "40V", {"voltage": 40.0}),
+        ("Breakover Voltage Vbo (Typ)", "110V", {"voltage": 110.0}),
+        ("Breakover Voltage Symmetry", "3V", {"voltage": 3.0}),
+        ("Dynamic Breakover Voltage", "5V", {"voltage": 5.0}),
         ("Output Low Voltage", "0.2V~0.5V", {"voltage 1 min": 0.2, "voltage 1 max": 0.5}),
         ("Output High Voltage", "700mV", {"voltage 1": 0.7}),
         ("Input Low Voltage", "500mV~800mV", {"voltage 1 min": 0.5, "voltage 1 max": 0.8}),
@@ -853,6 +857,8 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Frequency (Max)", "6GHz", "frequency", 6e9, "frequency"),
         ("Voltage", "600 V", "voltage", 600.0, "voltage"),
         ("Control Voltage Range/Center", "0V~3.3V", "voltage min", 0.0, "voltage"),
+        ("Vbo (Range Value)", "35V~45V", "voltage min", 35.0, "voltage"),
+        ("Breakover Voltage Vbo(Range Value)", "95V~110V", "voltage min", 95.0, "voltage"),
         ("Rated Speed", "8500RPM", "speed", 8500.0, "rotational_speed"),
         ("Rated Speed", "-", "speed", "NaN", "rotational_speed"),
     ],
@@ -903,6 +909,10 @@ def test_peak_output_current_sink_list(capsys):
         ("Drain Current (Idss)", "57mA", {"current": 0.057}),
         ("Current Rating (AC)", "3A", {"current": 3.0}),
         ("Current Rating (DC)", "50mA", {"current": 0.05}),
+        ("IR - Reverse Current", "1.5A", {"current": 1.5}),
+        ("Peak Forward Surge Current", "1.95kA", {"current": 1950.0}),
+        ("Breakover Current (Ibo)", "50uA", {"current": 50e-6}),
+        ("Repetitive Peak on-State Current (Itrm)", "2A", {"current": 2.0}),
     ],
 )
 def test_additional_current_values(key, value, expected, capsys):
@@ -2866,6 +2876,7 @@ def test_temperature_coefficient_aliases(key, value, expected, capsys):
         ("Energy (Max)", "-", "NaN"),
         ("Turn-on Energy (Eon)", "310uJ", 310e-6),
         ("Switching Energy(Eoff)", "12.9mJ", 0.0129),
+        ("Avalanche Energy", "10mJ", 0.01),
     ],
 )
 def test_energy_values(key, value, expected, capsys):
@@ -3504,6 +3515,7 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
         ("Access Time", "150ns", {"time": 150e-9}),
         ("Access Time", "-", {"time": "NaN"}),
         ("Delay Time", "250ns", {"time": 250e-9}),
+        ("Rise Time(Tr)", "2us", {"time": 2e-6}),
         ("Switch Time(Toff)", "40ns", {"time": 40e-9}),
         ("Operate Time", "2.5min", {"time": 150.0}),
         ("Release Time", "5ms, 15ms", {"time 1": 0.005, "time 2": 0.015}),
