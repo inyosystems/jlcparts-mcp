@@ -461,7 +461,9 @@ def normalizeAttribute(key, value):
             value = attributes.ratioAtFrequencyAttribute(value, "magnetic conductivity")
         elif key in larr(["Turns Ratio"]):
             value = attributes.turnsRatioAttribute(value)
-        elif key in larr(["Current Ratio", "Standing Poppy", "Sensitivity At"]):
+        elif key in larr(["Current Ratio"]):
+            value = attributes.turnsRatioAttribute(value)
+        elif key in larr(["Standing Poppy", "Sensitivity At"]):
             value = attributes.ratioRangeListAttribute(value, "ratio")
         elif key in larr(["Range"]):
             value = attributes.frequencyOrVoltageRangeAttribute(value)
