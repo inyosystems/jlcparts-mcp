@@ -2424,6 +2424,13 @@ def test_temperature_limit_values(key, value, expected, capsys):
         assert_quantity(values[quantity], temperature, "temperature")
 
 
+def test_temperature_range_alias(capsys):
+    values = normalized_values("Temperature Range", "-40℃~+85℃", capsys)
+
+    assert_quantity(values["temperature min"], -40, "temperature")
+    assert_quantity(values["temperature max"], 85, "temperature")
+
+
 @pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
@@ -2960,6 +2967,14 @@ def test_peak_wavelength_lists(value, expected, capsys):
     for quantity, expected_value in expected.items():
         unit = "luminous_intensity" if quantity.startswith("intensity") else "length"
         assert_quantity(values[quantity], expected_value, unit)
+
+
+def test_wavelength_alias_labels(capsys):
+    values = normalized_values("Wavelength", "R:625nm, G:525nm, B:470nm", capsys)
+
+    assert_quantity(values["wavelength R"], 625e-9, "length")
+    assert_quantity(values["wavelength G"], 525e-9, "length")
+    assert_quantity(values["wavelength B"], 470e-9, "length")
 
 
 @pytest.mark.parametrize(
@@ -3665,6 +3680,14 @@ def test_decibel_milliwatt_values(key, value, expected, capsys):
         assert_quantity(values[f"level {index}"], level, "decibel_milliwatt")
 
 
+def test_transmit_receive_rf_aliases(capsys):
+    values = normalized_values("Input Return Loss(Transmit)", "-10dB", capsys)
+    assert_quantity(values["level 1"], -10.0, "decibel")
+
+    values = normalized_values("P1d B(Transmit)", "21.5dBm", capsys)
+    assert_quantity(values["level 1"], 21.5, "decibel_milliwatt")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
@@ -3972,6 +3995,17 @@ def test_communication_distance(capsys):
     assert_quantity(values["length 1 max"], 5000.0, "length")
 
 
+def test_distance_aliases(capsys):
+    values = normalized_values("Distance", "50m, 200m, 120m", capsys)
+    assert_quantity(values["length 1"], 50.0, "length")
+    assert_quantity(values["length 2"], 200.0, "length")
+    assert_quantity(values["length 3"], 120.0, "length")
+
+    values = normalized_values("Sensing Range", "1cm~30cm", capsys)
+    assert_quantity(values["length 1 min"], 0.01, "length")
+    assert_quantity(values["length 1 max"], 0.3, "length")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
@@ -4138,6 +4172,15 @@ def test_shrinkage_ratio(capsys):
     values = normalized_values("Shrinkage Ratio", "Lateral Shrinkage ≥50%, Longitudinal Shrinkage ≤8%", capsys)
     assert_quantity(values["lateral shrinkage min"], 50.0, "percentage")
     assert_quantity(values["longitudinal shrinkage max"], 8.0, "percentage")
+
+
+def test_fraction_list_attributes(capsys):
+    values = normalized_values("Bias", "1/3,1/2", capsys)
+    assert_quantity(values["ratio 1"], 1 / 3, "ratio")
+    assert_quantity(values["ratio 2"], 0.5, "ratio")
+
+    values = normalized_values("Capacitance Ratio", "2@C1V/C4V", capsys)
+    assert_quantity(values["ratio 1"], 2.0, "ratio")
 
 
 def test_resistor_ratio_values(capsys):

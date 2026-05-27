@@ -237,7 +237,7 @@ def readDataRate(value):
     value = value.strip()
     if value in ["-", "--", "null", "NaN"]:
         return "NaN"
-    value = re.sub(r"(?:bit/s|bps|sps|B/s)$", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"(?:bit/s|bps|sps|B/s|Bd)$", "", value, flags=re.IGNORECASE)
     value = erase(value, ["Hz", "HZ", "H"]).strip()
     value = re.sub(r"([0-9.])([kmg])$", lambda m: m.group(1) + m.group(2).upper(), value)
     return readWithSiPrefix(value)
@@ -2422,6 +2422,21 @@ def powerListAttribute(value, name="power"):
     value = str(value).replace(";", ",")
     return scalarListAttribute(value, readPower, "power", name)
 
+def powerRangeListAttribute(value, name="power"):
+    value = str(value).replace(";", ",").strip()
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        parsed = rangeOrScalarAttribute(part, readPower, "power", f"{name} {i}")
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": f"{name} 1 min" if any(_rangeParts(part) for part in parts) else f"{name} 1",
+        "values": values
+    }
+
 def outputPowerListAttribute(value):
     value = str(value).replace("×", "x")
     parts = []
@@ -2721,6 +2736,25 @@ def shrinkageRatioAttribute(value):
     return {
         "format": ", ".join("${" + name + "}" for name in values),
         "primary": next(iter(values)),
+        "values": values
+    }
+
+def fractionListAttribute(value, name="ratio"):
+    value = str(value).replace(";", ",").strip()
+    values = {}
+    for i, part in enumerate([x.strip() for x in value.split(",")], start=1):
+        part = part.split("@", 1)[0].strip()
+        if part in ["-", "--", "null"]:
+            ratio = "NaN"
+        elif "/" in part:
+            numerator, denominator = [float(x.strip()) for x in part.split("/", 1)]
+            ratio = numerator / denominator
+        else:
+            ratio = readWithSiPrefix(part)
+        values[f"{name} {i}"] = [ratio, "ratio"]
+    return {
+        "format": ", ".join("${" + key + "}" for key in values),
+        "primary": f"{name} 1",
         "values": values
     }
 
@@ -3442,6 +3476,24 @@ def kelvinRangeListAttribute(value):
 def angleListAttribute(value):
     value = str(value).replace(";", ",")
     return scalarListAttribute(value, readAngle, "angle", "angle")
+
+def labeledAngleListAttribute(value):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        label = str(index)
+        if ":" in part:
+            label, part = [x.strip() for x in part.split(":", 1)]
+        name = f"angle {label}"
+        values[name] = [readAngle(part), "angle"]
+        formats.append("${" + name + "}")
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
 
 def angleRangeListAttribute(value):
     value = str(value).replace(";", ",").strip()
