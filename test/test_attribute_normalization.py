@@ -431,6 +431,17 @@ def test_extra_voltage_ranges(key, value, expected, capsys):
         }),
         ("Peak Repetitive Off State Voltage (Vdrm)", "1.2kV", {"voltage": 1200.0}),
         ("Gate Trigger Voltage (Vgt)", "1.1V, 1.7V", {"voltage 1": 1.1, "voltage 2": 1.7}),
+        ("Collector-Emitter Breakdown Voltage (VCES)", "1.2kV", {"voltage": 1200.0}),
+        ("Gate-Emitter Threshold Voltage (VGE(Th)@IC)", "2V@5V,10A", {"voltage": 2.0}),
+        ("Gate-Emitter Threshold Voltage (VGE(Th)@IC)", "3.75V, 5.75V", {"voltage 1": 3.75, "voltage 2": 5.75}),
+        ("Voltage - on State(Vtm)", "1.6V", {"voltage": 1.6}),
+        ("Repetitive Peak Off-State Voltage", "30V", {"voltage": 30.0}),
+        ("Collector Emitter Voltage", "20V", {"voltage": 20.0}),
+        ("Antistatic Capacity", "R:3000V, G:450V, B:250V", {
+            "voltage R": 3000.0,
+            "voltage G": 450.0,
+            "voltage B": 250.0,
+        }),
         ("DC Reverse Voltage(Vr)", "20V", {"voltage": 20.0}),
         ("Voltage - Input (Max)(Vi(Off))", "300mV@100uA,5V", {"voltage": 0.3}),
         ("Input Voltage (Vi(on)@IC,VCE)", "1.4V@1mA,0.3V", {"voltage": 1.4}),
@@ -997,6 +1008,11 @@ def test_peak_output_current_sink_list(capsys):
         ("Maximum Charge Current", "1.1A", {"current": 1.1}),
         ("RMS on-State Current(It (RMS))", "25A", {"current": 25.0}),
         ("Gate Trigger Current(Igt)", "15mA;25mA", {"current 1": 0.015, "current 2": 0.025}),
+        ("Collector Cut-Off Current (Ices)", "7uA", {"current": 7e-6}),
+        ("Limiting Current", "840mA", {"current": 0.84}),
+        ("Contact Current (DC)", "1mA", {"current": 0.001}),
+        ("Current - DC Forward(If)", "350mA, 250mA", {"current 1": 0.35, "current 2": 0.25}),
+        ("Dark Current", "100pA", {"current": 100e-12}),
     ],
 )
 def test_additional_current_values(key, value, expected, capsys):
@@ -1753,6 +1769,7 @@ def test_bit_width_counts(key, value, expected, capsys):
         ("Operating Life", "2万次", 20000),
         ("Program/Erase Cycles", "1×10^15 Cycles", 1000000000000000),
         ("Program/Erase Cycles", "1 Trillion Cycles", 1000000000000),
+        ("Switching Life", "10000 times", 10000),
     ],
 )
 def test_cycle_life_counts(key, value, expected, capsys):
@@ -2112,6 +2129,8 @@ def test_maximum_power_supply_range(value, expected, capsys):
         ("Supply Voltage Range", "3V~3.6V", {"voltage min": 3.0, "voltage max": 3.6}),
         ("Supply Voltage Range - Vccio", "2.5V;3.3V", {"voltage 1": 2.5, "voltage 2": 3.3}),
         ("Voltage - Supply(Vccio)", "2.5V, 3.3V", {"voltage 1": 2.5, "voltage 2": 3.3}),
+        ("Voltage - Supply (Ic)", "40V~57V", {"voltage min": 40.0, "voltage max": 57.0}),
+        ("Voltage - Supply (Power)", "50V~57V", {"voltage min": 50.0, "voltage max": 57.0}),
         ("VGS", "±30V", {"voltage min": -30.0, "voltage max": 30.0}),
         ("Hi-Pot", "1.5kV", {"voltage": 1500.0}),
         ("Isolation Voltage(RMS)", "3.75kV;5kV", {"voltage 1": 3750.0, "voltage 2": 5000.0}),
@@ -2330,11 +2349,40 @@ def test_phase_angle_aliases(key, capsys):
     assert_quantity(values["angle 2"], 180.0, "angle")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("0.7deg", {"phase": (0.7, "angle")}),
+        ("0.5deg, 0.7deg", {"phase 1": (0.5, "angle"), "phase 2": (0.7, "angle")}),
+        ("5dB", {"phase": (5.0, "decibel")}),
+    ],
+)
+def test_phase_unbalance(value, expected, capsys):
+    values = normalized_values("Phase Unbalance", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        value, unit = expected_value
+        assert_quantity(values[quantity], value, unit)
+
+
 def test_rotation_angle(capsys):
     values = normalized_values("Rotation Angle", "0°~360°", capsys)
 
     assert_quantity(values["angle 1 min"], 0.0, "angle")
     assert_quantity(values["angle 1 max"], 360.0, "angle")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("1.6N", 1.6),
+        ("70gf", 70 * 0.00980665),
+    ],
+)
+def test_press_force(value, expected, capsys):
+    values = normalized_values("Press Force", value, capsys)
+
+    assert_quantity(values["force"], expected, "force")
 
 
 @pytest.mark.parametrize(
@@ -2829,6 +2877,12 @@ def test_total_power_dissipation_alias(capsys):
     assert_quantity(values["power"], 0.15, "power")
 
 
+def test_average_gate_power_dissipation_alias(capsys):
+    values = normalized_values("Average Gate Power Dissipation (Pg(Av))", "200mW", capsys)
+
+    assert_quantity(values["power"], 0.2, "power")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
@@ -3312,7 +3366,18 @@ def test_insertion_loss_db_max(capsys):
     assert_quantity(values["level 2"], 1.1, "decibel")
 
 
-@pytest.mark.parametrize("key", ["Gain/Loss", "Amplitude Balance (Max)"])
+@pytest.mark.parametrize(
+    "key",
+    [
+        "Gain/Loss",
+        "Amplitude Balance (Max)",
+        "Amplitude Unbalance",
+        "Return Loss",
+        "Coupling Factor",
+        "Input Return Loss(Receive)",
+        "Output Return Loss(Transmit)",
+    ],
+)
 def test_rf_decibel_aliases(key, capsys):
     values = normalized_values(key, "7dB, 9dB", capsys)
 
@@ -3402,6 +3467,8 @@ def test_attenuation_value(value, expected, capsys):
         ("IP3", "28dBm", [28.0]),
         ("IP3", "+41.9dBm", [41.9]),
         ("P1d B", "-25dBm", [-25.0]),
+        ("P1d B(Receive)", "16dBm", [16.0]),
+        ("IP3(Receive)", "30dBm", [30.0]),
     ],
 )
 def test_decibel_milliwatt_values(key, value, expected, capsys):
@@ -3564,6 +3631,8 @@ def test_toleranced_thickness(value, expected, capsys):
             "length 1": 0.0016,
             "length 2": 0.0018,
         }),
+        ("Half Wave Width", "60nm", {"length 1": 60e-9}),
+        ("Spectral Range", "940nm, 850nm", {"length 1": 940e-9, "length 2": 850e-9}),
     ],
 )
 def test_additional_length_lists(key, value, expected, capsys):
@@ -3760,6 +3829,7 @@ def test_resistor_ratio_values(capsys):
         ("Switch Circuit", "2:1", {"ratio": (2.0, "ratio")}),
         ("Switch Circuit", "-", {"ratio": ("NaN", "ratio")}),
         ("Swr", "1.25", {"swr": (1.25, "ratio")}),
+        ("Vswr", "1.5, 1.8", {"vswr 1": (1.5, "ratio"), "vswr 2": (1.8, "ratio")}),
     ],
 )
 def test_additional_ratio_values(key, value, expected, capsys):

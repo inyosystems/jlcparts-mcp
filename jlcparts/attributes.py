@@ -267,6 +267,19 @@ def readAngularVelocity(value):
     value = re.sub(r"dps$", "", value, flags=re.I).strip()
     return float(value)
 
+def readForce(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(N|gf)", value, flags=re.I)
+    if match is None:
+        raise ValueError(f"Cannot parse force {value}")
+    scales = {
+        "n": 1,
+        "gf": 0.00980665,
+    }
+    return float(match.group(1)) * scales[match.group(2).lower()]
+
 def readInductance(value):
     value = value.replace("H", "").strip()
     return readWithSiPrefix(value)
@@ -2951,6 +2964,27 @@ def angleRangeListAttribute(value):
         "primary": "angle 1 min" if any(_rangeParts(part) or part.startswith("±") for part in parts) else "angle 1",
         "values": values
     }
+
+def angleOrDecibelListAttribute(value, name="angle"):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        value_name = name if len(parts) == 1 else f"{name} {index}"
+        if "db" in part.lower():
+            values[value_name] = [readDecibel(part), "decibel"]
+        else:
+            values[value_name] = [readAngle(part), "angle"]
+        formats.append("${" + value_name + "}")
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
+def forceAttribute(value):
+    return scalarAttribute(value, readForce, "force", "force")
 
 def humidityAttribute(value):
     value = str(value).strip()
