@@ -377,6 +377,7 @@ def test_dc_spark_over_voltage(value, expected, capsys):
         }),
         ("Common Mode Voltage", "0V~76V", {"voltage min": 0.0, "voltage max": 76.0}),
         ("Voltage - Input", "250V", {"voltage": 250.0}),
+        ("Control Voltage Range/Center", "0V~3.3V", {"voltage min": 0.0, "voltage max": 3.3}),
     ],
 )
 def test_extra_voltage_ranges(key, value, expected, capsys):
@@ -692,6 +693,12 @@ def test_capacitive_load_max(value, expected, capsys):
         ("Capacitance-Input", "1.5pF", {"capacitance": 1.5e-12}),
         ("Input Capacitiance(Ci)", "15pF", {"capacitance": 15e-12}),
         ("Electrostatic Capacity", "30pF~60pF", {"capacitance min": 30e-12, "capacitance max": 60e-12}),
+        ("Built-in Load Capacitance", "10pF", {"capacitance": 10e-12}),
+        ("Built - in Load Capacitance", "47pF", {"capacitance": 47e-12}),
+        ("Load Capacitor", "12.5pF", {"capacitance": 12.5e-12}),
+        ("Load Capacitance", "7.36pF", {"capacitance": 7.36e-12}),
+        ("Static Capacitance", "3.2pF", {"capacitance": 3.2e-12}),
+        ("Sensor Capacitance Range", "0pF~119pF", {"capacitance min": 0, "capacitance max": 119e-12}),
     ],
 )
 def test_extra_capacitance_attributes(key, value, expected, capsys):
@@ -845,6 +852,7 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Refresh Current", "8mA", "current", 0.008, "current"),
         ("Frequency (Max)", "6GHz", "frequency", 6e9, "frequency"),
         ("Voltage", "600 V", "voltage", 600.0, "voltage"),
+        ("Control Voltage Range/Center", "0V~3.3V", "voltage min", 0.0, "voltage"),
         ("Rated Speed", "8500RPM", "speed", 8500.0, "rotational_speed"),
         ("Rated Speed", "-", "speed", "NaN", "rotational_speed"),
     ],
@@ -2804,6 +2812,23 @@ def test_normal_temperature_frequency_tolerance(value, expected, capsys):
 
     for quantity, tolerance in expected.items():
         assert_quantity(values[quantity], tolerance, "ppm")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Frequency Tolerance", "±0.5%", {"tolerance min": [-0.5, "percentage"], "tolerance max": [0.5, "percentage"]}),
+        ("Frequency Tolerance", "±20ppm", {"tolerance min": [-20.0, "ppm"], "tolerance max": [20.0, "ppm"]}),
+        ("Frequency Stability(Full Temperature Range)", "-6ppm~+8ppm", {"stability min": [-6.0, "ppm"], "stability max": [8.0, "ppm"]}),
+        ("Absolute Pull Range (Apr)", "±30ppm", {"stability min": [-30.0, "ppm"], "stability max": [30.0, "ppm"]}),
+        ("Temperature Coefficient of Frequency", "±12ppm", {"stability min": [-12.0, "ppm"], "stability max": [12.0, "ppm"]}),
+    ],
+)
+def test_additional_frequency_stability_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, expected_value in expected.items():
+        assert_quantity(values[quantity], expected_value[0], expected_value[1])
 
 
 @pytest.mark.parametrize(

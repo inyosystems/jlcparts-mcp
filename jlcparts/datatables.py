@@ -148,6 +148,8 @@ def normalizeAttribute(key, value):
                 value = attributes.voltageListAttribute(value)
             else:
                 value = attributes.voltageAttribute(value)
+        elif key in larr(["Control Voltage Range/Center"]):
+            value = attributes.voltageRangeAttribute(value, "voltage")
         elif key in ["input voltage(dc)", "motor drive voltage(vm)", "control voltage",
                 "vcm - common mode voltage", "low voltage detection threshold",
                 "differential input voltage", "differential voltage",
@@ -412,7 +414,9 @@ def normalizeAttribute(key, value):
                 "Capacitance @ VR, F", "Off-State Capacitance (Co)",
                 "Maximum Capacitance @ 1mhz", "Inter-Electrode Capacitance",
                 "Electrostatic Capacitance", "Capacitance-Input",
-                "Input Capacitiance(Ci)"]):
+                "Input Capacitiance(Ci)", "Built-in Load Capacitance",
+                "Built - in Load Capacitance", "Load Capacitor",
+                "Load Capacitance", "Static Capacitance"]):
             if key in ["junction capacitance", "capacitive load (max)"] and compoundValue(value):
                 value = attributes.capacitanceListAttribute(value)
             elif multiScalarValue(value):
@@ -421,6 +425,8 @@ def normalizeAttribute(key, value):
                 value = attributes.capacitanceAttribute(value)
         elif key in larr(["Electrostatic Capacity"]):
             value = attributes.capacitanceRangeListAttribute(value) if compoundValue(value) else attributes.capacitanceRangeAttribute(value)
+        elif key in larr(["Sensor Capacitance Range"]):
+            value = attributes.capacitanceRangeAttribute(value)
         elif key in larr(["Inductance", "Equivalent Series Inductance"]):
             value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.inductanceAttribute(value)
         elif key in larr(["Length", "Width", "Height", "Diameter", "Switch Height", "Overall Length",
@@ -491,8 +497,11 @@ def normalizeAttribute(key, value):
             value = attributes.temperatureCoefficientAttribute(value)
         elif key in larr(["Frequency Stability"]):
             value = attributes.frequencyStabilityAttribute(value)
-        elif key in larr(["Normal Temperature Frequency Tolerance"]):
+        elif key in larr(["Normal Temperature Frequency Tolerance", "Frequency Tolerance"]):
             value = attributes.frequencyStabilityAttribute(value, "tolerance")
+        elif key in larr(["Frequency Stability(Full Temperature Range)",
+                "Absolute Pull Range (Apr)", "Temperature Coefficient of Frequency"]):
+            value = attributes.frequencyStabilityAttribute(value)
         elif key in larr(["Wavelength - Dominant", "Dominant Wavelength", "Peak Wavelength"]):
             value = attributes.opticalLengthRangeListAttribute(value) if compoundValue(value) else attributes.wavelengthAttribute(value)
         elif key in larr(["Tolerance"]):
