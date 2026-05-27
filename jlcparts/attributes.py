@@ -1145,6 +1145,9 @@ def lowFrequencyNoiseAttribute(value):
         if part.lower().endswith("p-p"):
             suffix = " p-p"
             part = part[:-3]
+        elif part.lower().endswith("pp"):
+            suffix = " p-p"
+            part = part[:-2]
         elif part.lower().endswith("rms"):
             suffix = " rms"
             part = part[:-3]
@@ -1153,6 +1156,36 @@ def lowFrequencyNoiseAttribute(value):
             parsed = scalarAttribute(part, readPpm, "ppm", name)
         else:
             parsed = scalarAttribute(part, readVoltage, "voltage", name)
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
+def noiseAttribute(value):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        if re.search(r"dB\s*\(A\)$", part, flags=re.I):
+            name = f"noise {index}"
+            parsed = scalarAttribute(re.sub(r"\s*\(A\)$", "", part, flags=re.I), readDecibel, "decibel", name)
+        elif re.search(r"%\s*Vout$", part, flags=re.I):
+            name = f"noise {index}"
+            parsed = scalarAttribute(re.sub(r"\s*Vout$", "", part, flags=re.I), readPercentage, "percentage", name)
+        else:
+            parsed = lowFrequencyNoiseAttribute(part)
+            if len(parts) > 1:
+                parsed_values = {}
+                parsed_format = parsed["format"]
+                for quantity, parsed_value in parsed["values"].items():
+                    renamed = re.sub(r"^noise 1", f"noise {index}", quantity)
+                    parsed_values[renamed] = parsed_value
+                    parsed_format = parsed_format.replace("${" + quantity + "}", "${" + renamed + "}")
+                parsed = {**parsed, "format": parsed_format, "values": parsed_values}
         values.update(parsed["values"])
         formats.append(parsed["format"])
     return {

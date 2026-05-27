@@ -476,6 +476,8 @@ def normalizeAttribute(key, value):
             value = attributes.currentTemperatureDriftAttribute(value)
         elif key in larr(["Noise - 1/10hz to 10hz"]):
             value = attributes.lowFrequencyNoiseAttribute(value)
+        elif key in larr(["Noise"]):
+            value = attributes.noiseAttribute(value)
         elif key in larr(["Temperature Coefficient", "Voltage Reference Drift", "Gain Drift",
                 "Temperature Stability"]):
             value = attributes.temperatureCoefficientAttribute(value)

@@ -2660,6 +2660,27 @@ def test_low_frequency_noise(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("30uVrms", {"noise 1 rms": [30e-6, "voltage"]}),
+        ("38uVpp", {"noise 1 p-p": [38e-6, "voltage"]}),
+        ("0.002%Vout", {"noise 1": [0.002, "percentage"]}),
+        ("17.8dB(A)", {"noise 1": [17.8, "decibel"]}),
+        ("1.6uVrms, 1uVrms", {
+            "noise 1 rms": [1.6e-6, "voltage"],
+            "noise 2 rms": [1e-6, "voltage"],
+        }),
+        ("-", {"noise 1": ["NaN", "voltage"]}),
+    ],
+)
+def test_noise_values(value, expected, capsys):
+    values = normalized_values("Noise", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        assert_quantity(values[quantity], expected_value[0], expected_value[1])
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("35ppm/℃", {"coefficient": [35.0, "temperature_coefficient"]}),
         ("190ppb/℃", {"coefficient": [0.19, "temperature_coefficient"]}),
         ("±50ppm/℃", {
