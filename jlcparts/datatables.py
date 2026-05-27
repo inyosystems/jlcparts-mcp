@@ -414,14 +414,20 @@ def normalizeAttribute(key, value):
             value = attributes.decibelListAttribute(value, "level")
         elif key in larr(["IP3", "P1d B", "P1d B(Receive)", "IP3(Receive)"]):
             value = attributes.decibelMilliwattListAttribute(value, "level")
+        elif key in larr(["Output Power"]):
+            value = attributes.outputPowerListAttribute(value)
         elif key in larr(["Output Power (Max)"]):
             value = attributes.powerOrDecibelMilliwattListAttribute(value, "power")
         elif key in larr(["Clock Feedthrough"]):
             value = attributes.voltageAmplitudeListAttribute(value, "voltage")
         elif key in larr(["Q @ Frequency"]):
             value = attributes.qAtFrequencyAttribute(value)
+        elif key in larr(["DC Current Gain (H Fe@IC,VCE)"]):
+            value = attributes.ratioAtCurrentVoltageAttribute(value, "gain")
         elif key in larr(["DC Current Gain"]):
             value = attributes.ratioRangeListAttribute(value, "gain")
+        elif key in larr(["Magnetic Conductivity-U''", "Magnetic Conductivity-U'"]):
+            value = attributes.ratioAtFrequencyAttribute(value, "magnetic conductivity")
         elif key in larr(["Gain"]):
             value = attributes.gainListAttribute(value)
         elif key in larr(["Dynamic Range"]):
@@ -454,6 +460,10 @@ def normalizeAttribute(key, value):
                 "Number of Receiver", "Number of Driver", "Input Number",
                 "Number of Pins Per Row", "Parallel Bit Count Per Channel"]):
             value = attributes.countListAttribute(value)
+        elif key in larr(["Number of Inputs"]):
+            value = attributes.inputCountAttribute(value)
+        elif key in larr(["Speaker Channels"]):
+            value = attributes.speakerChannelAttribute(value)
         elif key in larr(["Number of Rows", "Rows"]):
             value = attributes.rowCountAttribute(value)
         elif key in larr(["Number of Data Pins", "Number of Conductors"]):

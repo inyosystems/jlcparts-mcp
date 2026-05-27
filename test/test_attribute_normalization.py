@@ -1758,6 +1758,42 @@ def test_bit_width_counts(key, value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("1-Channel", {"channels 1": 1}),
+        ("2-Channel", {"channels 1": 2}),
+        ("1-Channel, 2-Channel", {"channels 1": 1, "channels 2": 2}),
+        ("Monaural", {"channels 1": 1}),
+        ("双声道", {"channels 1": 2}),
+    ],
+)
+def test_speaker_channels(value, expected, capsys):
+    values = normalized_values("Speaker Channels", value, capsys)
+
+    for quantity, count in expected.items():
+        assert_quantity(values[quantity], count, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("2 Pairs Differential Inputs", {"differential input pairs": 2}),
+        ("2 Single-Ended Inputs", {"single-ended inputs": 2}),
+        ("1 single-ended input + 1 differential pair input", {
+            "single-ended inputs": 1,
+            "differential input pairs": 1,
+        }),
+        ("8", {"inputs": 8}),
+    ],
+)
+def test_number_of_inputs(value, expected, capsys):
+    values = normalized_values("Number of Inputs", value, capsys)
+
+    for quantity, count in expected.items():
+        assert_quantity(values[quantity], count, "count")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Life", "100,000 cycles", 100000),
@@ -3479,6 +3515,40 @@ def test_decibel_milliwatt_values(key, value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("325mWx1@8Ω", {"power 1": (0.325, "power"), "channels 1": (1.0, "count"), "load 1": (8.0, "resistance")}),
+        ("2W×2@3Ω", {"power 1": (2.0, "power"), "channels 1": (2.0, "count"), "load 1": (3.0, "resistance")}),
+        ("2×7W@4Ω", {"power 1": (7.0, "power"), "channels 1": (2.0, "count"), "load 1": (4.0, "resistance")}),
+        ("21.7dBm", {"power 1": (21.7, "decibel_milliwatt")}),
+        ("30Wx1@8Ω, 15Wx2@4Ω", {
+            "power 1": (30.0, "power"),
+            "channels 1": (1.0, "count"),
+            "load 1": (8.0, "resistance"),
+            "power 2": (15.0, "power"),
+            "channels 2": (2.0, "count"),
+            "load 2": (4.0, "resistance"),
+        }),
+        ("8W×2+12W×1@8Ω", {
+            "power 1": (8.0, "power"),
+            "channels 1": (2.0, "count"),
+            "load 1": (8.0, "resistance"),
+            "power 2": (12.0, "power"),
+            "channels 2": (1.0, "count"),
+            "load 2": (8.0, "resistance"),
+        }),
+        ("2.3W(Max)", {"power 1": (2.3, "power")}),
+    ],
+)
+def test_output_power(value, expected, capsys):
+    values = normalized_values("Output Power", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        value, unit = expected_value
+        assert_quantity(values[quantity], value, unit)
+
+
+@pytest.mark.parametrize(
     ("value", "quantity", "expected", "unit"),
     [
         ("3dBm", "power", 3.0, "decibel_milliwatt"),
@@ -3807,6 +3877,49 @@ def test_dc_current_gain_values(value, expected, capsys):
 
     for quantity, gain in expected.items():
         assert_quantity(values[quantity], gain, "ratio")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("40@200mA,1V", {
+            "gain 1": (40.0, "ratio"),
+            "current 1": (0.2, "current"),
+            "voltage 1": (1.0, "voltage"),
+        }),
+        ("80@5V", {
+            "gain 1": (80.0, "ratio"),
+            "voltage 1": (5.0, "voltage"),
+        }),
+        ("30@5mA,5V;150@100mA.2V", {
+            "gain 1": (30.0, "ratio"),
+            "current 1": (0.005, "current"),
+            "voltage 1": (5.0, "voltage"),
+            "gain 2": (150.0, "ratio"),
+            "current 2": (0.1, "current"),
+            "voltage 2": (2.0, "voltage"),
+        }),
+        ("100~300", {
+            "gain 1 min": (100.0, "ratio"),
+            "gain 1 max": (300.0, "ratio"),
+        }),
+        ("900", {"gain 1": (900.0, "ratio")}),
+    ],
+)
+def test_dc_current_gain_hfe_conditions(value, expected, capsys):
+    values = normalized_values("DC Current Gain (H Fe@IC,VCE)", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        value, unit = expected_value
+        assert_quantity(values[quantity], value, unit)
+
+
+@pytest.mark.parametrize("key", ["Magnetic Conductivity-U''", "Magnetic Conductivity-U'"])
+def test_magnetic_conductivity_frequency(key, capsys):
+    values = normalized_values(key, "1.3@13.56MHz", capsys)
+
+    assert_quantity(values["magnetic conductivity 1"], 1.3, "ratio")
+    assert_quantity(values["frequency 1"], 13.56e6, "frequency")
 
 
 def test_resistor_ratio_values(capsys):

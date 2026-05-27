@@ -786,6 +786,55 @@ def countAttribute(value):
         }
     }
 
+def speakerChannelAttribute(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        counts = ["NaN"]
+    else:
+        parts = [x.strip() for x in value.split(",")]
+        counts = []
+        for part in parts:
+            if part.lower() == "monaural":
+                counts.append(1)
+            elif part == "双声道":
+                counts.append(2)
+            else:
+                match = re.search(r"\d+", part)
+                if match is None:
+                    raise ValueError(f"Cannot parse speaker channel count {value}")
+                counts.append(float(match.group(0)))
+    values = {
+        f"channels {i}": [count, "count"]
+        for i, count in enumerate(counts, start=1)
+    }
+    return {
+        "format": ", ".join("${" + name + "}" for name in values),
+        "primary": "channels 1",
+        "values": values
+    }
+
+def inputCountAttribute(value):
+    value = str(value).strip()
+    values = {}
+    if value in ["-", "--", "null"]:
+        values["inputs"] = ["NaN", "count"]
+    elif re.fullmatch(r"\d+", value):
+        values["inputs"] = [float(value), "count"]
+    else:
+        single = re.search(r"(\d+)\s+single-?ended", value, flags=re.I)
+        differential = re.search(r"(\d+)\s+(?:pairs?\s+)?differential", value, flags=re.I)
+        if single is not None:
+            values["single-ended inputs"] = [float(single.group(1)), "count"]
+        if differential is not None:
+            values["differential input pairs"] = [float(differential.group(1)), "count"]
+        if not values:
+            raise ValueError(f"Cannot parse input count {value}")
+    return {
+        "format": ", ".join("${" + name + "}" for name in values),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
 def _readConnectorCount(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
@@ -2115,6 +2164,54 @@ def powerListAttribute(value, name="power"):
     value = str(value).replace(";", ",")
     return scalarListAttribute(value, readPower, "power", name)
 
+def outputPowerListAttribute(value):
+    value = str(value).replace("×", "x")
+    parts = []
+    for part in [x.strip() for x in value.split(",")]:
+        signal, load = [x.strip() for x in part.split("@", 1)] if "@" in part else (part, None)
+        if "+" in signal:
+            parts.extend(
+                f"{subpart.strip()}@{load}" if load is not None else subpart.strip()
+                for subpart in signal.split("+")
+            )
+        else:
+            parts.append(part)
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        if part in ["-", "--", "null"]:
+            values[f"power {i}"] = ["NaN", "power"]
+            formats.append("${" + f"power {i}" + "}")
+            continue
+        signal, load = [x.strip() for x in part.split("@", 1)] if "@" in part else (part, None)
+        signal = re.sub(r"\([^)]*\)", "", signal).strip()
+        prefix_match = re.fullmatch(r"(\d+)\s*x\s*(.+)", signal, flags=re.I)
+        if prefix_match is not None and re.search(r"w", prefix_match.group(2), flags=re.I):
+            channels, power = prefix_match.groups()
+        else:
+            match = re.fullmatch(r"(.+?)(?:x\s*(\d+))?", signal, flags=re.I)
+            if match is None:
+                raise ValueError(f"Cannot parse output power {value}")
+            power, channels = match.groups()
+        power = power.strip()
+        if re.search(r"dBm$", power, flags=re.I):
+            values[f"power {i}"] = [readDecibelMilliwatt(power), "decibel_milliwatt"]
+        else:
+            values[f"power {i}"] = [readPower(power), "power"]
+        format_parts = ["${" + f"power {i}" + "}"]
+        if channels is not None:
+            values[f"channels {i}"] = [float(channels), "count"]
+            format_parts.append("x ${" + f"channels {i}" + "}")
+        if load is not None:
+            values[f"load {i}"] = [readResistance(load), "resistance"]
+            format_parts.append("@ ${" + f"load {i}" + "}")
+        formats.append(" ".join(format_parts))
+    return {
+        "format": ", ".join(formats),
+        "primary": "power 1",
+        "values": values
+    }
+
 def energyAttribute(value):
     return scalarAttribute(value, readEnergy, "energy", "energy")
 
@@ -2226,6 +2323,62 @@ def qAtFrequencyAttribute(value):
     return {
         "format": ", ".join(formats),
         "primary": "q 1",
+        "values": values
+    }
+
+def ratioAtCurrentVoltageAttribute(value, name="gain"):
+    value = str(value).strip()
+    values = {}
+    formats = []
+    for i, part in enumerate([x.strip() for x in value.split(";")], start=1):
+        signal = part
+        current = None
+        voltage = None
+        if "@" in part:
+            signal, condition = [x.strip() for x in part.split("@", 1)]
+            condition = re.sub(r"([munpkKMGT]?A)\.(?=\d)", r"\1,", condition)
+            pieces = [x.strip() for x in condition.split(",")]
+            if pieces:
+                if re.search(r"v", pieces[0], flags=re.I):
+                    voltage = pieces[0]
+                else:
+                    current = pieces[0]
+            if len(pieces) > 1:
+                voltage = pieces[1]
+        parsed_signal = rangeOrScalarAttribute(signal, readWithSiPrefix, "ratio", f"{name} {i}")
+        values.update(parsed_signal["values"])
+        format_parts = [parsed_signal["format"]]
+        if current is not None:
+            values[f"current {i}"] = [readCurrent(current), "current"]
+            format_parts.append("@ ${" + f"current {i}" + "}")
+        if voltage is not None:
+            values[f"voltage {i}"] = [readVoltage(voltage), "voltage"]
+            format_parts.append("${" + f"voltage {i}" + "}")
+        formats.append(" ".join(format_parts))
+    return {
+        "format": ", ".join(formats),
+        "primary": f"{name} 1",
+        "values": values
+    }
+
+def ratioAtFrequencyAttribute(value, name="ratio"):
+    value = str(value).strip()
+    values = {}
+    formats = []
+    for i, part in enumerate([x.strip() for x in value.split(",")], start=1):
+        signal = part
+        frequency = None
+        if "@" in part:
+            signal, frequency = [x.strip() for x in part.split("@", 1)]
+        values[f"{name} {i}"] = [readWithSiPrefix(signal), "ratio"]
+        format_parts = ["${" + f"{name} {i}" + "}"]
+        if frequency is not None:
+            values[f"frequency {i}"] = [readFrequency(frequency), "frequency"]
+            format_parts.append("@ ${" + f"frequency {i}" + "}")
+        formats.append(" ".join(format_parts))
+    return {
+        "format": ", ".join(formats),
+        "primary": f"{name} 1",
         "values": values
     }
 
