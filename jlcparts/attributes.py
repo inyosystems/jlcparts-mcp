@@ -1616,6 +1616,15 @@ def voltageListAttribute(value, name="voltage"):
         "values": values
     }
 
+def readVoltageAmplitude(value):
+    value = str(value).strip()
+    value = re.sub(r"(?:p-p|pp|rms)$", "", value, flags=re.I).strip()
+    return readVoltage(value)
+
+def voltageAmplitudeListAttribute(value, name="voltage"):
+    value = str(value).replace(";", ",")
+    return scalarListAttribute(value, readVoltageAmplitude, "voltage", name)
+
 def voltageOrCurrentListAttribute(value):
     value = str(value).replace(";", ",")
     parts = [x.strip() for x in value.split(",")]
@@ -1742,6 +1751,42 @@ def decibelListAttribute(value, name="level"):
     return {
         "format": ", ".join(formats),
         "primary": f"{name} 1",
+        "values": values
+    }
+
+def decibelRangeListAttribute(value, name="level"):
+    value = str(value)
+    separator = ";" if ";" in value else ","
+    parts = [x.strip() for x in value.split(separator)]
+    values = {}
+    formats = []
+    has_range = False
+    for i, part in enumerate(parts, start=1):
+        signal = part
+        frequency = None
+        match = re.fullmatch(r"(.*?)@\(?([^)]*)\)?", part)
+        if match is not None:
+            signal, frequency = match.groups()
+        parsed = rangeOrScalarAttribute(signal.strip(), readDecibel, "decibel", f"{name} {i}")
+        has_range = has_range or bool(_rangeParts(signal))
+        values.update(parsed["values"])
+        formatParts = [parsed["format"]]
+        if frequency:
+            try:
+                parsedFrequency = rangeOrScalarAttribute(
+                    frequency.strip(),
+                    readFrequency,
+                    "frequency",
+                    f"frequency {i}"
+                )
+                values.update(parsedFrequency["values"])
+                formatParts.append("@ " + parsedFrequency["format"])
+            except Exception:
+                pass
+        formats.append(" ".join(formatParts))
+    return {
+        "format": ", ".join(formats),
+        "primary": f"{name} 1 min" if has_range else f"{name} 1",
         "values": values
     }
 

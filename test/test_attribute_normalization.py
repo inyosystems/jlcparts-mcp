@@ -2793,6 +2793,7 @@ def test_switching_energy_lists(capsys):
         ("Input Return Loss", "12.5dB", [12.5]),
         ("Sound Pressure Level(Spl)", "95dB", [95.0]),
         ("Sound Pressure Level(Spl)", "83dB@0.1W,10cm", [83.0]),
+        ("Sound Pressure Level (Spl)", "95dB@12V,10cm", [95.0]),
     ],
 )
 def test_decibel_lists(key, value, expected, capsys):
@@ -2851,6 +2852,34 @@ def test_decibel_at_frequency_ranges_and_ignored_conditions(capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("15dB@2.4GHz, 21dB@5GHz, 17dB@6GHz", {
+            "level 1": 15.0,
+            "frequency 1": 2.4e9,
+            "level 2": 21.0,
+            "frequency 2": 5e9,
+            "level 3": 17.0,
+            "frequency 3": 6e9,
+        }),
+        ("9.6dB~10.6dB, 10.2dB~11.2dB", {
+            "level 1 min": 9.6,
+            "level 1 max": 10.6,
+            "level 2 min": 10.2,
+            "level 2 max": 11.2,
+        }),
+        ("-", {"level 1": "NaN"}),
+    ],
+)
+def test_attenuation_value(value, expected, capsys):
+    values = normalized_values("Attenuation Value", value, capsys)
+
+    for quantity, level in expected.items():
+        unit = "frequency" if quantity.startswith("frequency") else "decibel"
+        assert_quantity(values[quantity], level, unit)
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("IP3", "28dBm", [28.0]),
@@ -2863,6 +2892,21 @@ def test_decibel_milliwatt_values(key, value, expected, capsys):
 
     for index, level in enumerate(expected, start=1):
         assert_quantity(values[f"level {index}"], level, "decibel_milliwatt")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("6mVp-p", 0.006),
+        ("0.2mVRMS", 0.0002),
+        ("150uVRMS", 150e-6),
+        ("-", "NaN"),
+    ],
+)
+def test_clock_feedthrough_voltage(value, expected, capsys):
+    values = normalized_values("Clock Feedthrough", value, capsys)
+
+    assert_quantity(values["voltage 1"], expected, "voltage")
 
 
 @pytest.mark.parametrize(
