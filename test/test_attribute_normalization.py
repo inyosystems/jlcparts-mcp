@@ -1794,6 +1794,68 @@ def test_number_of_inputs(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("1 NPN", {"npn transistors": 1}),
+        ("1 N-Channel + 1 P-Channel", {"n-channel transistors": 1, "p-channel transistors": 1}),
+        ("2 NPN + 2 PNP", {"npn transistors": 2, "pnp transistors": 2}),
+    ],
+)
+def test_semiconductor_number(value, expected, capsys):
+    values = normalized_values("Number", value, capsys)
+
+    for quantity, count in expected.items():
+        assert_quantity(values[quantity], count, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("1 Independent", {"independent diodes": 1}),
+        ("1 Pair Common Anode", {"diode pairs": 1}),
+        ("3 series x 2 parallel", {"series diodes": 3, "parallel strings": 2}),
+        ("6 in series", {"series diodes": 6}),
+    ],
+)
+def test_diode_configuration_counts(value, expected, capsys):
+    values = normalized_values("Diode Configuration", value, capsys)
+
+    for quantity, count in expected.items():
+        assert_quantity(values[quantity], count, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("1 TRIAC", {"triacs": 1}),
+        ("1 Unidirectional Thyristor and 1 Diode", {"thyristors": 1, "diodes": 1}),
+        ("3 SCR and 3 Diode", {"scrs": 3, "diodes": 3}),
+    ],
+)
+def test_scr_type_counts(value, expected, capsys):
+    values = normalized_values("SCR Type", value, capsys)
+
+    for quantity, count in expected.items():
+        assert_quantity(values[quantity], count, "count")
+
+
+def test_driver_receiver(capsys):
+    values = normalized_values("Driver/Receiver", "1/1;2/2", capsys)
+
+    assert_quantity(values["drivers 1"], 1, "count")
+    assert_quantity(values["receivers 1"], 1, "count")
+    assert_quantity(values["drivers 2"], 2, "count")
+    assert_quantity(values["receivers 2"], 2, "count")
+
+
+def test_detents_pulses(capsys):
+    values = normalized_values("Number of Detents/Pulses (Incremental)", "24/12", capsys)
+
+    assert_quantity(values["detents"], 24, "count")
+    assert_quantity(values["pulses"], 12, "count")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Life", "100,000 cycles", 100000),
@@ -2419,6 +2481,13 @@ def test_press_force(value, expected, capsys):
     values = normalized_values("Press Force", value, capsys)
 
     assert_quantity(values["force"], expected, "force")
+
+
+def test_acceleration_measurement_range(capsys):
+    values = normalized_values("Acceleration Measurement Range (Max)", "±16g", capsys)
+
+    assert_quantity(values["acceleration min"], -16, "acceleration")
+    assert_quantity(values["acceleration max"], 16, "acceleration")
 
 
 @pytest.mark.parametrize(

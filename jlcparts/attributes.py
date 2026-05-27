@@ -89,6 +89,20 @@ def readRotationalSpeed(value):
 def rotationalSpeedAttribute(value):
     return scalarAttribute(value, readRotationalSpeed, "rotational_speed", "speed")
 
+def accelerationRangeAttribute(value, name="acceleration"):
+    value = str(value).strip()
+    if value.startswith("±"):
+        parsed = readAcceleration(value)
+        return {
+            "format": "${" + name + " min} ~ ${" + name + " max}",
+            "primary": name + " min",
+            "values": {
+                name + " min": [-parsed, "acceleration"],
+                name + " max": [parsed, "acceleration"]
+            }
+        }
+    return scalarAttribute(value, readAcceleration, "acceleration", name)
+
 def readCurrent(value):
     """
     Given a string, try to parse current and return it as Amperes (float)
@@ -265,6 +279,14 @@ def readAngularVelocity(value):
         return "NaN"
     value = value.replace("±", "")
     value = re.sub(r"dps$", "", value, flags=re.I).strip()
+    return float(value)
+
+def readAcceleration(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = value.replace("±", "")
+    value = re.sub(r"g$", "", value, flags=re.I).strip()
     return float(value)
 
 def readForce(value):
@@ -832,6 +854,114 @@ def inputCountAttribute(value):
     return {
         "format": ", ".join("${" + name + "}" for name in values),
         "primary": next(iter(values)),
+        "values": values
+    }
+
+def _countedTermsAttribute(value, terms, default_name="count"):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return {
+            "format": "${" + default_name + "}",
+            "primary": default_name,
+            "values": {default_name: ["NaN", "count"]}
+        }
+    normalized = value.lower()
+    normalized = normalized.replace("one", "1").replace("two", "2")
+    values = {}
+    for name, pattern in terms:
+        total = 0
+        for match in re.finditer(rf"(\d+)\s*(?:pair\s*)?(?:{pattern})", normalized, flags=re.I):
+            count = int(match.group(1))
+            if "pair" in match.group(0):
+                count *= 2
+            total += count
+        if total:
+            values[name] = [total, "count"]
+    if not values:
+        values[default_name] = ["NaN", "count"]
+    return {
+        "format": ", ".join("${" + name + "}" for name in values),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
+def transistorNumberAttribute(value):
+    return _countedTermsAttribute(value, [
+        ("npn transistors", r"npn"),
+        ("pnp transistors", r"pnp"),
+        ("n-channel transistors", r"n-?channel"),
+        ("p-channel transistors", r"p-?channel"),
+    ], "transistors")
+
+def diodeConfigurationAttribute(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        values = {"diodes": ["NaN", "count"]}
+    elif re.search(r"\d+\s+series\s*x\s*\d+\s+parallel", value, flags=re.I):
+        series, parallel = re.search(r"(\d+)\s+series\s*x\s*(\d+)\s+parallel", value, flags=re.I).groups()
+        values = {"series diodes": [float(series), "count"], "parallel strings": [float(parallel), "count"]}
+    else:
+        values = {}
+        independent = re.search(r"(\d+)\s+independent", value, flags=re.I)
+        if independent is not None:
+            values["independent diodes"] = [float(independent.group(1)), "count"]
+        pairs = re.search(r"(\d+)\s+pair", value, flags=re.I)
+        if pairs is not None:
+            values["diode pairs"] = [float(pairs.group(1)), "count"]
+        series = re.search(r"(\d+)\s+(?:in\s+)?series", value, flags=re.I)
+        if series is not None:
+            values["series diodes"] = [float(series.group(1)), "count"]
+        common_anode = re.search(r"(\d+)\s+common anodes?", value, flags=re.I)
+        if common_anode is not None:
+            values["common anode diodes"] = [float(common_anode.group(1)), "count"]
+        common_cathode = re.search(r"(\d+)\s+common cathodes?", value, flags=re.I)
+        if common_cathode is not None:
+            values["common cathode diodes"] = [float(common_cathode.group(1)), "count"]
+        if not values:
+            values["diodes"] = ["NaN", "count"]
+    return {
+        "format": ", ".join("${" + name + "}" for name in values),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
+def scrTypeAttribute(value):
+    return _countedTermsAttribute(value, [
+        ("triacs", r"triac"),
+        ("scrs", r"scr"),
+        ("thyristors", r"(?:uni)?directional thyristor|one-way thyristor|two-way thyristor"),
+        ("diodes", r"diode"),
+    ], "scr devices")
+
+def driverReceiverAttribute(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        values = {"drivers 1": ["NaN", "count"], "receivers 1": ["NaN", "count"]}
+        formats = ["${drivers 1}/${receivers 1}"]
+    else:
+        values = {}
+        formats = []
+        for i, part in enumerate([x.strip() for x in value.split(";")], start=1):
+            drivers, receivers = [float(x.strip()) for x in part.split("/", 1)]
+            values[f"drivers {i}"] = [drivers, "count"]
+            values[f"receivers {i}"] = [receivers, "count"]
+            formats.append("${" + f"drivers {i}" + "}/${" + f"receivers {i}" + "}")
+    return {
+        "format": ", ".join(formats),
+        "primary": "drivers 1",
+        "values": values
+    }
+
+def detentsPulsesAttribute(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        values = {"detents": ["NaN", "count"], "pulses": ["NaN", "count"]}
+    else:
+        detents, pulses = [float(x.strip()) for x in value.split("/", 1)]
+        values = {"detents": [detents, "count"], "pulses": [pulses, "count"]}
+    return {
+        "format": "${detents}/${pulses}",
+        "primary": "detents",
         "values": values
     }
 

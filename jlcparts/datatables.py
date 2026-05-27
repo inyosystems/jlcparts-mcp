@@ -428,6 +428,8 @@ def normalizeAttribute(key, value):
             value = attributes.ratioRangeListAttribute(value, "gain")
         elif key in larr(["Magnetic Conductivity-U''", "Magnetic Conductivity-U'"]):
             value = attributes.ratioAtFrequencyAttribute(value, "magnetic conductivity")
+        elif key in larr(["Driver/Receiver"]):
+            value = attributes.driverReceiverAttribute(value)
         elif key in larr(["Gain"]):
             value = attributes.gainListAttribute(value)
         elif key in larr(["Dynamic Range"]):
@@ -446,6 +448,14 @@ def normalizeAttribute(key, value):
             value = attributes.voltageListAttribute(value)
         elif key in larr(["Integral Non - Linearity", "Integral Nonlinearity", "Inl/Dnl(Lsb)", "Gain Error"]):
             value = attributes.lsbListAttribute(value, "gain error" if key == "gain error" else "linearity")
+        elif key in larr(["Number"]):
+            value = attributes.transistorNumberAttribute(value)
+        elif key in larr(["Diode Configuration"]):
+            value = attributes.diodeConfigurationAttribute(value)
+        elif key in larr(["SCR Type"]):
+            value = attributes.scrTypeAttribute(value)
+        elif key in larr(["Number of Detents/Pulses (Incremental)"]):
+            value = attributes.detentsPulsesAttribute(value)
         elif key in larr(["Number of Channels", "Number of Elements", "Number of Lines"]):
             value = attributes.channelCountAttribute(value)
         elif key in larr(["Resolution", "Resolution (Bits)", "Resolution(Bits)",
@@ -480,7 +490,7 @@ def normalizeAttribute(key, value):
                     "Logic Array Blocks", "Number of Circuits", "Number of Filters",
                     "Circuits", "Number of Poles", "Number of Nodes", "Unidirectional Channels",
                     "Bidirectional Channels", "Forward Channel", "Reverse Channel",
-                    "Number of Forward Channels", "Number of Reverse Channels",
+                "Number of Forward Channels", "Number of Reverse Channels",
                     "Number of Forward Channels Groups", "Number of Reverse Channels Groups",
                 "Number of Input Channels", "Number of Non-Differential Input Channels",
                 "Numberof Channels", "Mac Address Support", "Vlan Support",
@@ -489,7 +499,7 @@ def normalizeAttribute(key, value):
                     "Pin Number in Each Row", "Needle Number", "Channels",
                     "Number of Characters", "Number of Terminals",
                     "Turns", "Number of Turns", "Number of Coded Gears",
-                    "Number of Half Bridges", "Order"]):
+                    "Number of Half Bridges", "Number of H-Bridges", "Order"]):
             value = attributes.countAttribute(value)
         elif key in larr(["Dot Matrix Number", "Number of Digits",
                 "Display Configurations(Bit)"]):
@@ -672,6 +682,8 @@ def normalizeAttribute(key, value):
             value = attributes.angleRangeListAttribute(value)
         elif key in larr(["Press Force"]):
             value = attributes.forceAttribute(value)
+        elif key in larr(["Acceleration Measurement Range (Max)"]):
+            value = attributes.accelerationRangeAttribute(value)
         elif key in larr(["Humidity", "Humidity Tolerance"]):
             value = attributes.humidityAttribute(value)
         elif key in larr(["Operating Junction Temperature Range"]):
