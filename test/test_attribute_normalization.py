@@ -843,6 +843,7 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Source Current", "12mA", "current", 0.012, "current"),
         ("Sink Current", "12mA", "current", 0.012, "current"),
         ("Refresh Current", "8mA", "current", 0.008, "current"),
+        ("Frequency (Max)", "6GHz", "frequency", 6e9, "frequency"),
         ("Rated Speed", "8500RPM", "speed", 8500.0, "rotational_speed"),
         ("Rated Speed", "-", "speed", "NaN", "rotational_speed"),
     ],
@@ -890,6 +891,7 @@ def test_peak_output_current_sink_list(capsys):
         }),
         ("Interrupting Rating", "2000A@32V", {"current": 2000.0}),
         ("Rated Ripple Curren", "2.3A@100kHz", {"current": 2.3}),
+        ("Drain Current (Idss)", "57mA", {"current": 0.057}),
     ],
 )
 def test_additional_current_values(key, value, expected, capsys):
@@ -1399,6 +1401,7 @@ def test_row_count_attributes(key, value, expected, capsys):
         ("Number of Data Pins", "-", {"count": "NaN"}),
         ("Number of Conductors", "4P", {"count": 4}),
         ("Number of Conductors", "22", {"count": 22}),
+        ("Parallel Bit Count Per Channel", "12, 10", {"count 1": 12, "count 2": 10}),
     ],
 )
 def test_connector_count_attributes(key, value, expected, capsys):
@@ -2290,6 +2293,11 @@ def test_slew_rate(key, value, expected, capsys):
     for quantity, slew_rate in expected.items():
         assert_quantity(values[quantity], slew_rate, "slew_rate")
 
+def test_droop_rate(capsys):
+    values = normalized_values("Droop Rate", "2uV/us", capsys)
+
+    assert_quantity(values["droop rate"], 2.0, "slew_rate")
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
@@ -2443,6 +2451,11 @@ def test_melting_i2t(value, expected, capsys):
     values = normalized_values("Melting I2t", value, capsys)
 
     assert_quantity(values["melting i2t"], expected, "melting_i2t")
+
+def test_melt_i2t_alias(capsys):
+    values = normalized_values("Melt I2t", "1100", capsys)
+
+    assert_quantity(values["melting i2t"], 1100.0, "melting_i2t")
 
 
 @pytest.mark.parametrize(
@@ -2612,6 +2625,7 @@ def test_input_voltage_noise_density(key, value, expected, capsys):
         ("1.2mV/℃", {"drift 1": 0.0012}),
         ("2.4uV/℃, 8.8uV/℃", {"drift 1": 2.4e-6, "drift 2": 8.8e-6}),
         ("-", {"drift 1": "NaN"}),
+        ("±15uV/°C", {"drift 1 min": -15e-6, "drift 1 max": 15e-6}),
     ],
 )
 def test_input_offset_voltage_drift(value, expected, capsys):
@@ -2619,6 +2633,12 @@ def test_input_offset_voltage_drift(value, expected, capsys):
 
     for quantity, drift in expected.items():
         assert_quantity(values[quantity], drift, "voltage_temperature_drift")
+
+
+def test_spaced_input_offset_voltage_drift(capsys):
+    values = normalized_values("Input Offset Voltage Drift (VOS TC)", "1uV/°C", capsys)
+
+    assert_quantity(values["drift 1"], 1e-6, "voltage_temperature_drift")
 
 
 @pytest.mark.parametrize(

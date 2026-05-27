@@ -242,7 +242,8 @@ def normalizeAttribute(key, value):
                     "Source Current", "Sink Current", "Refresh Current",
                     "Contact Current", "Signal Current Rating",
                     "Breaking Capacity", "Interrupt Rating",
-                    "Interrupting Rating", "Rated Ripple Curren"]):
+                    "Interrupting Rating", "Rated Ripple Curren",
+                    "Drain Current (Idss)"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent current",
@@ -315,7 +316,7 @@ def normalizeAttribute(key, value):
                 value = attributes.energyListAttribute(value)
             else:
                 value = attributes.energyAttribute(value)
-        elif key in larr(["Melting I2t"]):
+        elif key in larr(["Melting I2t", "Melt I2t"]):
             value = attributes.meltingI2tAttribute(value)
         elif key in larr(["Attenuation", "Power Supply Rejection Ratio (Psrr)",
                 "Insertion Loss", "Signal-to-Noise Ratio", "Noise Figure",
@@ -366,7 +367,7 @@ def normalizeAttribute(key, value):
                 "Numberof Receivers", "Number of Receivers", "Number of Drivers",
                 "Number of Ports", "Number of Supporting Devices",
                 "Number of Receiver", "Number of Driver", "Input Number",
-                "Number of Pins Per Row"]):
+                "Number of Pins Per Row", "Parallel Bit Count Per Channel"]):
             value = attributes.countListAttribute(value)
         elif key in larr(["Number of Rows", "Rows"]):
             value = attributes.rowCountAttribute(value)
@@ -470,7 +471,7 @@ def normalizeAttribute(key, value):
             value = attributes.radiantIntensityAttribute(value)
         elif key in larr(["Input Voltage Noise Density", "Noise Density(E N)"]):
             value = attributes.voltageNoiseDensityAttribute(value)
-        elif key in larr(["Input Offset Voltage Drift(VOS TC)"]):
+        elif key in larr(["Input Offset Voltage Drift(VOS TC)", "Input Offset Voltage Drift (VOS TC)"]):
             value = attributes.voltageTemperatureDriftAttribute(value)
         elif key in larr(["Input Offset Current Drift (IOS TC)", "Input Offset Current Drift(IOS TC)"]):
             value = attributes.currentTemperatureDriftAttribute(value)
@@ -585,8 +586,8 @@ def normalizeAttribute(key, value):
             value = attributes.stringAttribute(value) if isinstance(value, str) and value.count(";") != 0 else attributes.chargeAtVoltage(value)
         elif key in larr(["Data Rate", "Data Rate (Max)"]):
             value = attributes.dataRateListAttribute(value) if compoundValue(value) else attributes.dataRateAttribute(value)
-        elif key in larr(["Slew Rate", "Slew Rate(Sr)", "Cmti(K V/Us)"]):
-            value = attributes.slewRateAttribute(value, "cmti" if key == "cmti(k v/us)" else "slew rate")
+        elif key in larr(["Slew Rate", "Slew Rate(Sr)", "Cmti(K V/Us)", "Droop Rate"]):
+            value = attributes.slewRateAttribute(value, "cmti" if key == "cmti(k v/us)" else ("droop rate" if key == "droop rate" else "slew rate"))
         elif key in larr(["Program Storage Size", "Ram Size", "Embedded Block Ram",
                 "Memory Size", "Memory Space", "Cache Size", "Fifo'S"]):
             value = attributes.dataSizeListAttribute(value) if key in ["ram size", "memory size"] and isinstance(value, str) and ("," in value or ";" in value) else attributes.dataSizeAttribute(value)
@@ -601,7 +602,7 @@ def normalizeAttribute(key, value):
                 "Gain Bandwidth Product (GBP)", "Resonant Frequency", "Count Rate",
                 "The Main Fclk", "Bandwidth (-3d B)", "-3db Bandwidth(G=1)",
                 "Frequency - Cutoff or Center", "Typical Application Frequency",
-                "Clock Frequency (Fc)"]):
+                "Clock Frequency (Fc)", "Frequency (Max)"]):
             if isinstance(value, str) and re.search(r"(?:bit/s|bps)\s*$", value, flags=re.IGNORECASE):
                 value = attributes.dataRateAttribute(value)
             else:

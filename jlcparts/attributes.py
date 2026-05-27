@@ -1119,12 +1119,26 @@ def voltageNoiseDensityAttribute(value):
 
 def voltageTemperatureDriftAttribute(value):
     value = str(value).replace(";", ",")
-    return scalarListAttribute(
-        value,
-        readVoltageTemperatureDrift,
-        "voltage_temperature_drift",
-        "drift",
-    )
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    has_range = False
+    for index, part in enumerate(parts, start=1):
+        name = f"drift {index}"
+        if part.startswith("±"):
+            has_range = True
+            magnitude = readVoltageTemperatureDrift(part[1:])
+            values[f"{name} min"] = [-magnitude, "voltage_temperature_drift"]
+            values[f"{name} max"] = [magnitude, "voltage_temperature_drift"]
+            formats.append("${" + f"{name} min" + "} ~ ${" + f"{name} max" + "}")
+        else:
+            values[name] = [readVoltageTemperatureDrift(part), "voltage_temperature_drift"]
+            formats.append("${" + name + "}")
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
 
 def currentTemperatureDriftAttribute(value):
     value = str(value).replace(";", ",")
