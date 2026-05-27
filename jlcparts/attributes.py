@@ -978,7 +978,7 @@ def metricThreadAttribute(value, name="thread diameter"):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
         return scalarAttribute(value, readLength, "length", name)
-    match = re.fullmatch(r"M\s*([0-9]+(?:\.[0-9]+)?)", value, flags=re.I)
+    match = re.fullmatch(r"M\s*([0-9]+(?:\.[0-9]+)?)(?:\s*thread)?", value, flags=re.I)
     if match is None:
         raise ValueError(f"Cannot parse metric thread {value}")
     return scalarAttribute(match.group(1) + "mm", readLength, "length", name)
