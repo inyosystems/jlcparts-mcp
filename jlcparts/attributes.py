@@ -107,6 +107,7 @@ def readCurrent(value):
 def readVoltage(value):
     value = value.replace("v", "V")
     value = re.sub(r"rms$", "", value, flags=re.I)
+    value = re.sub(r"\([^)]*\)", "", value)
     value = value.replace("V-", "V")
     value = value.replace("VDC", "V").replace("VAC", "V")
     value = re.sub(r"\bV(?:DS|GS)\s*=\s*", "", value, flags=re.IGNORECASE)
@@ -221,7 +222,7 @@ def readDataRate(value):
     value = value.strip()
     if value in ["-", "--", "null", "NaN"]:
         return "NaN"
-    value = re.sub(r"(?:bit/s|bps|sps)$", "", value, flags=re.IGNORECASE)
+    value = re.sub(r"(?:bit/s|bps|sps|B/s)$", "", value, flags=re.IGNORECASE)
     value = erase(value, ["Hz", "HZ", "H"]).strip()
     value = re.sub(r"([0-9.])([kmg])$", lambda m: m.group(1) + m.group(2).upper(), value)
     return readWithSiPrefix(value)
@@ -250,6 +251,21 @@ def readSlewRate(value):
         "s": 1,
     }
     return number * voltage_scales[voltage_unit] / time_scales[time_unit]
+
+def readFrameRate(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"fps$", "", value, flags=re.I).strip()
+    return float(value)
+
+def readAngularVelocity(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = value.replace("±", "")
+    value = re.sub(r"dps$", "", value, flags=re.I).strip()
+    return float(value)
 
 def readInductance(value):
     value = value.replace("H", "").strip()
@@ -909,6 +925,37 @@ def matrixCountAttribute(value):
         "values": values
     }
 
+def pixelArrayAttribute(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return countAttribute(value)
+    match = re.fullmatch(r"(\d+)H\s*x\s*(\d+)V", value, flags=re.I)
+    if match is None:
+        raise ValueError(f"Cannot parse pixel array {value}")
+    return {
+        "format": "${horizontal pixels} x ${vertical pixels}",
+        "primary": "horizontal pixels",
+        "values": {
+            "horizontal pixels": [int(match.group(1)), "count"],
+            "vertical pixels": [int(match.group(2)), "count"],
+        }
+    }
+
+def opticalFormatAttribute(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return scalarAttribute(value, readRatio, "ratio", "optical format")
+    if "/" in value:
+        numerator, denominator = value.split("/", 1)
+        parsed = float(numerator) / float(denominator)
+    else:
+        parsed = readRatio(value)
+    return {
+        "format": "${optical format}",
+        "primary": "optical format",
+        "values": {"optical format": [parsed, "ratio"]}
+    }
+
 def _readRowCount(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
@@ -1092,6 +1139,12 @@ def inductanceListAttribute(value):
 
 def frequencyAttribute(value):
     value = str(value)
+    return rangeOrScalarAttribute(value, readFrequency, "frequency", "frequency")
+
+def signedFrequencyRangeAttribute(value):
+    value = str(value).strip()
+    if value.startswith("±"):
+        value = "-" + value[1:] + "~+" + value[1:]
     return rangeOrScalarAttribute(value, readFrequency, "frequency", "frequency")
 
 def frequencyListAttribute(value):
@@ -1412,6 +1465,16 @@ def dataRateAttribute(value):
 def dataRateListAttribute(value):
     value = str(value).replace(";", ",")
     return scalarListAttribute(value, readDataRate, "data_rate", "data rate")
+
+def frameRateListAttribute(value):
+    value = str(value).replace(";", ",")
+    return scalarListAttribute(value, readFrameRate, "frequency", "frame rate")
+
+def angularVelocityAttribute(value):
+    value = str(value).strip()
+    if value.startswith("±"):
+        value = "-" + value[1:] + "~+" + value[1:]
+    return rangeOrScalarAttribute(value, readAngularVelocity, "angular_velocity", "angular velocity")
 
 def _expandSharedUnitAlternatives(value):
     match = re.fullmatch(
@@ -1890,6 +1953,42 @@ def readVoltageAmplitude(value):
 def voltageAmplitudeListAttribute(value, name="voltage"):
     value = str(value).replace(";", ",")
     return scalarListAttribute(value, readVoltageAmplitude, "voltage", name)
+
+def voltageOrDecibelListAttribute(value, name="ripple"):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        value_name = name if len(parts) == 1 else f"{name} {index}"
+        if "db" in part.lower():
+            values[value_name] = [readDecibel(part), "decibel"]
+        else:
+            values[value_name] = [readVoltageAmplitude(part), "voltage"]
+        formats.append("${" + value_name + "}")
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
+def powerOrDecibelMilliwattListAttribute(value, name="power"):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        value_name = name if len(parts) == 1 else f"{name} {index}"
+        if "dbm" in part.lower():
+            values[value_name] = [readDecibelMilliwatt(part), "decibel_milliwatt"]
+        else:
+            values[value_name] = [readPower(part), "power"]
+        formats.append("${" + value_name + "}")
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
 
 def voltageOrCurrentListAttribute(value):
     value = str(value).replace(";", ",")

@@ -106,6 +106,7 @@ def test_rds_on_multiple_measurements(value, measurements, capsys):
         ("Input Resistor", "10kΩ", {"resistance": 10000.0}),
         ("Input Resistor", "-", {"resistance": "NaN"}),
         ("Current Terminal Resistance", "1mΩ", {"resistance": 0.001}),
+        ("Output Resistance", "2Ω, 1.5Ω", {"resistance 1": 2.0, "resistance 2": 1.5}),
     ],
 )
 def test_resistance_list_attributes(key, value, expected, capsys):
@@ -419,6 +420,15 @@ def test_extra_voltage_ranges(key, value, expected, capsys):
         ("Breakover Voltage Vbo (Typ)", "110V", {"voltage": 110.0}),
         ("Breakover Voltage Symmetry", "3V", {"voltage": 3.0}),
         ("Dynamic Breakover Voltage", "5V", {"voltage": 5.0}),
+        ("Forward Voltage", "3.2V(UVA), 6V(UVC)", {"voltage 1": 3.2, "voltage 2": 6.0}),
+        ("Forward Voltage", "R:1.8V~2.4V;G:2.8V~3.4V;B:2.8V~3.4V", {
+            "voltage R min": 1.8,
+            "voltage R max": 2.4,
+            "voltage G min": 2.8,
+            "voltage G max": 3.4,
+            "voltage B min": 2.8,
+            "voltage B max": 3.4,
+        }),
         ("DC Reverse Voltage(Vr)", "20V", {"voltage": 20.0}),
         ("Voltage - Input (Max)(Vi(Off))", "300mV@100uA,5V", {"voltage": 0.3}),
         ("Input Voltage (Vi(on)@IC,VCE)", "1.4V@1mA,0.3V", {"voltage": 1.4}),
@@ -893,6 +903,9 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Frequency (Max)", "6GHz", "frequency", 6e9, "frequency"),
         ("Band Width", "45Hz~2kHz", "frequency min", 45.0, "frequency"),
         ("Band Width", "80kHz, 20kHz", "frequency 1", 80000.0, "frequency"),
+        ("Clock Frequency(Fc)", "100MHz", "frequency", 100e6, "frequency"),
+        ("Maximum Speed", "200MHz, 180MHz", "frequency 1", 200e6, "frequency"),
+        ("Pass Bandwidth", "7.5kHz", "frequency", 7500.0, "frequency"),
         ("Voltage", "600 V", "voltage", 600.0, "voltage"),
         ("Control Voltage Range/Center", "0V~3.3V", "voltage min", 0.0, "voltage"),
         ("Vbo (Range Value)", "35V~45V", "voltage min", 35.0, "voltage"),
@@ -971,6 +984,8 @@ def test_peak_output_current_sink_list(capsys):
         ("Quiescent Current (Max)", "2uA", {"current": 2e-6}),
         ("Sleep Mode Current (Izz)", "3uA", {"current": 3e-6}),
         ("Standby Current(Isb)", "5uA, 15uA", {"current 1": 5e-6, "current 2": 15e-6}),
+        ("Iout", "300mA, 400mA", {"current 1": 0.3, "current 2": 0.4}),
+        ("Maximum Charge Current", "1.1A", {"current": 1.1}),
     ],
 )
 def test_additional_current_values(key, value, expected, capsys):
@@ -1466,6 +1481,13 @@ def test_logic_array_blocks(value, expected, capsys):
         ("Turns", "11", {"count": 11}),
         ("Number of Turns", "25", {"count": 25}),
         ("Number of Coded Gears", "10", {"count": 10}),
+        ("SPI", "5", {"count": 5}),
+        ("UART/Usart", "4", {"count": 4}),
+        ("I2C", "3", {"count": 3}),
+        ("I2s", "4", {"count": 4}),
+        ("16bit Timer", "8", {"count": 8}),
+        ("CAN", "1", {"count": 1}),
+        ("Number of Half Bridges", "3", {"count": 3}),
     ],
 )
 def test_extra_count_attributes(key, value, expected, capsys):
@@ -1494,6 +1516,19 @@ def test_matrix_count_attributes(key, value, expected, capsys):
 
     for quantity, count in expected.items():
         assert_quantity(values[quantity], count, "count")
+
+
+def test_active_pixel_array(capsys):
+    values = normalized_values("Active Pixel Array", "1280Hx1080V", capsys)
+
+    assert_quantity(values["horizontal pixels"], 1280, "count")
+    assert_quantity(values["vertical pixels"], 1080, "count")
+
+
+def test_optical_format(capsys):
+    values = normalized_values("Optical Format(Inch)", "1/2.09", capsys)
+
+    assert_quantity(values["optical format"], 1 / 2.09, "ratio")
 
 
 @pytest.mark.parametrize(
@@ -1608,6 +1643,7 @@ def test_resolution_bits_values(capsys):
         ("ADC (Bit)", "24bit", {"resolution": (24, "count")}),
         ("Pwm (Bit)", "8bit;32bit", {"resolution 1": (8, "count"), "resolution 2": (32, "count")}),
         ("Core Size", "16/32 Bit", {"resolution 1": (16, "count"), "resolution 2": (32, "count")}),
+        ("Temperature Resolution", "12bit", {"resolution": (12, "count")}),
     ],
 )
 def test_resolution_alias_values(key, value, expected, capsys):
@@ -2061,6 +2097,10 @@ def test_maximum_power_supply_range(value, expected, capsys):
         }),
         ("Vin", "3V~36V", {"voltage min": 3.0, "voltage max": 36.0}),
         ("Vout", "5V, -5V", {"voltage 1": 5.0, "voltage 2": -5.0}),
+        ("Supply Voltage Range", "3V~3.6V", {"voltage min": 3.0, "voltage max": 3.6}),
+        ("Supply Voltage Range - Vccio", "2.5V;3.3V", {"voltage 1": 2.5, "voltage 2": 3.3}),
+        ("Voltage - Supply(Vccio)", "2.5V, 3.3V", {"voltage 1": 2.5, "voltage 2": 3.3}),
+        ("VGS", "±30V", {"voltage min": -30.0, "voltage max": 30.0}),
         ("Hi-Pot", "1.5kV", {"voltage": 1500.0}),
         ("Isolation Voltage(RMS)", "3.75kV;5kV", {"voltage 1": 3750.0, "voltage 2": 5000.0}),
         ("Isolation Voltage", "5kV", {"voltage": 5000.0}),
@@ -2101,6 +2141,9 @@ def test_logic_elements_blocks_count(capsys):
         ("3.75Gbps, 1Gbps", {"data rate 1": 3.75e9, "data rate 2": 1e9}),
         (("Data Rate (Max)", "24Mbps"), {"data rate": 24e6}),
         (("Data Rate (Max)", "40ksps, 100ksps"), {"data rate 1": 40e3, "data rate 2": 100e3}),
+        (("Reading Speed in Sequence", "330MB/S"), {"data rate": 330e6}),
+        (("Writing Speed in Sequence", "27.3MB/S"), {"data rate": 27.3e6}),
+        (("Transmission Rate", "106Kbit/s, 848Kbit/s"), {"data rate 1": 106e3, "data rate 2": 848e3}),
         ("NaN", {"data rate": "NaN"}),
     ],
 )
@@ -2113,6 +2156,27 @@ def test_data_rate(value, expected, capsys):
 
     for quantity, rate in expected.items():
         assert_quantity(values[quantity], rate, "data_rate")
+
+
+def test_frame_rate(capsys):
+    values = normalized_values("Frame Rate(Fps)", "30, 60", capsys)
+
+    assert_quantity(values["frame rate 1"], 30.0, "frequency")
+    assert_quantity(values["frame rate 2"], 60.0, "frequency")
+
+
+def test_gyroscope_measurement_range(capsys):
+    values = normalized_values("Gyroscope Measurement Range (Max)", "±2000dps", capsys)
+
+    assert_quantity(values["angular velocity min"], -2000.0, "angular_velocity")
+    assert_quantity(values["angular velocity max"], 2000.0, "angular_velocity")
+
+
+def test_relative_bandwidth(capsys):
+    values = normalized_values("Relative Bandwidth", "±6.5MHz", capsys)
+
+    assert_quantity(values["frequency min"], -6.5e6, "frequency")
+    assert_quantity(values["frequency max"], 6.5e6, "frequency")
 
 
 def test_b_constant_kelvin(capsys):
@@ -2819,6 +2883,19 @@ def test_ripple_noise_voltage(capsys):
 @pytest.mark.parametrize(
     ("value", "quantity", "expected", "unit"),
     [
+        ("100mV", "ripple", 0.1, "voltage"),
+        ("0.5dB, 0.4dB", "ripple 1", 0.5, "decibel"),
+    ],
+)
+def test_ripple_values(value, quantity, expected, unit, capsys):
+    values = normalized_values("Ripple", value, capsys)
+
+    assert_quantity(values[quantity], expected, unit)
+
+
+@pytest.mark.parametrize(
+    ("value", "quantity", "expected", "unit"),
+    [
         ("2.5m", "accuracy", 2.5, "length"),
         ("Grade 2.5", "accuracy grade", 2.5, "ratio"),
         ("±0.25dB", "accuracy min", -0.25, "decibel"),
@@ -3253,6 +3330,19 @@ def test_decibel_milliwatt_values(key, value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "quantity", "expected", "unit"),
+    [
+        ("3dBm", "power", 3.0, "decibel_milliwatt"),
+        ("100mW", "power", 0.1, "power"),
+    ],
+)
+def test_output_power_max(value, quantity, expected, unit, capsys):
+    values = normalized_values("Output Power (Max)", value, capsys)
+
+    assert_quantity(values[quantity], expected, unit)
+
+
+@pytest.mark.parametrize(
     ("value", "expected"),
     [
         ("6mVp-p", 0.006),
@@ -3435,6 +3525,13 @@ def test_display_dimensions(key, value, expected, capsys):
 
     for quantity, length in expected.items():
         assert_quantity(values[quantity], length, "length")
+
+
+def test_pixel_size(capsys):
+    values = normalized_values("Pixel Size", "4.2umx4.2um", capsys)
+
+    assert_quantity(values["length 1"], 4.2e-6, "length")
+    assert_quantity(values["length 2"], 4.2e-6, "length")
 
 
 @pytest.mark.parametrize(
