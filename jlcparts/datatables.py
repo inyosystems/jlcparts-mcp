@@ -134,7 +134,9 @@ def normalizeAttribute(key, value):
                 "Voltage - Input (Max)(Vi(Off))", "Input Voltage (Vi(on)@IC,VCE)",
                 "Output Voltage(Vo(on))", "Voltage - Isolation",
                 "Forward Voltage Drop", "Hi-Pot", "Isolation Voltage(RMS)",
-                "Isolation Voltage", "Forward Voltage", "Voltage"]):
+                "Isolation Voltage", "Forward Voltage",
+                "Peak Repetitive Off State Voltage (Vdrm)",
+                "Gate Trigger Voltage (Vgt)", "Voltage"]):
             if key == "charging saturation voltage" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "isolation voltage(vrms)" and compoundValue(value):
@@ -147,6 +149,8 @@ def normalizeAttribute(key, value):
                     value = attributes.labeledVoltageRangeListAttribute(value, "voltage")
                 else:
                     value = attributes.voltageRangeListAttribute(value, "voltage")
+            elif key == "gate trigger voltage (vgt)" and compoundValue(value):
+                value = attributes.voltageListAttribute(value, "voltage")
             elif key in larr(["Isolation Voltage(RMS)", "Isolation Voltage", "Hi-Pot"]) and compoundValue(value):
                 value = attributes.voltageListAttribute(value, "voltage")
             elif key in larr(["Coil Voltage", "Switching Voltage (Max)"]):
@@ -285,7 +289,8 @@ def normalizeAttribute(key, value):
                     "Digit Drive Current", "Forward Current",
                     "Output Current(It(RMS))", "Current - Surge(Itsm)",
                     "Quiescent Current (Max)", "Sleep Mode Current (Izz)",
-                    "Standby Current(Isb)", "Iout", "Maximum Charge Current"]):
+                    "Standby Current(Isb)", "Iout", "Maximum Charge Current",
+                    "RMS on-State Current(It (RMS))", "Gate Trigger Current(Igt)"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent current",
@@ -335,6 +340,7 @@ def normalizeAttribute(key, value):
                 "current - surge(itsm)",
                 "standby current(isb)",
                 "iout",
+                "gate trigger current(igt)",
             ]
             if key in ["current - leakage", "leakage current(dcl)"]:
                 value = attributes.currentAttribute(value)
@@ -386,6 +392,8 @@ def normalizeAttribute(key, value):
             else:
                 value = attributes.decibelListAttribute(value, "level")
         elif key in larr(["Insertion Loss (dB Max)"]):
+            value = attributes.decibelListAttribute(value, "level")
+        elif key in larr(["Gain/Loss", "Amplitude Balance (Max)"]):
             value = attributes.decibelListAttribute(value, "level")
         elif key in larr(["IP3", "P1d B"]):
             value = attributes.decibelMilliwattListAttribute(value, "level")
@@ -452,7 +460,7 @@ def normalizeAttribute(key, value):
                     "Pin Number in Each Row", "Needle Number", "Channels",
                     "Number of Characters", "Number of Terminals",
                     "Turns", "Number of Turns", "Number of Coded Gears",
-                    "Number of Half Bridges"]):
+                    "Number of Half Bridges", "Order"]):
             value = attributes.countAttribute(value)
         elif key in larr(["Dot Matrix Number", "Number of Digits",
                 "Display Configurations(Bit)"]):
@@ -521,7 +529,7 @@ def normalizeAttribute(key, value):
                 "Total Length", "Insert Thickness", "Spacing - Connector",
                 "Sheath (Insulation) Diameter", "Line Length",
                 "Wire Diameter", "Module Size", "Display Range", "Linear Range",
-                "Pixel Size", "Digit/Alpha Size(Inch)"]):
+                "Pixel Size", "Communication Distance", "Digit/Alpha Size(Inch)"]):
             if key == "diameter" and isinstance(value, str) and re.fullmatch(r"M\s*\d+(?:\.\d+)?", value, re.I):
                 value = re.sub(r"^M\s*", "", value, flags=re.I) + "mm"
             if key in larr(["Insulation Od", "Interface Length/Height", "Interface Diameter",
@@ -545,6 +553,8 @@ def normalizeAttribute(key, value):
                 value = attributes.inchLengthAttribute(value)
             elif key == "linear range":
                 value = attributes.mechanicalLengthAttribute(value)
+            elif key == "communication distance":
+                value = attributes.lengthRangeListAttribute(value, "length")
             elif key in larr(["Total Length", "Line Length"]):
                 value = attributes.lengthRangeListAttribute(value, "length")
             elif key == "thickness" and isinstance(value, str) and "±" in value:
@@ -577,7 +587,7 @@ def normalizeAttribute(key, value):
             value = attributes.currentTemperatureDriftAttribute(value)
         elif key in larr(["Noise - 1/10hz to 10hz"]):
             value = attributes.lowFrequencyNoiseAttribute(value)
-        elif key in larr(["Noise"]):
+        elif key in larr(["Noise", "Noise - 10hz to 10k Hz"]):
             value = attributes.noiseAttribute(value)
         elif key in larr(["Sensitivity"]):
             value = attributes.sensitivityAttribute(value)
@@ -602,7 +612,8 @@ def normalizeAttribute(key, value):
                 "Total Harmonic Distortion", "Differential Gain", "Capacitance Tolerance",
                 "Constant Current Accuracy", "Output Voltage Accuracy",
                 "Current Transfer Ratio (Ctr) Maximum/Saturation Value",
-                "Current Transfer Ratio (Ctr) Minimum", "Duty Cycle (Max)"]):
+                "Current Transfer Ratio (Ctr) Minimum", "Duty Cycle (Max)",
+                "B Constant Tolerance", "Resistance Tolerance"]):
             value = attributes.flexiblePercentageAttribute(value)
         elif key in larr(["Dissipation Factor"]):
             value = attributes.dissipationFactorAttribute(value)
@@ -617,20 +628,31 @@ def normalizeAttribute(key, value):
                 value = attributes.stringAttribute(value) if compoundValue(value) else attributes.percentageAttribute(value)
         elif key == "Rds On (Max) @ Id, Vgs".lower():
             value = attributes.rdsOnMaxAtIdsAtVgs(value)
+        elif key in larr(["Photoperceptivity"]):
+            value = attributes.illuminanceAttribute(value)
+        elif key in larr(["Absolute Accuracy", "Relative Accuracy"]):
+            value = attributes.pressureAttribute(value)
+        elif key in larr(["Temperature Coefficient of Offset(TCO)"]):
+            value = attributes.pressureTemperatureDriftAttribute(value)
+        elif key in larr(["Rotation Angle"]):
+            value = attributes.angleRangeListAttribute(value)
+        elif key in larr(["Humidity", "Humidity Tolerance"]):
+            value = attributes.humidityAttribute(value)
         elif key in larr(["Operating Junction Temperature Range"]):
             value = attributes.temperatureRangeAttribute(value)
         elif key in larr(["Operating Temperature", "Operating Temperature (Max)", "Operating Temperature (Min)",
                 "Operating Temperatue", "Holding Temperature", "Detection Temperature Range",
                 "Maximum Temperature Limit", "Holding Temperature Limit",
                 "Rated Functioning Temperature", "Working Temperature",
-                "Storage Temperature"]):
+                "Storage Temperature", "Temperature Tolerance"]):
             if key in larr(["Holding Temperature Limit"]) and isinstance(value, str) and ("/" in value or "," in value or ";" in value):
                 value = attributes.temperatureListAttribute(value)
             else:
                 value = attributes.stringAttribute(value) if compoundValue(value) else attributes.temperatureRangeAttribute(value)
         elif key in larr(["Soldering Temperature (Max)"]):
             value = attributes.solderingTemperatureAttribute(value)
-        elif key in larr(["B Constant (25°C/85°C)", "B Constant (25°C/50°C)"]):
+        elif key in larr(["B Constant (25°C/85°C)", "B Constant (25°C/50°C)",
+                "B Constant (25°C/100°C)"]):
             value = attributes.kelvinRangeListAttribute(value) if isinstance(value, str) and ("," in value or ";" in value) else attributes.kelvinAttribute(value)
         elif key in larr(["Color Temperature"]):
             value = attributes.kelvinRangeListAttribute(value)
@@ -726,16 +748,21 @@ def normalizeAttribute(key, value):
                 "The Main Fclk", "Bandwidth (-3d B)", "-3db Bandwidth(G=1)",
                 "Frequency - Cutoff or Center", "Typical Application Frequency",
                 "Clock Frequency (Fc)", "Frequency (Max)", "Band Width",
-                "Clock Frequency(Fc)", "Maximum Speed", "Pass Bandwidth"]):
+                "Clock Frequency(Fc)", "Maximum Speed", "Pass Bandwidth",
+                "Stop Bandwidth", "Passband Bandwidth", "Response Frequency",
+                "Central Frequency", "Lo Frequency Range", "IF Frequency Range",
+                "RF Frequency Range"]):
             if isinstance(value, str) and re.search(r"(?:bit/s|bps)\s*$", value, flags=re.IGNORECASE):
                 value = attributes.dataRateAttribute(value)
             else:
                 if key == "sampling rate" and isinstance(value, str) and re.search(r"\d\s*[munp]?s\b", value, flags=re.IGNORECASE):
                     value = attributes.timeAttribute(value)
-                elif key in ["sampling rate", "frequency - switching", "clock frequency", "transition frequency (f t)", "sampling frequency", "center frequency", "cpu maximum speed", "frequency(center/band)", "switch frequency", "absolute bandwidth", "throughput rate", "update rate", "frequency output", "gain bandwidth product", "count rate", "the main fclk", "bandwidth (-3d b)", "-3db bandwidth(g=1)", "frequency - cutoff or center", "typical application frequency", "clock frequency (fc)", "band width", "maximum speed"] and isinstance(value, str) and ("," in value or ";" in value) and "~" in value:
+                elif key in ["sampling rate", "frequency - switching", "clock frequency", "transition frequency (f t)", "sampling frequency", "center frequency", "cpu maximum speed", "frequency(center/band)", "switch frequency", "absolute bandwidth", "throughput rate", "update rate", "frequency output", "gain bandwidth product", "count rate", "the main fclk", "bandwidth (-3d b)", "-3db bandwidth(g=1)", "frequency - cutoff or center", "typical application frequency", "clock frequency (fc)", "band width", "maximum speed", "passband bandwidth", "central frequency"] and isinstance(value, str) and ("," in value or ";" in value) and "~" in value:
                     value = attributes.frequencyRangeListAttribute(value)
-                elif key in ["sampling rate", "frequency - switching", "clock frequency", "transition frequency (f t)", "sampling frequency", "center frequency", "cpu maximum speed", "frequency(center/band)", "switch frequency", "absolute bandwidth", "throughput rate", "update rate", "frequency output", "gain bandwidth product", "count rate", "the main fclk", "bandwidth (-3d b)", "-3db bandwidth(g=1)", "frequency - cutoff or center", "typical application frequency", "clock frequency (fc)", "band width", "maximum speed"] and isinstance(value, str) and ("," in value or ";" in value):
+                elif key in ["sampling rate", "frequency - switching", "clock frequency", "transition frequency (f t)", "sampling frequency", "center frequency", "cpu maximum speed", "frequency(center/band)", "switch frequency", "absolute bandwidth", "throughput rate", "update rate", "frequency output", "gain bandwidth product", "count rate", "the main fclk", "bandwidth (-3d b)", "-3db bandwidth(g=1)", "frequency - cutoff or center", "typical application frequency", "clock frequency (fc)", "band width", "maximum speed", "passband bandwidth", "central frequency"] and isinstance(value, str) and ("," in value or ";" in value):
                     value = attributes.frequencyListAttribute(value)
+                elif key in ["lo frequency range", "if frequency range", "rf frequency range", "response frequency"] and isinstance(value, str) and "~" in value:
+                    value = attributes.frequencyRangeListAttribute(value)
                 else:
                     value = attributes.stringAttribute(value) if compoundValue(value) else attributes.frequencyAttribute(value)
         elif key in larr(["Rated Speed"]):
@@ -762,7 +789,8 @@ def normalizeAttribute(key, value):
                 "Continuous Adjustable Delay Range", "Time Intervals", "Access Time",
                 "Delay Time", "Switch Time(Toff)", "Operate Time",
                 "Release Time", "Write Cycle Time (Tw)", "Write Cycle Time(Tw)",
-                "Write Cycle Time (T Wc)", "Time to First Fix"]):
+                "Write Cycle Time (T Wc)", "Write Cycle Time(T Wc)",
+                "Time to First Fix"]):
             if compoundValue(value) and "@" not in value:
                 if key in larr(["Propagation Delay (TPD)", "Propagation Delay Time", "Reset Timeout", "Settling Time", "Response Time (Tr)", "Time to Trip (Max)", "Td(Off)",
                         "Propagation Delay Tp Hl", "Propagation Delay Tp Lh", "Td(on)", "Block Erase Time(T Be)",

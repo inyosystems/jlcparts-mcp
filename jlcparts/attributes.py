@@ -285,6 +285,13 @@ def readLuminance(value):
     value = re.sub(r"cd\s*/\s*m2$", "", value, flags=re.IGNORECASE).strip()
     return readWithSiPrefix(value)
 
+def readIlluminance(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"lx$", "", value, flags=re.IGNORECASE).strip()
+    return readWithSiPrefix(value)
+
 def readRadiantIntensity(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
@@ -296,7 +303,7 @@ def readPressure(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
         return "NaN"
-    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(pa|hpa|kpa|mpa|bar)", value, flags=re.I)
+    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(pa|hpa|kpa|mpa|mbar|bar)", value, flags=re.I)
     if match is None:
         raise ValueError(f"Cannot parse pressure {value}")
     scales = {
@@ -304,21 +311,29 @@ def readPressure(value):
         "hpa": 100,
         "kpa": 1e3,
         "mpa": 1e6,
+        "mbar": 100,
         "bar": 1e5,
     }
     return float(match.group(1)) * scales[match.group(2).lower()]
+
+def readPressureTemperatureDrift(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"/\s*K$", "", value, flags=re.I).strip()
+    return readPressure(value)
 
 def readLength(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
         return "NaN"
-    parenthesizedMetric = re.search(r"\(([^)]*(?:nm|um|mm|cm|m|mil|in|inch|inches))\)", value, re.I)
+    parenthesizedMetric = re.search(r"\(([^)]*(?:nm|um|mm|cm|km|m|mil|in|inch|inches))\)", value, re.I)
     if parenthesizedMetric is not None:
         value = parenthesizedMetric.group(1)
     elif value.endswith("'"):
         return float(value[:-1]) * 0.3048
     value = value.replace("µ", "u").replace("μ", "u")
-    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(nm|um|mm|cm|m|mil|in|inch|inches)?", value, re.I)
+    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(nm|um|mm|cm|km|m|mil|in|inch|inches)?", value, re.I)
     if match is None:
         raise ValueError(f"Cannot parse length {value}")
     number = float(match.group(1))
@@ -328,6 +343,7 @@ def readLength(value):
         "um": 1e-6,
         "mm": 1e-3,
         "cm": 1e-2,
+        "km": 1e3,
         "m": 1,
         "mil": 25.4e-6,
         "in": 0.0254,
@@ -1536,6 +1552,12 @@ def pressureRangeListAttribute(value):
         "values": values
     }
 
+def pressureTemperatureDriftAttribute(value):
+    return scalarAttribute(value, readPressureTemperatureDrift, "pressure_temperature_drift", "pressure drift")
+
+def illuminanceAttribute(value):
+    return scalarAttribute(value, readIlluminance, "illuminance", "illuminance")
+
 def _readMechanicalLength(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
@@ -1821,7 +1843,7 @@ def _readCelsius(value):
     if value in ["-", "--", "null"]:
         return "NaN"
     value = value.rstrip("℃").strip()
-    return int(float(value))
+    return float(value)
 
 def temperatureRangeAttribute(value):
     value = str(value).replace("°C", "℃")
@@ -2912,6 +2934,28 @@ def kelvinRangeListAttribute(value):
 def angleListAttribute(value):
     value = str(value).replace(";", ",")
     return scalarListAttribute(value, readAngle, "angle", "angle")
+
+def angleRangeListAttribute(value):
+    value = str(value).replace(";", ",").strip()
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        if part.startswith("±"):
+            part = "-" + part[1:] + "~+" + part[1:]
+        parsed = rangeOrScalarAttribute(part, readAngle, "angle", f"angle {index}")
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    return {
+        "format": ", ".join(formats),
+        "primary": "angle 1 min" if any(_rangeParts(part) or part.startswith("±") for part in parts) else "angle 1",
+        "values": values
+    }
+
+def humidityAttribute(value):
+    value = str(value).strip()
+    value = re.sub(r"%\s*RH", "%", value, flags=re.I)
+    return flexiblePercentageAttribute(value)
 
 def accuracyAttribute(value):
     value = str(value).strip()

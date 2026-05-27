@@ -429,6 +429,8 @@ def test_extra_voltage_ranges(key, value, expected, capsys):
             "voltage B min": 2.8,
             "voltage B max": 3.4,
         }),
+        ("Peak Repetitive Off State Voltage (Vdrm)", "1.2kV", {"voltage": 1200.0}),
+        ("Gate Trigger Voltage (Vgt)", "1.1V, 1.7V", {"voltage 1": 1.1, "voltage 2": 1.7}),
         ("DC Reverse Voltage(Vr)", "20V", {"voltage": 20.0}),
         ("Voltage - Input (Max)(Vi(Off))", "300mV@100uA,5V", {"voltage": 0.3}),
         ("Input Voltage (Vi(on)@IC,VCE)", "1.4V@1mA,0.3V", {"voltage": 1.4}),
@@ -906,6 +908,13 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Clock Frequency(Fc)", "100MHz", "frequency", 100e6, "frequency"),
         ("Maximum Speed", "200MHz, 180MHz", "frequency 1", 200e6, "frequency"),
         ("Pass Bandwidth", "7.5kHz", "frequency", 7500.0, "frequency"),
+        ("Stop Bandwidth", "50kHz", "frequency", 50000.0, "frequency"),
+        ("Passband Bandwidth", "20.46MHz;48MHz", "frequency 1", 20.46e6, "frequency"),
+        ("Response Frequency", "20Hz~20kHz", "frequency 1 min", 20.0, "frequency"),
+        ("Central Frequency", "2.4GHz;5.4GHz", "frequency 1", 2.4e9, "frequency"),
+        ("Lo Frequency Range", "400MHz~2.5GHz", "frequency 1 min", 400e6, "frequency"),
+        ("IF Frequency Range", "10MHz~500MHz", "frequency 1 min", 10e6, "frequency"),
+        ("RF Frequency Range", "400MHz~2.5GHz", "frequency 1 min", 400e6, "frequency"),
         ("Voltage", "600 V", "voltage", 600.0, "voltage"),
         ("Control Voltage Range/Center", "0V~3.3V", "voltage min", 0.0, "voltage"),
         ("Vbo (Range Value)", "35V~45V", "voltage min", 35.0, "voltage"),
@@ -986,6 +995,8 @@ def test_peak_output_current_sink_list(capsys):
         ("Standby Current(Isb)", "5uA, 15uA", {"current 1": 5e-6, "current 2": 15e-6}),
         ("Iout", "300mA, 400mA", {"current 1": 0.3, "current 2": 0.4}),
         ("Maximum Charge Current", "1.1A", {"current": 1.1}),
+        ("RMS on-State Current(It (RMS))", "25A", {"current": 25.0}),
+        ("Gate Trigger Current(Igt)", "15mA;25mA", {"current 1": 0.015, "current 2": 0.025}),
     ],
 )
 def test_additional_current_values(key, value, expected, capsys):
@@ -1488,6 +1499,7 @@ def test_logic_array_blocks(value, expected, capsys):
         ("16bit Timer", "8", {"count": 8}),
         ("CAN", "1", {"count": 1}),
         ("Number of Half Bridges", "3", {"count": 3}),
+        ("Order", "2", {"count": 2}),
     ],
 )
 def test_extra_count_attributes(key, value, expected, capsys):
@@ -2193,6 +2205,10 @@ def test_b_constant_kelvin(capsys):
     assert_quantity(values["temperature 1"], 3450.0, "kelvin")
     assert_quantity(values["temperature 2"], 3950.0, "kelvin")
 
+    values = normalized_values("B Constant (25°C/100°C)", "3455K", capsys)
+
+    assert_quantity(values["temperature"], 3455.0, "kelvin")
+
 
 def test_holding_temperature(capsys):
     values = normalized_values("Holding Temperature", "76℃", capsys)
@@ -2314,6 +2330,13 @@ def test_phase_angle_aliases(key, capsys):
     assert_quantity(values["angle 2"], 180.0, "angle")
 
 
+def test_rotation_angle(capsys):
+    values = normalized_values("Rotation Angle", "0°~360°", capsys)
+
+    assert_quantity(values["angle 1 min"], 0.0, "angle")
+    assert_quantity(values["angle 1 max"], 360.0, "angle")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
@@ -2363,6 +2386,13 @@ def test_conversion_efficiency_values(value, expected, capsys):
         ("Duty Cycle (Max)", "85%, 90%", {"percentage 1": 85.0, "percentage 2": 90.0}),
         ("Current Transfer Ratio (Ctr) Maximum/Saturation Value", "400%", {"percentage": 400.0}),
         ("Current Transfer Ratio (Ctr) Minimum", "0.25%", {"percentage": 0.25}),
+        ("B Constant Tolerance", "±1%", {"percentage min": -1.0, "percentage max": 1.0}),
+        ("Resistance Tolerance", "±5%, ±0.5%", {
+            "percentage 1 min": -5.0,
+            "percentage 1 max": 5.0,
+            "percentage 2 min": -0.5,
+            "percentage 2 max": 0.5,
+        }),
     ],
 )
 def test_flexible_percentage_values(key, value, expected, capsys):
@@ -2873,6 +2903,23 @@ def test_pressure_range(value, expected, capsys):
         assert_quantity(values[quantity], pressure, "pressure")
 
 
+@pytest.mark.parametrize("key", ["Absolute Accuracy", "Relative Accuracy"])
+def test_pressure_accuracy(key, capsys):
+    values = normalized_values(key, "0.4Kpa", capsys)
+
+    assert_quantity(values["pressure"], 400.0, "pressure")
+
+    values = normalized_values(key, "1.5mbar", capsys)
+
+    assert_quantity(values["pressure"], 150.0, "pressure")
+
+
+def test_pressure_temperature_drift(capsys):
+    values = normalized_values("Temperature Coefficient of Offset(TCO)", "0.6pa/K", capsys)
+
+    assert_quantity(values["pressure drift"], 0.6, "pressure_temperature_drift")
+
+
 def test_ripple_noise_voltage(capsys):
     values = normalized_values("Ripple Noise", "150mVp-p, 70mVp-p", capsys)
 
@@ -2893,6 +2940,12 @@ def test_ripple_values(value, quantity, expected, unit, capsys):
     assert_quantity(values[quantity], expected, unit)
 
 
+def test_photoperceptivity(capsys):
+    values = normalized_values("Photoperceptivity", "120klx", capsys)
+
+    assert_quantity(values["illuminance"], 120000.0, "illuminance")
+
+
 @pytest.mark.parametrize(
     ("value", "quantity", "expected", "unit"),
     [
@@ -2905,6 +2958,27 @@ def test_accuracy_values(value, quantity, expected, unit, capsys):
     values = normalized_values("Accuracy", value, capsys)
 
     assert_quantity(values[quantity], expected, unit)
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Humidity", "0%RH~100%RH", {"percentage min": 0.0, "percentage max": 100.0}),
+        ("Humidity Tolerance", "±1.8%RH", {"percentage min": -1.8, "percentage max": 1.8}),
+    ],
+)
+def test_humidity_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, percentage in expected.items():
+        assert_quantity(values[quantity], percentage, "percentage")
+
+
+def test_temperature_tolerance(capsys):
+    values = normalized_values("Temperature Tolerance", "±0.2℃", capsys)
+
+    assert_quantity(values["temperature min"], -0.2, "temperature")
+    assert_quantity(values["temperature max"], 0.2, "temperature")
 
 
 @pytest.mark.parametrize(
@@ -3238,6 +3312,14 @@ def test_insertion_loss_db_max(capsys):
     assert_quantity(values["level 2"], 1.1, "decibel")
 
 
+@pytest.mark.parametrize("key", ["Gain/Loss", "Amplitude Balance (Max)"])
+def test_rf_decibel_aliases(key, capsys):
+    values = normalized_values(key, "7dB, 9dB", capsys)
+
+    assert_quantity(values["level 1"], 7.0, "decibel")
+    assert_quantity(values["level 2"], 9.0, "decibel")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
@@ -3546,6 +3628,18 @@ def test_linear_range_lengths(value, expected, capsys):
 
     for quantity, length in expected.items():
         assert_quantity(values[quantity], length, "length")
+
+
+def test_communication_distance(capsys):
+    values = normalized_values("Communication Distance", "150m, 500m", capsys)
+
+    assert_quantity(values["length 1"], 150.0, "length")
+    assert_quantity(values["length 2"], 500.0, "length")
+
+    values = normalized_values("Communication Distance", "3km~5km", capsys)
+
+    assert_quantity(values["length 1 min"], 3000.0, "length")
+    assert_quantity(values["length 1 max"], 5000.0, "length")
 
 
 @pytest.mark.parametrize(
