@@ -36,6 +36,15 @@ def pytest_addoption(parser):
         ),
     )
     parser.addoption(
+        "--attribute-sqlite",
+        default=None,
+        help=(
+            "Optional source cache.sqlite3 path. The focused attribute section "
+            "scan reads only the selected raw attribute values from SQLite, "
+            "avoiding a full generated datatable rebuild."
+        ),
+    )
+    parser.addoption(
         "--attribute-section-limit",
         type=int,
         default=None,

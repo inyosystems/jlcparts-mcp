@@ -2,6 +2,7 @@ import gzip
 import json
 import os
 import re
+import sqlite3
 from pathlib import Path
 
 import pytest
@@ -34,6 +35,69 @@ def _values_from_file(path):
     ]
 
 
+def _is_numeric_string(value):
+    return isinstance(value, str) and re.search(r"\d", value)
+
+
+def _attribute_values_from_extra(extra):
+    if not isinstance(extra, dict):
+        return {}
+    attributes = extra.get("attributes", extra)
+    if isinstance(attributes, list):
+        return {}
+    return attributes or {}
+
+
+def _attribute_values_from_jlc_extra(jlc_extra):
+    if not isinstance(jlc_extra, dict):
+        return {}
+    attributes = jlc_extra.get("attributes", {})
+    if isinstance(attributes, list):
+        return {}
+    return attributes or {}
+
+
+def _string_values_for_section_from_sqlite(
+    db_path, section, value_pattern=None, max_values=None
+):
+    pattern = re.compile(value_pattern) if value_pattern else None
+    values = []
+
+    conn = sqlite3.connect(db_path)
+    try:
+        query = """
+            SELECT extra, jlc_extra
+            FROM components
+            WHERE extra LIKE ? OR jlc_extra LIKE ?
+        """
+        params = [f'%"{section}"%', f'%"{section}"%']
+        if max_values:
+            query += " LIMIT ?"
+            params.append(max_values)
+        cursor = conn.execute(query, params)
+        for extra_json, jlc_extra_json in cursor:
+            for source, extractor in [
+                (extra_json, _attribute_values_from_extra),
+                (jlc_extra_json, _attribute_values_from_jlc_extra),
+            ]:
+                try:
+                    attributes = extractor(json.loads(source or "{}"))
+                except json.JSONDecodeError:
+                    continue
+                value = attributes.get(section)
+                if not _is_numeric_string(value):
+                    continue
+                if pattern and not pattern.search(value):
+                    continue
+                values.append(value)
+                if max_values and len(values) >= max_values:
+                    return list(dict.fromkeys(values))
+    finally:
+        conn.close()
+
+    return list(dict.fromkeys(values))
+
+
 def _string_values_for_section(section, value_pattern=None):
     with gzip.open(LUT_PATH, "rt", encoding="utf-8") as lut_file:
         attributes = json.load(lut_file)
@@ -45,7 +109,7 @@ def _string_values_for_section(section, value_pattern=None):
             continue
         for value in payload.get("values", {}).values():
             if isinstance(value, list) and len(value) > 1 and value[1] == "string":
-                if not re.search(r"\d", value[0]):
+                if not _is_numeric_string(value[0]):
                     continue
                 if pattern and not pattern.search(value[0]):
                     continue
@@ -108,10 +172,17 @@ def test_selected_attribute_section_normalizes_generated_values(pytestconfig, ca
         "JLC_ATTRIBUTE_VALUE_FILE"
     )
     direct_values.extend(_values_from_file(value_file))
+    sqlite_path = pytestconfig.getoption("--attribute-sqlite") or os.environ.get(
+        "JLC_ATTRIBUTE_SQLITE"
+    )
 
     for section in sections:
         if direct_values:
             values = direct_values
+        elif sqlite_path:
+            values = _string_values_for_section_from_sqlite(
+                sqlite_path, section, value_pattern, limit
+            )
         else:
             if not LUT_PATH.exists():
                 pytest.skip("generated attribute LUT is not available")
@@ -123,3 +194,34 @@ def test_selected_attribute_section_normalizes_generated_values(pytestconfig, ca
 
         for raw_value in values:
             _assert_normalized(section, raw_value, capsys)
+
+
+def test_attribute_section_sqlite_loader_reads_only_selected_section(tmp_path):
+    db_path = tmp_path / "cache.sqlite3"
+    conn = sqlite3.connect(db_path)
+    try:
+        conn.execute("CREATE TABLE components(extra TEXT, jlc_extra TEXT)")
+        conn.execute(
+            "INSERT INTO components(extra, jlc_extra) VALUES (?, ?)",
+            (
+                json.dumps({"attributes": {"Switching Current": "500mA"}}),
+                json.dumps({"attributes": {"Switching Voltage": "180V"}}),
+            ),
+        )
+        conn.execute(
+            "INSERT INTO components(extra, jlc_extra) VALUES (?, ?)",
+            (
+                json.dumps({"attributes": {"Other": "123"}}),
+                json.dumps({"attributes": {"Switching Current": "1A"}}),
+            ),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+    assert _string_values_for_section_from_sqlite(
+        db_path, "Switching Current"
+    ) == ["500mA", "1A"]
+    assert _string_values_for_section_from_sqlite(
+        db_path, "Switching Current", r"mA$"
+    ) == ["500mA"]
