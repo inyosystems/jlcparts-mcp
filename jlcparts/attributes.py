@@ -1009,6 +1009,20 @@ def metricThreadAttribute(value, name="thread diameter"):
         raise ValueError(f"Cannot parse metric thread {value}")
     return scalarAttribute(match.group(1) + "mm", readLength, "length", name)
 
+def metricThreadLengthAttribute(value):
+    value = str(value).strip()
+    match = re.fullmatch(r"M\s*([0-9]+(?:\.[0-9]+)?)\s*[xX]\s*([0-9]+(?:\.[0-9]+)?)", value)
+    if match is None:
+        return mechanicalDimensionsAttribute(value)
+    return {
+        "format": "M${thread diameter} x ${length}",
+        "primary": "thread diameter",
+        "values": {
+            "thread diameter": [readLength(match.group(1) + "mm"), "length"],
+            "length": [readLength(match.group(2) + "mm"), "length"],
+        }
+    }
+
 def barrierSideAttribute(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
@@ -2033,6 +2047,13 @@ def mechanicalDimensionsAttribute(value):
         "values": values
     }
 
+def parenthesizedMetricDimensionsAttribute(value):
+    value = str(value)
+    match = re.search(r"\(([^)]*mm[^)]*)\)", value, flags=re.I)
+    if match is None:
+        return mechanicalDimensionsAttribute(value)
+    return mechanicalDimensionsAttribute(match.group(1))
+
 def tolerancedLengthAttribute(value):
     value = str(value).strip()
     value = value.replace("≤", "")
@@ -2114,6 +2135,13 @@ def awgRangeListAttribute(value):
         "primary": "awg 1 min" if any(_rangeParts(part) for part in parts) else "awg 1",
         "values": values
     }
+
+def wireRodAwgAttribute(value):
+    value = str(value).strip()
+    match = re.search(r"([0-9]+(?:/[0-9]+)?(?:\s*~\s*[0-9]+(?:/[0-9]+)?)?)\s*AWG", value, flags=re.I)
+    if match is None:
+        raise ValueError(f"Cannot parse wire rod AWG {value}")
+    return awgRangeListAttribute(match.group(1))
 
 def magneticFluxDensityRangeListAttribute(value):
     value = str(value).replace(";", ",").strip()

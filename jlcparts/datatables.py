@@ -573,6 +573,8 @@ def normalizeAttribute(key, value):
             value = attributes.metricThreadAttribute(value)
         elif key in larr(["Thread Diameter", "Hexagonal Opposite Sides"]):
             value = attributes.metricThreadAttribute(value)
+        elif key in larr(["Size Specifications"]):
+            value = attributes.metricThreadLengthAttribute(value)
         elif key in larr(["Barrier Type"]):
             value = attributes.barrierSideAttribute(value)
         elif key in larr(["Structure"]):
@@ -723,7 +725,7 @@ def normalizeAttribute(key, value):
                 "Half Wave Width", "Spectral Range", "Digit/Alpha Size(Inch)",
                 "Slot Width", "Slit Width", "Iinearity Range",
                 "Link Range(Standard Mode)", "Operating Wavelength",
-                "Window Size"]):
+                "Window Size", "Size/Size"]):
             if key == "diameter" and isinstance(value, str) and re.fullmatch(r"M\s*\d+(?:\.\d+)?", value, re.I):
                 value = re.sub(r"^M\s*", "", value, flags=re.I) + "mm"
             if key in larr(["Insulation Od", "Interface Length/Height", "Interface Diameter",
@@ -746,6 +748,8 @@ def normalizeAttribute(key, value):
             elif key in larr(["Dimension", "Product Size", "Aperture Size", "Hole Size", "Metal Size",
                     "Window Size"]):
                 value = attributes.mechanicalDimensionsAttribute(value)
+            elif key in larr(["Size/Size"]):
+                value = attributes.parenthesizedMetricDimensionsAttribute(value)
             elif key in larr(["Digit/Alpha Size(Inch)"]):
                 value = attributes.inchLengthAttribute(value)
             elif key == "linear range":
@@ -894,6 +898,8 @@ def normalizeAttribute(key, value):
         elif key in larr(["Wire Gauge - Awg", "Wire Gauge", "Wire Gauge - Awg (Per)",
                 "Wire Gauge - Awg (Not Stranded Wire)"]):
             value = attributes.awgRangeListAttribute(value)
+        elif key in larr(["Wire Rod"]):
+            value = attributes.wireRodAwgAttribute(value)
         elif key in larr(["Operation Points", "Release Points",
                 "Magnetic Sensing Range(X,Y)", "Magnetic Sensing Range(Z)",
                 "Magnetic Field Range", "Minimum Field", "Bhys"]):

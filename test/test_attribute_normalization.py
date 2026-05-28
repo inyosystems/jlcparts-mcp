@@ -1959,6 +1959,17 @@ def test_metric_thread_attributes(key, capsys):
     assert_quantity(values["thread diameter"], 0.0035, "length")
 
 
+def test_size_specifications_metric_thread_length(capsys):
+    values = normalized_values("Size Specifications", "M3X13", capsys)
+
+    assert_quantity(values["thread diameter"], 0.003, "length")
+    assert_quantity(values["length"], 0.013, "length")
+
+    values = normalized_values("Size Specifications", "3.2X6", capsys)
+    assert_quantity(values["length 1"], 0.0032, "length")
+    assert_quantity(values["length 2"], 0.006, "length")
+
+
 def test_barrier_type_sides(capsys):
     values = normalized_values("Barrier Type", "2-Side", capsys)
 
@@ -3052,6 +3063,12 @@ def test_wire_gauge_awg(key, value, expected, capsys):
 
     for quantity, awg in expected.items():
         assert_quantity(values[quantity], awg, "awg")
+
+
+def test_wire_rod_awg(capsys):
+    values = normalized_values("Wire Rod", "UL1015 16AWG", capsys)
+
+    assert_quantity(values["awg 1"], 16, "awg")
 
 
 @pytest.mark.parametrize(
@@ -4267,6 +4284,11 @@ def test_mechanical_dimension_aliases(capsys):
 
     values = normalized_values("Metal Size", "φ4mm", capsys)
     assert_quantity(values["length"], 0.004, "length")
+
+    values = normalized_values("Size/Size", '0.55" L x 0.30" W x 0.40" H (14.0mm x 7.5mm x 10.1mm)', capsys)
+    assert_quantity(values["length 1"], 0.014, "length")
+    assert_quantity(values["length 2"], 0.0075, "length")
+    assert_quantity(values["length 3"], 0.0101, "length")
 
 
 @pytest.mark.parametrize(
