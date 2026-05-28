@@ -2213,6 +2213,28 @@ def test_vce_saturation_values(value, expected, capsys):
         assert_quantity(values[quantity], expected_value[0], expected_value[1])
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("SPI, I2C", ["SPI", "I2C"]),
+        ("SPI;DSP", ["SPI", "DSP"]),
+        ("I2C, S/PDIF", ["I2C", "S/PDIF"]),
+        ("U/D", ["U/D"]),
+    ],
+)
+def test_interface_attribute(value, expected, capsys):
+    values = normalized_values("Interface", value, capsys)
+
+    assert {
+        name: quantity
+        for name, (quantity, unit) in values.items()
+        if unit == "identifier"
+    } == {
+        f"interface {index}": token
+        for index, token in enumerate(expected, start=1)
+    }
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")
