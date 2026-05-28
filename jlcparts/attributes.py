@@ -2726,6 +2726,37 @@ def currentRangeListAttribute(value, name="current"):
 def voltageAtConditionAttribute(value, name="voltage"):
     return scalarAttribute(value, readVoltage, "voltage", name)
 
+def voltageAtElectricalConditionsAttribute(value, name="voltage"):
+    value = str(value).strip()
+    if "@" not in value:
+        return voltageListAttribute(value, name)
+
+    voltage_part, condition_part = [x.strip() for x in value.split("@", 1)]
+    values = {name: [readVoltage(voltage_part), "voltage"]}
+    formats = ["${" + name + "}"]
+    current_count = 0
+    voltage_count = 0
+    unknown_count = 0
+    for condition in [x.strip() for x in condition_part.split(",") if x.strip()]:
+        if re.search(r"v", condition, flags=re.I):
+            voltage_count += 1
+            key = f"condition voltage {voltage_count}"
+            values[key] = [readVoltage(condition), "voltage"]
+        elif re.search(r"a", condition, flags=re.I):
+            current_count += 1
+            key = f"condition current {current_count}"
+            values[key] = [readCurrent(condition), "current"]
+        else:
+            unknown_count += 1
+            key = f"condition {unknown_count}"
+            values[key] = [condition, "identifier"]
+        formats.append("${" + key + "}")
+    return {
+        "format": " @ ".join([formats[0], ", ".join(formats[1:])]) if len(formats) > 1 else formats[0],
+        "primary": name,
+        "values": values
+    }
+
 def voltageListAttribute(value, name="voltage"):
     value = str(value).replace(";", ",")
     if "/" in value and "," not in value:

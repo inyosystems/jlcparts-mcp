@@ -2181,6 +2181,38 @@ def test_category_attribute(capsys):
     assert values["subcategory id"] == [11295, "count"]
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("1.1V@250uA,100mA", {
+            "Vce": (1.1, "voltage"),
+            "condition current 1": (250e-6, "current"),
+            "condition current 2": (0.1, "current"),
+        }),
+        ("2V@20A,4.5V", {
+            "Vce": (2.0, "voltage"),
+            "condition current 1": (20.0, "current"),
+            "condition voltage 1": (4.5, "voltage"),
+        }),
+        ("150mV, 400mV", {
+            "Vce 1": (0.15, "voltage"),
+            "Vce 2": (0.4, "voltage"),
+        }),
+        ("400mV@0.04mA,0.5mA,1.6mA", {
+            "Vce": (0.4, "voltage"),
+            "condition current 1": (40e-6, "current"),
+            "condition current 2": (0.5e-3, "current"),
+            "condition current 3": (1.6e-3, "current"),
+        }),
+    ],
+)
+def test_vce_saturation_values(value, expected, capsys):
+    values = normalized_values("VCE Saturation(VCE(sat))", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        assert_quantity(values[quantity], expected_value[0], expected_value[1])
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")
