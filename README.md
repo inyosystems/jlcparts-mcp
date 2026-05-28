@@ -104,6 +104,15 @@ $ PYTHONPATH=. pytest -q test/test_attribute_section_scan.py \
     --attribute-value '35V~45V'
 ```
 
+To test one section against the SQLite cache without rebuilding generated
+tables, point the same test at the local database:
+
+```
+$ PYTHONPATH=. pytest -q test/test_attribute_section_scan.py \
+    --attribute-section 'Peak Forward Surge Current' \
+    --attribute-sqlite cache.sqlite3
+```
+
 ## The Page Is Broken!
 
 Feel free to open an issue on GitHub.

@@ -117,6 +117,33 @@ def _string_values_for_section(section, value_pattern=None):
     return list(dict.fromkeys(values))
 
 
+def _values_for_focused_section(
+    section,
+    direct_values=None,
+    value_file=None,
+    sqlite_path=None,
+    value_pattern=None,
+    limit=None,
+):
+    values = list(direct_values or [])
+    values.extend(_values_from_file(value_file))
+
+    if values:
+        pass
+    elif sqlite_path:
+        values = _string_values_for_section_from_sqlite(
+            sqlite_path, section, value_pattern, limit
+        )
+    else:
+        if not LUT_PATH.exists():
+            pytest.skip("generated attribute LUT is not available")
+        values = _string_values_for_section(section, value_pattern)
+
+    if limit:
+        return values[:limit]
+    return values
+
+
 def _assert_normalized(section, raw_value, capsys):
     normalized_name, normalized = normalizeAttribute(section, raw_value)
     captured = capsys.readouterr()
@@ -177,23 +204,47 @@ def test_selected_attribute_section_normalizes_generated_values(pytestconfig, ca
     )
 
     for section in sections:
-        if direct_values:
-            values = direct_values
-        elif sqlite_path:
-            values = _string_values_for_section_from_sqlite(
-                sqlite_path, section, value_pattern, limit
-            )
-        else:
-            if not LUT_PATH.exists():
-                pytest.skip("generated attribute LUT is not available")
-            values = _string_values_for_section(section, value_pattern)
+        values = _values_for_focused_section(
+            section,
+            direct_values=direct_values,
+            value_file=value_file,
+            sqlite_path=sqlite_path,
+            value_pattern=value_pattern,
+            limit=limit,
+        )
         assert values, f"no generated numeric string values found for {section!r}"
-
-        if limit:
-            values = values[:limit]
 
         for raw_value in values:
             _assert_normalized(section, raw_value, capsys)
+
+
+def test_attribute_section_scan_uses_direct_values_without_generated_lut(monkeypatch):
+    monkeypatch.setattr(
+        "test_attribute_section_scan.LUT_PATH",
+        Path("missing-attributes-lut.json.gz"),
+    )
+
+    assert _values_for_focused_section(
+        "Peak Forward Surge Current",
+        direct_values=["1A", "2A"],
+    ) == ["1A", "2A"]
+
+
+def test_attribute_section_scan_reads_value_file_without_generated_lut(
+    tmp_path, monkeypatch
+):
+    value_file = tmp_path / "values.txt"
+    value_file.write_text("1A\n\n2A\n", encoding="utf-8")
+    monkeypatch.setattr(
+        "test_attribute_section_scan.LUT_PATH",
+        Path("missing-attributes-lut.json.gz"),
+    )
+
+    assert _values_for_focused_section(
+        "Peak Forward Surge Current",
+        value_file=value_file,
+        limit=1,
+    ) == ["1A"]
 
 
 def test_attribute_section_sqlite_loader_reads_only_selected_section(tmp_path):
