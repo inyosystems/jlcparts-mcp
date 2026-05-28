@@ -591,7 +591,7 @@ def normalizeAttribute(key, value):
         elif key in larr(["Resolution", "Resolution (Bits)", "Resolution(Bits)",
                 "Output Bits", "DAC (Bit)", "ADC (Bit)", "Pwm (Bit)",
                 "Core Size", "Temperature Resolution", "Output Bit",
-                "Data Bus Width"]):
+                "Data Bus Width", "Effective Number of Bits"]):
             value = attributes.resolutionAttribute(value)
         elif key in larr(["Filter Order"]):
             value = attributes.filterOrderAttribute(value)
@@ -636,8 +636,11 @@ def normalizeAttribute(key, value):
                     "Number of Poles Per Deck", "Positions", "Number of Decks",
                     "Number of Conjugate Points of Uvw", "Number of Abz Pulses",
                     "Number of LED Drivers", "Output Channel", "Pin Number",
-                    "Number of Sensitive Elements"]):
+                    "Number of Sensitive Elements", "The Channel Number",
+                    "Channels Per Circuit", "Battery Count"]):
             value = attributes.countAttribute(value)
+        elif key in larr(["Work Score/Number of Work Combinations"]):
+            value = attributes.channelCountTextAttribute(value)
         elif key in larr(["Dot Matrix Number", "Dot Pixels", "Number of Digits",
                 "Display Configurations(Bit)"]):
             value = attributes.matrixCountAttribute(value)

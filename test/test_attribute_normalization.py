@@ -1595,6 +1595,9 @@ def test_logic_array_blocks(value, expected, capsys):
         ("Output Channel", "2", {"count": 2}),
         ("Pin Number", "8", {"count": 8}),
         ("Number of Sensitive Elements", "4", {"count": 4}),
+        ("The Channel Number", "24", {"count": 24}),
+        ("Channels Per Circuit", "12", {"count": 12}),
+        ("Battery Count", "-", {"count": "NaN"}),
     ],
 )
 def test_extra_count_attributes(key, value, expected, capsys):
@@ -1751,6 +1754,7 @@ def test_resolution_bits_values(capsys):
         ("Pwm (Bit)", "8bit;32bit", {"resolution 1": (8, "count"), "resolution 2": (32, "count")}),
         ("Core Size", "16/32 Bit", {"resolution 1": (16, "count"), "resolution 2": (32, "count")}),
         ("Temperature Resolution", "12bit", {"resolution": (12, "count")}),
+        ("Effective Number of Bits", "12bit", {"resolution": (12, "count")}),
     ],
 )
 def test_resolution_alias_values(key, value, expected, capsys):
@@ -1975,6 +1979,9 @@ def test_additional_text_counts(capsys):
 
     values = normalized_values("Line Number", "4.0", capsys)
     assert_quantity(values["count"], 4, "count")
+
+    values = normalized_values("Work Score/Number of Work Combinations", "3 way", capsys)
+    assert_quantity(values["count"], 3, "count")
 
 
 def test_attachment_counts(capsys):
