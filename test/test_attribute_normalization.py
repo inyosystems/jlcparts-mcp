@@ -1247,6 +1247,12 @@ def test_absolute_bandwidth_values(capsys):
             "frequency min": 400e3,
             "frequency max": 1e6,
         }),
+        ("Fixed-Frequency Pwm Mode", "27kHz", {"frequency": 27e3}),
+        ("Communication Frequency", "850MHz, 1800MHz, 1900MHz", {
+            "frequency 1": 850e6,
+            "frequency 2": 1800e6,
+            "frequency 3": 1900e6,
+        }),
     ],
 )
 def test_additional_frequency_aliases(key, value, expected, capsys):
@@ -1254,6 +1260,14 @@ def test_additional_frequency_aliases(key, value, expected, capsys):
 
     for quantity, frequency in expected.items():
         assert_quantity(values[quantity], frequency, "frequency")
+
+
+def test_communication_frequency_bands(capsys):
+    values = normalized_values("Communication Frequency", "B2, B3, B1", capsys)
+
+    assert_quantity(values["band 1"], 2, "count")
+    assert_quantity(values["band 2"], 3, "count")
+    assert_quantity(values["band 3"], 1, "count")
 
 
 def test_clock_frequency_lists(capsys):
@@ -2418,6 +2432,7 @@ def test_logic_elements_blocks_count(capsys):
         (("Reading Speed in Sequence", "330MB/S"), {"data rate": 330e6}),
         (("Writing Speed in Sequence", "27.3MB/S"), {"data rate": 27.3e6}),
         (("Transmission Rate", "106Kbit/s, 848Kbit/s"), {"data rate 1": 106e3, "data rate 2": 848e3}),
+        (("Sequential Read/Write (Mb/S)", "256/119MB/s"), {"read data rate": 256e6, "write data rate": 119e6}),
         ("NaN", {"data rate": "NaN"}),
     ],
 )
@@ -2430,6 +2445,13 @@ def test_data_rate(value, expected, capsys):
 
     for quantity, rate in expected.items():
         assert_quantity(values[quantity], rate, "data_rate")
+
+
+def test_random_read_write_iops(capsys):
+    values = normalized_values("Random Read/Write (Iops)", "3200/1800iops", capsys)
+
+    assert_quantity(values["read iops"], 3200, "frequency")
+    assert_quantity(values["write iops"], 1800, "frequency")
 
 
 def test_frame_rate(capsys):

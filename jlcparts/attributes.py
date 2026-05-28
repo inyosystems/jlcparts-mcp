@@ -1524,6 +1524,24 @@ def frequencyRangeListAttribute(value):
         "values": values
     }
 
+def frequencyOrBandListAttribute(value):
+    value = str(value).strip()
+    if re.search(r"hz|mh|gh|kh", value, flags=re.IGNORECASE):
+        return frequencyListAttribute(value)
+
+    parts = [x.strip() for x in value.replace(";", ",").split(",") if x.strip()]
+    values = {}
+    for index, part in enumerate(parts, start=1):
+        match = re.fullmatch(r"B\s*(\d+)", part, flags=re.IGNORECASE)
+        if match is None:
+            raise ValueError(f"Cannot parse communication band {part}")
+        values[f"band {index}"] = [int(match.group(1)), "count"]
+    return {
+        "format": ", ".join("${" + f"band {i}" + "}" for i in range(1, len(parts) + 1)),
+        "primary": "band 1",
+        "values": values
+    }
+
 def currentListAttribute(value):
     value = str(value).replace(";", ",")
     return scalarListAttribute(value, readCurrent, "current", "current")
@@ -1823,6 +1841,40 @@ def dataRateAttribute(value):
 def dataRateListAttribute(value):
     value = str(value).replace(";", ",")
     return scalarListAttribute(value, readDataRate, "data_rate", "data rate")
+
+def readWriteDataRateAttribute(value):
+    value = str(value).strip()
+    read, write = [x.strip() for x in value.split("/", 1)]
+    unit_match = re.search(r"([A-Za-z/]+)$", write)
+    if unit_match is not None and re.search(r"[A-Za-z]", read) is None:
+        read += unit_match.group(1)
+    return {
+        "format": "${read data rate}/${write data rate}",
+        "primary": "read data rate",
+        "values": {
+            "read data rate": [readDataRate(read), "data_rate"],
+            "write data rate": [readDataRate(write), "data_rate"],
+        }
+    }
+
+def readIops(value):
+    value = value.strip()
+    if value in ["-", "--", "null", "NaN"]:
+        return "NaN"
+    value = re.sub(r"iops$", "", value, flags=re.IGNORECASE).strip()
+    return readWithSiPrefix(value)
+
+def readWriteIopsAttribute(value):
+    value = str(value).strip()
+    read, write = [x.strip() for x in value.split("/", 1)]
+    return {
+        "format": "${read iops}/${write iops}",
+        "primary": "read iops",
+        "values": {
+            "read iops": [readIops(read), "frequency"],
+            "write iops": [readIops(write), "frequency"],
+        }
+    }
 
 def frameRateListAttribute(value):
     value = str(value).replace(";", ",")

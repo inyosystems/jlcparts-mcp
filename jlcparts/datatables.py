@@ -961,6 +961,10 @@ def normalizeAttribute(key, value):
         elif key in larr(["Reading Speed in Sequence", "Writing Speed in Sequence",
                 "Transmission Rate", "Date Rate", "Data Transmission Rate"]):
             value = attributes.dataRateListAttribute(value) if compoundValue(value) else attributes.dataRateAttribute(value)
+        elif key in larr(["Sequential Read/Write (Mb/S)"]):
+            value = attributes.readWriteDataRateAttribute(value)
+        elif key in larr(["Random Read/Write (Iops)"]):
+            value = attributes.readWriteIopsAttribute(value)
         elif key in larr(["Frame Rate(Fps)"]):
             value = attributes.frameRateListAttribute(value)
         elif key in larr(["Gyroscope Measurement Range (Max)"]):
@@ -994,7 +998,7 @@ def normalizeAttribute(key, value):
                 "Central Frequency", "Lo Frequency Range", "IF Frequency Range",
                 "RF Frequency Range", "Frequency Bands (Low/High)",
                 "Output Rate", "Oscillator Frequency Range",
-                "Frequency Response"]):
+                "Frequency Response", "Fixed-Frequency Pwm Mode"]):
             if isinstance(value, str) and re.search(r"(?:bit/s|bps)\s*$", value, flags=re.IGNORECASE):
                 value = attributes.dataRateAttribute(value)
             else:
@@ -1010,6 +1014,8 @@ def normalizeAttribute(key, value):
                     value = attributes.frequencyRangeListAttribute(value)
                 else:
                     value = attributes.stringAttribute(value) if compoundValue(value) else attributes.frequencyAttribute(value)
+        elif key in larr(["Communication Frequency"]):
+            value = attributes.frequencyOrBandListAttribute(value)
         elif key in larr(["Rated Speed"]):
             value = attributes.rotationalSpeedAttribute(value)
         elif key in larr(["Rotate Speed"]):
