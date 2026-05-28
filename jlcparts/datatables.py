@@ -650,7 +650,7 @@ def normalizeAttribute(key, value):
             value = attributes.matrixCountAttribute(value)
         elif key in larr(["Active Pixel Array"]):
             value = attributes.pixelArrayAttribute(value)
-        elif key in larr(["Optical Format(Inch)"]):
+        elif key in larr(["Optical Format(Inch)", "Optical Format (Inch)"]):
             value = attributes.opticalFormatAttribute(value)
         elif key in larr(["SPI", "UART/Usart", "I2C", "I2s", "16bit Timer", "CAN"]):
             value = attributes.countAttribute(value)
@@ -819,7 +819,7 @@ def normalizeAttribute(key, value):
                 "Aging Per Year"]):
             value = attributes.frequencyStabilityAttribute(value)
         elif key in larr(["Wavelength - Dominant", "Dominant Wavelength", "Peak Wavelength",
-                "Wavelength"]):
+                "Wavelength", "Spectral Peak", "Wavelength - Peak"]):
             value = attributes.opticalLengthRangeListAttribute(value) if key == "wavelength" or compoundValue(value) else attributes.wavelengthAttribute(value)
         elif key in larr(["Phase Balance", "Phase Difference",
                 "Reception Angle", "Operating Angle in Each Direction"]):
@@ -943,6 +943,10 @@ def normalizeAttribute(key, value):
         elif key in larr(["Resistance - Post Trip (R1) (Max)",
                 "On Resistance", "On-Resistance", "Total Resistance"]):
             value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.resistanceAttribute(value)
+        elif key in larr(["Illuminated Resistance @ 10lux"]):
+            value = attributes.resistanceRangeListAttribute(value)
+        elif key in larr(["Dark Resistance"]):
+            value = attributes.resistanceRangeAttribute(value)
         elif key in larr(["Impedance @ Frequency"]):
             value = attributes.stringAttribute(value) if compoundValue(value) else attributes.impedanceAtFrequency(value)
         elif key == "Ripple Current".lower():

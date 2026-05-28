@@ -1654,6 +1654,9 @@ def test_optical_format(capsys):
 
     assert_quantity(values["optical format"], 1 / 2.09, "ratio")
 
+    values = normalized_values("Optical Format (Inch)", "1/4", capsys)
+    assert_quantity(values["optical format"], 0.25, "ratio")
+
 
 @pytest.mark.parametrize(
     ("key", "value", "expected"),
@@ -3153,6 +3156,13 @@ def test_peak_wavelength_lists(value, expected, capsys):
         assert_quantity(values[quantity], expected_value, unit)
 
 
+@pytest.mark.parametrize("key", ["Spectral Peak", "Wavelength - Peak"])
+def test_peak_wavelength_aliases(key, capsys):
+    values = normalized_values(key, "540nm", capsys)
+
+    assert_quantity(values["wavelength"], 540e-9, "length")
+
+
 def test_wavelength_alias_labels(capsys):
     values = normalized_values("Wavelength", "R:625nm, G:525nm, B:470nm", capsys)
 
@@ -3354,6 +3364,15 @@ def test_luminance_values(capsys):
     values = normalized_values("Luminance", "180cd/m2", capsys)
 
     assert_quantity(values["luminance"], 180.0, "luminance")
+
+
+def test_photoresistor_resistance_values(capsys):
+    values = normalized_values("Illuminated Resistance @ 10lux", "5kΩ~10kΩ", capsys)
+    assert_quantity(values["resistance min"], 5000, "resistance")
+    assert_quantity(values["resistance max"], 10000, "resistance")
+
+    values = normalized_values("Dark Resistance", "200kΩ", capsys)
+    assert_quantity(values["resistance"], 200000, "resistance")
 
 
 @pytest.mark.parametrize(

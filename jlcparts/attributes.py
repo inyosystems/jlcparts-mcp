@@ -706,6 +706,26 @@ def resistanceListAttribute(value):
     value = str(value).replace(";", ",")
     return scalarListAttribute(value, readResistance, "resistance", "resistance")
 
+def resistanceRangeAttribute(value):
+    return rangeOrScalarAttribute(value, readResistance, "resistance", "resistance")
+
+def resistanceRangeListAttribute(value):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        name = f"resistance {index}" if len(parts) > 1 else "resistance"
+        parsed = rangeOrScalarAttribute(part, readResistance, "resistance", name)
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    primary_name = "resistance 1" if len(parts) > 1 else "resistance"
+    return {
+        "format": ", ".join(formats),
+        "primary": primary_name + " min" if any(_rangeParts(part) for part in parts) else primary_name,
+        "values": values
+    }
+
 def impedanceAttribute(value):
     value = readResistance(value)
     return {
