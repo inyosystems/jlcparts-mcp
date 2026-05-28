@@ -108,6 +108,7 @@ def readCurrent(value):
     Given a string, try to parse current and return it as Amperes (float)
     """
     value = erase(value, ["PNP"])
+    value = erase(value, ["<", ">", "≤", "≥"])
     value = value.split("@")[0]
     value = re.sub(r"([0-9.])a\b", r"\1A", value)
     value = re.sub(r"([0-9])\.A\b", r"\1A", value)

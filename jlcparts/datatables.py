@@ -318,7 +318,15 @@ def normalizeAttribute(key, value):
                     "Output Current (Maximum Value)", "Rated Output Current",
                     "Rated Input Current", "Reference Current (A)",
                     "Modulated Current", "Send Curren", "Electric Current",
-                    "Setting Current", "Current - DC Forward (If)"]):
+                    "Setting Current", "Current - DC Forward (If)",
+                    "Switching Current", "Maximum Load Current",
+                    "Standby Supply Current (Isb)", "Battery Current",
+                    "Supply Current (Program)", "Supply Current (Erase)",
+                    "Idle Current", "RMS on-State Current(It(RMS))",
+                    "Current Dark", "Continuous Load Current",
+                    "Threshold Current", "Collector Current (Max)",
+                    "Bias Current", "Peak Output Current", "Input Current",
+                    "Load Current (Max)"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent current",
@@ -374,12 +382,14 @@ def normalizeAttribute(key, value):
                 "switching current (max)",
                 "current output (maximum value)",
                 "output current (maximum value)",
+                "battery current",
             ]
             if key in ["current - leakage", "leakage current(dcl)"]:
                 value = attributes.currentAttribute(value)
             elif key == "forward current" and isinstance(value, str) and ("," in value or ":" in value):
                 value = attributes.labeledCurrentListAttribute(value)
-            elif key in ["current range", "current consumption", "trigger current", "setting current"]:
+            elif key in ["current range", "current consumption", "trigger current", "setting current",
+                    "bias current"]:
                 value = attributes.currentRangeListAttribute(value)
             elif key in currentListKeys and isinstance(value, str) and ("," in value or ";" in value):
                 value = attributes.currentListAttribute(value)
