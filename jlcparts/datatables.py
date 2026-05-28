@@ -145,13 +145,24 @@ def normalizeAttribute(key, value):
                 "Collector Emitter Voltage", "Antistatic Capacity",
                 "ESD Withstand Voltage", "High Potential", "Hi-Pot( VRMS )",
                 "Secondary Side Voltage", "Rated Voltage(DC)", "DC Voltage",
-                "Service Voltage", "Working Voltage", "Voltage"]):
+                "Service Voltage", "Working Voltage", "Voltage",
+                "Switching Voltage", "DC Reverse Voltage",
+                "Peak Off-State Voltage(Vdrm)",
+                "Collector-Emitter Saturation Voltage (VCE(sat)@IC,IF)",
+                "Receiving End Voltage", "Voltage - Load",
+                "Input Forward Voltage", "Reverse Pressure (Typ)",
+                "ESD Protection Voltage", "MOS Breakdown Voltage",
+                "Insulated Voltage", "Input Offset Voltage",
+                "VBE Saturation(VBE(Sat))", "VBE on(VBE(on))",
+                "Rated Output Voltage"]):
             if key == "charging saturation voltage" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "isolation voltage(vrms)" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key in larr(["Voltage - Input (Max)(Vi(Off))",
                     "Input Voltage (Vi(on)@IC,VCE)", "Output Voltage(Vo(on))"]):
+                value = attributes.voltageAtConditionAttribute(value, "voltage")
+            elif key in larr(["Collector-Emitter Saturation Voltage (VCE(sat)@IC,IF)"]):
                 value = attributes.voltageAtConditionAttribute(value, "voltage")
             elif key == "gate-emitter threshold voltage (vge(th)@ic)":
                 value = attributes.voltageAtConditionAttribute(value, "voltage") if "@" in str(value) else attributes.voltageRangeListAttribute(value)
@@ -165,6 +176,8 @@ def normalizeAttribute(key, value):
             elif key == "gate trigger voltage (vgt)" and compoundValue(value):
                 value = attributes.voltageListAttribute(value, "voltage")
             elif key in larr(["Isolation Voltage(RMS)", "Isolation Voltage", "Hi-Pot"]) and compoundValue(value):
+                value = attributes.voltageListAttribute(value, "voltage")
+            elif key in larr(["Insulated Voltage", "VBE on(VBE(on))"]) and compoundValue(value):
                 value = attributes.voltageListAttribute(value, "voltage")
             elif key in larr(["Coil Voltage", "Switching Voltage (Max)"]):
                 value = attributes.voltageOrCurrentListAttribute(value)
@@ -216,7 +229,7 @@ def normalizeAttribute(key, value):
                 "reverse breakdown voltage", "gate drive voltage",
                 "operating supply voltage", "voltage - output 1",
                 "antistatic ability", "c-e saturation voltage",
-                "primary side voltage"]:
+                "primary side voltage", "input voltage(ac)", "triping voltage"]:
             value = attributes.voltageRangeListAttribute(value) if compoundValue(value) else attributes.voltageRangeAttribute(value, "voltage")
         elif key in larr(["High-Side Bias Voltage(Vbs)"]):
             value = attributes.voltageRangeAttribute(value, "voltage")
