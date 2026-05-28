@@ -2059,6 +2059,36 @@ def test_display_switch_package_counts(capsys):
     assert_quantity(values["pins"], 3, "count")
 
 
+def test_memory_generation_and_material_attributes(capsys):
+    values = normalized_values("Type of Memory", "1 FLASH +1 RAM", capsys)
+    assert_quantity(values["flash"], 1, "count")
+    assert_quantity(values["ram"], 1, "count")
+
+    values = normalized_values("Ipex Algebra", "Gen 3", capsys)
+    assert_quantity(values["generation"], 3, "count")
+
+    values = normalized_values("Texture of Material", "6063-T5 aluminum", capsys)
+    assert_quantity(values["material grade"], 6063, "count")
+    assert_quantity(values["temper"], 5, "count")
+
+    values = normalized_values("Shield Clip", "301 stainless steel", capsys)
+    assert_quantity(values["material grade"], 301, "count")
+
+
+def test_plating_and_product_description_dimensions(capsys):
+    values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
+    assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")
+    assert_quantity(values["tin thickness max"], 150 * 0.0254e-6, "length")
+    assert_quantity(values["nickel thickness min"], 50 * 0.0254e-6, "length")
+    assert_quantity(values["nickel thickness max"], 50 * 0.0254e-6, "length")
+
+    values = normalized_values("Product Description", "M3*6*L4+1.4", capsys)
+    assert_quantity(values["length 1"], 0.003, "length")
+    assert_quantity(values["length 2"], 0.006, "length")
+    assert_quantity(values["length 3"], 0.004, "length")
+    assert_quantity(values["length 4"], 0.0014, "length")
+
+
 def test_viewing_direction_clock_angle(capsys):
     values = normalized_values("Viewing Direction", "6 o'clock", capsys)
 

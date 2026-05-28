@@ -581,6 +581,16 @@ def normalizeAttribute(key, value):
             value = attributes.segmentDisplayTypeAttribute(value)
         elif key in larr(["Switch Type"]):
             value = attributes.switchWayAttribute(value)
+        elif key in larr(["Type of Memory"]):
+            value = attributes.memoryCompositionAttribute(value)
+        elif key in larr(["Ipex Algebra"]):
+            value = attributes.generationAttribute(value)
+        elif key in larr(["Texture of Material", "Shield Clip"]):
+            value = attributes.materialGradeAttribute(value)
+        elif key in larr(["Product Description"]):
+            value = attributes.metricProductDescriptionAttribute(value)
+        elif key in larr(["Electroplate"]):
+            value = attributes.platingThicknessAttribute(value)
         elif key in larr(["Packaging/Housing"]):
             value = attributes.packagePinCountAttribute(value)
         elif key in larr(["Viewing Direction"]):

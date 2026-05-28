@@ -1275,6 +1275,85 @@ def applyConnectorCountAttribute(value):
         "values": values
     }
 
+def memoryCompositionAttribute(value):
+    value = str(value).strip()
+    values = {}
+    for count, memory_type in re.findall(r"(\d+)\s*([A-Za-z]+)", value):
+        values[memory_type.lower()] = [int(count), "count"]
+    if not values:
+        values["count"] = ["NaN", "count"]
+    return {
+        "format": ", ".join("${" + name + "}" for name in values),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
+def generationAttribute(value):
+    value = str(value).strip()
+    match = re.fullmatch(r"Gen\s+(\d+)", value, flags=re.I)
+    if match is None:
+        return countAttribute(value)
+    return {
+        "format": "${generation}",
+        "primary": "generation",
+        "values": {"generation": [int(match.group(1)), "count"]}
+    }
+
+def platingThicknessAttribute(value):
+    value = str(value).strip()
+    values = {}
+    formats = []
+    for layer in [x.strip() for x in value.split(",")]:
+        match = re.search(r"([A-Za-z ]*?)\s+plating\s+([0-9.]+)(?:\s*~\s*([0-9.]+))?\s*u\"", layer, flags=re.I)
+        if match is None:
+            raise ValueError(f"Cannot parse plating thickness {value}")
+        label = match.group(1).strip().lower()
+        label = " ".join(word for word in label.split() if word not in {"bright"})
+        low = float(match.group(2)) * 0.0254e-6
+        high = float(match.group(3) or match.group(2)) * 0.0254e-6
+        values[f"{label} thickness min"] = [low, "length"]
+        values[f"{label} thickness max"] = [high, "length"]
+        formats.append("${" + f"{label} thickness min" + "} ~ ${" + f"{label} thickness max" + "}")
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
+def metricProductDescriptionAttribute(value):
+    value = str(value).strip()
+    numbers = re.findall(r"(?<![A-Za-z])\d+(?:\.\d+)?|(?<=M)\d+(?:\.\d+)?|(?<=L)\d+(?:\.\d+)?", value)
+    if not numbers:
+        raise ValueError(f"Cannot parse product dimensions {value}")
+    values = {
+        f"length {index}": [readLength(number + "mm"), "length"]
+        for index, number in enumerate(numbers, start=1)
+    }
+    return {
+        "format": " x ".join("${" + f"length {index}" + "}" for index in range(1, len(numbers) + 1)),
+        "primary": "length 1",
+        "values": values
+    }
+
+def materialGradeAttribute(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return countAttribute(value)
+    values = {}
+    grade = re.search(r"\b(\d{3,4})\b", value)
+    if grade is not None:
+        values["material grade"] = [int(grade.group(1)), "count"]
+    temper = re.search(r"\bT(\d+)\b", value, flags=re.I)
+    if temper is not None:
+        values["temper"] = [int(temper.group(1)), "count"]
+    if not values:
+        values["material grade"] = ["NaN", "count"]
+    return {
+        "format": ", ".join("${" + name + "}" for name in values),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
 def _readCycleCount(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
