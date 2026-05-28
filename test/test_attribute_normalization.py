@@ -2129,6 +2129,39 @@ def test_identifier_attributes(key, value, capsys):
     assert values["identifier"] == [value, "identifier"]
 
 
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        (
+            "Features",
+            "Programmable gain, Built-in reference source",
+            ["Programmable gain", "Built-in reference source"],
+        ),
+        (
+            "Feature",
+            "Low ESR;Overcurrent Protection(OCP);Short-Circuit  Protection",
+            ["Low ESR", "Overcurrent Protection(OCP)", "Short-Circuit Protection"],
+        ),
+        (
+            "Function",
+            "Power-on reset, Power-down mode, Integrated buffer",
+            ["Power-on reset", "Power-down mode", "Integrated buffer"],
+        ),
+    ],
+)
+def test_feature_list_attributes(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    assert {
+        name: quantity
+        for name, (quantity, unit) in values.items()
+        if unit == "identifier"
+    } == {
+        f"feature {index}": token
+        for index, token in enumerate(expected, start=1)
+    }
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")

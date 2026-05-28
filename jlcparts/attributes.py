@@ -34,6 +34,24 @@ def identifierAttribute(value, name="identifier"):
         }
     }
 
+def identifierListAttribute(value, name="identifier", separators=r"[,;]"):
+    tokens = [
+        " ".join(token.split())
+        for token in re.split(separators, str(value))
+        if token.strip()
+    ]
+    if not tokens:
+        tokens = ["-"]
+    keys = [f"{name} {index}" for index in range(1, len(tokens) + 1)]
+    return {
+        "format": ", ".join("${" + key + "}" for key in keys),
+        "primary": keys[0],
+        "values": {
+            key: [token, "identifier"]
+            for key, token in zip(keys, tokens)
+        }
+    }
+
 def readWithSiPrefix(value):
     """
     Given a string in format <number><unitPrefix> (without the actual unit),

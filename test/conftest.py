@@ -53,3 +53,12 @@ def pytest_addoption(parser):
             "section by test_attribute_section_scan.py."
         ),
     )
+    parser.addoption(
+        "--attribute-all-strings",
+        action="store_true",
+        default=False,
+        help=(
+            "Scan all generated string values for the selected attribute section, "
+            "not only numeric-looking strings."
+        ),
+    )

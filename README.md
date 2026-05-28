@@ -113,6 +113,15 @@ $ PYTHONPATH=. pytest -q test/test_attribute_section_scan.py \
     --attribute-sqlite cache.sqlite3
 ```
 
+For textual sections whose values do not contain numbers, include all generated
+strings explicitly:
+
+```
+$ PYTHONPATH=. pytest -q test/test_attribute_section_scan.py \
+    --attribute-section 'Features' \
+    --attribute-all-strings
+```
+
 ## The Page Is Broken!
 
 Feel free to open an issue on GitHub.

@@ -58,7 +58,7 @@ def _attribute_values_from_jlc_extra(jlc_extra):
 
 
 def _string_values_for_section_from_sqlite(
-    db_path, section, value_pattern=None, max_values=None
+    db_path, section, value_pattern=None, max_values=None, numeric_only=True
 ):
     pattern = re.compile(value_pattern) if value_pattern else None
     values = []
@@ -85,7 +85,9 @@ def _string_values_for_section_from_sqlite(
                 except json.JSONDecodeError:
                     continue
                 value = attributes.get(section)
-                if not _is_numeric_string(value):
+                if not isinstance(value, str):
+                    continue
+                if numeric_only and not _is_numeric_string(value):
                     continue
                 if pattern and not pattern.search(value):
                     continue
@@ -98,7 +100,7 @@ def _string_values_for_section_from_sqlite(
     return list(dict.fromkeys(values))
 
 
-def _string_values_for_section(section, value_pattern=None):
+def _string_values_for_section(section, value_pattern=None, numeric_only=True):
     with gzip.open(LUT_PATH, "rt", encoding="utf-8") as lut_file:
         attributes = json.load(lut_file)
 
@@ -109,7 +111,9 @@ def _string_values_for_section(section, value_pattern=None):
             continue
         for value in payload.get("values", {}).values():
             if isinstance(value, list) and len(value) > 1 and value[1] == "string":
-                if not _is_numeric_string(value[0]):
+                if not isinstance(value[0], str):
+                    continue
+                if numeric_only and not _is_numeric_string(value[0]):
                     continue
                 if pattern and not pattern.search(value[0]):
                     continue
@@ -124,6 +128,7 @@ def _values_for_focused_section(
     sqlite_path=None,
     value_pattern=None,
     limit=None,
+    numeric_only=True,
 ):
     values = list(direct_values or [])
     values.extend(_values_from_file(value_file))
@@ -132,12 +137,12 @@ def _values_for_focused_section(
         pass
     elif sqlite_path:
         values = _string_values_for_section_from_sqlite(
-            sqlite_path, section, value_pattern, limit
+            sqlite_path, section, value_pattern, limit, numeric_only
         )
     else:
         if not LUT_PATH.exists():
             pytest.skip("generated attribute LUT is not available")
-        values = _string_values_for_section(section, value_pattern)
+        values = _string_values_for_section(section, value_pattern, numeric_only)
 
     if limit:
         return values[:limit]
@@ -202,6 +207,10 @@ def test_selected_attribute_section_normalizes_generated_values(pytestconfig, ca
     sqlite_path = pytestconfig.getoption("--attribute-sqlite") or os.environ.get(
         "JLC_ATTRIBUTE_SQLITE"
     )
+    numeric_only = not (
+        pytestconfig.getoption("--attribute-all-strings")
+        or os.environ.get("JLC_ATTRIBUTE_ALL_STRINGS")
+    )
 
     for section in sections:
         values = _values_for_focused_section(
@@ -211,8 +220,10 @@ def test_selected_attribute_section_normalizes_generated_values(pytestconfig, ca
             sqlite_path=sqlite_path,
             value_pattern=value_pattern,
             limit=limit,
+            numeric_only=numeric_only,
         )
-        assert values, f"no generated numeric string values found for {section!r}"
+        value_kind = "numeric string" if numeric_only else "string"
+        assert values, f"no generated {value_kind} values found for {section!r}"
 
         for raw_value in values:
             _assert_normalized(section, raw_value, capsys)
@@ -228,6 +239,30 @@ def test_attribute_section_scan_uses_direct_values_without_generated_lut(monkeyp
         "Peak Forward Surge Current",
         direct_values=["1A", "2A"],
     ) == ["1A", "2A"]
+
+
+def test_attribute_section_scan_can_read_non_numeric_generated_strings(
+    tmp_path, monkeypatch
+):
+    lut_path = tmp_path / "attributes-lut.json.gz"
+    with gzip.open(lut_path, "wt", encoding="utf-8") as lut_file:
+        json.dump([
+            [
+                "Features",
+                {
+                    "values": {
+                        "feature-a": ["Low power", "string"],
+                        "feature-b": ["No digits", "string"],
+                    }
+                },
+            ]
+        ], lut_file)
+    monkeypatch.setattr("test_attribute_section_scan.LUT_PATH", lut_path)
+
+    assert _values_for_focused_section(
+        "Features",
+        numeric_only=False,
+    ) == ["Low power", "No digits"]
 
 
 def test_attribute_section_scan_reads_value_file_without_generated_lut(
