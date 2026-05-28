@@ -439,9 +439,11 @@ def normalizeAttribute(key, value):
                 "Total Power Dissipation(Pd)",
                 "Average Gate Power Dissipation (Pg(Av))", "Radiant Flux",
                 "Quiescent Dissipation", "Power Consumption",
-                "Dissipation Power"]):
+                "Dissipation Power", "Corresponding Power"]):
             if key == "radiant flux":
                 value = attributes.powerRangeListAttribute(value, "power") if compoundValue(value) or (isinstance(value, str) and "~" in value) else attributes.powerAtConditionAttribute(value, "power")
+            elif key == "corresponding power":
+                value = attributes.powerRangeListAttribute(value, "power")
             elif key == "peak pulse power(ppp)@8/20us" and isinstance(value, str) and ("," in value or ";" in value):
                 value = attributes.powerListAttribute(value, "power")
             elif key in ["power dissipation (pd)", "coil rated power"] and compoundValue(value):
@@ -710,7 +712,7 @@ def normalizeAttribute(key, value):
                 "Lead Spacing", "Φd", "Pin Spacing", "Capacitor Length", "Pin Spaceing",
                 "Capacitor Diameter", "Size/Dimension", "Body Thickness", "Body Height",
                 "Body Length", "Body Width", "Thickness", "Fuse Length",
-                "Fuse Diameter (Φd)", "Fuse Width", "Inside Contact Diameter",
+                "Fuse Diameter (Φd)", "Fuse Width", "Fuse Height", "Inside Contact Diameter",
                 "Hole/Pin Spacing", "(For Insertion) Insertion Piece Thickness",
                 "Length of Copper Pipe", "Tail Width", "Spacing", "Slice Width",
                 "Needle Diameter", "Full Length of Copper Pipe",
@@ -910,6 +912,8 @@ def normalizeAttribute(key, value):
             value = attributes.awgRangeListAttribute(value)
         elif key in larr(["Wire Rod"]):
             value = attributes.wireRodAwgAttribute(value)
+        elif key in larr(["Core Wire Gauge"]):
+            value = attributes.coreWireGaugeAttribute(value)
         elif key in larr(["Operation Points", "Release Points",
                 "Magnetic Sensing Range(X,Y)", "Magnetic Sensing Range(Z)",
                 "Magnetic Field Range", "Minimum Field", "Bhys"]):

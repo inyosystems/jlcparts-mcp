@@ -3105,6 +3105,17 @@ def test_wire_rod_awg(capsys):
     assert_quantity(values["awg 1"], 16, "awg")
 
 
+def test_core_wire_gauge(capsys):
+    values = normalized_values("Core Wire Gauge", "Diameter 2mm", capsys)
+    assert_quantity(values["diameter"], 0.002, "length")
+
+    values = normalized_values("Core Wire Gauge", "30AWG", capsys)
+    assert_quantity(values["awg 1"], 30, "awg")
+
+    values = normalized_values("Core Wire Gauge", "RG0.81 white cable, OD: 0.81mm", capsys)
+    assert_quantity(values["diameter"], 0.00081, "length")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
@@ -3286,12 +3297,17 @@ def test_average_gate_power_dissipation_alias(capsys):
     [
         ("Power Consumption", "30mW", 0.03),
         ("Dissipation Power", "1.48W", 1.48),
+        ("Corresponding Power", "100W-600W", {"power 1 min": 100.0, "power 1 max": 600.0}),
     ],
 )
 def test_additional_power_aliases(key, value, expected, capsys):
     values = normalized_values(key, value, capsys)
 
-    assert_quantity(values["power"], expected, "power")
+    if isinstance(expected, dict):
+        for quantity, power in expected.items():
+            assert_quantity(values[quantity], power, "power")
+    else:
+        assert_quantity(values["power"], expected, "power")
 
 
 @pytest.mark.parametrize(
@@ -4157,6 +4173,7 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Fuse Length", "20mm", 0.02),
         ("Fuse Diameter (Φd)", "5.2mm", 0.0052),
         ("Fuse Width", "3.8mm", 0.0038),
+        ("Fuse Height", "8.3mm", 0.0083),
         ("Inside Contact Diameter", "1.3mm", 0.0013),
         ("Hole/Pin Spacing", "2.54mm", 0.00254),
         ("(For Insertion) Insertion Piece Thickness", "0.81mm", 0.00081),

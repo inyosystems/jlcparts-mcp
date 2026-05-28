@@ -2229,6 +2229,22 @@ def wireRodAwgAttribute(value):
         raise ValueError(f"Cannot parse wire rod AWG {value}")
     return awgRangeListAttribute(match.group(1))
 
+def coreWireGaugeAttribute(value):
+    value = str(value).strip()
+    awg = re.search(r"(?:AWG\s*|\b)([0-9]+(?:/[0-9]+)?(?:\s*~\s*[0-9]+(?:/[0-9]+)?)?)\s*AWG\b|AWG\s*([0-9]+)", value, flags=re.I)
+    if awg is not None:
+        gauge = next(group for group in awg.groups() if group is not None)
+        parsed = awgRangeListAttribute(gauge)
+        return {
+            **parsed,
+            "primary": parsed["primary"],
+        }
+
+    diameter = re.search(r"(?:Diameter|OD)\s*:?\s*([0-9]+(?:\.[0-9]+)?)\s*(mm)?", value, flags=re.I)
+    if diameter is None:
+        raise ValueError(f"Cannot parse core wire gauge {value}")
+    return scalarAttribute(diameter.group(1) + "mm", readLength, "length", "diameter")
+
 def magneticFluxDensityRangeListAttribute(value):
     value = str(value).replace(";", ",").strip()
     parts = [x.strip() for x in value.split(",")]
@@ -2647,6 +2663,7 @@ def powerListAttribute(value, name="power"):
 
 def powerRangeListAttribute(value, name="power"):
     value = str(value).replace(";", ",").strip()
+    value = re.sub(r"(?<=W)\s*-\s*(?=\d)", "~", value, flags=re.I)
     parts = [x.strip() for x in value.split(",")]
     values = {}
     formats = []
