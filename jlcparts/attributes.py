@@ -1185,6 +1185,27 @@ def _readConnectorCount(value):
 def connectorCountAttribute(value):
     return scalarAttribute(value, _readConnectorCount, "count", "count")
 
+def applyConnectorCountAttribute(value):
+    value = str(value).strip()
+    counts = [int(match) for match in re.findall(r"(\d+)\s*P", value, flags=re.I)]
+    if not counts:
+        return countAttribute("-")
+    if len(counts) == 1:
+        return {
+            "format": "${count}",
+            "primary": "count",
+            "values": {"count": [counts[0], "count"]}
+        }
+    values = {
+        f"count {index}": [count, "count"]
+        for index, count in enumerate(counts, start=1)
+    }
+    return {
+        "format": ", ".join("${" + f"count {index}" + "}" for index in range(1, len(counts) + 1)),
+        "primary": "count 1",
+        "values": values
+    }
+
 def _readCycleCount(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:

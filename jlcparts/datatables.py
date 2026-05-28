@@ -665,6 +665,8 @@ def normalizeAttribute(key, value):
         elif key in larr(["Number of Contacts", "Number of Holes", "Number of Positions",
                 "Number of Positions or Pins"]):
             value = attributes.connectorCountAttribute(value)
+        elif key in larr(["Apply"]):
+            value = attributes.applyConnectorCountAttribute(value)
         elif key in larr(["Frequency Registers(Bit)", "Tuning Word Width(Bits)",
                 "Tuning Word Width (Max)"]):
             value = attributes.connectorCountAttribute(value)

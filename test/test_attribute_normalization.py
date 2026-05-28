@@ -1844,6 +1844,22 @@ def test_number_of_positions(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("10P MIL", {"count": 10}),
+        ("34P/40P MIL", {"count 1": 34, "count 2": 40}),
+        ("50P/MDR", {"count": 50}),
+        ("Universal form", {"count": "NaN"}),
+    ],
+)
+def test_apply_connector_count(value, expected, capsys):
+    values = normalized_values("Apply", value, capsys)
+
+    for quantity, count in expected.items():
+        assert_quantity(values[quantity], count, "count")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Frequency Registers(Bit)", "48", 48),
