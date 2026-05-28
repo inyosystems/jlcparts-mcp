@@ -2035,6 +2035,36 @@ def test_attachment_counts(capsys):
     assert_quantity(values["terminals"], 4, "count")
 
 
+def test_relay_contact_form_counts(capsys):
+    values = normalized_values("Contact Form", "1 Form A + 1 Form B: 1A + 1B (SPST-NO + SPST-NC)", capsys)
+
+    assert_quantity(values["form A"], 1, "count")
+    assert_quantity(values["form B"], 1, "count")
+
+    values = normalized_values("Relay Contact Form", "1 Form A(SPST-NO)", capsys)
+    assert_quantity(values["form A"], 1, "count")
+
+    values = normalized_values("Contact Types", "2CO", capsys)
+    assert_quantity(values["changeover contacts"], 2, "count")
+
+
+def test_display_switch_package_counts(capsys):
+    values = normalized_values("Display Type", "7 Segment", capsys)
+    assert_quantity(values["segments"], 7, "count")
+
+    values = normalized_values("Switch Type", "Square Tilt 5-Way", capsys)
+    assert_quantity(values["ways"], 5, "count")
+
+    values = normalized_values("Packaging/Housing", "3-SIP Module", capsys)
+    assert_quantity(values["pins"], 3, "count")
+
+
+def test_viewing_direction_clock_angle(capsys):
+    values = normalized_values("Viewing Direction", "6 o'clock", capsys)
+
+    assert_quantity(values["angle"], 180, "angle")
+
+
 def test_wire_strands(capsys):
     values = normalized_values("Number of Wire Strands", "42/0.0039\"", capsys)
 

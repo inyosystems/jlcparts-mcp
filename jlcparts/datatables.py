@@ -573,6 +573,18 @@ def normalizeAttribute(key, value):
             value = attributes.attachmentCountsAttribute(value)
         elif key in larr(["Rating"]):
             value = attributes.attachmentCountsAttribute(value)
+        elif key in larr(["Contact Form", "Relay Contact Form"]):
+            value = attributes.relayContactFormAttribute(value)
+        elif key in larr(["Contact Types"]):
+            value = attributes.relayContactTypeAttribute(value)
+        elif key in larr(["Display Type"]):
+            value = attributes.segmentDisplayTypeAttribute(value)
+        elif key in larr(["Switch Type"]):
+            value = attributes.switchWayAttribute(value)
+        elif key in larr(["Packaging/Housing"]):
+            value = attributes.packagePinCountAttribute(value)
+        elif key in larr(["Viewing Direction"]):
+            value = attributes.clockViewingDirectionAttribute(value)
         elif key in larr(["Screw Specification", "Socket Specification", "Screw Hole Size"]):
             value = attributes.metricThreadAttribute(value)
         elif key in larr(["Thread Diameter", "Hexagonal Opposite Sides"]):

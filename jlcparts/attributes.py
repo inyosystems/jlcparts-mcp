@@ -1156,6 +1156,75 @@ def attachmentCountsAttribute(value):
         "values": values
     }
 
+def relayContactFormAttribute(value):
+    value = str(value).strip()
+    values = {}
+    for count, form in re.findall(r"(\d+)\s*(?:Form\s*)?([A-C])\b", value, flags=re.I):
+        values[f"form {form.upper()}"] = [int(count), "count"]
+    if not values:
+        values["contacts"] = ["NaN", "count"]
+    return {
+        "format": ", ".join("${" + name + "}" for name in values),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
+def relayContactTypeAttribute(value):
+    value = str(value).strip()
+    co = re.fullmatch(r"(\d+)\s*CO", value, flags=re.I)
+    if co is not None:
+        return {
+            "format": "${changeover contacts}",
+            "primary": "changeover contacts",
+            "values": {"changeover contacts": [int(co.group(1)), "count"]}
+        }
+    return relayContactFormAttribute(value)
+
+def segmentDisplayTypeAttribute(value):
+    value = str(value).strip()
+    match = re.search(r"(\d+)\s*Segment", value, flags=re.I)
+    if match is None:
+        raise ValueError(f"Cannot parse segment display type {value}")
+    return {
+        "format": "${segments}",
+        "primary": "segments",
+        "values": {"segments": [int(match.group(1)), "count"]}
+    }
+
+def switchWayAttribute(value):
+    value = str(value).strip()
+    match = re.search(r"(\d+)\s*-\s*Way", value, flags=re.I)
+    if match is None:
+        raise ValueError(f"Cannot parse switch way count {value}")
+    return {
+        "format": "${ways}",
+        "primary": "ways",
+        "values": {"ways": [int(match.group(1)), "count"]}
+    }
+
+def packagePinCountAttribute(value):
+    value = str(value).strip()
+    match = re.match(r"(\d+)\s*-\s*", value)
+    if match is None:
+        raise ValueError(f"Cannot parse package pin count {value}")
+    return {
+        "format": "${pins}",
+        "primary": "pins",
+        "values": {"pins": [int(match.group(1)), "count"]}
+    }
+
+def clockViewingDirectionAttribute(value):
+    value = str(value).strip()
+    match = re.fullmatch(r"(\d+(?:\.\d+)?)\s*o'?clock", value, flags=re.I)
+    if match is None:
+        raise ValueError(f"Cannot parse viewing direction {value}")
+    angle = (float(match.group(1)) % 12) * 30
+    return {
+        "format": "${angle}",
+        "primary": "angle",
+        "values": {"angle": [angle, "angle"]}
+    }
+
 def _readConnectorCount(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
