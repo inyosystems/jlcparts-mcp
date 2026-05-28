@@ -2235,6 +2235,28 @@ def test_interface_attribute(value, expected, capsys):
     }
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Encoder/decoder", ["Encoder/decoder"]),
+        ("Driver, Buffer", ["Driver", "Buffer"]),
+        ("Transceiver;隔离器", ["Transceiver", "隔离器"]),
+        ("NPN+PNP", ["NPN+PNP"]),
+    ],
+)
+def test_type_attribute(value, expected, capsys):
+    values = normalized_values("Type", value, capsys)
+
+    assert {
+        name: quantity
+        for name, (quantity, unit) in values.items()
+        if unit == "identifier"
+    } == {
+        f"type {index}": token
+        for index, token in enumerate(expected, start=1)
+    }
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")
