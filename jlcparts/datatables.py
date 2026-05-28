@@ -612,7 +612,9 @@ def normalizeAttribute(key, value):
                     "Number of Half Bridges", "Number of H-Bridges", "Order",
                     "Number of Plugs", "Channel", "Number of Positions (Absolute)",
                     "Number of Poles Per Deck", "Positions", "Number of Decks",
-                    "Number of Conjugate Points of Uvw", "Number of Abz Pulses"]):
+                    "Number of Conjugate Points of Uvw", "Number of Abz Pulses",
+                    "Number of LED Drivers", "Output Channel", "Pin Number",
+                    "Number of Sensitive Elements"]):
             value = attributes.countAttribute(value)
         elif key in larr(["Dot Matrix Number", "Dot Pixels", "Number of Digits",
                 "Display Configurations(Bit)"]):
@@ -783,7 +785,8 @@ def normalizeAttribute(key, value):
         elif key in larr(["Wavelength - Dominant", "Dominant Wavelength", "Peak Wavelength",
                 "Wavelength"]):
             value = attributes.opticalLengthRangeListAttribute(value) if key == "wavelength" or compoundValue(value) else attributes.wavelengthAttribute(value)
-        elif key in larr(["Phase Balance", "Phase Difference"]):
+        elif key in larr(["Phase Balance", "Phase Difference",
+                "Reception Angle", "Operating Angle in Each Direction"]):
             value = attributes.angleListAttribute(value)
         elif key in larr(["Phase Unbalance"]):
             value = attributes.angleOrDecibelListAttribute(value, "phase")
@@ -824,7 +827,7 @@ def normalizeAttribute(key, value):
             value = attributes.pressureTemperatureDriftAttribute(value)
         elif key in larr(["Rotation Angle"]):
             value = attributes.angleRangeListAttribute(value)
-        elif key in larr(["Angle of Throw"]):
+        elif key in larr(["Angle of Throw", "Half Angle"]):
             value = attributes.angleRangeListAttribute(value)
         elif key in larr(["Press Force", "Operating Force"]):
             value = attributes.forceRangeListAttribute(value)
@@ -839,11 +842,19 @@ def normalizeAttribute(key, value):
                 "Maximum Temperature Limit", "Holding Temperature Limit",
                 "Rated Functioning Temperature", "Working Temperature",
                 "Storage Temperature", "Temperature Tolerance", "Shrinkage Temperature",
-                "Temperature Range", "Operating Temp", "Operature Temperature"]):
-            if key in larr(["Holding Temperature Limit"]) and isinstance(value, str) and ("/" in value or "," in value or ";" in value):
+                "Temperature Range", "Operating Temp", "Operature Temperature",
+                "Temperature", "Temperature Hysteresis Configuration",
+                "Programmable Action Temperature Range",
+                "Accuracy of Operating Temperature", "Reset Temperature",
+                "Temperature Resistance"]):
+            if key in larr(["Holding Temperature Limit", "Temperature Hysteresis Configuration"]) and isinstance(value, str) and ("/" in value or "," in value or ";" in value):
                 value = attributes.temperatureListAttribute(value)
             else:
                 value = attributes.stringAttribute(value) if compoundValue(value) else attributes.temperatureRangeAttribute(value)
+        elif key in larr(["Measurement Range", "Gas Range"]):
+            value = attributes.ppmRangeAttribute(value, "ppm")
+        elif key in larr(["Switch Life"]):
+            value = attributes.cycleCountAttribute(value)
         elif key in larr(["Soldering Temperature (Max)"]):
             value = attributes.solderingTemperatureAttribute(value)
         elif key in larr(["B Constant (25°C/85°C)", "B Constant (25°C/50°C)",

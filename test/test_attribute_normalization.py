@@ -1575,6 +1575,10 @@ def test_logic_array_blocks(value, expected, capsys):
         ("CAN", "1", {"count": 1}),
         ("Number of Half Bridges", "3", {"count": 3}),
         ("Order", "2", {"count": 2}),
+        ("Number of LED Drivers", "3", {"count": 3}),
+        ("Output Channel", "2", {"count": 2}),
+        ("Pin Number", "8", {"count": 8}),
+        ("Number of Sensitive Elements", "4", {"count": 4}),
     ],
 )
 def test_extra_count_attributes(key, value, expected, capsys):
@@ -1984,6 +1988,8 @@ def test_wire_strands(capsys):
         ("Program/Erase Cycles", "1×10^15 Cycles", 1000000000000000),
         ("Program/Erase Cycles", "1 Trillion Cycles", 1000000000000),
         ("Switching Life", "10000 times", 10000),
+        ("Switch Life", "100,000 Times", 100000),
+        ("Switch Life", "1万次", 10000),
     ],
 )
 def test_cycle_life_counts(key, value, expected, capsys):
@@ -2476,6 +2482,25 @@ def test_temperature_range_alias(capsys):
     assert_quantity(values["temperature max"], 85, "temperature")
 
 
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Temperature", "0℃~+85℃", {"temperature min": 0, "temperature max": 85}),
+        ("Temperature Hysteresis Configuration", "2℃, 10℃", {"temperature 1": 2, "temperature 2": 10}),
+        ("Programmable Action Temperature Range", "-55℃~+125℃", {"temperature min": -55, "temperature max": 125}),
+        ("Accuracy of Operating Temperature", "±0.5℃", {"temperature min": -0.5, "temperature max": 0.5}),
+        ("Reset Temperature", "86℃", {"temperature": 86}),
+        ("Temperature Resistance", "-20℃~+80℃", {"temperature min": -20, "temperature max": 80}),
+        ("Temperature Resistance", "120℃", {"temperature": 120}),
+    ],
+)
+def test_additional_temperature_aliases(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, temperature in expected.items():
+        assert_quantity(values[quantity], temperature, "temperature")
+
+
 def test_misc_numeric_aliases(capsys):
     values = normalized_values("Air Volume", "1.01CFM", capsys)
     assert_quantity(values["air flow"], 1.01 * 0.00047194745, "air_flow")
@@ -2567,7 +2592,7 @@ def test_operating_junction_temperature_range(capsys):
         ("-", {"angle 1": "NaN"}),
     ],
 )
-@pytest.mark.parametrize("key", ["Viewing Angle", "Differential Phase"])
+@pytest.mark.parametrize("key", ["Viewing Angle", "Differential Phase", "Reception Angle", "Operating Angle in Each Direction"])
 def test_angle_values(key, value, expected, capsys):
     values = normalized_values(key, value, capsys)
 
@@ -2604,6 +2629,13 @@ def test_rotation_angle(capsys):
 
     assert_quantity(values["angle 1 min"], 0.0, "angle")
     assert_quantity(values["angle 1 max"], 360.0, "angle")
+
+
+def test_half_angle_alias(capsys):
+    values = normalized_values("Half Angle", "±60°", capsys)
+
+    assert_quantity(values["angle 1 min"], -60.0, "angle")
+    assert_quantity(values["angle 1 max"], 60.0, "angle")
 
 
 @pytest.mark.parametrize(
@@ -3302,6 +3334,20 @@ def test_humidity_values(key, value, expected, capsys):
 
     for quantity, percentage in expected.items():
         assert_quantity(values[quantity], percentage, "percentage")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Measurement Range", "0ppm~40000ppm", {"ppm min": 0.0, "ppm max": 40000.0}),
+        ("Gas Range", "100ppm~10000ppm", {"ppm min": 100.0, "ppm max": 10000.0}),
+    ],
+)
+def test_ppm_range_aliases(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, ppm in expected.items():
+        assert_quantity(values[quantity], ppm, "ppm")
 
 
 def test_temperature_tolerance(capsys):
