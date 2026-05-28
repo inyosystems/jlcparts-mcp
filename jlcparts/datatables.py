@@ -154,7 +154,16 @@ def normalizeAttribute(key, value):
                 "ESD Protection Voltage", "MOS Breakdown Voltage",
                 "Insulated Voltage", "Input Offset Voltage",
                 "VBE Saturation(VBE(Sat))", "VBE on(VBE(on))",
-                "Rated Output Voltage"]):
+                "Rated Output Voltage", "Vmax", "Forward Voltage (Typ)",
+                "Applied Voltage", "Withstand Voltage - Output",
+                "Gate-Source Breakdown Voltage (V(Br)Gss)",
+                "Gate-Source Cutoff Voltage (Vgs(Off)@ID)",
+                "Output Voltage (Vo(on)@IO/Ii)",
+                "Input Voltage (Vi(Off)@IC,VCE)",
+                "Diode Forward Voltage (Vf@IF)",
+                "Collector-Emitter Saturation Voltage (VCE(sat)@IC,VGE)",
+                "Peak Forward on State Voltage (Vtm)",
+                "Voltage - on State (Vtm)"]):
             if key == "charging saturation voltage" and compoundValue(value):
                 value = attributes.voltageListAttribute(value)
             elif key == "isolation voltage(vrms)" and compoundValue(value):
@@ -162,7 +171,12 @@ def normalizeAttribute(key, value):
             elif key in larr(["Voltage - Input (Max)(Vi(Off))",
                     "Input Voltage (Vi(on)@IC,VCE)", "Output Voltage(Vo(on))"]):
                 value = attributes.voltageAtConditionAttribute(value, "voltage")
-            elif key in larr(["Collector-Emitter Saturation Voltage (VCE(sat)@IC,IF)"]):
+            elif key in larr(["Collector-Emitter Saturation Voltage (VCE(sat)@IC,IF)",
+                    "Gate-Source Cutoff Voltage (Vgs(Off)@ID)",
+                    "Output Voltage (Vo(on)@IO/Ii)",
+                    "Input Voltage (Vi(Off)@IC,VCE)",
+                    "Diode Forward Voltage (Vf@IF)",
+                    "Collector-Emitter Saturation Voltage (VCE(sat)@IC,VGE)"]):
                 value = attributes.voltageAtConditionAttribute(value, "voltage")
             elif key == "gate-emitter threshold voltage (vge(th)@ic)":
                 value = attributes.voltageAtConditionAttribute(value, "voltage") if "@" in str(value) else attributes.voltageRangeListAttribute(value)
@@ -339,7 +353,11 @@ def normalizeAttribute(key, value):
                     "Current Dark", "Continuous Load Current",
                     "Threshold Current", "Collector Current (Max)",
                     "Bias Current", "Peak Output Current", "Input Current",
-                    "Load Current (Max)"]):
+                    "Load Current (Max)",
+                    "Collector Cut-Off Current (Icbo@Vcb)",
+                    "Current - Collector Pulsed (Icm)",
+                    "Collector Current(Ic)",
+                    "Pulsed Collector Current (Icm)"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent current",
@@ -396,6 +414,7 @@ def normalizeAttribute(key, value):
                 "current output (maximum value)",
                 "output current (maximum value)",
                 "battery current",
+                "current - collector pulsed (icm)",
             ]
             if key in ["current - leakage", "leakage current(dcl)"]:
                 value = attributes.currentAttribute(value)
@@ -430,7 +449,9 @@ def normalizeAttribute(key, value):
             else:
                 value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.powerAtConditionAttribute(value, "power")
         elif key in larr(["Energy", "Energy (Max)", "Turn-on Energy (Eon)",
-                "Switching Energy(Eoff)", "Avalanche Energy"]):
+                "Switching Energy(Eoff)", "Avalanche Energy",
+                "Turn on Switching Loss (Eon)",
+                "Turn Off Switching Loss (Eoff)"]):
             if key in ["turn-on energy (eon)", "switching energy(eoff)"] and compoundValue(value):
                 value = attributes.energyListAttribute(value)
             else:
@@ -483,7 +504,8 @@ def normalizeAttribute(key, value):
             value = attributes.voltageAmplitudeListAttribute(value, "voltage")
         elif key in larr(["Q @ Frequency"]):
             value = attributes.qAtFrequencyAttribute(value)
-        elif key in larr(["DC Current Gain (H Fe@IC,VCE)"]):
+        elif key in larr(["DC Current Gain (H Fe@IC,VCE)",
+                "DC Current Gain (H Fe@VCE,IC)"]):
             value = attributes.ratioAtCurrentVoltageAttribute(value, "gain")
         elif key in larr(["DC Current Gain"]):
             value = attributes.ratioRangeListAttribute(value, "gain")
@@ -780,7 +802,8 @@ def normalizeAttribute(key, value):
         elif key in larr(["Normal Temperature Frequency Tolerance", "Frequency Tolerance"]):
             value = attributes.frequencyStabilityAttribute(value, "tolerance")
         elif key in larr(["Frequency Stability(Full Temperature Range)",
-                "Absolute Pull Range (Apr)", "Temperature Coefficient of Frequency"]):
+                "Absolute Pull Range (Apr)", "Temperature Coefficient of Frequency",
+                "Aging Per Year"]):
             value = attributes.frequencyStabilityAttribute(value)
         elif key in larr(["Wavelength - Dominant", "Dominant Wavelength", "Peak Wavelength",
                 "Wavelength"]):
@@ -927,7 +950,8 @@ def normalizeAttribute(key, value):
                    "Output Capacitance (Coss @ Vds)",
                    "Reverse Transfer Capacitance (Crss@Vds)", "Reverse Transfer Capacitance (Crss @ Vds)"]):
             value = attributes.capacityAtVoltage(value)
-        elif key in larr(["Total Gate Charge (Qg@Vgs)", "Total Gate Charge (Qg @ Vgs)"]):
+        elif key in larr(["Total Gate Charge (Qg@Vgs)", "Total Gate Charge (Qg @ Vgs)",
+                "Total Gate Charge (Qg@IC,VGE)"]):
             value = attributes.stringAttribute(value) if isinstance(value, str) and value.count(";") != 0 else attributes.chargeAtVoltage(value)
         elif key in larr(["Data Rate", "Data Rate (Max)", "Signaling Rate"]):
             value = attributes.dataRateListAttribute(value) if compoundValue(value) else attributes.dataRateAttribute(value)
@@ -1016,7 +1040,7 @@ def normalizeAttribute(key, value):
                 "Write Cycle Time (T Wc)", "Write Cycle Time(T Wc)",
                 "Time to First Fix", "Operation Time",
                 "Propagation Delay Tp Lh/Tp Hl", "Turn-Off Delay",
-                "Measuring Range"]):
+                "Measuring Range", "Turn on Delay Time (Td(on))"]):
             if compoundValue(value) and "@" not in value:
                 if key in larr(["Propagation Delay (TPD)", "Propagation Delay Time", "Reset Timeout", "Settling Time", "Response Time (Tr)", "Time to Trip (Max)", "Td(Off)",
                         "Propagation Delay Tp Hl", "Propagation Delay Tp Lh", "Td(on)", "Block Erase Time(T Be)",

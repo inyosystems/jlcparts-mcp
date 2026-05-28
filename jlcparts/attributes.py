@@ -2674,7 +2674,10 @@ def ratioAtCurrentVoltageAttribute(value, name="gain"):
                 else:
                     current = pieces[0]
             if len(pieces) > 1:
-                voltage = pieces[1]
+                if re.search(r"a", pieces[1], flags=re.I):
+                    current = pieces[1]
+                else:
+                    voltage = pieces[1]
         parsed_signal = rangeOrScalarAttribute(signal, readWithSiPrefix, "ratio", f"{name} {i}")
         values.update(parsed_signal["values"])
         format_parts = [parsed_signal["format"]]
@@ -3763,18 +3766,20 @@ def chargeAtVoltage(value):
             }
         }
     def readTheTuple(value):
-        match = re.match(r"(?P<cap>.*?)(\s*[ @](?P<voltage>.*))?", value.strip())
-        if match is None:
-            raise RuntimeError(f"Cannot parse charge at voltage for {value}")
-        q = match.groupdict().get("cap")
-        v = match.groupdict().get("voltage")
+        value = value.strip()
+        if "@" in value:
+            q, v = [x.strip() for x in value.split("@", 1)]
+        else:
+            q = value
+            v = None
 
-        if q is not None:
+        if q:
             q = readCharge(q.strip())
         else:
             q = "NaN"
 
         if v is not None:
+            v = v.strip().split(",")[-1]
             v = readVoltage(re.sub(r'-?\d+~', '', v.strip()))
         else:
             v = "NaN"

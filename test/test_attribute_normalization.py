@@ -477,6 +477,18 @@ def test_extra_voltage_ranges(key, value, expected, capsys):
         ("VBE Saturation(VBE(Sat))", "0.86V", {"voltage": 0.86}),
         ("VBE on(VBE(on))", "2.8V, 3V, 2V", {"voltage 1": 2.8, "voltage 2": 3.0, "voltage 3": 2.0}),
         ("Rated Output Voltage", "954mV", {"voltage": 0.954}),
+        ("Vmax", "32V", {"voltage": 32.0}),
+        ("Forward Voltage (Typ)", "1.2V", {"voltage": 1.2}),
+        ("Applied Voltage", "150V", {"voltage": 150.0}),
+        ("Withstand Voltage - Output", "80V", {"voltage": 80.0}),
+        ("Gate-Source Breakdown Voltage (V(Br)Gss)", "40V", {"voltage": 40.0}),
+        ("Gate-Source Cutoff Voltage (Vgs(Off)@ID)", "1.5V@0.1uA", {"voltage": 1.5}),
+        ("Output Voltage (Vo(on)@IO/Ii)", "100mV@5mA,0.25mA", {"voltage": 0.1}),
+        ("Input Voltage (Vi(Off)@IC,VCE)", "300mV@100uA,5V", {"voltage": 0.3}),
+        ("Diode Forward Voltage (Vf@IF)", "2.7V@30A", {"voltage": 2.7}),
+        ("Collector-Emitter Saturation Voltage (VCE(sat)@IC,VGE)", "1.6V@60A,15V", {"voltage": 1.6}),
+        ("Peak Forward on State Voltage (Vtm)", "1.9V", {"voltage": 1.9}),
+        ("Voltage - on State (Vtm)", "1.55V", {"voltage": 1.55}),
         ("Output Low Voltage", "0.2V~0.5V", {"voltage 1 min": 0.2, "voltage 1 max": 0.5}),
         ("Output High Voltage", "700mV", {"voltage 1": 0.7}),
         ("Input Low Voltage", "500mV~800mV", {"voltage 1 min": 0.5, "voltage 1 max": 0.8}),
@@ -1056,6 +1068,10 @@ def test_peak_output_current_sink_list(capsys):
         ("Peak Output Current", "15A", {"current": 15.0}),
         ("Input Current", "<0.2A (Average Current 0.03~0.1A)", {"current": 0.2}),
         ("Load Current (Max)", "1.5A", {"current": 1.5}),
+        ("Collector Cut-Off Current (Icbo@Vcb)", "100nA@30V", {"current": 100e-9}),
+        ("Current - Collector Pulsed (Icm)", "60A, 70A", {"current 1": 60.0, "current 2": 70.0}),
+        ("Collector Current(Ic)", "500mA", {"current": 0.5}),
+        ("Pulsed Collector Current (Icm)", "200A", {"current": 200.0}),
     ],
 )
 def test_additional_current_values(key, value, expected, capsys):
@@ -3550,6 +3566,7 @@ def test_temperature_coefficient(value, expected, capsys):
         ("±0.2%", {"stability min": [-0.2, "percentage"], "stability max": [0.2, "percentage"]}),
         ("-120ppm~+10ppm", {"stability min": -120.0, "stability max": 10.0}),
         ("50ppm", {"stability": 50.0}),
+        ("±2ppm", {"stability min": -2.0, "stability max": 2.0}),
         ("-", {"stability": "NaN"}),
     ],
 )
@@ -3561,6 +3578,13 @@ def test_frequency_stability(value, expected, capsys):
             assert_quantity(values[quantity], stability[0], stability[1])
         else:
             assert_quantity(values[quantity], stability, "ppm")
+
+
+def test_aging_per_year_frequency_stability_alias(capsys):
+    values = normalized_values("Aging Per Year", "±2ppm", capsys)
+
+    assert_quantity(values["stability min"], -2.0, "ppm")
+    assert_quantity(values["stability max"], 2.0, "ppm")
 
 
 @pytest.mark.parametrize(
@@ -3632,6 +3656,8 @@ def test_temperature_coefficient_aliases(key, value, expected, capsys):
         ("Turn-on Energy (Eon)", "310uJ", 310e-6),
         ("Switching Energy(Eoff)", "12.9mJ", 0.0129),
         ("Avalanche Energy", "10mJ", 0.01),
+        ("Turn on Switching Loss (Eon)", "0.22mJ", 0.00022),
+        ("Turn Off Switching Loss (Eoff)", "0.33mJ", 0.00033),
     ],
 )
 def test_energy_values(key, value, expected, capsys):
@@ -4347,6 +4373,14 @@ def test_dc_current_gain_hfe_conditions(value, expected, capsys):
         assert_quantity(values[quantity], value, unit)
 
 
+def test_dc_current_gain_hfe_vce_ic_alias(capsys):
+    values = normalized_values("DC Current Gain (H Fe@VCE,IC)", "750@3V,2A", capsys)
+
+    assert_quantity(values["gain 1"], 750.0, "ratio")
+    assert_quantity(values["voltage 1"], 3.0, "voltage")
+    assert_quantity(values["current 1"], 2.0, "current")
+
+
 @pytest.mark.parametrize("key", ["Magnetic Conductivity-U''", "Magnetic Conductivity-U'"])
 def test_magnetic_conductivity_frequency(key, capsys):
     values = normalized_values(key, "1.3@13.56MHz", capsys)
@@ -4490,6 +4524,13 @@ def test_junction_capacitance_at_frequency_list(capsys):
     assert_quantity(values["frequency 1"], 1e6, "frequency")
     assert_quantity(values["capacitance 2"], 0.25e-12, "capacitance")
     assert_quantity(values["frequency 2"], 1e6, "frequency")
+
+
+def test_total_gate_charge_with_current_voltage_conditions(capsys):
+    values = normalized_values("Total Gate Charge (Qg@IC,VGE)", "95nC@40A,15V", capsys)
+
+    assert_quantity(values["charge"], 95e-9, "charge")
+    assert_quantity(values["voltage"], 15.0, "voltage")
 
 
 @pytest.mark.parametrize(
@@ -4659,6 +4700,7 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
         ("Propagation Delay Tp Lh/Tp Hl", "100ns;130ns", {"time 1": 100e-9, "time 2": 130e-9}),
         ("Turn-Off Delay", "1.1us", {"time": 1.1e-6}),
         ("Measuring Range", "3.5ns~2.5us", {"time min": 3.5e-9, "time max": 2.5e-6}),
+        ("Turn on Delay Time (Td(on))", "40ns", {"time": 40e-9}),
         ("Lifetime", "18000hrs@85℃", {"time": 18000 * 3600}),
         ("Lifetime @ Temperature", "10000hrs@105℃", {"time": 10000 * 3600}),
         ("Load Life", "4000hrs@125℃", {"time": 4000 * 3600}),
