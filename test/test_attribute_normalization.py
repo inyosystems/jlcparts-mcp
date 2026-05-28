@@ -2121,6 +2121,7 @@ def test_memory_generation_and_material_attributes(capsys):
         ("Plastic Material", "PA46"),
         ("Specification", "6.35"),
         ("Holes Structure", "1x13P"),
+        ("Manufacturer", "Analog Devices Inc./Maxim Integrated"),
     ],
 )
 def test_identifier_attributes(key, value, capsys):
