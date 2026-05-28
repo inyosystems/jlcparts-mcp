@@ -2893,6 +2893,11 @@ def test_static_dv_dt(capsys):
 
     assert_quantity(values["dv/dt"], 7e9, "slew_rate")
 
+def test_common_mode_transient_immunity_alias(capsys):
+    values = normalized_values("Common Mode Transient Immunity (Cmti)", "20kV/us", capsys)
+
+    assert_quantity(values["cmti"], 20e9, "slew_rate")
+
 
 @pytest.mark.parametrize(
     ("value", "expected"),
@@ -3615,7 +3620,13 @@ def test_switching_energy_lists(capsys):
         ("Noise Figure", "7.9dB, 8.1dB", [7.9, 8.1]),
         ("Common Mode Rejection Ratio(CMRR)", "94dB, 118dB", [94.0, 118.0]),
         ("Common Mode Rejection Ratio (CMRR)", "100dB, 90dB, 86dB", [100.0, 90.0, 86.0]),
+        ("Common Mode Rejection Ratio", "20dB", [20.0]),
         ("Return Loss (Min)", "9.5dB", [9.5]),
+        ("Return Loss (Low Band/High Band)", "9.54dB", [9.54]),
+        ("High Band Return Loss (Min)", "14dB", [14.0]),
+        ("Low Band Return Loss (Min)", "20dB", [20.0]),
+        ("Harmonics", "-40dBc", [-40.0]),
+        ("Phase Noise", "-95dBc/Hz", [-95.0]),
         ("Output Return Loss", "13.5dB", [13.5]),
         ("Input Return Loss", "12.5dB", [12.5]),
         ("Sound Pressure Level(Spl)", "95dB", [95.0]),
@@ -3721,6 +3732,8 @@ def test_decibel_at_frequency_ranges_and_ignored_conditions(capsys):
             "level 2 min": 10.2,
             "level 2 max": 11.2,
         }),
+        ("25dB~33dB", {"level 1 min": 25.0, "level 1 max": 33.0}),
+        ("55dB;62dB", {"level 1": 55.0, "level 2": 62.0}),
         ("-", {"level 1": "NaN"}),
     ],
 )
@@ -3740,6 +3753,7 @@ def test_attenuation_value(value, expected, capsys):
         ("P1d B", "-25dBm", [-25.0]),
         ("P1d B(Receive)", "16dBm", [16.0]),
         ("IP3(Receive)", "30dBm", [30.0]),
+        ("IP3(Transmit)", "23dBm", [23.0]),
     ],
 )
 def test_decibel_milliwatt_values(key, value, expected, capsys):
@@ -3764,6 +3778,39 @@ def test_rf_range_aliases(capsys):
     values = normalized_values("Input Range", "-29dBm~17dBm", capsys)
     assert_quantity(values["level min"], -29.0, "decibel_milliwatt")
     assert_quantity(values["level max"], 17.0, "decibel_milliwatt")
+
+
+def test_frequency_band_aliases(capsys):
+    values = normalized_values(
+        "Frequency Bands (Low/High)",
+        "1.572GHz~1.578GHz;2.4GHz~2.5GHz",
+        capsys,
+    )
+
+    assert_quantity(values["frequency 1 min"], 1.572e9, "frequency")
+    assert_quantity(values["frequency 1 max"], 1.578e9, "frequency")
+    assert_quantity(values["frequency 2 min"], 2.4e9, "frequency")
+    assert_quantity(values["frequency 2 max"], 2.5e9, "frequency")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Output Rate", "1250MHz", 1250e6),
+        ("Frequency Response", "3kHz", 3000.0),
+    ],
+)
+def test_additional_scalar_frequency_aliases(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    assert_quantity(values["frequency"], expected, "frequency")
+
+
+def test_oscillator_frequency_range_alias(capsys):
+    values = normalized_values("Oscillator Frequency Range", "0.1MHz~30MHz", capsys)
+
+    assert_quantity(values["frequency 1 min"], 100000.0, "frequency")
+    assert_quantity(values["frequency 1 max"], 30e6, "frequency")
 
 
 @pytest.mark.parametrize(

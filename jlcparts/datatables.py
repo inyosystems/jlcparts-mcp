@@ -440,15 +440,19 @@ def normalizeAttribute(key, value):
         elif key in larr(["Attenuation", "Power Supply Rejection Ratio (Psrr)",
                 "Insertion Loss", "Signal-to-Noise Ratio", "Noise Figure",
                 "S/N Ratio", "Common Mode Rejection Ratio(CMRR)", "Common Mode Rejection Ratio (CMRR)",
+                "Common Mode Rejection Ratio",
                 "Return Loss (Min)", "Sound Pressure Level(Spl)", "Peak Gain",
                 "Snr(Signal to Noise Ratio)", "Signal to Noise Ratio",
                 "Output Return Loss", "Input Return Loss", "Sound Pressure Level (Spl)",
-                "Attenuation Value"]):
+                "Attenuation Value", "Return Loss (Low Band/High Band)",
+                "High Band Return Loss (Min)", "Low Band Return Loss (Min)",
+                "Phase Noise", "Harmonics"]):
             if key in larr(["Sound Pressure Level(Spl)", "Sound Pressure Level (Spl)"]):
                 value = attributes.decibelTokenListAttribute(value, "level")
             elif key == "peak gain":
                 value = attributes.decibelListAttribute(value, "gain")
-            elif key in larr(["Attenuation Value"]):
+            elif key in larr(["Attenuation Value", "Low Band Attenuation (Min/Max)",
+                    "High Band Attenuation (Min/Max)"]):
                 value = attributes.decibelRangeListAttribute(value, "level")
             else:
                 value = attributes.decibelListAttribute(value, "level")
@@ -462,12 +466,14 @@ def normalizeAttribute(key, value):
                 "High Band Insertion Loss (Max)", "High Band Attenuation (Min)",
                 "Step Size"]):
             value = attributes.decibelListAttribute(value, "level")
+        elif key in larr(["Low Band Attenuation (Min/Max)", "High Band Attenuation (Min/Max)"]):
+            value = attributes.decibelRangeListAttribute(value, "level")
         elif key in larr(["Noise Floor"]):
             value = attributes.decibelMilliwattPerHertzListAttribute(value, "noise")
         elif key in larr(["Input Range"]):
             value = attributes.decibelMilliwattRangeAttribute(value, "level")
         elif key in larr(["IP3", "P1d B", "P1d B(Receive)", "IP3(Receive)",
-                "P1d B(Transmit)"]):
+                "P1d B(Transmit)", "IP3(Transmit)"]):
             value = attributes.decibelMilliwattListAttribute(value, "level")
         elif key in larr(["Output Power"]):
             value = attributes.outputPowerListAttribute(value)
@@ -924,8 +930,8 @@ def normalizeAttribute(key, value):
         elif key in larr(["Relative Bandwidth"]):
             value = attributes.signedFrequencyRangeAttribute(value)
         elif key in larr(["Slew Rate", "Slew Rate(Sr)", "Cmti(K V/Us)", "Droop Rate",
-                "Static Dv/Dt"]):
-            value = attributes.slewRateAttribute(value, "cmti" if key == "cmti(k v/us)" else ("droop rate" if key == "droop rate" else ("dv/dt" if key == "static dv/dt" else "slew rate")))
+                "Static Dv/Dt", "Common Mode Transient Immunity (Cmti)"]):
+            value = attributes.slewRateAttribute(value, "cmti" if key in ["cmti(k v/us)", "common mode transient immunity (cmti)"] else ("droop rate" if key == "droop rate" else ("dv/dt" if key == "static dv/dt" else "slew rate")))
         elif key in larr(["Program Storage Size", "Ram Size", "Embedded Block Ram",
                 "Memory Size", "Memory Space", "Cache Size", "Fifo'S",
                 "Eeprom", "Memory Size of Flash", "Memory Size of Ram"]):
@@ -948,7 +954,9 @@ def normalizeAttribute(key, value):
                 "Clock Frequency(Fc)", "Maximum Speed", "Pass Bandwidth",
                 "Stop Bandwidth", "Passband Bandwidth", "Response Frequency",
                 "Central Frequency", "Lo Frequency Range", "IF Frequency Range",
-                "RF Frequency Range"]):
+                "RF Frequency Range", "Frequency Bands (Low/High)",
+                "Output Rate", "Oscillator Frequency Range",
+                "Frequency Response"]):
             if isinstance(value, str) and re.search(r"(?:bit/s|bps)\s*$", value, flags=re.IGNORECASE):
                 value = attributes.dataRateAttribute(value)
             else:
@@ -959,7 +967,8 @@ def normalizeAttribute(key, value):
                 elif key in ["sampling rate", "frequency - switching", "clock frequency", "transition frequency (f t)", "sampling frequency", "center frequency", "cpu maximum speed", "frequency(center/band)", "switch frequency", "absolute bandwidth", "throughput rate", "update rate", "frequency output", "gain bandwidth product", "count rate", "the main fclk", "bandwidth (-3d b)", "-3db bandwidth(g=1)", "frequency - cutoff or center", "typical application frequency", "clock frequency (fc)", "band width", "maximum speed", "passband bandwidth", "central frequency"] and isinstance(value, str) and ("," in value or ";" in value):
                     value = attributes.frequencyListAttribute(value)
                 elif key in ["lo frequency range", "if frequency range", "rf frequency range",
-                        "response frequency", "low band range", "high band range"] and isinstance(value, str) and "~" in value:
+                        "response frequency", "low band range", "high band range",
+                        "frequency bands (low/high)", "oscillator frequency range"] and isinstance(value, str) and "~" in value:
                     value = attributes.frequencyRangeListAttribute(value)
                 else:
                     value = attributes.stringAttribute(value) if compoundValue(value) else attributes.frequencyAttribute(value)
