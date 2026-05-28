@@ -107,6 +107,9 @@ def test_rds_on_multiple_measurements(value, measurements, capsys):
         ("Input Resistor", "-", {"resistance": "NaN"}),
         ("Current Terminal Resistance", "1mΩ", {"resistance": 0.001}),
         ("Output Resistance", "2Ω, 1.5Ω", {"resistance 1": 2.0, "resistance 2": 1.5}),
+        ("On Resistance", "750mΩ", {"resistance": 0.75}),
+        ("On-Resistance", "28mΩ", {"resistance": 0.028}),
+        ("Total Resistance", "5kΩ", {"resistance": 5000.0}),
     ],
 )
 def test_resistance_list_attributes(key, value, expected, capsys):
@@ -3138,6 +3141,18 @@ def test_average_gate_power_dissipation_alias(capsys):
 
     assert_quantity(values["power"], 0.2, "power")
 
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Power Consumption", "30mW", 0.03),
+        ("Dissipation Power", "1.48W", 1.48),
+    ],
+)
+def test_additional_power_aliases(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    assert_quantity(values["power"], expected, "power")
+
 
 @pytest.mark.parametrize(
     ("value", "expected"),
@@ -3917,6 +3932,9 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Wire Diameter", "2.5mm", 0.0025),
         ("Digit/Alpha Size(Inch)", "0.56", 0.014224),
         ("Thread Length", "30cm", 0.3),
+        ("Slot Width", "1.2mm", 0.0012),
+        ("Slit Width", "0.12mm", 0.00012),
+        ("Link Range(Standard Mode)", "30cm", 0.3),
     ],
 )
 def test_scalar_length_attributes(key, value, expected, capsys):
@@ -3934,6 +3952,22 @@ def test_scalar_length_attributes(key, value, expected, capsys):
 )
 def test_toleranced_thickness(value, expected, capsys):
     values = normalized_values("Thickness", value, capsys)
+
+    for quantity, length in expected.items():
+        assert_quantity(values[quantity], length, "length")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Iinearity Range", "0cm~62cm", {"length min": 0.0, "length max": 0.62}),
+        ("Iinearity Range", "8m", {"length": 8.0}),
+        ("Operating Wavelength", "5um~14um", {"length 1 min": 5e-6, "length 1 max": 14e-6}),
+        ("Window Size", "3x4mm", {"length 1": 0.003, "length 2": 0.004}),
+    ],
+)
+def test_additional_length_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
 
     for quantity, length in expected.items():
         assert_quantity(values[quantity], length, "length")

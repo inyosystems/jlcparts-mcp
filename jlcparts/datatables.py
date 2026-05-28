@@ -419,7 +419,8 @@ def normalizeAttribute(key, value):
                 "Pd - Power Dissipation(Pd)",
                 "Total Power Dissipation(Pd)",
                 "Average Gate Power Dissipation (Pg(Av))", "Radiant Flux",
-                "Quiescent Dissipation"]):
+                "Quiescent Dissipation", "Power Consumption",
+                "Dissipation Power"]):
             if key == "radiant flux":
                 value = attributes.powerRangeListAttribute(value, "power") if compoundValue(value) or (isinstance(value, str) and "~" in value) else attributes.powerAtConditionAttribute(value, "power")
             elif key == "peak pulse power(ppp)@8/20us" and isinstance(value, str) and ("," in value or ";" in value):
@@ -686,7 +687,10 @@ def normalizeAttribute(key, value):
                 "Head Thickness", "Nominal Length", "Cylinder Body",
                 "Dimension", "Product Size", "Aperture Size", "Hole Size",
                 "Travel", "Metal Size",
-                "Half Wave Width", "Spectral Range", "Digit/Alpha Size(Inch)"]):
+                "Half Wave Width", "Spectral Range", "Digit/Alpha Size(Inch)",
+                "Slot Width", "Slit Width", "Iinearity Range",
+                "Link Range(Standard Mode)", "Operating Wavelength",
+                "Window Size"]):
             if key == "diameter" and isinstance(value, str) and re.fullmatch(r"M\s*\d+(?:\.\d+)?", value, re.I):
                 value = re.sub(r"^M\s*", "", value, flags=re.I) + "mm"
             if key in larr(["Insulation Od", "Interface Length/Height", "Interface Diameter",
@@ -706,13 +710,19 @@ def normalizeAttribute(key, value):
                 value = attributes.boardSpaceAttribute(value)
             elif key in larr(["Module Size", "Display Range", "Pixel Size"]):
                 value = attributes.boardSpaceAttribute(value)
-            elif key in larr(["Dimension", "Product Size", "Aperture Size", "Hole Size", "Metal Size"]):
+            elif key in larr(["Dimension", "Product Size", "Aperture Size", "Hole Size", "Metal Size",
+                    "Window Size"]):
                 value = attributes.mechanicalDimensionsAttribute(value)
             elif key in larr(["Digit/Alpha Size(Inch)"]):
                 value = attributes.inchLengthAttribute(value)
             elif key == "linear range":
                 value = attributes.mechanicalLengthAttribute(value)
-            elif key in ["communication distance", "distance", "transmission distance", "sensing range"]:
+            elif key == "iinearity range":
+                value = attributes.lengthAttribute(value)
+            elif key == "link range(standard mode)":
+                value = attributes.lengthAttribute(value)
+            elif key in ["communication distance", "distance", "transmission distance", "sensing range",
+                    "operating wavelength"]:
                 value = attributes.lengthRangeListAttribute(value, "length")
             elif key in ["half wave width", "spectral range"]:
                 value = attributes.lengthRangeListAttribute(value, "length")
@@ -875,7 +885,8 @@ def normalizeAttribute(key, value):
             value = attributes.powerDissipation(value)
         elif key in larr(["Equivalent Series Resistance", "Equivalent Series Resistance (ESR)", "ESR"]):
             value = attributes.esr(value)
-        elif key in larr(["Resistance - Post Trip (R1) (Max)"]):
+        elif key in larr(["Resistance - Post Trip (R1) (Max)",
+                "On Resistance", "On-Resistance", "Total Resistance"]):
             value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.resistanceAttribute(value)
         elif key in larr(["Impedance @ Frequency"]):
             value = attributes.stringAttribute(value) if compoundValue(value) else attributes.impedanceAtFrequency(value)
