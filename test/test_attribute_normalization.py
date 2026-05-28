@@ -2163,6 +2163,24 @@ def test_feature_list_attributes(key, value, expected, capsys):
     }
 
 
+def test_category_attribute(capsys):
+    values = normalized_values(
+        "Category",
+        {
+            "id1": 601,
+            "id2": 11295,
+            "name1": "ADC/DAC/Data Conversion",
+            "name2": "ADC/DAC - Specialized",
+        },
+        capsys,
+    )
+
+    assert values["category"] == ["ADC/DAC/Data Conversion", "identifier"]
+    assert values["subcategory"] == ["ADC/DAC - Specialized", "identifier"]
+    assert values["category id"] == [601, "count"]
+    assert values["subcategory id"] == [11295, "count"]
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")

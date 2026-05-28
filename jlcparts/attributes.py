@@ -52,6 +52,25 @@ def identifierListAttribute(value, name="identifier", separators=r"[,;]"):
         }
     }
 
+def categoryAttribute(value):
+    if not isinstance(value, dict):
+        return identifierAttribute(value, "category")
+    category = str(value.get("name1", "")).strip() or "-"
+    subcategory = str(value.get("name2", "")).strip() or "-"
+    values = {
+        "category": [category, "identifier"],
+        "subcategory": [subcategory, "identifier"],
+    }
+    if value.get("id1") is not None:
+        values["category id"] = [int(value["id1"]), "count"]
+    if value.get("id2") is not None:
+        values["subcategory id"] = [int(value["id2"]), "count"]
+    return {
+        "format": "${category} / ${subcategory}",
+        "primary": "subcategory",
+        "values": values
+    }
+
 def readWithSiPrefix(value):
     """
     Given a string in format <number><unitPrefix> (without the actual unit),
