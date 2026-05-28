@@ -2747,6 +2747,9 @@ def test_operating_force(capsys):
     values = normalized_values("Operating Force", "260gf@±50gf", capsys)
     assert_quantity(values["force 1"], 260 * 0.00980665, "force")
 
+    values = normalized_values("Operation Force", "50gf@±10gf", capsys)
+    assert_quantity(values["force 1"], 50 * 0.00980665, "force")
+
 
 def test_acceleration_measurement_range(capsys):
     values = normalized_values("Acceleration Measurement Range (Max)", "±16g", capsys)
@@ -3371,8 +3374,18 @@ def test_photoresistor_resistance_values(capsys):
     assert_quantity(values["resistance min"], 5000, "resistance")
     assert_quantity(values["resistance max"], 10000, "resistance")
 
+    values = normalized_values("Cell Resistance @ Illuminance", "5kΩ~10kΩ", capsys)
+    assert_quantity(values["resistance min"], 5000, "resistance")
+    assert_quantity(values["resistance max"], 10000, "resistance")
+
     values = normalized_values("Dark Resistance", "200kΩ", capsys)
     assert_quantity(values["resistance"], 200000, "resistance")
+
+
+def test_photoresistor_gamma_value(capsys):
+    values = normalized_values("Γ Value", "0.6", capsys)
+
+    assert_quantity(values["gamma"], 0.6, "ratio")
 
 
 @pytest.mark.parametrize(
@@ -4357,6 +4370,13 @@ def test_mechanical_dimension_aliases(capsys):
     assert_quantity(values["length 1"], 0.014, "length")
     assert_quantity(values["length 2"], 0.0075, "length")
     assert_quantity(values["length 3"], 0.0101, "length")
+
+
+@pytest.mark.parametrize("key", ["Conduction Travel", "Total Travel"])
+def test_travel_length_aliases(key, capsys):
+    values = normalized_values(key, "1.5mm", capsys)
+
+    assert_quantity(values["length"], 0.0015, "length")
 
 
 @pytest.mark.parametrize(

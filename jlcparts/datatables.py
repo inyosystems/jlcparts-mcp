@@ -541,6 +541,8 @@ def normalizeAttribute(key, value):
             value = attributes.ratioRangeListAttribute(value, "ratio")
         elif key in larr(["Vswr"]):
             value = attributes.ratioRangeListAttribute(value, "vswr")
+        elif key in larr(["Γ Value"]):
+            value = attributes.ratioRangeListAttribute(value, "gamma")
         elif key in larr(["Switch Circuit"]):
             value = attributes.switchCircuitAttribute(value)
         elif key in larr(["Swr"]):
@@ -723,7 +725,7 @@ def normalizeAttribute(key, value):
                 "Distance Across Flats", "Length Code", "Hexagonal Opposite Edge",
                 "Head Thickness", "Nominal Length", "Cylinder Body",
                 "Dimension", "Product Size", "Aperture Size", "Hole Size",
-                "Travel", "Metal Size",
+                "Travel", "Conduction Travel", "Total Travel", "Metal Size",
                 "Half Wave Width", "Spectral Range", "Digit/Alpha Size(Inch)",
                 "Slot Width", "Slit Width", "Iinearity Range",
                 "Link Range(Standard Mode)", "Operating Wavelength",
@@ -867,6 +869,8 @@ def normalizeAttribute(key, value):
             value = attributes.angleRangeListAttribute(value)
         elif key in larr(["Press Force", "Operating Force"]):
             value = attributes.forceRangeListAttribute(value)
+        elif key in larr(["Operation Force"]):
+            value = attributes.forceRangeListAttribute(value)
         elif key in larr(["Acceleration Measurement Range (Max)"]):
             value = attributes.accelerationRangeAttribute(value)
         elif key in larr(["Humidity", "Humidity Tolerance"]):
@@ -944,6 +948,8 @@ def normalizeAttribute(key, value):
                 "On Resistance", "On-Resistance", "Total Resistance"]):
             value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.resistanceAttribute(value)
         elif key in larr(["Illuminated Resistance @ 10lux"]):
+            value = attributes.resistanceRangeListAttribute(value)
+        elif key in larr(["Cell Resistance @ Illuminance"]):
             value = attributes.resistanceRangeListAttribute(value)
         elif key in larr(["Dark Resistance"]):
             value = attributes.resistanceRangeAttribute(value)
