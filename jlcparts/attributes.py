@@ -2130,6 +2130,10 @@ def timeListAttribute(value):
 def timeAtConditionAttribute(value):
     return scalarAttribute(value, readTime, "time", "time")
 
+def trailingTimeAttribute(value):
+    value = str(value).split(",")[-1].strip()
+    return timeAttribute(value)
+
 def readYearDuration(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:

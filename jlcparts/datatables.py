@@ -983,7 +983,9 @@ def normalizeAttribute(key, value):
                 "Delay Time", "Switch Time(Toff)", "Operate Time",
                 "Release Time", "Write Cycle Time (Tw)", "Write Cycle Time(Tw)",
                 "Write Cycle Time (T Wc)", "Write Cycle Time(T Wc)",
-                "Time to First Fix"]):
+                "Time to First Fix", "Operation Time",
+                "Propagation Delay Tp Lh/Tp Hl", "Turn-Off Delay",
+                "Measuring Range"]):
             if compoundValue(value) and "@" not in value:
                 if key in larr(["Propagation Delay (TPD)", "Propagation Delay Time", "Reset Timeout", "Settling Time", "Response Time (Tr)", "Time to Trip (Max)", "Td(Off)",
                         "Propagation Delay Tp Hl", "Propagation Delay Tp Lh", "Td(on)", "Block Erase Time(T Be)",
@@ -993,7 +995,7 @@ def normalizeAttribute(key, value):
                         "Thermal Time Constant", "Hold Time", "Phase Jitter",
                         "Action Time (Ton)", "Cycle-to-Cycle Jitter",
                         "Period Jitter", "Operate Time", "Release Time",
-                        "Time to First Fix"]) and isinstance(value, str) and ("," in value or ";" in value):
+                        "Time to First Fix", "Propagation Delay Tp Lh/Tp Hl"]) and isinstance(value, str) and ("," in value or ";" in value):
                     value = attributes.timeListAttribute(value)
                 else:
                     value = attributes.stringAttribute(value)
@@ -1001,6 +1003,8 @@ def normalizeAttribute(key, value):
                 value = attributes.timeListAttribute(value)
             else:
                 value = attributes.timeAtConditionAttribute(value) if isinstance(value, str) and "@" in value else attributes.timeAttribute(value)
+        elif key == "switching power":
+            value = attributes.trailingTimeAttribute(value)
         elif key in larr(["Data Retention - Tdr (Year)"]):
             value = attributes.yearDurationAttribute(value)
         else:
