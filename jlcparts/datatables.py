@@ -779,8 +779,12 @@ def normalizeAttribute(key, value):
             value = attributes.pitchAttribute(value)
         elif key in larr(["Luminous Intensity", "Light Intensity"]):
             value = attributes.luminousIntensityAttribute(value)
+        elif key in larr(["Lumens", "Luminous Flux (25°C)"]):
+            value = attributes.luminousFluxAttribute(value)
         elif key in larr(["Luminance"]):
             value = attributes.luminanceAttribute(value)
+        elif key in larr(["Cri Color Rendering Index"]):
+            value = attributes.ratioRangeListAttribute(value, "cri")
         elif key in larr(["Radiant Intensity"]):
             value = attributes.radiantIntensityAttribute(value)
         elif key in larr(["Pressure Range"]):

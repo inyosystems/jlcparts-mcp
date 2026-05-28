@@ -347,6 +347,13 @@ def readLuminousIntensity(value):
     value = re.sub(r"cd$", "", value, flags=re.IGNORECASE).strip()
     return readWithSiPrefix(value)
 
+def readLuminousFlux(value):
+    value = value.strip()
+    if value in ["-", "--", "null"]:
+        return "NaN"
+    value = re.sub(r"lm$", "", value, flags=re.IGNORECASE).strip()
+    return readWithSiPrefix(value)
+
 def readLuminance(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
@@ -1637,6 +1644,23 @@ def luminousIntensityAttribute(value):
     return {
         "format": ", ".join(formats),
         "primary": next(iter(values)),
+        "values": values
+    }
+
+def luminousFluxAttribute(value):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",")]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        name = f"flux {index}" if len(parts) > 1 else "flux"
+        parsed = rangeOrScalarAttribute(part, readLuminousFlux, "luminous_flux", name)
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    primary_name = "flux 1" if len(parts) > 1 else "flux"
+    return {
+        "format": ", ".join(formats),
+        "primary": primary_name + " min" if any(_rangeParts(part) for part in parts) else primary_name,
         "values": values
     }
 

@@ -3329,6 +3329,27 @@ def test_luminous_intensity(key, value, expected, capsys):
         assert_quantity(values[quantity], intensity, "luminous_intensity")
 
 
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Lumens", "383lm", {"flux": 383}),
+        ("Lumens", "1380lm, 2070lm", {"flux 1": 1380, "flux 2": 2070}),
+        ("Luminous Flux (25°C)", "938lm", {"flux": 938}),
+    ],
+)
+def test_luminous_flux(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, flux in expected.items():
+        assert_quantity(values[quantity], flux, "luminous_flux")
+
+
+def test_cri_color_rendering_index(capsys):
+    values = normalized_values("Cri Color Rendering Index", "90", capsys)
+
+    assert_quantity(values["cri"], 90, "ratio")
+
+
 def test_luminance_values(capsys):
     values = normalized_values("Luminance", "180cd/m2", capsys)
 
