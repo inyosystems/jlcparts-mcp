@@ -585,6 +585,21 @@ def normalizeAttribute(key, value):
             value = attributes.memoryCompositionAttribute(value)
         elif key in larr(["Ipex Algebra"]):
             value = attributes.generationAttribute(value)
+        elif key in larr(["Battery Type", "Applicable Battery Specifications",
+                "DDR Sdram Standard", "Protocol Standard", "Usoc Codes",
+                "Grade", "WiFi Protocols", "CPU", "Controller Type", "Model",
+                "Support Interface", "Utilized IC/Part", "Wireless Standard",
+                "Core Processor", "Support PoE Standard", "Character Set",
+                "With Relay/Socket Model",
+                "Package", "Mpn", "Description", "Display Configurations",
+                "Display Configurations(Segment)", "Touch Screen Type",
+                "Logic Family", "Type of Battery", "Ratings", "Subclass",
+                "Level of Protection", "Ethernet Speed Standards", "Versions",
+                "Algorithm", "Input Type", "USB Protocol", "Application",
+                "Memory Format", "Agreement", "CPU Core", "Standard",
+                "Pin Structure", "Flame Retardant Rating", "Plastic Material",
+                "Specification", "Holes Structure"]):
+            value = attributes.identifierAttribute(value)
         elif key in larr(["Texture of Material", "Shield Clip"]):
             value = attributes.materialGradeAttribute(value)
         elif key in larr(["Product Description"]):
@@ -1148,6 +1163,7 @@ _ATTRIBUTE_ALIASES_RAW = {
     "Number of  Channels": "Number of Channels",
     "NumberOfHoles": "Number of Holes",
     "InterfaceType": "Interface Type",
+    "Wi Fi Protocols": "WiFi Protocols",
     "ContactResistance": "Contact Resistance",
     "InsulationResistance": "Insulation Resistance",
     "moq": "Minimum Order Quantity",
@@ -1380,6 +1396,7 @@ def normalizeCapitalization(key):
         "VDD": "Vdd",
         "VSS": "Vss",
         "Cpu": "CPU",
+        "Wi Fi": "WiFi",
         "Drain-Source on": "Drain-Source On",
     }
     for old, new in replacements.items():

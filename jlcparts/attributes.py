@@ -25,6 +25,15 @@ def stringAttribute(value, name="default"):
         }
     }
 
+def identifierAttribute(value, name="identifier"):
+    return {
+        "format": "${" + name + "}",
+        "primary": name,
+        "values": {
+            name: [str(value), "identifier"]
+        }
+    }
+
 def readWithSiPrefix(value):
     """
     Given a string in format <number><unitPrefix> (without the actual unit),

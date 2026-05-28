@@ -2075,6 +2075,60 @@ def test_memory_generation_and_material_attributes(capsys):
     assert_quantity(values["material grade"], 301, "count")
 
 
+@pytest.mark.parametrize(
+    ("key", "value"),
+    [
+        ("Battery Type", "CR2032"),
+        ("Applicable Battery Specifications", "CR2032"),
+        ("DDR Sdram Standard", "DDR3"),
+        ("Protocol Standard", "USB 2.0"),
+        ("Usoc Codes", "RJ45"),
+        ("Grade", "UL style 21215"),
+        ("WiFi Protocols", "WIFI 802.11b/g/n"),
+        ("CPU", "ESP8266"),
+        ("Controller Type", "ST7789V"),
+        ("Model", "XT60U-M"),
+        ("Support Interface", "I2C;SPI;UART"),
+        ("Utilized IC/Part", "ATWILC1000B-MU"),
+        ("Wireless Standard", "Bluetooth5.0"),
+        ("Core Processor", "ESP8266 chip"),
+        ("Support PoE Standard", "IEEE 802.3 at(PoE+), IEEE 802.3 af(PoE)"),
+        ("Character Set", "GB2312"),
+        ("With Relay/Socket Model", "HF-157F"),
+        ("Package", "SOIC-16-300mil"),
+        ("Mpn", "DRV411AIRGPR"),
+        ("Description", "VQFN-20 ADC/DAC - Specialized ROHS"),
+        ("Display Configurations", "7段"),
+        ("Display Configurations(Segment)", "7 Segment"),
+        ("Touch Screen Type", "4、5Or8Wire Resistive Type"),
+        ("Logic Family", "STLD1"),
+        ("Type of Battery", "Lithium Battery, LiFePO4 Battery"),
+        ("Ratings", "AEC-Q200"),
+        ("Subclass", "X1,Y1"),
+        ("Level of Protection", "IEC 61000-4-2"),
+        ("Ethernet Speed Standards", "10BASE-T, 100BASE-TX, 100BASE-FX"),
+        ("Versions", "PCI-E 3.0"),
+        ("Algorithm", "SHA-256"),
+        ("Input Type", "2-Wire Bus"),
+        ("USB Protocol", "USB 2.0"),
+        ("Application", "I2C"),
+        ("Memory Format", "DDR3 SDRAM"),
+        ("Agreement", "FeliCa,ISO 14443A,ISO 14443B,ISO 15693,MIFARE,NFC"),
+        ("CPU Core", "ARM Cortex-M0"),
+        ("Standard", "IEC 320-C8"),
+        ("Pin Structure", "2x4P"),
+        ("Flame Retardant Rating", "UL94V-0"),
+        ("Plastic Material", "PA46"),
+        ("Specification", "6.35"),
+        ("Holes Structure", "1x13P"),
+    ],
+)
+def test_identifier_attributes(key, value, capsys):
+    values = normalized_values(key, value, capsys)
+
+    assert values["identifier"] == [value, "identifier"]
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")
