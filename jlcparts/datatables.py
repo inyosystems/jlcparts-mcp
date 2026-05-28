@@ -604,6 +604,8 @@ def normalizeAttribute(key, value):
                 "Number of Pins Per Row", "Parallel Bit Count Per Channel",
                 "Step Resolution"]):
             value = attributes.countListAttribute(value)
+        elif key in larr(["Word Size"]):
+            value = attributes.wordSizeAttribute(value)
         elif key in larr(["Number of Inputs"]):
             value = attributes.inputCountAttribute(value)
         elif key in larr(["Speaker Channels"]):
@@ -971,6 +973,10 @@ def normalizeAttribute(key, value):
             value = attributes.readWriteDataRateAttribute(value)
         elif key in larr(["Random Read/Write (Iops)"]):
             value = attributes.readWriteIopsAttribute(value)
+        elif key in larr(["Random Write (Iops)"]):
+            value = attributes.iopsAttribute(value, "write iops")
+        elif key in larr(["Random Read (Iops)"]):
+            value = attributes.iopsAttribute(value, "read iops")
         elif key in larr(["Frame Rate(Fps)"]):
             value = attributes.frameRateListAttribute(value)
         elif key in larr(["Gyroscope Measurement Range (Max)"]):

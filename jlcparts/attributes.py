@@ -1297,6 +1297,45 @@ def matrixCountAttribute(value):
         "values": values
     }
 
+def wordSizeAttribute(value):
+    value = str(value).strip()
+    parts = [x.strip() for x in value.split(",") if x.strip()]
+    if len(parts) == 1 and "x" not in parts[0].lower():
+        return countRangeAttribute(value) if _rangeParts(value) else countAttribute(value)
+
+    values = {}
+    formats = []
+
+    def add_count_or_range(name, raw):
+        range_parts = _rangeParts(raw)
+        if range_parts is None:
+            values[name] = [_readCount(raw), "count"]
+            return "${" + name + "}"
+        low, high = range_parts
+        values[f"{name} min"] = [_readCount(low), "count"]
+        values[f"{name} max"] = [_readCount(high), "count"]
+        return "${" + name + " min} ~ ${" + name + " max}"
+
+    for index, part in enumerate(parts, start=1):
+        suffix = f" {index}" if len(parts) > 1 else ""
+        if "x" in part.lower():
+            axes = [x.strip() for x in re.split(r"\s*x\s*", part, flags=re.I) if x.strip()]
+            if len(axes) != 2:
+                raise ValueError(f"Cannot parse word size {value}")
+            columns_name = f"columns{suffix}"
+            rows_name = f"rows{suffix}"
+            columns_format = add_count_or_range(columns_name, axes[0])
+            rows_format = add_count_or_range(rows_name, axes[1])
+            formats.append(columns_format + " x " + rows_format)
+        else:
+            count_name = f"count{suffix}"
+            formats.append(add_count_or_range(count_name, part))
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
 def pixelArrayAttribute(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
@@ -1877,6 +1916,9 @@ def readIops(value):
         return "NaN"
     value = re.sub(r"iops$", "", value, flags=re.IGNORECASE).strip()
     return readWithSiPrefix(value)
+
+def iopsAttribute(value, name="iops"):
+    return scalarAttribute(value, readIops, "frequency", name)
 
 def readWriteIopsAttribute(value):
     value = str(value).strip()

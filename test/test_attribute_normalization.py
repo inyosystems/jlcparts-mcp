@@ -2202,6 +2202,28 @@ def test_driver_receiver_count_values(key, value, expected, capsys):
         assert_quantity(values[quantity], count, "count")
 
 
+def test_word_size_counts(capsys):
+    values = normalized_values("Word Size", "12, 16", capsys)
+    assert_quantity(values["count 1"], 12, "count")
+    assert_quantity(values["count 2"], 16, "count")
+
+    values = normalized_values("Word Size", "16x16, 16, 8x16", capsys)
+    assert_quantity(values["columns 1"], 16, "count")
+    assert_quantity(values["rows 1"], 16, "count")
+    assert_quantity(values["count 2"], 16, "count")
+    assert_quantity(values["columns 3"], 8, "count")
+    assert_quantity(values["rows 3"], 16, "count")
+
+    values = normalized_values("Word Size", "5x7~24", capsys)
+    assert_quantity(values["columns"], 5, "count")
+    assert_quantity(values["rows min"], 7, "count")
+    assert_quantity(values["rows max"], 24, "count")
+
+    values = normalized_values("Word Size", "16~192", capsys)
+    assert_quantity(values["count min"], 16, "count")
+    assert_quantity(values["count max"], 192, "count")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
@@ -2463,6 +2485,12 @@ def test_random_read_write_iops(capsys):
 
     assert_quantity(values["read iops"], 3200, "frequency")
     assert_quantity(values["write iops"], 1800, "frequency")
+
+    values = normalized_values("Random Write (Iops)", "65Kiops", capsys)
+    assert_quantity(values["write iops"], 65000, "frequency")
+
+    values = normalized_values("Random Read (Iops)", "70Kiops", capsys)
+    assert_quantity(values["read iops"], 70000, "frequency")
 
 
 def test_frame_rate(capsys):
