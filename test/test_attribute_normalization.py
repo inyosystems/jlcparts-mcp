@@ -2812,6 +2812,43 @@ def test_peak_pulse_current_8_20us(value, expected, capsys):
         assert_quantity(values[quantity], current, "current")
 
 
+def test_peak_pulse_current_waveform_list(capsys):
+    values = normalized_values(
+        "Peak Pulse Current (Ipp)",
+        "57.5A@10/1000us, 431.3A@8/20us",
+        capsys,
+    )
+
+    assert_quantity(values["current 1"], 57.5, "current")
+    assert_quantity(values["pulse rise time 1"], 10e-6, "time")
+    assert_quantity(values["pulse duration 1"], 1000e-6, "time")
+    assert_quantity(values["current 2"], 431.3, "current")
+    assert_quantity(values["pulse rise time 2"], 8e-6, "time")
+    assert_quantity(values["pulse duration 2"], 20e-6, "time")
+
+
+def test_peak_pulse_current_mixed_condition_list(capsys):
+    values = normalized_values(
+        "Peak Pulse Current (Ipp)",
+        "30A, 60A, 120A@10/1000us",
+        capsys,
+    )
+
+    assert_quantity(values["current 1"], 30.0, "current")
+    assert_quantity(values["current 2"], 60.0, "current")
+    assert_quantity(values["current 3"], 120.0, "current")
+    assert_quantity(values["pulse rise time 3"], 10e-6, "time")
+    assert_quantity(values["pulse duration 3"], 1000e-6, "time")
+
+
+def test_peak_pulse_current_time_range(capsys):
+    values = normalized_values("Peak Pulse Current (Ipp)", "35.6A@10-15ms", capsys)
+
+    assert_quantity(values["current"], 35.6, "current")
+    assert_quantity(values["pulse time min"], 10e-3, "time")
+    assert_quantity(values["pulse time max"], 15e-3, "time")
+
+
 def test_number_of_io_count(capsys):
     values = normalized_values("Number of I/O", "8", capsys)
 

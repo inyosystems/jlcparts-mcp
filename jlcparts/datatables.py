@@ -536,7 +536,9 @@ def normalizeAttribute(key, value):
                 "battery current",
                 "current - collector pulsed (icm)",
             ]
-            if key in ["current - leakage", "leakage current(dcl)"]:
+            if key == "peak pulse current (ipp)" and isinstance(value, str) and ("@" in value or "," in value or ";" in value):
+                value = attributes.currentAtPulseListAttribute(value)
+            elif key in ["current - leakage", "leakage current(dcl)"]:
                 value = attributes.currentAttribute(value)
             elif key == "forward current" and isinstance(value, str) and ("," in value or ":" in value):
                 value = attributes.labeledCurrentListAttribute(value)
