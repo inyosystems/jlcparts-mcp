@@ -888,6 +888,7 @@ def test_capacitive_load_max(value, expected, capsys):
         ("Built - in Load Capacitance", "47pF", {"capacitance": 47e-12}),
         ("Load Capacitor", "12.5pF", {"capacitance": 12.5e-12}),
         ("Load Capacitance", "7.36pF", {"capacitance": 7.36e-12}),
+        ("External Load Capacitor", "10pF", {"capacitance": 10e-12}),
         ("Static Capacitance", "3.2pF", {"capacitance": 3.2e-12}),
         ("Sensor Capacitance Range", "0pF~119pF", {"capacitance min": 0, "capacitance max": 119e-12}),
     ],
@@ -1338,6 +1339,7 @@ def test_absolute_bandwidth_values(capsys):
     ("key", "value", "expected"),
     [
         ("Bandwidth (-3d B)", "85MHz", {"frequency": 85e6}),
+        ("Bandwidth", "140kHz, 200kHz", {"frequency 1": 140e3, "frequency 2": 200e3}),
         ("-3db Bandwidth(G=1)", "60kHz", {"frequency": 60e3}),
         ("Frequency - Cutoff or Center", "1MHz", {"frequency": 1e6}),
         ("Frequency - Cutoff or Center", "900MHz~2GHz", {

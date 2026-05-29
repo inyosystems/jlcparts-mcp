@@ -888,7 +888,7 @@ def normalizeAttribute(key, value):
                 "Input Capacitiance(Ci)", "Built-in Load Capacitance",
                 "Built - in Load Capacitance", "Load Capacitor",
                 "Load Capacitance", "Static Capacitance", "Diode Capacitance",
-                "Cww( P F Max )"]):
+                "External Load Capacitor", "Cww( P F Max )"]):
             if key == "diode capacitance":
                 value = attributes.diodeCapacitanceAttribute(value)
             elif key in ["junction capacitance", "capacitive load (max)"] and compoundValue(value):
@@ -1241,9 +1241,9 @@ def normalizeAttribute(key, value):
             else:
                 if key == "sampling rate" and isinstance(value, str) and re.search(r"\d\s*[munp]?s\b", value, flags=re.IGNORECASE):
                     value = attributes.timeAttribute(value)
-                elif key in ["sampling rate", "frequency - switching", "frequency range", "switching frequency", "clock frequency", "transition frequency (f t)", "sampling frequency", "center frequency", "cpu maximum speed", "frequency(center/band)", "switch frequency", "absolute bandwidth", "throughput rate", "update rate", "frequency output", "gain bandwidth product", "count rate", "the main fclk", "bandwidth (-3d b)", "-3db bandwidth(g=1)", "frequency - cutoff or center", "typical application frequency", "clock frequency (fc)", "band width", "maximum speed", "passband bandwidth", "central frequency"] and isinstance(value, str) and ("," in value or ";" in value) and "~" in value:
+                elif key in ["sampling rate", "frequency - switching", "frequency range", "switching frequency", "clock frequency", "transition frequency (f t)", "sampling frequency", "center frequency", "cpu maximum speed", "frequency(center/band)", "switch frequency", "absolute bandwidth", "throughput rate", "update rate", "frequency output", "gain bandwidth product", "count rate", "the main fclk", "bandwidth", "bandwidth (-3d b)", "-3db bandwidth(g=1)", "frequency - cutoff or center", "typical application frequency", "clock frequency (fc)", "band width", "maximum speed", "passband bandwidth", "central frequency"] and isinstance(value, str) and ("," in value or ";" in value) and "~" in value:
                     value = attributes.frequencyRangeListAttribute(value)
-                elif key in ["sampling rate", "frequency - switching", "frequency range", "switching frequency", "clock frequency", "transition frequency (f t)", "sampling frequency", "center frequency", "cpu maximum speed", "frequency(center/band)", "switch frequency", "absolute bandwidth", "throughput rate", "update rate", "frequency output", "gain bandwidth product", "count rate", "the main fclk", "bandwidth (-3d b)", "-3db bandwidth(g=1)", "frequency - cutoff or center", "typical application frequency", "clock frequency (fc)", "band width", "maximum speed", "passband bandwidth", "central frequency"] and isinstance(value, str) and ("," in value or ";" in value):
+                elif key in ["sampling rate", "frequency - switching", "frequency range", "switching frequency", "clock frequency", "transition frequency (f t)", "sampling frequency", "center frequency", "cpu maximum speed", "frequency(center/band)", "switch frequency", "absolute bandwidth", "throughput rate", "update rate", "frequency output", "gain bandwidth product", "count rate", "the main fclk", "bandwidth", "bandwidth (-3d b)", "-3db bandwidth(g=1)", "frequency - cutoff or center", "typical application frequency", "clock frequency (fc)", "band width", "maximum speed", "passband bandwidth", "central frequency"] and isinstance(value, str) and ("," in value or ";" in value):
                     value = attributes.frequencyListAttribute(value)
                 elif key in ["lo frequency range", "if frequency range", "rf frequency range",
                         "response frequency", "low band range", "high band range",
