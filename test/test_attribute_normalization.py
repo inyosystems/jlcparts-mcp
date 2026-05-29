@@ -2144,6 +2144,27 @@ def test_scr_type_counts(value, expected, capsys):
         assert_quantity(values[quantity], count, "count")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("NPN", ["NPN"]),
+        ("1 NPN Pre-biased, 1 PNP Pre-biased", ["1 NPN Pre-biased", "1 PNP Pre-biased"]),
+        ("NPN+PNP", ["NPN+PNP"]),
+    ],
+)
+def test_transistor_type_identifiers(value, expected, capsys):
+    values = normalized_values("Transistor Type", value, capsys)
+
+    assert {
+        name: quantity
+        for name, (quantity, unit) in values.items()
+        if unit == "identifier"
+    } == {
+        f"type {index}": token
+        for index, token in enumerate(expected, start=1)
+    }
+
+
 def test_driver_receiver(capsys):
     values = normalized_values("Driver/Receiver", "1/1;2/2", capsys)
 
