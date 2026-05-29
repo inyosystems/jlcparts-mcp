@@ -159,6 +159,7 @@ def test_static_rds_on_values(value, expected, capsys):
         ("Resistance @ 25°C", "60Ω, 30Ω", {"resistance 1": 60.0, "resistance 2": 30.0}),
         ("Resistance", "100Ω, 47Ω", {"resistance 1": 100.0, "resistance 2": 47.0}),
         ("Resistance", "5kΩ, 1.25kΩ", {"resistance 1": 5000.0, "resistance 2": 1250.0}),
+        ("DC Resistance", "85mΩ, 340Ω", {"resistance 1": 0.085, "resistance 2": 340.0}),
         ("Resistance Value", "100kΩ", {"resistance": 100000.0}),
         ("Resistance Value", "1.45kΩ, 2.54kΩ", {"resistance 1": 1450.0, "resistance 2": 2540.0}),
         ("Output Impedance", "2.2kΩ", {"resistance": 2200.0}),
