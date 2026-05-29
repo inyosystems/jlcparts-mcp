@@ -494,6 +494,7 @@ def normalizeAttribute(key, value):
                 "receive current",
                 "current - collector(ic)",
                 "supply current (iq)",
+                "ib - input bias current",
                 "current - input bias(ib)",
                 "current - output low(iol)",
                 "current - output high(ioh)",
