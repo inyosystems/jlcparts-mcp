@@ -2787,7 +2787,7 @@ def solderingTemperatureAttribute(value):
     if value.strip() in ["-", "--", "null"]:
         return scalarAttribute("-", lambda x: "NaN", "temperature", "temperature")
 
-    if "@" not in value:
+    if "@" not in value or value.endswith("@"):
         return temperatureRangeAttribute(value)
 
     temperature, duration = [x.strip() for x in value.split("@", 1)]

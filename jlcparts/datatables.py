@@ -1117,7 +1117,7 @@ def normalizeAttribute(key, value):
             value = attributes.ppmRangeAttribute(value, "ppm")
         elif key in larr(["Switch Life"]):
             value = attributes.cycleCountAttribute(value)
-        elif key in larr(["Soldering Temperature (Max)"]):
+        elif key in larr(["Soldering Temperature (Max)", "Welding Temperature (Max)"]):
             value = attributes.solderingTemperatureAttribute(value)
         elif key in larr(["B Constant (25°C/85°C)", "B Constant (25°C/50°C)",
                 "B Constant (25°C/75°C)", "B Constant (25°C/100°C)"]):

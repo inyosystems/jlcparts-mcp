@@ -3531,20 +3531,27 @@ def test_additional_temperature_range_attributes(key, value, expected, capsys):
 
 
 @pytest.mark.parametrize(
-    ("value", "expected"),
+    ("key", "value", "expected"),
     [
-        ("260℃", {"temperature": (260, "temperature")}),
-        ("260℃@3S", {"temperature": (260, "temperature"), "time": (3, "time")}),
-        ("260℃@3~5S", {
+        ("Soldering Temperature (Max)", "260℃", {"temperature": (260, "temperature")}),
+        ("Soldering Temperature (Max)", "260℃@3S", {"temperature": (260, "temperature"), "time": (3, "time")}),
+        ("Soldering Temperature (Max)", "260℃@3~5S", {
             "temperature": (260, "temperature"),
             "time min": (3, "time"),
             "time max": (5, "time"),
         }),
-        ("-", {"temperature": ("NaN", "temperature")}),
+        ("Soldering Temperature (Max)", "-", {"temperature": ("NaN", "temperature")}),
+        ("Welding Temperature (Max)", "250℃@5S", {"temperature": (250, "temperature"), "time": (5, "time")}),
+        ("Welding Temperature (Max)", "265℃@2~3S", {
+            "temperature": (265, "temperature"),
+            "time min": (2, "time"),
+            "time max": (3, "time"),
+        }),
+        ("Welding Temperature (Max)", "260℃@", {"temperature": (260, "temperature")}),
     ],
 )
-def test_soldering_temperature_max_attribute(value, expected, capsys):
-    values = normalized_values("Soldering Temperature (Max)", value, capsys)
+def test_soldering_temperature_max_attribute(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
 
     for quantity, expected_value in expected.items():
         value, unit = expected_value
