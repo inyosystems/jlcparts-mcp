@@ -1157,7 +1157,7 @@ def normalizeAttribute(key, value):
         elif key in larr(["Dark Resistance"]):
             value = attributes.resistanceRangeAttribute(value)
         elif key in larr(["Impedance @ Frequency"]):
-            value = attributes.stringAttribute(value) if compoundValue(value) else attributes.impedanceAtFrequency(value)
+            value = attributes.impedanceAtFrequency(value)
         elif key == "Ripple Current".lower():
             value = attributes.rippleCurrent(value)
         elif key == "Size(mm)".lower():

@@ -2793,9 +2793,34 @@ def temperatureListAttribute(value):
     }
 
 def impedanceAtFrequency(value):
-    if _hasCompoundValues(str(value)):
-        raise ValueError(f"Compound impedance value cannot be represented as scalar tuple: {value}")
-    return esr(str(value))
+    parts = [x.strip() for x in str(value).replace(";", ",").split(",") if x.strip()]
+    multiple = len(parts) > 1
+    values = {}
+    formats = []
+
+    for index, part in enumerate(parts, start=1):
+        impedance_name = f"impedance {index}" if multiple else "impedance"
+        frequency_name = f"frequency {index}" if multiple else "frequency"
+        if part == "-":
+            values[impedance_name] = ["NaN", "resistance"]
+            values[frequency_name] = ["NaN", "frequency"]
+            formats.append("-")
+            continue
+
+        part = erase(part, ["(", ")"])
+        if "@" in part:
+            impedance, frequency = [x.strip() for x in part.split("@", 1)]
+        else:
+            impedance, frequency = part, "-"
+        values[impedance_name] = [readResistance(impedance), "resistance"]
+        values[frequency_name] = [readFrequency(frequency), "frequency"]
+        formats.append("${" + impedance_name + "} @ ${" + frequency_name + "}")
+
+    return {
+        "format": ", ".join(formats),
+        "primary": "impedance 1" if multiple else "impedance",
+        "values": values
+    }
 
 def currentAtConditionAttribute(value, name="current"):
     return scalarAttribute(value, readCurrent, "current", name)

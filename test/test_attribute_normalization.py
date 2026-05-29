@@ -249,6 +249,22 @@ def test_impedance_ratio_aliases(key, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "measurements"),
+    [
+        ("300Ω@100MHz, 250Ω@100MHz", [(300.0, 100e6), (250.0, 100e6)]),
+        ("2.8kΩ@10MHz, 1kΩ@10MHz", [(2800.0, 10e6), (1000.0, 10e6)]),
+        ("1.2kΩ@100MHz, 900Ω@1GHz", [(1200.0, 100e6), (900.0, 1e9)]),
+    ],
+)
+def test_impedance_at_frequency_lists(value, measurements, capsys):
+    values = normalized_values("Impedance @ Frequency", value, capsys)
+
+    for index, (impedance, frequency) in enumerate(measurements, start=1):
+        assert_quantity(values[f"impedance {index}"], impedance, "resistance")
+        assert_quantity(values[f"frequency {index}"], frequency, "frequency")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Single Supply", "2V~36V", (2.0, 36.0)),
