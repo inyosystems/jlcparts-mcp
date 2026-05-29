@@ -2354,6 +2354,13 @@ def test_interface_type_attribute(value, expected, capsys):
     }
 
 
+def test_protocol_identifier_list(capsys):
+    values = normalized_values("Protocol", "USB 3.1;DP 1.3", capsys)
+
+    assert values["protocol 1"] == ["USB 3.1", "identifier"]
+    assert values["protocol 2"] == ["DP 1.3", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
