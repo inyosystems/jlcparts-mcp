@@ -909,6 +909,21 @@ def test_equivalent_series_inductance_values(capsys):
 @pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
+        ("Secondary Side Inductance", "652uH", {"inductance": 652e-6}),
+        ("Leakage Inductance", "300nH", {"inductance": 300e-9}),
+        ("Inductance", "150uH, 450uH", {"inductance 1": 150e-6, "inductance 2": 450e-6}),
+    ],
+)
+def test_inductance_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for quantity, inductance in expected.items():
+        assert_quantity(values[quantity], inductance, "inductance")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
         ("Inductor", "350uH", {"inductance": 350e-6}),
         ("Inductor", "150uH;450uH", {"inductance 1": 150e-6, "inductance 2": 450e-6}),
         ("Inductor(100khz,1/10v/8m A) (Min)", "325uH", {"inductance": 325e-6}),

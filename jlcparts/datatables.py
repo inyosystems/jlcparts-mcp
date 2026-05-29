@@ -906,8 +906,8 @@ def normalizeAttribute(key, value):
         elif key in larr(["Sensor Capacitance Range"]):
             value = attributes.capacitanceRangeAttribute(value)
         elif key in larr(["Inductance", "Equivalent Series Inductance",
-                "Leakage Inductance", "Ll(K)( U H Max )"]):
-            value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.inductanceAttribute(value)
+                "Leakage Inductance", "Secondary Side Inductance", "Ll(K)( U H Max )"]):
+            value = attributes.inductanceListAttribute(value) if compoundValue(value) else attributes.inductanceAttribute(value)
         elif key in larr(["Inductor", "Inductor(100khz,1/10v/8m A) (Min)"]):
             value = attributes.inductanceListAttribute(value) if compoundValue(value) else attributes.inductanceAttribute(value)
         elif key in larr(["Length", "Width", "Height", "Diameter", "Switch Height", "Overall Length",
