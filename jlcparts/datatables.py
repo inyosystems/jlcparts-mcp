@@ -613,6 +613,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "type")
         elif key in larr(["Applications"]):
             value = attributes.identifierListAttribute(value, "application")
+        elif key in larr(["Connector Type"]):
+            value = attributes.identifierListAttribute(value, "connector type")
         elif key in larr(["Category"]):
             value = attributes.categoryAttribute(value)
         elif key in larr(["Texture of Material", "Shield Clip"]):

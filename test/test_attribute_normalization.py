@@ -2305,6 +2305,29 @@ def test_applications_attribute(value, expected, capsys):
     }
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("DC Power Jack", ["DC Power Jack"]),
+        ("Type-A, Type-C", ["Type-A", "Type-C"]),
+        ("DDR1;DDR2", ["DDR1", "DDR2"]),
+        ("Blade/Shrapnel Connector", ["Blade/Shrapnel Connector"]),
+        ("Ferrite Ring (SMD)", ["Ferrite Ring (SMD)"]),
+    ],
+)
+def test_connector_type_attribute(value, expected, capsys):
+    values = normalized_values("Connector Type", value, capsys)
+
+    assert {
+        name: quantity
+        for name, (quantity, unit) in values.items()
+        if unit == "identifier"
+    } == {
+        f"connector type {index}": token
+        for index, token in enumerate(expected, start=1)
+    }
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")
