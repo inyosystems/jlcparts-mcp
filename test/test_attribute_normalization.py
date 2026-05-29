@@ -2502,6 +2502,29 @@ def test_size_attribute(value, expected, capsys):
         assert_quantity(values[quantity], expected_value[0], expected_value[1])
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Brass;Copper Alloy", ["Brass", "Copper Alloy"]),
+        ("Brass, Phosphor bronze", ["Brass", "Phosphor Bronze"]),
+        ("phosphor bronze", ["Phosphor Bronze"]),
+        ("锡磷青铜", ["Tin Phosphor Bronze"]),
+        ("AgSnO2+W", ["AgSnO2+W"]),
+    ],
+)
+def test_contact_material_attribute(value, expected, capsys):
+    values = normalized_values("Contact Material", value, capsys)
+
+    assert {
+        name: quantity
+        for name, (quantity, unit) in values.items()
+        if unit == "identifier"
+    } == {
+        f"material {index}": token
+        for index, token in enumerate(expected, start=1)
+    }
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")

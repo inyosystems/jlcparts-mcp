@@ -91,6 +91,27 @@ TOPOLOGY_ALIASES = {
     "Totem pole": "Totem Pole",
 }
 
+CONTACT_MATERIAL_ALIASES = {
+    "brass": "Brass",
+    "bronze": "Bronze",
+    "Copper alloy": "Copper Alloy",
+    "copper alloy": "Copper Alloy",
+    "Phosphor bronze": "Phosphor Bronze",
+    "phosphor bronze": "Phosphor Bronze",
+    "Phosphor coppe": "Phosphor Copper",
+    "Stainless steel": "Stainless Steel",
+    "manganese steel": "Manganese Steel",
+    "Manganese steel": "Manganese Steel",
+    "Beryllium copper": "Beryllium Copper",
+    "Aluminum alloy": "Aluminum Alloy",
+    "High conductivity copper": "High Conductivity Copper",
+    "Electrolytic copper": "Electrolytic Copper",
+    "Nickelalloy": "Nickel Alloy",
+    "锡磷青铜": "Tin Phosphor Bronze",
+    "铜端": "Copper End",
+    "前金后锡": "Gold Front Tin Back",
+}
+
 def saveJson(object, filename, hash=False, pretty=False, compress=False):
     openFn = gzip.open if compress else open
     with openFn(filename, "wt", encoding="utf-8") as f:
@@ -700,6 +721,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "peripheral", aliases=PERIPHERAL_FUNCTION_ALIASES)
         elif key in larr(["Topology"]):
             value = attributes.identifierListAttribute(value, "topology", aliases=TOPOLOGY_ALIASES)
+        elif key in larr(["Contact Material"]):
+            value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)
         elif key in larr(["Category"]):
             value = attributes.categoryAttribute(value)
         elif key in larr(["Texture of Material", "Shield Clip"]):
