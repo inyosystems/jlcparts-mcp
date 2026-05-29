@@ -74,6 +74,34 @@ def identifierListAttribute(value, name="identifier", separators=",;", aliases=N
         }
     }
 
+def configurationAttribute(value):
+    tokens = splitIdentifierList(value, ",;")
+    parsed = []
+    for token in tokens:
+        match = re.fullmatch(
+            r"\s*(\d+)\s*[- ]?\s*(?:segments?|segment|段)\s*(?:[x×]\s*(\d+)\s*[- ]?\s*(?:digits?|digit|bits?|bit))?\s*",
+            token,
+            flags=re.I,
+        )
+        if match is None:
+            return identifierListAttribute(value, "configuration")
+        segments, digits = match.groups()
+        parsed.append((float(segments), float(digits) if digits is not None else "NaN"))
+
+    values = {}
+    formats = []
+    for index, (segments, digits) in enumerate(parsed, start=1):
+        segment_name = f"segments {index}" if len(parsed) > 1 else "segments"
+        digit_name = f"digits {index}" if len(parsed) > 1 else "digits"
+        values[segment_name] = [segments, "count"]
+        values[digit_name] = [digits, "count"]
+        formats.append("${" + segment_name + "} x ${" + digit_name + "}")
+    return {
+        "format": ", ".join(formats),
+        "primary": "segments 1" if len(parsed) > 1 else "segments",
+        "values": values
+    }
+
 def categoryAttribute(value):
     if not isinstance(value, dict):
         return identifierAttribute(value, "category")

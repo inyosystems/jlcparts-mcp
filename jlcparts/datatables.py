@@ -738,6 +738,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierAttribute(value)
         elif key in larr(["Features", "Feature", "Function"]):
             value = attributes.identifierListAttribute(value, "feature")
+        elif key in larr(["Configuration"]):
+            value = attributes.configurationAttribute(value)
         elif key in larr(["Interface"]):
             value = attributes.identifierListAttribute(value, "interface")
         elif key in larr(["Interface Type"]):

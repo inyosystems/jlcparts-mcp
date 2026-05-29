@@ -2312,6 +2312,22 @@ def test_category_attribute(capsys):
     assert values["subcategory id"] == [11295, "count"]
 
 
+def test_configuration_display_counts(capsys):
+    values = normalized_values("Configuration", "8 Segment x 2 Digit, 7 Segment x 3 Digit", capsys)
+
+    assert_quantity(values["segments 1"], 8, "count")
+    assert_quantity(values["digits 1"], 2, "count")
+    assert_quantity(values["segments 2"], 7, "count")
+    assert_quantity(values["digits 2"], 3, "count")
+
+
+def test_configuration_identifiers(capsys):
+    values = normalized_values("Configuration", "Common Drain, Common source", capsys)
+
+    assert values["configuration 1"] == ["Common Drain", "identifier"]
+    assert values["configuration 2"] == ["Common source", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
