@@ -1076,6 +1076,8 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Peak Non-Repetitive Surge Current (Itsm@F)", "160A@50Hz", "current", 160.0, "current"),
         ("Quiescent Current (Ground Current)", "800nA", "current", 800e-9, "current"),
         ("Quiescent Current Per Amplifier", "1.14mA", "current", 0.00114, "current"),
+        ("Controller Stand-By Current", "130uA", "current", 130e-6, "current"),
+        ("Controller Stand-By Current", "-", "current", "NaN", "current"),
         ("Peak Output Current(Sink)", "2mA", "current", 0.002, "current"),
         ("Peak Output Current(Source)", "400uA", "current", 400e-6, "current"),
         ("Hold Current", "750mA", "current", 0.75, "current"),

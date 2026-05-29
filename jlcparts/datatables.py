@@ -415,6 +415,7 @@ def normalizeAttribute(key, value):
                     "Quiescent Current", "Quiescent Current (Iq)", "Quiescent Current(Iq)",
                     "Quiescent Current (Ground Current)", "Quiescent Current Per Amplifier",
                     "Ib - Input Bias Current", "Input Bias Current (Ib)", "Standby Current",
+                    "Controller Stand-By Current",
                     "Non-Repetitive Peak Forward Surge Current", "Quiescent Supply Current",
                     "Input Offset Current(IOS)", "Receive Current", "Current - Collector(Ic)",
                     "Supply Current (Iq)", "Current - Input Bias(Ib)", "Current - Output Low(Iol)",
