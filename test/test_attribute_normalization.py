@@ -234,6 +234,20 @@ def test_impedance_values(value, expected, capsys):
         assert_quantity(values[quantity], resistance, "resistance")
 
 
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("DCR Secondary Side (Max)", "5.04Ω", 5.04),
+        ("DCR Secondary Side (Max)", "0.75mΩ", 0.00075),
+        ("DCR Primary Side (Max)", "1.5mΩ", 0.0015),
+    ],
+)
+def test_dcr_resistance_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    assert_quantity(values["resistance"], expected, "resistance")
+
+
 @pytest.mark.parametrize("key", ["Characteristic Impedance", "Resonant Impedance"])
 def test_impedance_alias_values(key, capsys):
     values = normalized_values(key, "50Ω", capsys)
@@ -1493,6 +1507,8 @@ def test_center_frequency(value, expected, capsys):
         ("Source Current", "3mA;15mA", [0.003, 0.015]),
         ("Sink Current", "24mA;64mA", [0.024, 0.064]),
         ("Refresh Current", "1mA, 2.7mA, 400uA", [0.001, 0.0027, 400e-6]),
+        ("Power Current Rating", "5A, 250mA, 1.25A", [5.0, 0.25, 1.25]),
+        ("Supply Current", "1.2mA, 300uA", [0.0012, 300e-6]),
     ],
 )
 def test_current_lists(key, value, expected, capsys):
@@ -1522,6 +1538,15 @@ def test_current_range(value, expected, capsys):
 
     for quantity, current in expected.items():
         assert_quantity(values[quantity], current, "current")
+
+
+def test_supply_current_range_list(capsys):
+    values = normalized_values("Supply Current", "150uA~230uA, 130uA~250uA", capsys)
+
+    assert_quantity(values["current 1 min"], 150e-6, "current")
+    assert_quantity(values["current 1 max"], 230e-6, "current")
+    assert_quantity(values["current 2 min"], 130e-6, "current")
+    assert_quantity(values["current 2 max"], 250e-6, "current")
 
 
 @pytest.mark.parametrize(
