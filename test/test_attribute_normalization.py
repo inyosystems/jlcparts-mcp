@@ -2549,6 +2549,33 @@ def test_illumination_color_attribute(value, expected, capsys):
     }
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("600kHz, 1MHz, 800kHz", {
+            "frequency 1": 600e3,
+            "frequency 2": 1e6,
+            "frequency 3": 800e3,
+        }),
+        ("1.2MHz;2.4MHz", {
+            "frequency 1": 1.2e6,
+            "frequency 2": 2.4e6,
+        }),
+        ("18kHz~40kHz;55kHz~75kHz", {
+            "frequency 1 min": 18e3,
+            "frequency 1 max": 40e3,
+            "frequency 2 min": 55e3,
+            "frequency 2 max": 75e3,
+        }),
+    ],
+)
+def test_switching_frequency_attribute(value, expected, capsys):
+    values = normalized_values("Switching Frequency", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        assert_quantity(values[quantity], expected_value, "frequency")
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")
