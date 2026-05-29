@@ -3359,6 +3359,10 @@ def test_b_constant_kelvin(capsys):
 
     assert_quantity(values["temperature"], 3455.0, "kelvin")
 
+    values = normalized_values("B Constant (25°C/75°C)", "3477K", capsys)
+
+    assert_quantity(values["temperature"], 3477.0, "kelvin")
+
 
 def test_holding_temperature(capsys):
     values = normalized_values("Holding Temperature", "76℃", capsys)
