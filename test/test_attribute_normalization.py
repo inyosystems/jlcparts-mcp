@@ -1415,6 +1415,20 @@ def test_frequency_output_values(capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("16GHz, 6.4GHz", [16e9, 6.4e9]),
+        ("24.576MHz, 24MHz, 22.579MHz", [24.576e6, 24e6, 22.579e6]),
+    ],
+)
+def test_output_frequency_max_lists(value, expected, capsys):
+    values = normalized_values("Output Frequency (Max)", value, capsys)
+
+    for index, frequency in enumerate(expected, start=1):
+        assert_quantity(values[f"frequency {index}"], frequency, "frequency")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("1GHz", 1e9),
         ("16.776MHz", 16.776e6),
         ("-", "NaN"),
