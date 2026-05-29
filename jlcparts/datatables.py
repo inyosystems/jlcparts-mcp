@@ -704,6 +704,8 @@ def normalizeAttribute(key, value):
             value = attributes.categoryAttribute(value)
         elif key in larr(["Texture of Material", "Shield Clip"]):
             value = attributes.materialGradeAttribute(value)
+        elif key in larr(["Specifications"]):
+            value = attributes.specificationsAttribute(value)
         elif key in larr(["Product Description"]):
             value = attributes.metricProductDescriptionAttribute(value)
         elif key in larr(["Electroplate"]):

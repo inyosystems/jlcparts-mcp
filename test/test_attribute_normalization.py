@@ -2429,6 +2429,50 @@ def test_power_attribute(value, expected, capsys):
         assert_quantity(values[quantity], expected_value, "power")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("3pin", {"count": (3, "count")}),
+        ("M3X8", {"thread diameter": (0.003, "length"), "length 1": (0.008, "length")}),
+        ("M2.5X0.45", {"thread diameter": (0.0025, "length"), "thread pitch": (0.00045, "length")}),
+        ("M3-0.5X10", {
+            "thread diameter": (0.003, "length"),
+            "thread pitch": (0.0005, "length"),
+            "length 1": (0.01, "length"),
+        }),
+        ("M3X11+6", {
+            "thread diameter": (0.003, "length"),
+            "length 1": (0.011, "length"),
+            "length 2": (0.006, "length"),
+        }),
+        ("30*1.5*1mm", {
+            "length 1": (0.03, "length"),
+            "length 2": (0.0015, "length"),
+            "length 3": (0.001, "length"),
+        }),
+        ("6.5mm", {"length": (0.0065, "length")}),
+    ],
+)
+def test_specifications_attribute(value, expected, capsys):
+    values = normalized_values("Specifications", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        assert_quantity(values[quantity], expected_value[0], expected_value[1])
+
+
+def test_specifications_identifier_fallback(capsys):
+    values = normalized_values(
+        "Specifications",
+        "Coil Voltage: 230 VAC; Coil Current: 14.2mA",
+        capsys,
+    )
+
+    assert values["specification"] == [
+        "Coil Voltage: 230 VAC; Coil Current: 14.2mA",
+        "identifier",
+    ]
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")

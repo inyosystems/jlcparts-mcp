@@ -1403,6 +1403,75 @@ def metricProductDescriptionAttribute(value):
         "values": values
     }
 
+def specificationsAttribute(value):
+    value = str(value).strip()
+    if value in ["", "-", "--"]:
+        return identifierAttribute("-", "specification")
+
+    pin_match = re.fullmatch(r"(\d+)\s*pin", value, flags=re.I)
+    if pin_match:
+        return countAttribute(pin_match.group(1))
+
+    metric_match = re.fullmatch(
+        r"[PK]?M(\d+(?:\.\d+)?)"
+        r"(?:\s*[-xX*]\s*(\d+(?:\.\d+)?))?"
+        r"(?:\s*[xX*]\s*(\d+(?:\.\d+)?))?"
+        r"(?:\s*\+\s*(\d+(?:\.\d+)?))?"
+        r"(?:\s+.*)?",
+        value,
+        flags=re.I,
+    )
+    if metric_match:
+        diameter, second, third, extra = metric_match.groups()
+        values = {"thread diameter": [float(diameter) / 1000, "length"]}
+        formats = ["${thread diameter}"]
+        if second:
+            parsed_second = float(second)
+            if parsed_second < 1:
+                values["thread pitch"] = [parsed_second / 1000, "length"]
+                formats.append("${thread pitch}")
+            else:
+                values["length 1"] = [parsed_second / 1000, "length"]
+                formats.append("${length 1}")
+        if third:
+            index = 2 if "length 1" in values else 1
+            values[f"length {index}"] = [float(third) / 1000, "length"]
+            formats.append("${" + f"length {index}" + "}")
+        if extra:
+            index = 1 + len([name for name in values if name.startswith("length ")])
+            values[f"length {index}"] = [float(extra) / 1000, "length"]
+            formats.append("${" + f"length {index}" + "}")
+        return {
+            "format": " x ".join(formats),
+            "primary": "thread diameter",
+            "values": values
+        }
+
+    dimensions = re.fullmatch(
+        r"(\d+(?:\.\d+)?)\s*(?:mm)?\s*[*×xX]\s*"
+        r"(\d+(?:\.\d+)?)\s*(?:mm)?"
+        r"(?:\s*[*×xX]\s*(\d+(?:\.\d+)?)\s*(?:mm)?)?",
+        value,
+        flags=re.I,
+    )
+    if dimensions:
+        lengths = [float(x) / 1000 for x in dimensions.groups() if x is not None]
+        values = {
+            f"length {index}": [length, "length"]
+            for index, length in enumerate(lengths, start=1)
+        }
+        return {
+            "format": " x ".join("${" + key + "}" for key in values.keys()),
+            "primary": "length 1",
+            "values": values
+        }
+
+    length_match = re.fullmatch(r"(\d+(?:\.\d+)?)\s*mm", value, flags=re.I)
+    if length_match:
+        return lengthAttribute(value)
+
+    return identifierAttribute(value, "specification")
+
 def materialGradeAttribute(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:
