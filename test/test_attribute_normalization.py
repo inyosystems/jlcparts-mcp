@@ -2403,6 +2403,32 @@ def test_topology_attribute(value, expected, capsys):
     }
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("R:75mW, G:120mW, B:120mW", {
+            "power R": 0.075,
+            "power G": 0.12,
+            "power B": 0.12,
+        }),
+        ("75mW, 62.5mW", {
+            "power 1": 0.075,
+            "power 2": 0.0625,
+        }),
+        ("R:120mW, G:60mW, B:60mW", {
+            "power R": 0.12,
+            "power G": 0.06,
+            "power B": 0.06,
+        }),
+    ],
+)
+def test_power_attribute(value, expected, capsys):
+    values = normalized_values("Power", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        assert_quantity(values[quantity], expected_value, "power")
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")

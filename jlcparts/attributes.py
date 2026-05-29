@@ -2839,6 +2839,25 @@ def powerOrDecibelMilliwattListAttribute(value, name="power"):
         "values": values
     }
 
+def labeledPowerListAttribute(value, name="power"):
+    value = str(value).replace(";", ",")
+    parts = [x.strip() for x in value.split(",") if x.strip()]
+    values = {}
+    formats = []
+    for index, part in enumerate(parts, start=1):
+        label = None
+        value_part = part
+        if ":" in part:
+            label, value_part = [x.strip() for x in part.split(":", 1)]
+        value_name = f"{name} {label}" if label else f"{name} {index}"
+        values[value_name] = [readPower(value_part), "power"]
+        formats.append("${" + value_name + "}")
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
 def voltageOrCurrentListAttribute(value):
     value = str(value).replace(";", ",")
     parts = [x.strip() for x in value.split(",")]
