@@ -2123,6 +2123,7 @@ def test_memory_generation_and_material_attributes(capsys):
         ("Holes Structure", "1x13P"),
         ("Manufacturer", "Analog Devices Inc./Maxim Integrated"),
         ("Series", "74HC Series"),
+        ("Lamp Holder Type", "2.0mm x 1.25mm square LED"),
     ],
 )
 def test_identifier_attributes(key, value, capsys):
