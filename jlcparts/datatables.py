@@ -202,7 +202,7 @@ def normalizeAttribute(key, value):
                 "Resistance - Initial (Ri) (Min)",
                 "DCR Secondary Side (Max)", "DCR Primary Side (Max)"]):
             value = attributes.resistanceListAttribute(value) if compoundValue(value) else attributes.resistanceAttribute(value)
-        elif key in larr(["Series Resistance (RS)", "Input Resistor",
+        elif key in larr(["Series Resistance (RS)", "Input Resistor", "Contact Resistance",
                 "Current Terminal Resistance"]):
             value = attributes.resistanceAttribute(value)
         elif key in larr(["Balance Port Impedence", "Unbalance Port Impedence", "Impedance(Zzk)",
