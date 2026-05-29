@@ -2385,6 +2385,27 @@ def test_identifier_attributes(key, value, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Mini-SPOX(5264)", ["Mini-SPOX(5264)"]),
+        ("XA, XAD, XM, XAG", ["XA", "XAD", "XM", "XAG"]),
+        ("-;-", ["-", "-"]),
+    ],
+)
+def test_reference_series_identifiers(value, expected, capsys):
+    values = normalized_values("Reference Series", value, capsys)
+
+    assert {
+        name: quantity
+        for name, (quantity, unit) in values.items()
+        if unit == "identifier"
+    } == {
+        f"series {index}": token
+        for index, token in enumerate(expected, start=1)
+    }
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         (
