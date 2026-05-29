@@ -591,9 +591,16 @@ def normalizeAttribute(key, value):
                 "Output Return Loss", "Input Return Loss", "Sound Pressure Level (Spl)",
                 "Attenuation Value", "Return Loss (Low Band/High Band)",
                 "High Band Return Loss (Min)", "Low Band Return Loss (Min)",
-                "Phase Noise", "Harmonics"]):
+                "Phase Noise", "Harmonics", "Isolation", "Isolation(L-I)", "Isolation(L-R)"]):
             if key in larr(["Sound Pressure Level(Spl)", "Sound Pressure Level (Spl)"]):
                 value = attributes.decibelTokenListAttribute(value, "level")
+            elif key == "isolation":
+                if isinstance(value, str) and re.search(r"dB", value, re.I):
+                    value = attributes.decibelListAttribute(value, "level")
+                elif isinstance(value, str) and re.search(r"V", value, re.I):
+                    value = attributes.voltageListAttribute(value, "voltage")
+                else:
+                    value = attributes.identifierAttribute(value, "isolation")
             elif key == "peak gain":
                 value = attributes.decibelListAttribute(value, "gain")
             elif key in larr(["Attenuation Value", "Low Band Attenuation (Min/Max)",

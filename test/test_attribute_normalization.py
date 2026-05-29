@@ -4515,6 +4515,10 @@ def test_switching_energy_lists(capsys):
         ("Sound Pressure Level(Spl)", "95dB", [95.0]),
         ("Sound Pressure Level(Spl)", "83dB@0.1W,10cm", [83.0]),
         ("Sound Pressure Level (Spl)", "95dB@12V,10cm", [95.0]),
+        ("Isolation", "19dB", [19.0]),
+        ("Isolation", "25dB, 23dB", [25.0, 23.0]),
+        ("Isolation(L-I)", "44dB", [44.0]),
+        ("Isolation(L-R)", "40dB", [40.0]),
     ],
 )
 def test_decibel_lists(key, value, expected, capsys):
@@ -4522,6 +4526,24 @@ def test_decibel_lists(key, value, expected, capsys):
 
     for index, level in enumerate(expected, start=1):
         assert_quantity(values[f"level {index}"], level, "decibel")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("2500V", {"voltage 1": 2500.0}),
+        ("2.5kV", {"voltage 1": 2500.0}),
+        ("Non-isolated", {"isolation": "Non-isolated"}),
+    ],
+)
+def test_mixed_isolation_values(value, expected, capsys):
+    values = normalized_values("Isolation", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        if isinstance(expected_value, str):
+            assert values[quantity] == [expected_value, "identifier"]
+        else:
+            assert_quantity(values[quantity], expected_value, "voltage")
 
 
 def test_insertion_loss_db_max(capsys):
