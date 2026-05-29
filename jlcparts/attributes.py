@@ -2853,6 +2853,26 @@ def impedanceAtFrequency(value):
 def currentAtConditionAttribute(value, name="current"):
     return scalarAttribute(value, readCurrent, "current", name)
 
+def currentAtVoltageAttribute(value, name="current", voltage_name="voltage"):
+    value = str(value).strip()
+    if value == "-":
+        current, voltage = "NaN", "NaN"
+    elif "@" in value:
+        current_part, voltage_part = [x.strip() for x in value.split("@", 1)]
+        current = readCurrent(current_part)
+        voltage = readVoltage(voltage_part)
+    else:
+        current = readCurrent(value)
+        voltage = "NaN"
+    return {
+        "format": "${" + name + "} @ ${" + voltage_name + "}",
+        "primary": name,
+        "values": {
+            name: [current, "current"],
+            voltage_name: [voltage, "voltage"],
+        }
+    }
+
 def currentAtPulseListAttribute(value, name="current"):
     def parsePulseCondition(condition, suffix, values, format_parts):
         condition = condition.strip().strip("()")

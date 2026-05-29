@@ -448,7 +448,7 @@ def normalizeAttribute(key, value):
                     "Contact Current", "Signal Current Rating",
                     "Breaking Capacity", "Interrupt Rating",
                     "Interrupting Rating", "Rated Ripple Curren",
-                    "Drain Current (Idss)", "Current Rating (AC)",
+                    "Drain Current (Idss)", "Drain Current (Idss@VDS,VGS=0)", "Current Rating (AC)",
                     "Current Rating (DC)", "IR - Reverse Current",
                     "Peak Forward Surge Current", "Breakover Current (Ibo)",
                     "Repetitive Peak on-State Current (Itrm)", "Leak Current",
@@ -538,7 +538,9 @@ def normalizeAttribute(key, value):
                 "battery current",
                 "current - collector pulsed (icm)",
             ]
-            if key == "peak pulse current (ipp)" and isinstance(value, str) and ("@" in value or "," in value or ";" in value):
+            if key == "drain current (idss@vds,vgs=0)":
+                value = attributes.currentAtVoltageAttribute(value, "Idss", "Vds")
+            elif key == "peak pulse current (ipp)" and isinstance(value, str) and ("@" in value or "," in value or ";" in value):
                 value = attributes.currentAtPulseListAttribute(value)
             elif key in ["current - leakage", "leakage current(dcl)"]:
                 value = attributes.currentAttribute(value)

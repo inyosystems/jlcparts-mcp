@@ -1565,6 +1565,13 @@ def test_current_range(value, expected, capsys):
         assert_quantity(values[quantity], current, "current")
 
 
+def test_drain_current_idss_at_vds(capsys):
+    values = normalized_values("Drain Current (Idss@VDS,VGS=0)", "14mA@10V", capsys)
+
+    assert_quantity(values["Idss"], 0.014, "current")
+    assert_quantity(values["Vds"], 10.0, "voltage")
+
+
 def test_supply_current_range_list(capsys):
     values = normalized_values("Supply Current", "150uA~230uA, 130uA~250uA", capsys)
 
