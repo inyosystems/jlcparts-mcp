@@ -3761,12 +3761,19 @@ def test_operating_junction_temperature_range(capsys):
         ("-", {"angle 1": "NaN"}),
     ],
 )
-@pytest.mark.parametrize("key", ["Viewing Angle", "Differential Phase", "Reception Angle", "Operating Angle in Each Direction"])
+@pytest.mark.parametrize("key", ["Viewing Angle", "Differential Phase", "Reception Angle", "Operating Angle in Each Direction", "Angle"])
 def test_angle_values(key, value, expected, capsys):
     values = normalized_values(key, value, capsys)
 
     for quantity, angle in expected.items():
         assert_quantity(values[quantity], angle, "angle")
+
+
+@pytest.mark.parametrize("value", ["Bent tip", "Straight Header"])
+def test_angle_identifiers(value, capsys):
+    values = normalized_values("Angle", value, capsys)
+
+    assert values["angle"] == [value, "identifier"]
 
 
 @pytest.mark.parametrize("key", ["Phase Balance", "Phase Difference"])

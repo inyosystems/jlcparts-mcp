@@ -1056,6 +1056,8 @@ def normalizeAttribute(key, value):
         elif key in larr(["Phase Balance", "Phase Difference",
                 "Reception Angle", "Operating Angle in Each Direction"]):
             value = attributes.angleListAttribute(value)
+        elif key in larr(["Angle"]):
+            value = attributes.angleListAttribute(value) if isinstance(value, str) and (re.search(r"\d", value) or value.strip() in ["-", "--", "null"]) else attributes.identifierAttribute(value, "angle")
         elif key in larr(["Phase Unbalance"]):
             value = attributes.angleOrDecibelListAttribute(value, "phase")
         elif key in larr(["Tolerance"]):
