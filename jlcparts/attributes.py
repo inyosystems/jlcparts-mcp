@@ -2992,7 +2992,10 @@ def voltageAtCurrentListAttribute(value, name="voltage"):
             voltage_part, current_part = [x.strip() for x in part.split("@", 1)]
             current_part = current_part.strip("() ")
             voltage = readVoltage(voltage_part)
-            current = readCurrent(current_part)
+            try:
+                current = readCurrent(current_part)
+            except (KeyError, ValueError):
+                current = "NaN"
         else:
             voltage = readVoltage(part)
             current = "NaN"

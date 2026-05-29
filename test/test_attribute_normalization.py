@@ -1082,6 +1082,35 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("1.25V@150mA, 1V@50mA", {
+            "Vf 1": (1.25, "voltage"),
+            "current 1": (0.15, "current"),
+            "Vf 2": (1.0, "voltage"),
+            "current 2": (0.05, "current"),
+        }),
+        ("885mV@10mA, 715mV@1mA", {
+            "Vf 1": (0.885, "voltage"),
+            "current 1": (0.01, "current"),
+            "Vf 2": (0.715, "voltage"),
+            "current 2": (0.001, "current"),
+        }),
+        ("500mV@60V", {
+            "Vf": (0.5, "voltage"),
+            "current": ("NaN", "current"),
+        }),
+    ],
+)
+def test_forward_voltage_vf_at_if_lists(value, expected, capsys):
+    values = normalized_values("Forward Voltage (Vf @ If)", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        amount, unit = expected_value
+        assert_quantity(values[quantity], amount, unit)
+
+
+@pytest.mark.parametrize(
     ("key", "value", "quantity", "expected", "unit"),
     [
         ("Sampling Rate", "352800Hz", "frequency", 352800.0, "frequency"),

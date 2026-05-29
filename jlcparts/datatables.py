@@ -1194,8 +1194,7 @@ def normalizeAttribute(key, value):
         elif key == "Size(mm)".lower():
             value = attributes.sizeMm(value)
         elif key in larr(["Voltage - Forward (Vf) (Max) @ If", "Forward Voltage (Vf @ If)"]):
-            invalidForwardCurrent = isinstance(value, str) and "@" in value and "A" not in value.split("@", 1)[1]
-            value = attributes.stringAttribute(value) if isinstance(value, str) and (";" in value or value.count("@") > 1 or invalidForwardCurrent) else attributes.forwardVoltage(value)
+            value = attributes.voltageAtCurrentListAttribute(value, "Vf")
         elif key in larr(["Voltage - Breakdown (Min)", "Voltage - Zener (Nom) (Vz)",
             "Breakdown Voltage (Min)", "Zener Voltage (Nom)", "Vf - Forward Voltage"]):
             value = attributes.voltageRange(value)
