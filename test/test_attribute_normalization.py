@@ -6085,6 +6085,7 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
         ("Operation Time", "600us", {"time": 600e-6}),
         ("Switching Power", "3W, 150us", {"time": 150e-6}),
         ("Propagation Delay Tp Lh/Tp Hl", "100ns;130ns", {"time 1": 100e-9, "time 2": 130e-9}),
+        ("Maximum Delay Time TPD", "5.1ns", {"time": 5.1e-9}),
         ("Turn-Off Delay", "1.1us", {"time": 1.1e-6}),
         ("Measuring Range", "3.5ns~2.5us", {"time min": 3.5e-9, "time max": 2.5e-6}),
         ("Turn on Delay Time (Td(on))", "40ns", {"time": 40e-9}),
