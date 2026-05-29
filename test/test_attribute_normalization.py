@@ -2352,6 +2352,33 @@ def test_output_type_attribute(value, expected, capsys):
     }
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("PWM;Watchdog", ["PWM", "Watchdog"]),
+        ("Low-VoltageDetect;WDT;PWM;CCP capture/compare",
+            ["Low-Voltage Detection", "Watchdog", "PWM", "CCP Capture/Compare"]),
+        ("RTC Real-time Clock;Watchdog;Ethernet protocol stack",
+            ["RTC", "Watchdog", "Ethernet Protocol Stack"]),
+        ("Temperature transducer;TRNG;硬件加密",
+            ["Temperature Sensor", "TRNG", "Hardware Encryption"]),
+        ("触摸按键;安全加密", ["Touch Button", "Hardware Encryption"]),
+        ("LCD/LED Driver;WDT", ["LCD/LED Driver", "Watchdog"]),
+    ],
+)
+def test_peripheral_function_attribute(value, expected, capsys):
+    values = normalized_values("Peripheral/Function", value, capsys)
+
+    assert {
+        name: quantity
+        for name, (quantity, unit) in values.items()
+        if unit == "identifier"
+    } == {
+        f"peripheral {index}": token
+        for index, token in enumerate(expected, start=1)
+    }
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")

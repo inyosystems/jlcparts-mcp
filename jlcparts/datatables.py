@@ -51,6 +51,32 @@ OUTPUT_TYPE_ALIASES = {
     "2-WireBus": "2-Wire Bus",
 }
 
+PERIPHERAL_FUNCTION_ALIASES = {
+    "WDT": "Watchdog",
+    "RTC Real-time Clock": "RTC",
+    "Real-Time Clock": "RTC",
+    "Temperature transducer": "Temperature Sensor",
+    "On-chip temperature sensor": "Temperature Sensor",
+    "Hardware Cryptographic Engine": "Hardware Encryption",
+    "硬件加密": "Hardware Encryption",
+    "安全加密": "Hardware Encryption",
+    "CRC check": "CRC",
+    "True Random Number Generator": "TRNG",
+    "Low-VoltageDetect": "Low-Voltage Detection",
+    "LIN(Local Interconnect Network)": "LIN",
+    "LIN Bus Protocol": "LIN",
+    "Ethernet protocol stack": "Ethernet Protocol Stack",
+    "Bluetooth protocol stack": "Bluetooth Protocol Stack",
+    "Zigbee Protocol Stack": "Zigbee Protocol Stack",
+    "Touch Button": "Touch Button",
+    "触摸按键": "Touch Button",
+    "CCP capture/comparison": "CCP Capture/Compare",
+    "CCP capture/compare": "CCP Capture/Compare",
+    "Motor controller PWM": "Motor Controller PWM",
+    "Integrated programmable logic device": "Integrated Programmable Logic Device",
+    "POR": "Power-on Reset",
+}
+
 def saveJson(object, filename, hash=False, pretty=False, compress=False):
     openFn = gzip.open if compress else open
     with openFn(filename, "wt", encoding="utf-8") as f:
@@ -654,6 +680,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "connector type")
         elif key in larr(["Output Type"]):
             value = attributes.identifierListAttribute(value, "output type", aliases=OUTPUT_TYPE_ALIASES)
+        elif key in larr(["Peripheral/Function"]):
+            value = attributes.identifierListAttribute(value, "peripheral", aliases=PERIPHERAL_FUNCTION_ALIASES)
         elif key in larr(["Category"]):
             value = attributes.categoryAttribute(value)
         elif key in larr(["Texture of Material", "Shield Clip"]):
