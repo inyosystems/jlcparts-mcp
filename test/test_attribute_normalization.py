@@ -1078,6 +1078,8 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Quiescent Current Per Amplifier", "1.14mA", "current", 0.00114, "current"),
         ("Controller Stand-By Current", "130uA", "current", 130e-6, "current"),
         ("Controller Stand-By Current", "-", "current", "NaN", "current"),
+        ("Nand Stand-By Current", "40uA", "current", 40e-6, "current"),
+        ("Nand Stand-By Current", "-", "current", "NaN", "current"),
         ("Peak Output Current(Sink)", "2mA", "current", 0.002, "current"),
         ("Peak Output Current(Source)", "400uA", "current", 400e-6, "current"),
         ("Hold Current", "750mA", "current", 0.75, "current"),
