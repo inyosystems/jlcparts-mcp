@@ -1367,6 +1367,13 @@ def test_absolute_bandwidth_values(capsys):
             "frequency 2": 868e6,
             "frequency 3": 915e6,
         }),
+        ("Frequency", "100kHz, 1Hz", {"frequency 1": 100e3, "frequency 2": 1.0}),
+        ("Frequency", "42kHz~900kHz, 4.2kHz~90kHz", {
+            "frequency 1 min": 42e3,
+            "frequency 1 max": 900e3,
+            "frequency 2 min": 4.2e3,
+            "frequency 2 max": 90e3,
+        }),
         ("Clock Frequency (Fc)", "166MHz", {"frequency": 166e6}),
         ("Clock Frequency (Fc)", "400kHz~1MHz", {
             "frequency min": 400e3,
