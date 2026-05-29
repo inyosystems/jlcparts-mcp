@@ -14,6 +14,43 @@ from jlcparts.common import sha256file
 from jlcparts import attributes, descriptionAttributes
 from jlcparts.taxonomy import clean_label, normalize_category_pair, taxonomy_key
 
+
+OUTPUT_TYPE_ALIASES = {
+    "Current buffering": "Current Buffered",
+    "Current-缓冲": "Current Buffered",
+    "Current-Non-buffered": "Current Unbuffered",
+    "Current-非缓冲": "Current Unbuffered",
+    "Voltage Buffer": "Voltage Buffered",
+    "Voltage-缓冲": "Voltage Buffered",
+    "Voltage-Unbuffered": "Voltage Unbuffered",
+    "Voltage-非缓冲": "Voltage Unbuffered",
+    "Voltage - Non-Buffered": "Voltage Unbuffered",
+    "Push Pull": "Push-Pull",
+    "Push-pull": "Push-Pull",
+    "Push-pull type": "Push-Pull",
+    "Leakage": "Open Drain",
+    "漏极开路": "Open Drain",
+    "Open-drain": "Open Drain",
+    "Open drain": "Open Drain",
+    "Open set": "Open Collector",
+    "开集": "Open Collector",
+    "Open Emission": "Open Emitter",
+    "Open shoot": "Open Emitter",
+    "开射": "Open Emitter",
+    "互补": "Complementary",
+    "Complementary type": "Complementary",
+    "Supplementary type": "Complementary",
+    "Supplementarytype": "Complementary",
+    "轨到轨": "Rail-to-Rail",
+    "上拉": "Pull-Up",
+    "模拟量": "Analog Output",
+    "Analog output": "Analog Output",
+    "Differential output": "Differential",
+    "Clipped sine wave": "Clipped Sine Wave",
+    "Clipped Sine wave": "Clipped Sine Wave",
+    "2-WireBus": "2-Wire Bus",
+}
+
 def saveJson(object, filename, hash=False, pretty=False, compress=False):
     openFn = gzip.open if compress else open
     with openFn(filename, "wt", encoding="utf-8") as f:
@@ -615,6 +652,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "application")
         elif key in larr(["Connector Type"]):
             value = attributes.identifierListAttribute(value, "connector type")
+        elif key in larr(["Output Type"]):
+            value = attributes.identifierListAttribute(value, "output type", aliases=OUTPUT_TYPE_ALIASES)
         elif key in larr(["Category"]):
             value = attributes.categoryAttribute(value)
         elif key in larr(["Texture of Material", "Shield Clip"]):

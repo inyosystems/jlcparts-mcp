@@ -2328,6 +2328,30 @@ def test_connector_type_attribute(value, expected, capsys):
     }
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Current-缓冲", ["Current Buffered"]),
+        ("Voltage-缓冲;Current-非缓冲", ["Voltage Buffered", "Current Unbuffered"]),
+        ("Open-drain, Open Collector", ["Open Drain", "Open Collector"]),
+        ("漏极开路;Push-pull", ["Open Drain", "Push-Pull"]),
+        ("CMOS;互补;轨到轨;TTL", ["CMOS", "Complementary", "Rail-to-Rail", "TTL"]),
+        ("Clipped sine wave", ["Clipped Sine Wave"]),
+    ],
+)
+def test_output_type_attribute(value, expected, capsys):
+    values = normalized_values("Output Type", value, capsys)
+
+    assert {
+        name: quantity
+        for name, (quantity, unit) in values.items()
+        if unit == "identifier"
+    } == {
+        f"output type {index}": token
+        for index, token in enumerate(expected, start=1)
+    }
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")

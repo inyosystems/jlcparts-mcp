@@ -55,8 +55,13 @@ def splitIdentifierList(value, separators=",;"):
         tokens.append(item)
     return tokens
 
-def identifierListAttribute(value, name="identifier", separators=",;"):
+def identifierListAttribute(value, name="identifier", separators=",;", aliases=None):
     tokens = splitIdentifierList(value, separators)
+    if aliases:
+        tokens = [
+            aliases.get(token, aliases.get(token.lower(), token))
+            for token in tokens
+        ]
     if not tokens:
         tokens = ["-"]
     keys = [f"{name} {index}" for index in range(1, len(tokens) + 1)]
