@@ -1109,6 +1109,8 @@ def normalizeAttribute(key, value):
                 "Temperature Resistance"]):
             if key in larr(["Holding Temperature Limit", "Temperature Hysteresis Configuration"]) and isinstance(value, str) and ("/" in value or "," in value or ";" in value):
                 value = attributes.temperatureListAttribute(value)
+            elif key == "operating temperature" and compoundValue(value):
+                value = attributes.temperatureListAttribute(value)
             else:
                 value = attributes.stringAttribute(value) if compoundValue(value) else attributes.temperatureRangeAttribute(value)
         elif key in larr(["Measurement Range", "Gas Range"]):

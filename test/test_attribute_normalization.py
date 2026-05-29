@@ -3436,6 +3436,37 @@ def test_temperature_range_alias(capsys):
     assert_quantity(values["temperature max"], 85, "temperature")
 
 
+def test_operating_temperature_list(capsys):
+    values = normalized_values("Operating Temperature", "-40℃~+85℃, 0℃~+70℃", capsys)
+
+    assert_quantity(values["temperature min 1"], -40, "temperature")
+    assert_quantity(values["temperature max 1"], 85, "temperature")
+    assert_quantity(values["temperature min 2"], 0, "temperature")
+    assert_quantity(values["temperature max 2"], 70, "temperature")
+
+
+def test_operating_temperature_conditional_list(capsys):
+    values = normalized_values(
+        "Operating Temperature",
+        "-40℃~+85℃@(TA), -40℃~+125℃@(TJ)",
+        capsys,
+    )
+
+    assert_quantity(values["temperature min 1"], -40, "temperature")
+    assert_quantity(values["temperature max 1"], 85, "temperature")
+    assert_quantity(values["temperature min 2"], -40, "temperature")
+    assert_quantity(values["temperature max 2"], 125, "temperature")
+
+
+def test_operating_temperature_scalar_list(capsys):
+    values = normalized_values("Operating Temperature", "65℃, 60℃, 50℃, 55℃", capsys)
+
+    assert_quantity(values["temperature 1"], 65, "temperature")
+    assert_quantity(values["temperature 2"], 60, "temperature")
+    assert_quantity(values["temperature 3"], 50, "temperature")
+    assert_quantity(values["temperature 4"], 55, "temperature")
+
+
 @pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
