@@ -2525,6 +2525,30 @@ def test_contact_material_attribute(value, expected, capsys):
     }
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Red", ["Red"]),
+        ("Red, green, blue", ["Red", "Green", "Blue"]),
+        ("Blue(RGB)", ["Blue"]),
+        ("Green-yellow,Yellow", ["Yellow Green", "Yellow"]),
+        ("Amber Color,Blue", ["Amber", "Blue"]),
+        ("Cold White", ["Cool White"]),
+    ],
+)
+def test_illumination_color_attribute(value, expected, capsys):
+    values = normalized_values("Illumination Color", value, capsys)
+
+    assert {
+        name: quantity
+        for name, (quantity, unit) in values.items()
+        if unit == "identifier"
+    } == {
+        f"color {index}": token
+        for index, token in enumerate(expected, start=1)
+    }
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")

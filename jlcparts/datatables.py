@@ -112,6 +112,23 @@ CONTACT_MATERIAL_ALIASES = {
     "前金后锡": "Gold Front Tin Back",
 }
 
+COLOR_ALIASES = {
+    "blue": "Blue",
+    "green": "Green",
+    "yellow": "Yellow",
+    "emerald green": "Emerald Green",
+    "Emerald green": "Emerald Green",
+    "Deep red": "Deep Red",
+    "Red-orange": "Orange Red",
+    "Amber Color": "Amber",
+    "Green-yellow": "Yellow Green",
+    "Yellow-Green": "Yellow Green",
+    "Green Yellow": "Yellow Green",
+    "Blue(RGB)": "Blue",
+    "Blue to white": "Blue to White",
+    "Cold White": "Cool White",
+}
+
 def saveJson(object, filename, hash=False, pretty=False, compress=False):
     openFn = gzip.open if compress else open
     with openFn(filename, "wt", encoding="utf-8") as f:
@@ -723,6 +740,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "topology", aliases=TOPOLOGY_ALIASES)
         elif key in larr(["Contact Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)
+        elif key in larr(["Illumination Color"]):
+            value = attributes.identifierListAttribute(value, "color", aliases=COLOR_ALIASES)
         elif key in larr(["Category"]):
             value = attributes.categoryAttribute(value)
         elif key in larr(["Texture of Material", "Shield Clip"]):
