@@ -3187,6 +3187,59 @@ def powerListAttribute(value, name="power"):
     value = str(value).replace(";", ",")
     return scalarListAttribute(value, readPower, "power", name)
 
+def powerAtPulseListAttribute(value, name="power"):
+    def parsePulseCondition(condition, suffix, values, format_parts):
+        condition = condition.strip().strip("()")
+        waveform = re.fullmatch(
+            r"([+-]?\d+(?:\.\d+)?)\s*/\s*([+-]?\d+(?:\.\d+)?)([fpnum]?s)",
+            condition,
+            re.I,
+        )
+        if waveform:
+            rise, duration, unit = waveform.groups()
+            rise_name = f"pulse rise time{suffix}"
+            duration_name = f"pulse duration{suffix}"
+            values[rise_name] = [readTime(rise + unit), "time"]
+            values[duration_name] = [readTime(duration + unit), "time"]
+            format_parts.append("${" + rise_name + "}/${" + duration_name + "}")
+            return
+
+        time_name = f"pulse time{suffix}"
+        condition = re.sub(
+            r"^([+-]?\d+(?:\.\d+)?)\s*([~-])\s*([+-]?\d+(?:\.\d+)?)([fpnum]?s)$",
+            r"\1\4~\3\4",
+            condition,
+            flags=re.I,
+        )
+        parsed = rangeOrScalarAttribute(condition, readTime, "time", time_name)
+        values.update(parsed["values"])
+        format_parts.append(parsed["format"])
+
+    parts = [x.strip() for x in str(value).replace(";", ",").split(",") if x.strip()]
+    multiple = len(parts) > 1
+    values = {}
+    formats = []
+
+    for index, part in enumerate(parts, start=1):
+        suffix = f" {index}" if multiple else ""
+        power_name = f"{name}{suffix}"
+        if "@" in part:
+            power, condition = [x.strip() for x in part.split("@", 1)]
+        else:
+            power, condition = part, None
+
+        values[power_name] = [readPower(power), "power"]
+        format_parts = ["${" + power_name + "}"]
+        if condition:
+            parsePulseCondition(condition, suffix, values, format_parts)
+        formats.append(" @ ".join(format_parts))
+
+    return {
+        "format": ", ".join(formats),
+        "primary": f"{name} 1" if multiple else name,
+        "values": values,
+    }
+
 def powerRangeListAttribute(value, name="power"):
     value = str(value).replace(";", ",").strip()
     value = re.sub(r"(?<=W)\s*-\s*(?=\d)", "~", value, flags=re.I)

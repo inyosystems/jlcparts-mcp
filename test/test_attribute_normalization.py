@@ -4050,6 +4050,21 @@ def test_peak_pulse_power_dissipation_at_pulse(value, expected, capsys):
     assert_quantity(values["power"], expected, "power")
 
 
+def test_peak_pulse_power_dissipation_pulse_list(capsys):
+    values = normalized_values(
+        "Peak Pulse Power Dissipation (Ppp)",
+        "60W@8/20us, 3kW@8/20us",
+        capsys,
+    )
+
+    assert_quantity(values["power 1"], 60.0, "power")
+    assert_quantity(values["pulse rise time 1"], 8e-6, "time")
+    assert_quantity(values["pulse duration 1"], 20e-6, "time")
+    assert_quantity(values["power 2"], 3000.0, "power")
+    assert_quantity(values["pulse rise time 2"], 8e-6, "time")
+    assert_quantity(values["pulse duration 2"], 20e-6, "time")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [

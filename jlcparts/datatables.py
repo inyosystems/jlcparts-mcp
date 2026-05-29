@@ -572,6 +572,8 @@ def normalizeAttribute(key, value):
                 value = attributes.powerRangeListAttribute(value, "power")
             elif key == "power" and isinstance(value, str) and ("," in value or ";" in value):
                 value = attributes.labeledPowerListAttribute(value, "power")
+            elif key == "peak pulse power dissipation (ppp)" and isinstance(value, str) and ("@" in value or "," in value or ";" in value):
+                value = attributes.powerAtPulseListAttribute(value, "power")
             elif key == "peak pulse power(ppp)@8/20us" and isinstance(value, str) and ("," in value or ";" in value):
                 value = attributes.powerListAttribute(value, "power")
             elif key in ["power dissipation (pd)", "coil rated power"] and compoundValue(value):
