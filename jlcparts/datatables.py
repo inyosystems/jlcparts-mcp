@@ -810,6 +810,8 @@ def normalizeAttribute(key, value):
             value = attributes.pinCountOrPitchAttribute(value)
         elif key in larr(["Thickness of Contact Surface Treatment"]):
             value = attributes.contactTreatmentThicknessAttribute(value)
+        elif key in larr(["Finish Thickness"]):
+            value = attributes.finishThicknessAttribute(value)
         elif key in larr(["Number of Wire Strands"]):
             value = attributes.wireStrandsAttribute(value)
         elif key in larr(["Number of Channels", "Number of Elements", "Number of Lines",

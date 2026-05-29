@@ -1200,6 +1200,16 @@ def pinCountOrPitchAttribute(value):
 def contactTreatmentThicknessAttribute(value):
     return scalarAttribute(value, readLength, "length", "thickness")
 
+def finishThicknessAttribute(value):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return scalarAttribute("-", readLength, "length", "thickness")
+    if re.fullmatch(r"[+-]?\d+(?:\.\d+)?\s*u\"", value, flags=re.I):
+        value = re.sub(r"\s*u\"$", "mil", value, flags=re.I)
+    if re.fullmatch(r"[+-]?\d+(?:\.\d+)?\s*(?:nm|um|mm|cm|km|m|mil|in|inch|inches)", value, flags=re.I):
+        return scalarAttribute(value, readLength, "length", "thickness")
+    return identifierAttribute(value, "finish")
+
 def wireStrandsAttribute(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:

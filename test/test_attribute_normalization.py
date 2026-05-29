@@ -2448,6 +2448,27 @@ def test_identifier_attributes(key, value, capsys):
     assert values["identifier"] == [value, "identifier"]
 
 
+@pytest.mark.parametrize("value", ["FLASH", "Gold", "Tin"])
+def test_finish_thickness_identifier(value, capsys):
+    values = normalized_values("Finish Thickness", value, capsys)
+
+    assert values["finish"] == [value, "identifier"]
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("2um", 2e-6),
+        ('15u"', 15 * 25.4e-6),
+        ("-", "NaN"),
+    ],
+)
+def test_finish_thickness_length(value, expected, capsys):
+    values = normalized_values("Finish Thickness", value, capsys)
+
+    assert_quantity(values["thickness"], expected, "length")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
