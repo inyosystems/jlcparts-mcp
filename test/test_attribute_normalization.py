@@ -2781,6 +2781,12 @@ def test_connector_type_attribute(value, expected, capsys):
     }
 
 
+def test_connection_type_identifier(capsys):
+    values = normalized_values("Connection Type", "Screw Connection (M2.5)", capsys)
+
+    assert values["connection type"] == ["Screw Connection (M2.5)", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
