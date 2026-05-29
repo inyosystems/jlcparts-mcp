@@ -1017,7 +1017,7 @@ def normalizeAttribute(key, value):
             value = attributes.pitchAttribute(value)
         elif key in larr(["Luminous Intensity", "Light Intensity"]):
             value = attributes.luminousIntensityAttribute(value)
-        elif key in larr(["Lumens", "Luminous Flux (25°C)"]):
+        elif key in larr(["Lumens", "Luminous Flux (25°C)", "Luminous Flux (@25°C)"]):
             value = attributes.luminousFluxAttribute(value)
         elif key in larr(["Luminance"]):
             value = attributes.luminanceAttribute(value)

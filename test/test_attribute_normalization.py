@@ -4554,6 +4554,9 @@ def test_luminous_intensity(key, value, expected, capsys):
         ("Lumens", "383lm", {"flux": 383}),
         ("Lumens", "1380lm, 2070lm", {"flux 1": 1380, "flux 2": 2070}),
         ("Luminous Flux (25°C)", "938lm", {"flux": 938}),
+        ("Luminous Flux (@25°C)", "1lm~5lm", {"flux min": 1, "flux max": 5}),
+        ("Luminous Flux (@25°C)", "34.5lm", {"flux": 34.5}),
+        ("Luminous Flux (@25°C)", "-", {"flux": "NaN"}),
     ],
 )
 def test_luminous_flux(key, value, expected, capsys):
