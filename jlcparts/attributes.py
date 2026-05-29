@@ -1472,6 +1472,36 @@ def specificationsAttribute(value):
 
     return identifierAttribute(value, "specification")
 
+def sizeAttribute(value):
+    value = str(value).strip()
+    if value in ["", "-", "--"]:
+        return identifierAttribute("-", "size")
+
+    if re.fullmatch(r"\d+(?:\.\d+)?", value):
+        return lengthAttribute(value + "mm")
+
+    pin_count = None
+    pin_match = re.search(r"-(\d+)\s*pin$", value, flags=re.I)
+    if pin_match:
+        pin_count = int(pin_match.group(1))
+        value = value[:pin_match.start()]
+
+    numbers = re.findall(r"\d+(?:\.\d+)?", value)
+    if numbers:
+        values = {
+            f"length {index}": [float(number) / 1000, "length"]
+            for index, number in enumerate(numbers, start=1)
+        }
+        if pin_count is not None:
+            values["pins"] = [pin_count, "count"]
+        return {
+            "format": " x ".join("${" + key + "}" for key in values.keys()),
+            "primary": "length 1",
+            "values": values
+        }
+
+    return identifierAttribute(value, "size")
+
 def materialGradeAttribute(value):
     value = str(value).strip()
     if value in ["-", "--", "null"]:

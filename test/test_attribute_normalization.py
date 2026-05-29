@@ -2473,6 +2473,35 @@ def test_specifications_identifier_fallback(capsys):
     ]
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("29mm×12.7mm×15.7mm", {
+            "length 1": (0.029, "length"),
+            "length 2": (0.0127, "length"),
+            "length 3": (0.0157, "length"),
+        }),
+        ("L2.9*W1.5*H1.2 mm", {
+            "length 1": (0.0029, "length"),
+            "length 2": (0.0015, "length"),
+            "length 3": (0.0012, "length"),
+        }),
+        ("M3x7x9.5-6pin", {
+            "length 1": (0.003, "length"),
+            "length 2": (0.007, "length"),
+            "length 3": (0.0095, "length"),
+            "pins": (6, "count"),
+        }),
+        ("2.8", {"length": (0.0028, "length")}),
+    ],
+)
+def test_size_attribute(value, expected, capsys):
+    values = normalized_values("Size", value, capsys)
+
+    for quantity, expected_value in expected.items():
+        assert_quantity(values[quantity], expected_value[0], expected_value[1])
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")
