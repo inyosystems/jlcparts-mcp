@@ -2221,6 +2221,7 @@ def test_memory_generation_and_material_attributes(capsys):
         ("Utilized IC/Part", "ATWILC1000B-MU"),
         ("Wireless Standard", "Bluetooth5.0"),
         ("Core Processor", "ESP8266 chip"),
+        ("Core IC", "nRF52832 chip"),
         ("Support PoE Standard", "IEEE 802.3 at(PoE+), IEEE 802.3 af(PoE)"),
         ("Character Set", "GB2312"),
         ("With Relay/Socket Model", "HF-157F"),

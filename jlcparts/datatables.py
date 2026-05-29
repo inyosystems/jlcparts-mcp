@@ -724,7 +724,7 @@ def normalizeAttribute(key, value):
                 "DDR Sdram Standard", "Protocol Standard", "Usoc Codes",
                 "Grade", "WiFi Protocols", "CPU", "Controller Type", "Model",
                 "Support Interface", "Utilized IC/Part", "Wireless Standard",
-                "Core Processor", "Support PoE Standard", "Character Set",
+                "Core Processor", "Core IC", "Support PoE Standard", "Character Set",
                 "With Relay/Socket Model",
                 "Package", "Mpn", "Description", "Display Configurations",
                 "Display Configurations(Segment)", "Touch Screen Type",
