@@ -2286,6 +2286,16 @@ def test_memory_generation_and_material_attributes(capsys):
 
 
 @pytest.mark.parametrize(
+    "value",
+    ["H62 brass", "304 stainless steel", "SUS304-1/2H,T0.15", "-"],
+)
+def test_material_quality_identifier(value, capsys):
+    values = normalized_values("Material Quality", value, capsys)
+
+    assert values["identifier"] == [value, "identifier"]
+
+
+@pytest.mark.parametrize(
     ("key", "value"),
     [
         ("Battery Type", "CR2032"),
