@@ -2684,6 +2684,12 @@ def test_protocol_identifier_list(capsys):
     assert values["protocol 1"] == ["USB 3.1", "identifier"]
     assert values["protocol 2"] == ["DP 1.3", "identifier"]
 
+    values = normalized_values("Interface Protocol", "I2C;SPI;UART", capsys)
+
+    assert values["protocol 1"] == ["I2C", "identifier"]
+    assert values["protocol 2"] == ["SPI", "identifier"]
+    assert values["protocol 3"] == ["UART", "identifier"]
+
 
 @pytest.mark.parametrize(
     ("value", "expected"),
