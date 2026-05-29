@@ -77,6 +77,20 @@ PERIPHERAL_FUNCTION_ALIASES = {
     "POR": "Power-on Reset",
 }
 
+TOPOLOGY_ALIASES = {
+    "boost converter": "Boost",
+    "Push-pull": "Push-Pull",
+    "Push-pull type": "Push-Pull",
+    "Half Bridge": "Half-Bridge",
+    "Half-bridge": "Half-Bridge",
+    "Full Bridge": "Full-Bridge",
+    "Step-down": "Buck",
+    "Step-down-Boost": "Buck-Boost",
+    "Switched capacitor(充电泵)": "Charge Pump",
+    "Inverted": "Inverting",
+    "Totem pole": "Totem Pole",
+}
+
 def saveJson(object, filename, hash=False, pretty=False, compress=False):
     openFn = gzip.open if compress else open
     with openFn(filename, "wt", encoding="utf-8") as f:
@@ -682,6 +696,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "output type", aliases=OUTPUT_TYPE_ALIASES)
         elif key in larr(["Peripheral/Function"]):
             value = attributes.identifierListAttribute(value, "peripheral", aliases=PERIPHERAL_FUNCTION_ALIASES)
+        elif key in larr(["Topology"]):
+            value = attributes.identifierListAttribute(value, "topology", aliases=TOPOLOGY_ALIASES)
         elif key in larr(["Category"]):
             value = attributes.categoryAttribute(value)
         elif key in larr(["Texture of Material", "Shield Clip"]):

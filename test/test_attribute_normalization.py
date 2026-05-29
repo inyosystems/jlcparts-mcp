@@ -2379,6 +2379,30 @@ def test_peripheral_function_attribute(value, expected, capsys):
     }
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("SEPIC, Buck, Boost, Buck-Boost", ["SEPIC", "Buck", "Boost", "Buck-Boost"]),
+        ("Boost;Cuk;Flyback;SEPIC", ["Boost", "Cuk", "Flyback", "SEPIC"]),
+        ("Step-down;Boost;Step-down-Boost", ["Buck", "Boost", "Buck-Boost"]),
+        ("Full Bridge;Half-bridge;Push-pull type", ["Full-Bridge", "Half-Bridge", "Push-Pull"]),
+        ("Switched capacitor(充电泵)", ["Charge Pump"]),
+        ("boost converter", ["Boost"]),
+    ],
+)
+def test_topology_attribute(value, expected, capsys):
+    values = normalized_values("Topology", value, capsys)
+
+    assert {
+        name: quantity
+        for name, (quantity, unit) in values.items()
+        if unit == "identifier"
+    } == {
+        f"topology {index}": token
+        for index, token in enumerate(expected, start=1)
+    }
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")
