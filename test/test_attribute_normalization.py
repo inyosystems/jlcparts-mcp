@@ -709,6 +709,37 @@ def test_input_voltage_dc_multiple_ranges(capsys):
     assert_quantity(values["voltage 2 max"], 36.0, "voltage")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("125V;250V", {"voltage 1": 125.0, "voltage 2": 250.0}),
+        ("80~305VAC、113~431VDC", {
+            "voltage 1 min": 80.0,
+            "voltage 1 max": 305.0,
+            "voltage 2 min": 113.0,
+            "voltage 2 max": 431.0,
+        }),
+        ("85~264VAC/100~370VDC", {
+            "voltage 1 min": 85.0,
+            "voltage 1 max": 264.0,
+            "voltage 2 min": 100.0,
+            "voltage 2 max": 370.0,
+        }),
+        ("85-305VAC、120-430VDC", {
+            "voltage 1 min": 85.0,
+            "voltage 1 max": 305.0,
+            "voltage 2 min": 120.0,
+            "voltage 2 max": 430.0,
+        }),
+    ],
+)
+def test_input_voltage_lists(value, expected, capsys):
+    values = normalized_values("Input Voltage", value, capsys)
+
+    for quantity, voltage in expected.items():
+        assert_quantity(values[quantity], voltage, "voltage")
+
+
 def test_common_mode_voltage_multiple_ranges(capsys):
     values = normalized_values("Vcm - Common Mode Voltage", "-2V~76V, -2V~42V", capsys)
 

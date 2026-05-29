@@ -3167,6 +3167,9 @@ def voltageRangeAttribute(value, name="voltage"):
 
 def voltageRangeListAttribute(value, name="voltage"):
     value = str(value).strip()
+    value = value.replace("、", ",")
+    value = re.sub(r"(\d[A-Za-z]*)/(?=\d)", r"\1,", value)
+    value = re.sub(r"(?<=\d)\s*-\s*(?=\d)", "~", value)
     parts = [x.strip() for x in re.split(r"[,;]", value)]
     values = {}
     formats = []
