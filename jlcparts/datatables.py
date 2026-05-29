@@ -1128,10 +1128,10 @@ def normalizeAttribute(key, value):
             else:
                 if isinstance(value, str) and value.count("@") == 1 and ";" in value:
                     value = value.replace(";", ",")
-                malformedRdsValue = isinstance(value, str) and ("/" in value.split("@", 1)[0] or re.search(r",[^,]*Ω", value))
+                malformedRdsValue = isinstance(value, str) and "@" not in value and ";" not in value and re.search(r",[^,]*Ω", value)
                 if isinstance(value, str):
                     value = re.sub(r"@VGS\s*", "@", value, flags=re.IGNORECASE)
-                value = attributes.stringAttribute(value) if isinstance(value, str) and (malformedRdsValue or value.count("@") > 1 or ("," in value and value.count("@") != 1)) else attributes.rdsOnMaxAtVgsAtIds(value)
+                value = attributes.stringAttribute(value) if isinstance(value, str) and (malformedRdsValue or ("," in value and value.count("@") == 0)) else attributes.rdsOnMaxAtVgsAtIds(value)
         elif key == "Power Dissipation-Max (Ta=25°C)".lower():
             value = attributes.powerDissipation(value)
         elif key in larr(["Equivalent Series Resistance", "Equivalent Series Resistance (ESR)", "ESR"]):

@@ -48,6 +48,53 @@ def test_rds_on_at_vgs_id_malformed_tuples(value, rds, vgs, current, capsys):
     ("value", "measurements"),
     [
         (
+            "990mΩ@100mA,4.5V;1.9Ω@100mA,4.5V",
+            [(0.99, 4.5, 0.1), (1.9, 4.5, 0.1)],
+        ),
+        (
+            "400mΩ@4.5V,540mA;700mΩ@4.5V,430mA",
+            [(0.4, 4.5, 0.54), (0.7, 4.5, 0.43)],
+        ),
+        (
+            "170mΩ@4.5V;380mΩ@4.5V",
+            [(0.17, 4.5, "NaN"), (0.38, 4.5, "NaN")],
+        ),
+        (
+            "60mΩ@3.1A,10;95mΩ@2.7A,10V",
+            [(0.06, 10.0, 3.1), (0.095, 10.0, 2.7)],
+        ),
+        (
+            "9.2mΩ@9.8A,10V;60mΩ@5A,10V;30mΩ@6A,10V",
+            [(0.0092, 10.0, 9.8), (0.06, 10.0, 5.0), (0.03, 10.0, 6.0)],
+        ),
+        (
+            "26/55mΩ@10V",
+            [(0.026, 10.0, "NaN"), (0.055, 10.0, "NaN")],
+        ),
+        (
+            "900mΩ@10V,500mΩ",
+            [(0.9, 10.0, 0.5)],
+        ),
+    ],
+)
+def test_rds_on_at_vgs_id_measurement_lists(value, measurements, capsys):
+    values = normalized_values(
+        "Drain-Source On Resistance (RDS(on) @ Vgs, Id)",
+        value,
+        capsys,
+    )
+
+    for index, (rds, vgs, current) in enumerate(measurements, start=1):
+        suffix = f" {index}" if len(measurements) > 1 else ""
+        assert_quantity(values[f"Rds{suffix}"], rds, "resistance")
+        assert_quantity(values[f"Vgs{suffix}"], vgs, "voltage")
+        assert_quantity(values[f"Id{suffix}"], current, "current")
+
+
+@pytest.mark.parametrize(
+    ("value", "measurements"),
+    [
+        (
             "1.5mΩ@10V, 2mΩ@4.5V",
             [(0.0015, 10.0), (0.002, 4.5)],
         ),

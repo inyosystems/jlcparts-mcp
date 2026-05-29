@@ -3639,17 +3639,55 @@ def rdsOnMaxAtVgsAtIds(value):
     Given a string in format "<resistance> @ <voltage>, <current>" parse it and
     return it as structured value
     """
+    def hasCurrentUnit(v):
+        return bool(re.search(r"a\b", v.strip(), re.I))
+
+    def hasVoltageUnit(v):
+        return bool(re.search(r"v\b", v.strip(), re.I))
+
+    def splitResistanceValues(resistance):
+        resistance = resistance.strip()
+        ratio = re.fullmatch(
+            r"([+-]?\d+(?:\.\d+)?)\s*/\s*([+-]?\d+(?:\.\d+)?)([a-zA-ZμµΩ]*)",
+            resistance,
+        )
+        if ratio:
+            first, second, unit = ratio.groups()
+            return [first + unit, second + unit]
+        return [resistance]
+
+    def splitConditions(condition):
+        condition = condition.strip().lstrip("=").strip()
+        if "," in condition or "，" in condition:
+            first, second = [x.strip() for x in re.split(r"[,，]", condition, 1)]
+        else:
+            first, second = condition, "-"
+
+        first_is_current = hasCurrentUnit(first)
+        first_is_voltage = hasVoltageUnit(first)
+        second_is_current = hasCurrentUnit(second)
+        second_is_voltage = hasVoltageUnit(second)
+
+        if first_is_current or second_is_voltage:
+            current, voltage = first, second
+        elif first_is_voltage or second_is_current:
+            voltage, current = first, second
+        else:
+            voltage, current = first, second
+
+        if current == "" or "·" in current:
+            current = "-"
+        if voltage == "":
+            voltage = "-"
+        return voltage, current
+
     def readRds(v):
         if v == "-":
-            return "NaN", "NaN", "NaN"
+            return [("NaN", "NaN", "NaN")]
         v = v.strip()
         if "@" in v:
             resistance, condition = v.split("@", 1)
-            condition = condition.strip().lstrip("=").strip()
-            if "," in condition or "，" in condition:
-                voltage, current = re.split(r"[,，]", condition, 1)
-            else:
-                voltage, current = condition, None
+            voltage, current = splitConditions(condition)
         else:
             match = re.fullmatch(
                     r"\s*([\w.Ω]+)\s*(?:\s+([-+~\w.]+?)\s*(?:(?<=\d)([.\w]+)\s*)?)?",
@@ -3660,60 +3698,66 @@ def rdsOnMaxAtVgsAtIds(value):
                 raise ValueError(f"Cannot parse RDS tuple {v}")
             resistance, voltage, current = match.groups()
 
-        resistance = resistance.strip()
         voltage = voltage.strip() if voltage is not None else "-"
         current = current.strip() if current is not None else "-"
         if current == "" or "·" in current:
             current = "-"
+        if current != "-" and "Ω" in current and not hasCurrentUnit(current):
+            current = current.replace("Ω", "A")
 
-        if not current.endswith("A"):
-            if current.endswith("V"):
-                if voltage.endswith("A") or voltage.endswith("m"):
-                    # There are sometimes swapped values
-                    current, voltage = voltage, current
-                else:
-                    current = current.replace("V", "A")
-            else:
-                current += "A"
-        if voltage.endswith("A"):
-            voltage = voltage.replace("A", "V")
+        if current != "-" and not hasCurrentUnit(current):
+            current += "A"
+        if voltage != "-" and not hasVoltageUnit(voltage):
+            voltage += "V"
         if "~" in voltage:
             voltage = voltage.split("~")[-1]
-        return (readResistance(resistance),
-                readCurrent(current),
-                readVoltage(voltage))
-    if value.count(",") == 3 or ";" in value:
-        # Double P & N MOSFET
-        if ";" in value:
-            s = value.split(";")
-        else:
-            s = value.split(",")
-            s = [s[0] + "," + s[1], s[2] + "," + s[3]]
-        rds1, id1, vgs1 = readRds(s[0])
-        rds2, id2, vgs2 = readRds(s[1])
-        return {
-            "format": "${Rds 1} @ ${Vgs 1}, ${Id 1}; ${Rds 2} @ ${Vgs 2}, ${Id 2}",
-            "primary": "Rds 1",
-            "values": {
-                "Rds 2": [rds2, "resistance"],
-                "Id 2": [id2, "current"],
-                "Vgs 2": [vgs2, "voltage"],
-                "Rds 1": [rds1, "resistance"],
-                "Id 1": [id1, "current"],
-                "Vgs 1": [vgs1, "voltage"]
-            }
-        }
+
+        return [
+            (readResistance(resistance), readCurrent(current), readVoltage(voltage))
+            for resistance in splitResistanceValues(resistance)
+        ]
+
+    if ";" in value:
+        s = value.split(";")
+    elif value.count(",") == 3:
+        # Double P & N MOSFET without semicolon separator.
+        s = value.split(",")
+        s = [s[0] + "," + s[1], s[2] + "," + s[3]]
     else:
-        rds, ids, vgs = readRds(value)
+        s = [value]
+
+    measurements = []
+    for part in s:
+        measurements.extend(readRds(part))
+
+    if len(measurements) > 1:
+        if ";" in value:
+            separator = "; "
+        else:
+            separator = ", "
+        values = {}
+        formats = []
+        for index, (rds, ids, vgs) in enumerate(measurements, start=1):
+            values[f"Rds {index}"] = [rds, "resistance"]
+            values[f"Id {index}"] = [ids, "current"]
+            values[f"Vgs {index}"] = [vgs, "voltage"]
+            formats.append("${Rds " + str(index) + "} @ ${Vgs " + str(index) + "}, ${Id " + str(index) + "}")
         return {
-            "format": "${Rds} @ ${Vgs}, ${Id}",
-            "primary": "Rds",
-            "values": {
-                "Rds": [rds, "resistance"],
-                "Id": [ids, "current"],
-                "Vgs": [vgs, "voltage"]
-            }
+            "format": separator.join(formats),
+            "primary": "Rds 1",
+            "values": values
         }
+
+    rds, ids, vgs = measurements[0]
+    return {
+        "format": "${Rds} @ ${Vgs}, ${Id}",
+        "primary": "Rds",
+        "values": {
+            "Rds": [rds, "resistance"],
+            "Id": [ids, "current"],
+            "Vgs": [vgs, "voltage"]
+        }
+    }
 
 
 def rdsMeasurementsAtVgs(value):
