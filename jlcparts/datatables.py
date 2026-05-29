@@ -399,7 +399,7 @@ def normalizeAttribute(key, value):
             value = attributes.voltageAtConditionAttribute(value, "voltage")
         elif key in larr(["Rated current", "Rated Current", "surge current", "Current - Average Rectified (Io)",
                     "Average Rectified Current (IO)",
-                    "Power Current Rating",
+                    "Power Current Rating", "Power Current Rating (Max)",
                     "Current - Breakover", "Current - Peak Output", "Current - Peak Pulse (10/1000μs)",
                     "Impulse Discharge Current (8/20us)", "Current - Gate Trigger (Igt) (Max)",
                     "Current - On State (It (AV)) (Max)", "Current - On State (It (RMS)) (Max)",
@@ -478,7 +478,7 @@ def normalizeAttribute(key, value):
                     "Collector Cut-Off Current (Icbo@Vcb)",
                     "Current - Collector Pulsed (Icm)",
                     "Collector Current(Ic)",
-                    "Pulsed Collector Current (Icm)"]):
+                    "Pulsed Collector Current (Icm)", "Contact Current (AC)"]):
             currentListKeys = [
                 "non-repetitive peak forward surge current",
                 "quiescent current",
@@ -547,8 +547,8 @@ def normalizeAttribute(key, value):
             elif key in ["current range", "current consumption", "trigger current", "setting current",
                     "bias current"]:
                 value = attributes.currentRangeListAttribute(value)
-            elif key in ["supply current", "power current rating"]:
-                value = attributes.currentRangeListAttribute(value) if isinstance(value, str) and ("~" in value or "," in value or ";" in value) else attributes.currentAttribute(value)
+            elif key in ["rated current", "supply current", "power current rating"]:
+                value = attributes.currentRangeListAttribute(value) if isinstance(value, str) and ("~" in value or "," in value or ";" in value or re.search(r"\d\s*-\s*\d", value)) else attributes.currentAttribute(value)
             elif key in currentListKeys and isinstance(value, str) and ("," in value or ";" in value):
                 value = attributes.currentListAttribute(value)
             elif isinstance(value, str) and ("," in value or re.search(r"\d\s*-\s*\d", value)):

@@ -1511,6 +1511,7 @@ def test_center_frequency(value, expected, capsys):
         ("Refresh Current", "1mA, 2.7mA, 400uA", [0.001, 0.0027, 400e-6]),
         ("Power Current Rating", "5A, 250mA, 1.25A", [5.0, 0.25, 1.25]),
         ("Supply Current", "1.2mA, 300uA", [0.0012, 300e-6]),
+        ("Rated Current", "15A, 16A", [15.0, 16.0]),
     ],
 )
 def test_current_lists(key, value, expected, capsys):
@@ -1549,6 +1550,13 @@ def test_supply_current_range_list(capsys):
     assert_quantity(values["current 1 max"], 230e-6, "current")
     assert_quantity(values["current 2 min"], 130e-6, "current")
     assert_quantity(values["current 2 max"], 250e-6, "current")
+
+
+def test_rated_current_dash_range(capsys):
+    values = normalized_values("Rated Current", "40-50A", capsys)
+
+    assert_quantity(values["current min"], 40.0, "current")
+    assert_quantity(values["current max"], 50.0, "current")
 
 
 @pytest.mark.parametrize(
@@ -2844,6 +2852,19 @@ def test_collector_current(value, expected, capsys):
 )
 def test_charge_current_max(value, expected, capsys):
     values = normalized_values("Charge Current - Max", value, capsys)
+
+    assert_quantity(values["current"], expected, "current")
+
+
+@pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Power Current Rating (Max)", "5A", 5.0),
+        ("Contact Current (AC)", "100mA", 0.1),
+    ],
+)
+def test_additional_scalar_current_values(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
 
     assert_quantity(values["current"], expected, "current")
 
