@@ -2573,6 +2573,28 @@ def test_applications_attribute(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("USB to UART, USB to SPI, USB to I2C", ["USB to UART", "USB to SPI", "USB to I2C"]),
+        ("Buffers;Driver", ["Buffers", "Driver"]),
+        ("USB to HUB; USB to SD/MMC", ["USB to HUB", "USB to SD/MMC"]),
+        ("-", ["-"]),
+    ],
+)
+def test_applications_function_attribute(value, expected, capsys):
+    values = normalized_values("Applications Function", value, capsys)
+
+    assert {
+        name: quantity
+        for name, (quantity, unit) in values.items()
+        if unit == "identifier"
+    } == {
+        f"application {index}": token
+        for index, token in enumerate(expected, start=1)
+    }
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("DC Power Jack", ["DC Power Jack"]),
         ("Type-A, Type-C", ["Type-A", "Type-C"]),
         ("DDR1;DDR2", ["DDR1", "DDR2"]),

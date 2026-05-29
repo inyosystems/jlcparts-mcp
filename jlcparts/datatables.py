@@ -757,7 +757,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "protocol")
         elif key in larr(["Type"]):
             value = attributes.identifierListAttribute(value, "type")
-        elif key in larr(["Applications"]):
+        elif key in larr(["Applications", "Applications Function"]):
             value = attributes.identifierListAttribute(value, "application")
         elif key in larr(["Connector Type"]):
             value = attributes.identifierListAttribute(value, "connector type")
