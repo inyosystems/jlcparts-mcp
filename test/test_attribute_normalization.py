@@ -2442,6 +2442,27 @@ def test_interface_type_attribute(value, expected, capsys):
     }
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("SPI, I2C, UART", ["SPI", "I2C", "UART"]),
+        ("I2C;SPI;UART", ["I2C", "SPI", "UART"]),
+        ("serial", ["serial"]),
+    ],
+)
+def test_control_interface_attribute(value, expected, capsys):
+    values = normalized_values("Control Interface", value, capsys)
+
+    assert {
+        name: quantity
+        for name, (quantity, unit) in values.items()
+        if unit == "identifier"
+    } == {
+        f"interface {index}": token
+        for index, token in enumerate(expected, start=1)
+    }
+
+
 def test_protocol_identifier_list(capsys):
     values = normalized_values("Protocol", "USB 3.1;DP 1.3", capsys)
 
