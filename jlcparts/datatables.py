@@ -570,6 +570,7 @@ def normalizeAttribute(key, value):
                 "Rated Wattage", "Coil Rated Power",
                 "Pd - Power Dissipation(Pd)",
                 "Total Power Dissipation(Pd)",
+                "Total Device Dissipation (Pd)",
                 "Average Gate Power Dissipation (Pg(Av))", "Radiant Flux",
                 "Quiescent Dissipation", "Power Consumption",
                 "Dissipation Power", "Corresponding Power"]):

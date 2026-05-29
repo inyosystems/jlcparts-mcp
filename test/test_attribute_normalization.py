@@ -4426,6 +4426,20 @@ def test_total_power_dissipation_alias(capsys):
     assert_quantity(values["power"], 0.15, "power")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("150mW", 0.15),
+        ("1.8W", 1.8),
+        ("-", "NaN"),
+    ],
+)
+def test_total_device_dissipation_alias(value, expected, capsys):
+    values = normalized_values("Total Device Dissipation (Pd)", value, capsys)
+
+    assert_quantity(values["power"], expected, "power")
+
+
 def test_average_gate_power_dissipation_alias(capsys):
     values = normalized_values("Average Gate Power Dissipation (Pg(Av))", "200mW", capsys)
 
