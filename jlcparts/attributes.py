@@ -2847,6 +2847,40 @@ def currentRangeListAttribute(value, name="current"):
 def voltageAtConditionAttribute(value, name="voltage"):
     return scalarAttribute(value, readVoltage, "voltage", name)
 
+def voltageAtCurrentListAttribute(value, name="voltage"):
+    """
+    Parse one or more voltage measurements in the form "voltage@(current)".
+    """
+    parts = [x.strip() for x in re.split(r"[,;]", str(value)) if x.strip()]
+    multiple = len(parts) > 1
+    values = {}
+    formats = []
+
+    for index, part in enumerate(parts, start=1):
+        voltage_name = f"{name} {index}" if multiple else name
+        current_name = f"current {index}" if multiple else "current"
+
+        if part == "-":
+            voltage, current = "NaN", "NaN"
+        elif "@" in part:
+            voltage_part, current_part = [x.strip() for x in part.split("@", 1)]
+            current_part = current_part.strip("() ")
+            voltage = readVoltage(voltage_part)
+            current = readCurrent(current_part)
+        else:
+            voltage = readVoltage(part)
+            current = "NaN"
+
+        values[voltage_name] = [voltage, "voltage"]
+        values[current_name] = [current, "current"]
+        formats.append("${" + voltage_name + "} @ ${" + current_name + "}")
+
+    return {
+        "format": ", ".join(formats),
+        "primary": f"{name} 1" if multiple else name,
+        "values": values
+    }
+
 def voltageAtElectricalConditionsAttribute(value, name="voltage"):
     value = str(value).strip()
     if "@" not in value:

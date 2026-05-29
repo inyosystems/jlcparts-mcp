@@ -774,6 +774,35 @@ def test_clamping_voltage_ipp(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "measurements"),
+    [
+        (
+            "Voltage Dropout",
+            "235mV@(500mA), 260mV@(500mA)",
+            [(0.235, 0.5), (0.26, 0.5)],
+        ),
+        (
+            "Voltage Dropout",
+            "1V@(100mA), 1.1V@(800mA), 1.05V@(500mA)",
+            [(1.0, 0.1), (1.1, 0.8), (1.05, 0.5)],
+        ),
+        (
+            "Dropout Voltage",
+            "-;200mV@(200mA)",
+            [("NaN", "NaN"), (0.2, 0.2)],
+        ),
+    ],
+)
+def test_dropout_voltage_at_current_lists(key, value, measurements, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for index, (voltage, current) in enumerate(measurements, start=1):
+        suffix = f" {index}" if len(measurements) > 1 else ""
+        assert_quantity(values[f"voltage{suffix}"], voltage, "voltage")
+        assert_quantity(values[f"current{suffix}"], current, "current")
+
+
+@pytest.mark.parametrize(
     ("value", "expected"),
     [
         ("3pF", {"capacitance": 3e-12}),

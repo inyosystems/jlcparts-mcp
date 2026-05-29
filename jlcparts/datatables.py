@@ -388,6 +388,8 @@ def normalizeAttribute(key, value):
                 value = attributes.voltageListAttribute(value, "voltage")
             elif key == "vce saturation(vce(sat))":
                 value = attributes.voltageAtElectricalConditionsAttribute(value, "Vce")
+            elif key in larr(["Voltage Dropout", "Dropout Voltage"]) and isinstance(value, str) and "@" in value:
+                value = attributes.voltageAtCurrentListAttribute(value, "voltage")
             else:
                 value = attributes.stringAttribute(value) if compoundValue(value) else attributes.voltageAtConditionAttribute(value, "voltage")
         elif key in larr(["Voltage - Forward(Vf)", "Forward Voltage (Vf)"]):
