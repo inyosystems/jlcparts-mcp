@@ -5934,6 +5934,20 @@ def test_response_time_values(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("key", "value", "expected"),
+    [
+        ("Turn-on Time", "20ns, 28ns", [20e-9, 28e-9]),
+        ("Turn-Off Time", "80us, 800us", [80e-6, 800e-6]),
+    ],
+)
+def test_turn_on_off_time_lists(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    for index, time in enumerate(expected, start=1):
+        assert_quantity(values[f"time {index}"], time, "time")
+
+
+@pytest.mark.parametrize(
     ("value", "expected"),
     [
         ("300ms", [0.3]),
