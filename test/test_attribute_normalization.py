@@ -2576,6 +2576,21 @@ def test_switching_frequency_attribute(value, expected, capsys):
         assert_quantity(values[quantity], expected_value, "frequency")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("500mA, 315mA", [0.5, 0.315]),
+        ("3A, -3A", [3.0, -3.0]),
+        ("4A, 8A, -3A, -1.25A", [4.0, 8.0, -3.0, -1.25]),
+    ],
+)
+def test_output_current_max_attribute(value, expected, capsys):
+    values = normalized_values("Output Current (Max)", value, capsys)
+
+    for index, expected_value in enumerate(expected, start=1):
+        assert_quantity(values[f"current {index}"], expected_value, "current")
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")

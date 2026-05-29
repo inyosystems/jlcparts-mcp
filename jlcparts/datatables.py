@@ -524,6 +524,7 @@ def normalizeAttribute(key, value):
                 "current - surge(itsm)",
                 "standby current(isb)",
                 "iout",
+                "output current (max)",
                 "gate trigger current(igt)",
                 "current - dc forward(if)",
                 "current - dc forward (if)",
