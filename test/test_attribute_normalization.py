@@ -1057,6 +1057,8 @@ def test_forward_voltage_vf_lists(key, value, expected, capsys):
         ("Lo Frequency Range", "400MHz~2.5GHz", "frequency 1 min", 400e6, "frequency"),
         ("IF Frequency Range", "10MHz~500MHz", "frequency 1 min", 10e6, "frequency"),
         ("RF Frequency Range", "400MHz~2.5GHz", "frequency 1 min", 400e6, "frequency"),
+        ("Frequency Range", "2.4GHz~2.5GHz, 4.9GHz~5.845GHz", "frequency 1 min", 2.4e9, "frequency"),
+        ("Frequency Range", "50Hz, 60Hz", "frequency 1", 50.0, "frequency"),
         ("Voltage", "600 V", "voltage", 600.0, "voltage"),
         ("Control Voltage Range/Center", "0V~3.3V", "voltage min", 0.0, "voltage"),
         ("Vbo (Range Value)", "35V~45V", "voltage min", 35.0, "voltage"),
