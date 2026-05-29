@@ -5829,6 +5829,20 @@ def test_response_time_tr_values(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("1ms", 1e-3),
+        ("800us", 800e-6),
+        ("1s", 1),
+    ],
+)
+def test_response_time_values(value, expected, capsys):
+    values = normalized_values("Response Time", value, capsys)
+
+    assert_quantity(values["time"], expected, "time")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("300ms", [0.3]),
         ("1.17min", [70.2]),
         ("100ms;8.2s;4.8s", [0.1, 8.2, 4.8]),

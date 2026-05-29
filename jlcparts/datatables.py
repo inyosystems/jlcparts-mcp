@@ -1274,7 +1274,7 @@ def normalizeAttribute(key, value):
         elif key in larr(["Propagation Delay", "Propagation Delay (TPD)", "Propagation Delay Time", "Turn-On Time",
                 "Turn-Off Time", "Rise Time", "Rise Time(Tr)", "Rise Time (Tr)",
                 "Fall Time", "Reverse Recovery Time (Trr)",
-                "Reset Timeout", "Settling Time", "Response Time (Tr)", "Time to Trip (Max)", "Td(Off)",
+                "Reset Timeout", "Settling Time", "Response Time", "Response Time (Tr)", "Time to Trip (Max)", "Td(Off)",
                 "Propagation Delay Tp Hl", "Propagation Delay Tp Lh", "Max Propagation Delay",
                 "Maximum Propagation Delay", "Td(on)", "Block Erase Time(T Be)",
                 "Block Erase Time (T Be)",
