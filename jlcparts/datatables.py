@@ -749,6 +749,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierAttribute(value)
         elif key in larr(["Reference Series"]):
             value = attributes.identifierListAttribute(value, "series")
+        elif key in larr(["Circuit"]):
+            value = attributes.identifierAttribute(value, "circuit")
         elif key in larr(["Features", "Feature", "Function"]):
             value = attributes.identifierListAttribute(value, "feature")
         elif key in larr(["Configuration"]):

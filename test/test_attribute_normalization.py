@@ -2405,6 +2405,13 @@ def test_reference_series_identifiers(value, expected, capsys):
     }
 
 
+@pytest.mark.parametrize("value", ["SP3T", "Double pole triple throw", "2P2T", "-"])
+def test_circuit_identifier(value, capsys):
+    values = normalized_values("Circuit", value, capsys)
+
+    assert values["circuit"] == [value, "identifier"]
+
+
 @pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
