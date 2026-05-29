@@ -1142,7 +1142,7 @@ def normalizeAttribute(key, value):
             value = attributes.kelvinRangeListAttribute(value) if isinstance(value, str) and ("," in value or ";" in value) else attributes.kelvinAttribute(value)
         elif key in larr(["Color Temperature"]):
             value = attributes.kelvinRangeListAttribute(value)
-        elif key in larr(["Wire Gauge - MM2", "Wire Gauge - Sqmm",
+        elif key in larr(["Wire Gauge - MM2", "Wire Gauge - Mm", "Wire Gauge - Sqmm",
                 "Wire Gauge - Sqmm (Per)", "Wire Gauge - MM2 (Not Stranded Wire)"]):
             value = attributes.areaMm2RangeListAttribute(value)
         elif key in larr(["Wire Gauge - Awg", "Wire Gauge", "Wire Gauge - Awg (Per)",

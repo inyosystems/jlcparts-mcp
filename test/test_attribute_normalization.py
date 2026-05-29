@@ -4224,7 +4224,7 @@ def test_color_temperature(value, expected, capsys):
         ("0.3~0.4", {"area 1 min": 0.3, "area 1 max": 0.4}),
     ],
 )
-@pytest.mark.parametrize("key", ["Wire Gauge - MM2", "Wire Gauge - Sqmm", "Wire Gauge - Sqmm (Per)", "Wire Gauge - MM2 (Not Stranded Wire)"])
+@pytest.mark.parametrize("key", ["Wire Gauge - MM2", "Wire Gauge - Mm", "Wire Gauge - Sqmm", "Wire Gauge - Sqmm (Per)", "Wire Gauge - MM2 (Not Stranded Wire)"])
 def test_wire_gauge_mm2(key, value, expected, capsys):
     values = normalized_values(key, value, capsys)
 
