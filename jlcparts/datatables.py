@@ -818,6 +818,7 @@ def normalizeAttribute(key, value):
         elif key in larr(["Number of Pins", "Number of Resistors", "Number of Loop",
                     "Number of Regulators", "Number of Outputs", "Number of Capacitors",
                     "Number of I/O", "Gpio Ports Number", "Number of Logic Elements/Blocks",
+                    "Logic Elements/Cells",
                     "Number of Differential Input Channels", "Number of Taps",
                     "Number of Voltages Monitored", "Number of Amplifiers",
                     "Attrition", "Minimum Order Quantity", "Minimum Placement Quantity",
@@ -901,6 +902,7 @@ def normalizeAttribute(key, value):
             value = attributes.inductanceListAttribute(value) if compoundValue(value) else attributes.inductanceAttribute(value)
         elif key in larr(["Length", "Width", "Height", "Diameter", "Switch Height", "Overall Length",
                 "Height Above Board", "Body Height (Max)", "Inner Diameter After Contraction",
+                "Maximum Body Height",
                 "Undeclared Tolerance", "X-Length of Bottom Edge on Board (Spacing Line)",
                 "Y-Width of Bottom Edge on Board", "Z-Height of the Board", "Diameter (Φd)", "Insulation Od",
                 "Insulation Height", "Switch Length", "Switch Width", "Interface Length/Height", "Interface Diameter",

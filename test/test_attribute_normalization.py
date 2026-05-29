@@ -3179,6 +3179,13 @@ def test_logic_elements_blocks_count(capsys):
 
     assert_quantity(values["count"], "NaN", "count")
 
+
+def test_logic_elements_cells_count(capsys):
+    values = normalized_values("Logic Elements/Cells", "10320", capsys)
+
+    assert_quantity(values["count"], 10320, "count")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
@@ -4912,6 +4919,7 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Body Thickness", "5mm", 0.005),
         ("Body Height", "0.3mm", 0.0003),
         ("Body Height (Max)", "1.18mm", 0.00118),
+        ("Maximum Body Height", "1.65mm", 0.00165),
         ("Body Length", "168mm", 0.168),
         ("Body Width", "76mm", 0.076),
         ("Thickness", "0.06mm", 0.00006),
