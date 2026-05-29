@@ -121,6 +121,22 @@ def test_rds_on_multiple_measurements(value, measurements, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("60Ω", 60.0),
+        ("12Ω", 12.0),
+        ("-", "NaN"),
+    ],
+)
+def test_static_rds_on_values(value, expected, capsys):
+    values = normalized_values("Static Drain-Source On Resistance (RDS(on))", value, capsys)
+
+    assert_quantity(values["Rds"], expected, "resistance")
+    assert_quantity(values["Vgs"], "NaN", "voltage")
+    assert_quantity(values["Id"], "NaN", "current")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("Coil Resistance", "1.44kΩ", {"resistance": 1440.0}),

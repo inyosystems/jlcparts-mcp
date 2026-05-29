@@ -1170,7 +1170,8 @@ def normalizeAttribute(key, value):
             value = attributes.drainToSourceVoltage(value)
         elif key in larr(["Drain Source On Resistance (RDS(on)@Vgs,Id)",
                           "Drain-Source On Resistance (RDS(on))",
-                          "Drain-Source On Resistance (RDS(on) @ Vgs, Id)"]):
+                          "Drain-Source On Resistance (RDS(on) @ Vgs, Id)",
+                          "Static Drain-Source On Resistance (RDS(on))"]):
             if key == "drain-source on resistance (rds(on))" and isinstance(value, str) and ("," in value or ";" in value):
                 value = attributes.rdsMeasurementsAtVgs(value)
             else:
