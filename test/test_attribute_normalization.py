@@ -3784,6 +3784,9 @@ def test_embedded_block_ram(value, expected, capsys):
     ("key", "value", "expected"),
     [
         ("Eeprom", "2KB", 2 * 1024),
+        ("Flash Size", "12KB", 12 * 1024),
+        ("Flash Size", "2MB", 2 * 1024 * 1024),
+        ("Flash Size", "-", "NaN"),
         ("Memory Size of Flash", "256Mbit", 256 * 1024 * 1024 / 8),
         ("Memory Size of Ram", "64Mbit", 64 * 1024 * 1024 / 8),
     ],
