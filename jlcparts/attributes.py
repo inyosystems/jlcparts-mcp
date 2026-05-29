@@ -3552,6 +3552,48 @@ def ratioRangeListAttribute(value, name="ratio"):
         "values": values
     }
 
+def toleranceAttribute(value):
+    value = str(value).strip()
+    if "%" in value:
+        parsed = flexiblePercentageAttribute(value)
+        return {
+            **parsed,
+            "primary": parsed["primary"].replace("percentage", "tolerance"),
+            "format": parsed["format"].replace("percentage", "tolerance"),
+            "values": {
+                name.replace("percentage", "tolerance"): parsed_value
+                for name, parsed_value in parsed["values"].items()
+            }
+        }
+    if "℃" in value or "°C" in value:
+        parsed = temperatureListAttribute(value) if _hasCompoundValues(value) else temperatureRangeAttribute(value)
+        return {
+            **parsed,
+            "primary": parsed["primary"].replace("temperature", "tolerance"),
+            "format": parsed["format"].replace("temperature", "tolerance"),
+            "values": {
+                name.replace("temperature", "tolerance"): parsed_value
+                for name, parsed_value in parsed["values"].items()
+            }
+        }
+
+    value = value.replace(";", ",")
+    parts = [x.strip() for x in value.split(",") if x.strip()]
+    values = {}
+    formats = []
+    for i, part in enumerate(parts, start=1):
+        name = f"tolerance {i}" if len(parts) > 1 else "tolerance"
+        normalized_part = "-" + part[1:] + "~+" + part[1:] if part.startswith("±") else part
+        parsed = rangeOrScalarAttribute(normalized_part, readRatio, "ratio", name)
+        values.update(parsed["values"])
+        formats.append(parsed["format"])
+    primary_name = "tolerance 1" if len(parts) > 1 else "tolerance"
+    return {
+        "format": ", ".join(formats),
+        "primary": primary_name + " min" if any(_rangeParts(part) or part.startswith("±") for part in parts) else primary_name,
+        "values": values
+    }
+
 def gainListAttribute(value):
     value = str(value).strip()
     parts = [x.strip() for x in value.split(",")]

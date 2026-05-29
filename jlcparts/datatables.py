@@ -1038,7 +1038,7 @@ def normalizeAttribute(key, value):
         elif key in larr(["Phase Unbalance"]):
             value = attributes.angleOrDecibelListAttribute(value, "phase")
         elif key in larr(["Tolerance"]):
-            value = attributes.percentageAttribute(value) if isinstance(value, str) and "%" in value and not compoundValue(value) else attributes.stringAttribute(value)
+            value = attributes.toleranceAttribute(value)
         elif key in larr(["Precision", "Linearity", "Error", "Degree of Linearity",
                 "Total Harmonic Distortion + Noise (Thd+N)", "Total Harmonic Distortion(Thd)",
                 "Total Harmonic Distortion", "Differential Gain", "Capacitance Tolerance",

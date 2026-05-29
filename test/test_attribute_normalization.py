@@ -3611,6 +3611,35 @@ def test_flexible_percentage_values(key, value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("0.1%, 0.5%", {
+            "tolerance 1": (0.1, "percentage"),
+            "tolerance 2": (0.5, "percentage"),
+        }),
+        ("-0.6%;+0.4%", {
+            "tolerance min": (-0.6, "percentage"),
+            "tolerance max": (0.4, "percentage"),
+        }),
+        ("±1℃", {
+            "tolerance min": (-1.0, "temperature"),
+            "tolerance max": (1.0, "temperature"),
+        }),
+        ("±1.5", {
+            "tolerance min": (-1.5, "ratio"),
+            "tolerance max": (1.5, "ratio"),
+        }),
+        ("-", {"tolerance": ("NaN", "ratio")}),
+    ],
+)
+def test_mixed_tolerance_values(value, expected, capsys):
+    values = normalized_values("Tolerance", value, capsys)
+
+    for quantity, (amount, unit) in expected.items():
+        assert_quantity(values[quantity], amount, unit)
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("6%", {"percentage": [6.0, "percentage"]}),
         ("16%", {"percentage": [16.0, "percentage"]}),
         ("1mW/℃", {"power drift": [0.001, "power_temperature_drift"]}),
