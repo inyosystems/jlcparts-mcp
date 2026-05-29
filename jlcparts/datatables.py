@@ -745,7 +745,7 @@ def normalizeAttribute(key, value):
                 "Memory Format", "Agreement", "CPU Core", "Standard",
                 "Pin Structure", "Flame Retardant Rating", "Plastic Material",
                 "Specification", "Holes Structure", "Manufacturer", "Series",
-                "Lamp Holder Type", "Material Quality"]):
+                "Lamp Holder Type", "Material Quality", "Ip Rating"]):
             value = attributes.identifierAttribute(value)
         elif key in larr(["Reference Series"]):
             value = attributes.identifierListAttribute(value, "series")

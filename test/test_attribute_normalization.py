@@ -2376,6 +2376,8 @@ def test_material_quality_identifier(value, capsys):
         ("Manufacturer", "Analog Devices Inc./Maxim Integrated"),
         ("Series", "74HC Series"),
         ("Lamp Holder Type", "2.0mm x 1.25mm square LED"),
+        ("Ip Rating", "IP67"),
+        ("Ip Rating", "-"),
     ],
 )
 def test_identifier_attributes(key, value, capsys):
