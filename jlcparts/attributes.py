@@ -34,12 +34,29 @@ def identifierAttribute(value, name="identifier"):
         }
     }
 
-def identifierListAttribute(value, name="identifier", separators=r"[,;]"):
-    tokens = [
-        " ".join(token.split())
-        for token in re.split(separators, str(value))
-        if token.strip()
-    ]
+def splitIdentifierList(value, separators=",;"):
+    tokens = []
+    token = []
+    depth = 0
+    for char in str(value):
+        if char in "([{":
+            depth += 1
+        elif char in ")]}" and depth > 0:
+            depth -= 1
+        if char in separators and depth == 0:
+            item = " ".join("".join(token).split())
+            if item:
+                tokens.append(item)
+            token = []
+        else:
+            token.append(char)
+    item = " ".join("".join(token).split())
+    if item:
+        tokens.append(item)
+    return tokens
+
+def identifierListAttribute(value, name="identifier", separators=",;"):
+    tokens = splitIdentifierList(value, separators)
     if not tokens:
         tokens = ["-"]
     keys = [f"{name} {index}" for index in range(1, len(tokens) + 1)]

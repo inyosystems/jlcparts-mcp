@@ -2238,6 +2238,29 @@ def test_interface_attribute(value, expected, capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("SPI, I2C", ["SPI", "I2C"]),
+        ("CMOS;serial", ["CMOS", "serial"]),
+        ("Up/Down(U/D,CS)", ["Up/Down(U/D,CS)"]),
+        ("PWM, SPI, ADC, USB, I2C, ISP, JTAG, DMA",
+            ["PWM", "SPI", "ADC", "USB", "I2C", "ISP", "JTAG", "DMA"]),
+    ],
+)
+def test_interface_type_attribute(value, expected, capsys):
+    values = normalized_values("Interface Type", value, capsys)
+
+    assert {
+        name: quantity
+        for name, (quantity, unit) in values.items()
+        if unit == "identifier"
+    } == {
+        f"interface {index}": token
+        for index, token in enumerate(expected, start=1)
+    }
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("Encoder/decoder", ["Encoder/decoder"]),
         ("Driver, Buffer", ["Driver", "Buffer"]),
         ("Transceiver;隔离器", ["Transceiver", "隔离器"]),
