@@ -1290,6 +1290,7 @@ def test_peak_output_current_sink_list(capsys):
         ("Battery Current", "50nA, 150nA", {"current 1": 50e-9, "current 2": 150e-9}),
         ("Supply Current (Program)", "30mA", {"current": 0.03}),
         ("Supply Current (Erase)", "5mA", {"current": 0.005}),
+        ("Supply Current (Read)", "140uA", {"current": 140e-6}),
         ("Idle Current", "75uA", {"current": 75e-6}),
         ("RMS on-State Current(It(RMS))", "70mA", {"current": 0.07}),
         ("Current Dark", "5pA", {"current": 5e-12}),
