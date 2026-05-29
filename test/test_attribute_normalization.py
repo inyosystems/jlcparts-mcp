@@ -2280,6 +2280,29 @@ def test_type_attribute(value, expected, capsys):
     }
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Cellular,CATV,DBS,PCS,WLAN", ["Cellular", "CATV", "DBS", "PCS", "WLAN"]),
+        ("RS422;RS485", ["RS422", "RS485"]),
+        ("802.11a/b/g/WiFi;802.16/WiMax;WLAN",
+            ["802.11a/b/g/WiFi", "802.16/WiMax", "WLAN"]),
+        ("2G/3G/4G", ["2G/3G/4G"]),
+    ],
+)
+def test_applications_attribute(value, expected, capsys):
+    values = normalized_values("Applications", value, capsys)
+
+    assert {
+        name: quantity
+        for name, (quantity, unit) in values.items()
+        if unit == "identifier"
+    } == {
+        f"application {index}": token
+        for index, token in enumerate(expected, start=1)
+    }
+
+
 def test_plating_and_product_description_dimensions(capsys):
     values = normalized_values("Electroplate", 'Bright tin plating 80~150u", nickel plating 50u"', capsys)
     assert_quantity(values["tin thickness min"], 80 * 0.0254e-6, "length")
