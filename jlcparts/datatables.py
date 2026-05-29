@@ -492,6 +492,7 @@ def normalizeAttribute(key, value):
                 "current - input bias(ib)",
                 "current - output low(iol)",
                 "current - output high(ioh)",
+                "saturation current (isat)",
                 "current - surge(itsm@f)",
                 "send current",
                 "current of transmitting",

@@ -1526,6 +1526,8 @@ def test_center_frequency(value, expected, capsys):
         ("Current - Collector(Ic)", "5A, 4.45A", [5.0, 4.45]),
         ("Current - Output Low(Iol)", "2.6mA, 6.8mA, 1mA", [0.0026, 0.0068, 0.001]),
         ("Current - Output High(Ioh)", "1mA, 2.6mA, 6.8mA", [0.001, 0.0026, 0.0068]),
+        ("Saturation Current (Isat)", "75A, 85A", [75.0, 85.0]),
+        ("Saturation Current (Isat)", "900mA, 1.02A", [0.9, 1.02]),
         ("Current - Surge(Itsm@F)", "170A@60Hz, 155A@50Hz", [170.0, 155.0]),
         ("Send Current", "9.5mA, 16mA", [0.0095, 0.016]),
         ("Current of Transmitting", "7.1mA, 3.5mA", [0.0071, 0.0035]),
