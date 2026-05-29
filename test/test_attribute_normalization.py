@@ -1161,6 +1161,8 @@ def test_peak_output_current_sink_list(capsys):
         ("Contact Current", "3A, 6A", {"current 1": 3.0, "current 2": 6.0}),
         ("Contact Current", "-", {"current": "NaN"}),
         ("Signal Current Rating", "500mA", {"current": 0.5}),
+        ("Signal Current Rating (Max)", "1.25A", {"current": 1.25}),
+        ("Signal Current Rating (Max)", "-", {"current": "NaN"}),
         ("Breaking Capacity", "50A;300A", {"current 1": 50.0, "current 2": 300.0}),
         ("Breaking Capacity", "50A@125V", {"current": 50.0}),
         ("Interrupt Rating", "1kA@32V", {"current": 1000.0}),

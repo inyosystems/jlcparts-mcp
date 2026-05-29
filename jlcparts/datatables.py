@@ -447,7 +447,7 @@ def normalizeAttribute(key, value):
                     "Output Sink Current", "Output Leakage Current(Icex)",
                     "Input Current(Off)", "Input Current(on)",
                     "Source Current", "Sink Current", "Refresh Current",
-                    "Contact Current", "Signal Current Rating",
+                    "Contact Current", "Signal Current Rating", "Signal Current Rating (Max)",
                     "Breaking Capacity", "Interrupt Rating",
                     "Interrupting Rating", "Rated Ripple Curren",
                     "Drain Current (Idss)", "Drain Current (Idss@VDS,VGS=0)", "Current Rating (AC)",
