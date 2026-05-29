@@ -240,6 +240,20 @@ def test_impedance_values(value, expected, capsys):
 
 
 @pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("0.2Ω", 0.2),
+        ("150mΩ", 0.15),
+        ("-", "NaN"),
+    ],
+)
+def test_dynamic_impedance_values(value, expected, capsys):
+    values = normalized_values("Dynamic Impedance", value, capsys)
+
+    assert_quantity(values["impedance"], expected, "resistance")
+
+
+@pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
         ("DCR Secondary Side (Max)", "5.04Ω", 5.04),

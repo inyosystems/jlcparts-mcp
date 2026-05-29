@@ -206,7 +206,8 @@ def normalizeAttribute(key, value):
                 "Current Terminal Resistance"]):
             value = attributes.resistanceAttribute(value)
         elif key in larr(["Balance Port Impedence", "Unbalance Port Impedence", "Impedance(Zzk)",
-                "Impedance", "Characteristic Impedance", "Resonant Impedance"]):
+                "Impedance", "Characteristic Impedance", "Resonant Impedance",
+                "Dynamic Impedance"]):
             value = attributes.impedanceListAttribute(value) if compoundValue(value) else attributes.impedanceAttribute(value)
         elif key in larr(["Impedance Ratio-Unbalanced/Balanced",
                 "Impedance - Unbalanced/Balanced"]):
