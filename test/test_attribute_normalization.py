@@ -2122,6 +2122,7 @@ def test_memory_generation_and_material_attributes(capsys):
         ("Specification", "6.35"),
         ("Holes Structure", "1x13P"),
         ("Manufacturer", "Analog Devices Inc./Maxim Integrated"),
+        ("Series", "74HC Series"),
     ],
 )
 def test_identifier_attributes(key, value, capsys):
