@@ -896,6 +896,7 @@ def normalizeAttribute(key, value):
                 "Write Cycle Endurance", "Store Cycles", "Switching Life"]):
             value = attributes.cycleCountListAttribute(value) if compoundValue(value) else attributes.cycleCountAttribute(value)
         elif key in larr(["Capacitance", "Junction Capacitance", "Input Capacitance", "Input Capacitance(Cies)",
+                "Input Capacitance (Cies@VCE)",
                 "CISS-Input Capacitance", "Output Capacitance(Coes)",
                 "Reverse Transfer Capacitance (Cres)", "Reverse Transfer Capacitance (Crss)",
                 "Con", "Capacitive Load (Max)", "Nominal Capacitance",
@@ -908,6 +909,8 @@ def normalizeAttribute(key, value):
                 "External Load Capacitor", "Cww( P F Max )"]):
             if key == "diode capacitance":
                 value = attributes.diodeCapacitanceAttribute(value)
+            elif key == "input capacitance (cies@vce)":
+                value = attributes.capacitanceAtVoltageAttribute(value, "capacitance", "Vce")
             elif key == "capacitance" and isinstance(value, str) and "@" in value:
                 value = attributes.capacitanceAttribute(value)
             elif key == "capacitance" and multiScalarValue(value):

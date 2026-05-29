@@ -3752,6 +3752,32 @@ def switchCircuitAttribute(value):
 def capacitanceAtConditionAttribute(value, name="capacitance"):
     return scalarAttribute(value, readCapacitance, "capacitance", name)
 
+def capacitanceAtVoltageAttribute(value, name="capacitance", voltage_name="voltage"):
+    value = str(value).strip()
+    if value in ["-", "--", "null"]:
+        return {
+            "format": "${" + name + "} @ ${" + voltage_name + "}",
+            "primary": name,
+            "values": {
+                name: ["NaN", "capacitance"],
+                voltage_name: ["NaN", "voltage"],
+            },
+        }
+    if "@" not in value:
+        parsed = scalarAttribute(value, readCapacitance, "capacitance", name)
+        parsed["values"][voltage_name] = ["NaN", "voltage"]
+        parsed["format"] += " @ ${" + voltage_name + "}"
+        return parsed
+    capacitance, voltage = [x.strip() for x in value.split("@", 1)]
+    return {
+        "format": "${" + name + "} @ ${" + voltage_name + "}",
+        "primary": name,
+        "values": {
+            name: [readCapacitance(capacitance), "capacitance"],
+            voltage_name: [readVoltage(voltage), "voltage"],
+        },
+    }
+
 def capacitanceAtFrequencyAttribute(value):
     value = str(value)
     if "," in value or ";" in value:

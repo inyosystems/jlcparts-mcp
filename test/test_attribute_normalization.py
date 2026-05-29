@@ -931,6 +931,8 @@ def test_capacitive_load_max(value, expected, capsys):
         ("Electrostatic Capacitance", "0.8pF", {"capacitance": 0.8e-12}),
         ("Input Capacitance", "1.8pF", {"capacitance": 1.8e-12}),
         ("Input Capacitance", "-", {"capacitance": "NaN"}),
+        ("Input Capacitance (Cies@VCE)", "3.29nF@25V", {"capacitance": 3.29e-9, "Vce": 25.0}),
+        ("Input Capacitance (Cies@VCE)", "-", {"capacitance": "NaN", "Vce": "NaN"}),
         ("Capacitance-Input", "1.5pF", {"capacitance": 1.5e-12}),
         ("Input Capacitiance(Ci)", "15pF", {"capacitance": 15e-12}),
         ("Capacitance", "0.35pF, 0.45pF", {"capacitance 1": 0.35e-12, "capacitance 2": 0.45e-12}),
@@ -950,8 +952,9 @@ def test_capacitive_load_max(value, expected, capsys):
 def test_extra_capacitance_attributes(key, value, expected, capsys):
     values = normalized_values(key, value, capsys)
 
-    for quantity, capacitance in expected.items():
-        assert_quantity(values[quantity], capacitance, "capacitance")
+    for quantity, amount in expected.items():
+        unit = "voltage" if quantity == "Vce" else "capacitance"
+        assert_quantity(values[quantity], amount, unit)
 
 
 def test_equivalent_series_inductance_values(capsys):
