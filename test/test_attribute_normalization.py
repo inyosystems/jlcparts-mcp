@@ -2731,6 +2731,17 @@ def test_io_type_attribute(capsys):
     assert values["interface 4"] == ["SPI", "identifier"]
 
 
+def test_the_interface_type_attribute(capsys):
+    values = normalized_values("The Interface Type", "I2C;SPI", capsys)
+
+    assert values["interface 1"] == ["I2C", "identifier"]
+    assert values["interface 2"] == ["SPI", "identifier"]
+
+    values = normalized_values("The Interface Type", "Analog Signal", capsys)
+
+    assert values["interface 1"] == ["Analog Signal", "identifier"]
+
+
 def test_protocol_identifier_list(capsys):
     values = normalized_values("Protocol", "USB 3.1;DP 1.3", capsys)
 
