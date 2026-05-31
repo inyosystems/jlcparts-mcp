@@ -4723,6 +4723,7 @@ def test_average_gate_power_dissipation_alias(capsys):
         ("Power Consumption", "30mW", 0.03),
         ("Dissipation Power", "1.48W", 1.48),
         ("Power Capacity", "50W", 50.0),
+        ("Power Rating", "0.6W", 0.6),
         ("Maximum Switching Power", "100W", 100.0),
         ("Corresponding Power", "100W-600W", {"power 1 min": 100.0, "power 1 max": 600.0}),
     ],
