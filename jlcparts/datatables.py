@@ -818,6 +818,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierAttribute(value, "sensor type")
         elif key in larr(["Terminal Type"]):
             value = attributes.identifierAttribute(value, "terminal type")
+        elif key in larr(["Input/Output"]):
+            value = attributes.inputOutputAttribute(value)
         elif key in larr(["Gender"]):
             value = attributes.identifierListAttribute(value, "gender", aliases=GENDER_ALIASES)
         elif key in larr(["Holder Type"]):

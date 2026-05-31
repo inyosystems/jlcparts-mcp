@@ -2319,6 +2319,13 @@ def test_terminal_type_identifier(capsys):
     assert values["terminal type"] == ["Bidirectional Terminal (2 Tabs+1 Receptacle)", "identifier"]
 
 
+def test_input_output_identifiers(capsys):
+    values = normalized_values("Input/Output", "IPEX to 1.13 cable black", capsys)
+
+    assert values["input"] == ["IPEX", "identifier"]
+    assert values["output"] == ["1.13 cable black", "identifier"]
+
+
 def test_driver_receiver(capsys):
     values = normalized_values("Driver/Receiver", "1/1;2/2", capsys)
 
