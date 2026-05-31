@@ -3235,6 +3235,12 @@ def test_plating_and_product_description_dimensions(capsys):
     assert_quantity(values["nickel thickness min"], 50 * 0.0254e-6, "length")
     assert_quantity(values["nickel thickness max"], 50 * 0.0254e-6, "length")
 
+    values = normalized_values("Surface Treatment", 'Nickel-Plated 50u, Semi-Gold Plated 1+1u', capsys)
+    assert_quantity(values["nickel thickness min"], 50 * 0.0254e-6, "length")
+    assert_quantity(values["nickel thickness max"], 50 * 0.0254e-6, "length")
+    assert_quantity(values["semi gold thickness min"], 2 * 0.0254e-6, "length")
+    assert_quantity(values["semi gold thickness max"], 2 * 0.0254e-6, "length")
+
     values = normalized_values("Thickness of Contact Surface Treatment", "40.0µin(1.02µm)", capsys)
     assert_quantity(values["thickness"], 1.02e-6, "length")
 

@@ -850,6 +850,8 @@ def normalizeAttribute(key, value):
             value = attributes.metricProductDescriptionAttribute(value)
         elif key in larr(["Electroplate"]):
             value = attributes.platingThicknessAttribute(value)
+        elif key in larr(["Surface Treatment"]):
+            value = attributes.surfaceTreatmentAttribute(value)
         elif key in larr(["Packaging/Housing"]):
             value = attributes.packagePinCountAttribute(value)
         elif key in larr(["Viewing Direction"]):

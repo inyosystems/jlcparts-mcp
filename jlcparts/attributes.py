@@ -1412,13 +1412,17 @@ def platingThicknessAttribute(value):
     values = {}
     formats = []
     for layer in [x.strip() for x in value.split(",")]:
-        match = re.search(r"([A-Za-z ]*?)\s+plating\s+([0-9.]+)(?:\s*~\s*([0-9.]+))?\s*u\"", layer, flags=re.I)
+        match = re.search(
+            r"([A-Za-z -]*?)\s*-?\s*(?:plating|plated)\s+([0-9.]+(?:\s*\+\s*[0-9.]+)?)(?:\s*~\s*([0-9.]+))?\s*u\"?",
+            layer,
+            flags=re.I,
+        )
         if match is None:
             raise ValueError(f"Cannot parse plating thickness {value}")
-        label = match.group(1).strip().lower()
+        label = match.group(1).strip().replace("-", " ").lower()
         label = " ".join(word for word in label.split() if word not in {"bright"})
-        low = float(match.group(2)) * 0.0254e-6
-        high = float(match.group(3) or match.group(2)) * 0.0254e-6
+        low = sum(float(part.strip()) for part in match.group(2).split("+")) * 0.0254e-6
+        high = float(match.group(3)) * 0.0254e-6 if match.group(3) else low
         values[f"{label} thickness min"] = [low, "length"]
         values[f"{label} thickness max"] = [high, "length"]
         formats.append("${" + f"{label} thickness min" + "} ~ ${" + f"{label} thickness max" + "}")
@@ -1427,6 +1431,12 @@ def platingThicknessAttribute(value):
         "primary": next(iter(values)),
         "values": values
     }
+
+def surfaceTreatmentAttribute(value):
+    value = str(value).strip()
+    if re.search(r"\d", value) and re.search(r"\b(?:plating|plated)\b", value, flags=re.I):
+        return platingThicknessAttribute(value)
+    return identifierAttribute(value, "surface treatment")
 
 def metricProductDescriptionAttribute(value):
     value = str(value).strip()
