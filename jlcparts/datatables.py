@@ -91,6 +91,15 @@ TOPOLOGY_ALIASES = {
     "Totem pole": "Totem Pole",
 }
 
+DRIVEN_CONFIGURATION_ALIASES = {
+    "Low-side": "Low Side",
+    "low-side": "Low Side",
+    "High-side": "High Side",
+    "high-side": "High Side",
+    "Half Bridge": "Half-Bridge",
+    "half-bridge": "Half-Bridge",
+}
+
 COMMUNICATION_SYSTEM_ALIASES = {
     "CAT-M": "Cat-M",
     "cat-m": "Cat-M",
@@ -874,6 +883,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "characteristic")
         elif key in larr(["Configuration"]):
             value = attributes.configurationAttribute(value)
+        elif key in larr(["Driven Configuration"]):
+            value = attributes.identifierListAttribute(value, "configuration", aliases=DRIVEN_CONFIGURATION_ALIASES)
         elif key in larr(["Interface", "Control Interface", "Communication Interface", "Memory Interface", "IO Type", "The Interface Type", "Mac Interface"]):
             value = attributes.identifierListAttribute(value, "interface")
         elif key in larr(["Interface Type"]):

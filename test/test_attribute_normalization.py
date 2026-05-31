@@ -3161,6 +3161,14 @@ def test_topology_attribute(value, expected, capsys):
     }
 
 
+def test_driven_configuration_identifiers(capsys):
+    values = normalized_values("Driven Configuration", "Low-side, high-side, half-bridge", capsys)
+
+    assert values["configuration 1"] == ["Low Side", "identifier"]
+    assert values["configuration 2"] == ["High Side", "identifier"]
+    assert values["configuration 3"] == ["Half-Bridge", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
