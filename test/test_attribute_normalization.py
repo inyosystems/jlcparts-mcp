@@ -3747,6 +3747,12 @@ def test_plastic_color_identifiers(capsys):
     assert values["color 1"] == ["Blue", "identifier"]
 
 
+def test_luminous_color_identifiers(capsys):
+    values = normalized_values("Luminous Color", "自然白色", capsys)
+
+    assert values["color 1"] == ["Natural White", "identifier"]
+
+
 def test_lens_color_identifiers(capsys):
     values = normalized_values("Lens Color", "Frosted Red Lens, Frosted Green Lens", capsys)
 
