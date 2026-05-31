@@ -3474,6 +3474,16 @@ def test_detection_color_identifiers(capsys):
     assert values["color 4"] == ["Infrared", "identifier"]
 
 
+def test_jacket_color_identifiers(capsys):
+    values = normalized_values("Jacket Color", "Milky white", capsys)
+
+    assert values["color 1"] == ["Milky White", "identifier"]
+
+    values = normalized_values("Jacket Color", "No", capsys)
+
+    assert values["color 1"] == ["None", "identifier"]
+
+
 def test_lens_color_identifiers(capsys):
     values = normalized_values("Lens Color", "Frosted Red Lens, Frosted Green Lens", capsys)
 
