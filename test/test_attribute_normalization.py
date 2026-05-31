@@ -2807,6 +2807,18 @@ def test_holder_type_attribute(capsys):
     assert values["holder type 1"] == ["Right Angle", "identifier"]
 
 
+def test_mounting_type_attribute(capsys):
+    values = normalized_values("Mounting Type", "Surface Mount, Right-Angle, Socket", capsys)
+
+    assert values["mounting type 1"] == ["Surface Mount", "identifier"]
+    assert values["mounting type 2"] == ["Right Angle", "identifier"]
+    assert values["mounting type 3"] == ["Socket", "identifier"]
+
+    values = normalized_values("Mounting Type", "Through-hole", capsys)
+
+    assert values["mounting type 1"] == ["Through Hole", "identifier"]
+
+
 def test_dimming_attribute(capsys):
     values = normalized_values("Dimming", "Analog, PWM, I2C", capsys)
 
