@@ -500,12 +500,12 @@ def readLength(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
         return "NaN"
+    value = value.replace("µ", "u").replace("μ", "u")
     parenthesizedMetric = re.search(r"\(([+-]?\d+(?:\.\d+)?\s*(?:nm|um|mm|cm|km|m|mil|in|inch|inches))", value, re.I)
     if parenthesizedMetric is not None:
         value = parenthesizedMetric.group(1)
     elif value.endswith("'"):
         return float(value[:-1]) * 0.3048
-    value = value.replace("µ", "u").replace("μ", "u")
     match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(nm|um|mm|cm|km|m|mil|in|inch|inches)?", value, re.I)
     if match is None:
         raise ValueError(f"Cannot parse length {value}")
