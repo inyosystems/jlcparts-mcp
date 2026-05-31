@@ -2459,6 +2459,18 @@ def test_card_type_identifiers(capsys):
     assert values["card type 1"] == ["Unspecified", "identifier"]
 
 
+def test_direction_identifiers(capsys):
+    values = normalized_values("Direction", "Omni-directional, Bi-Directional, 向上计数器", capsys)
+
+    assert values["direction 1"] == ["Omnidirectional", "identifier"]
+    assert values["direction 2"] == ["Bidirectional", "identifier"]
+    assert values["direction 3"] == ["Up Counter", "identifier"]
+
+    values = normalized_values("Direction", "-", capsys)
+
+    assert values["direction 1"] == ["Unspecified", "identifier"]
+
+
 def test_environmental_requirements(capsys):
     values = normalized_values(
         "Environmental Requirements",

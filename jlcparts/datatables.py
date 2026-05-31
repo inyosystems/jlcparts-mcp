@@ -204,6 +204,13 @@ CARD_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+DIRECTION_ALIASES = {
+    "Bi-Directional": "Bidirectional",
+    "Omni-directional": "Omnidirectional",
+    "向上计数器": "Up Counter",
+    "-": "Unspecified",
+}
+
 HOLDER_TYPE_ALIASES = {
     "Free-hanging": "Free Hanging",
     "Right-Angle": "Right Angle",
@@ -1042,6 +1049,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "class", aliases=AMPLIFIER_CLASS_ALIASES)
         elif key in larr(["Card Type"]):
             value = attributes.identifierListAttribute(value, "card type", aliases=CARD_TYPE_ALIASES)
+        elif key in larr(["Direction"]):
+            value = attributes.identifierListAttribute(value, "direction", aliases=DIRECTION_ALIASES)
         elif key in larr(["Input Signal"]):
             value = attributes.identifierListAttribute(value, "input signal", aliases=SIGNAL_LEVEL_ALIASES)
         elif key in larr(["Peripheral/Function"]):
