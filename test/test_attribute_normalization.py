@@ -3268,6 +3268,14 @@ def test_lens_color_identifiers(capsys):
     assert values["lens color 2"] == ["Frosted Green Lens", "identifier"]
 
 
+def test_emitted_color_identifiers(capsys):
+    values = normalized_values("Emitted Color", "Red, General Green/Yellow-Green", capsys)
+
+    assert values["color 1"] == ["Red", "identifier"]
+    assert values["color 2"] == ["General Green", "identifier"]
+    assert values["color 3"] == ["Yellow Green", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [

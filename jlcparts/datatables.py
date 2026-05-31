@@ -152,17 +152,24 @@ COLOR_ALIASES = {
     "green": "Green",
     "red": "Red",
     "yellow": "Yellow",
+    "Amber color": "Amber",
     "emerald green": "Emerald Green",
     "Emerald green": "Emerald Green",
+    "Emerald": "Emerald Green",
     "Deep red": "Deep Red",
     "Red-orange": "Orange Red",
+    "Orange-red": "Orange Red",
+    "Orange-Red": "Orange Red",
     "Amber Color": "Amber",
     "Green-yellow": "Yellow Green",
     "Yellow-Green": "Yellow Green",
     "Green Yellow": "Yellow Green",
+    "Yellow-green": "Yellow Green",
+    "YellowGreen": "Yellow Green",
     "Blue(RGB)": "Blue",
     "Blue to white": "Blue to White",
     "Cold White": "Cool White",
+    "White light": "White",
     "Transparent color": "Transparent",
     "silver color": "Silver",
     "Natural color": "Natural",
@@ -862,6 +869,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)
         elif key in larr(["Illumination Color", "Color"]):
             value = attributes.identifierListAttribute(value, "color", aliases=COLOR_ALIASES)
+        elif key in larr(["Emitted Color"]):
+            value = attributes.identifierListAttribute(value, "color", separators=",;/", aliases=COLOR_ALIASES)
         elif key in larr(["Lens Color"]):
             value = attributes.identifierListAttribute(value, "lens color")
         elif key in larr(["Category"]):
