@@ -978,7 +978,11 @@ def normalizeAttribute(key, value):
                 "Window Size", "Size/Size"]):
             if key == "diameter" and isinstance(value, str) and re.fullmatch(r"M\s*\d+(?:\.\d+)?", value, re.I):
                 value = re.sub(r"^M\s*", "", value, flags=re.I) + "mm"
-            if key in larr(["Insulation Od", "Interface Length/Height", "Interface Diameter",
+            if key == "length" and isinstance(value, str) and "(" in value:
+                value = attributes.lengthAttribute(value)
+            elif key == "length" and isinstance(value, str) and ("," in value or ";" in value):
+                value = attributes.lengthRangeListAttribute(value, "length")
+            elif key in larr(["Insulation Od", "Interface Length/Height", "Interface Diameter",
                     "System Fit Height", "Fuse Length", "Fuse Diameter (Φd)",
                     "Fuse Width", "FFC, Fcb Thickness", "Tail Diameter",
                     "Line Length", "Wire Diameter"]) and isinstance(value, str) and ("," in value or ";" in value):

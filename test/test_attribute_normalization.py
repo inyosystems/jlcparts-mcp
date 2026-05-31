@@ -5424,6 +5424,7 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Switch Width", "6.8mm", 0.0068),
         ("Diameter", "50mm", 0.05),
         ("Diameter", "M3", 0.003),
+        ("Length", "0.984'(300.00mm,11.81\")", 0.3),
         ("Diameter (Φd)", "30mm", 0.03),
         ("Diameter (Φd)", "1.36cm", 0.0136),
         ("Interface Diameter", "7.5mm", 0.0075),
@@ -5564,6 +5565,7 @@ def test_additional_toleranced_lengths(key, value, expected, capsys):
         }),
         ("Total Length", "5cm", {"length 1": 0.05}),
         ("Line Length", "30cm, 23cm", {"length 1": 0.3, "length 2": 0.23}),
+        ("Length", "7.7mm, 8.3mm", {"length 1": 0.0077, "length 2": 0.0083}),
         ("Wire Diameter", "1.6mm, Rib Line Diameter 1.8MM", {
             "length 1": 0.0016,
             "length 2": 0.0018,
