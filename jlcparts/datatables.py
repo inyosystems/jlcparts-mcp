@@ -216,6 +216,11 @@ DIRECTION_ALIASES = {
     "-": "Unspecified",
 }
 
+TERMINATION_STYLE_ALIASES = {
+    "PCPin": "PC Pin",
+    "-": "Unspecified",
+}
+
 CONTACT_TYPE_ALIASES = {
     "Double-Sided Contacts": "Double-Sided Contact",
     "Dual-sided contacts": "Double-Sided Contact",
@@ -1032,6 +1037,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierAttribute(value, "sensor type")
         elif key in larr(["Terminal Type"]):
             value = attributes.identifierAttribute(value, "terminal type")
+        elif key in larr(["Termination Style"]):
+            value = attributes.identifierListAttribute(value, "termination style", aliases=TERMINATION_STYLE_ALIASES)
         elif key in larr(["Input/Output"]):
             value = attributes.inputOutputAttribute(value)
         elif key in larr(["Environmental Requirements"]):

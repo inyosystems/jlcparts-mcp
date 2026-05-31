@@ -2332,6 +2332,17 @@ def test_terminal_type_identifier(capsys):
     assert values["terminal type"] == ["Bidirectional Terminal (2 Tabs+1 Receptacle)", "identifier"]
 
 
+def test_termination_style_identifiers(capsys):
+    values = normalized_values("Termination Style", "Screw, Hinged (Snap On)", capsys)
+
+    assert values["termination style 1"] == ["Screw", "identifier"]
+    assert values["termination style 2"] == ["Hinged (Snap On)", "identifier"]
+
+    values = normalized_values("Termination Style", "PCPin", capsys)
+
+    assert values["termination style 1"] == ["PC Pin", "identifier"]
+
+
 def test_input_output_identifiers(capsys):
     values = normalized_values("Input/Output", "IPEX to 1.13 cable black", capsys)
 
