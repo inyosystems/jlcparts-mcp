@@ -733,7 +733,7 @@ def normalizeAttribute(key, value):
             value = attributes.diodeConfigurationAttribute(value)
         elif key in larr(["SCR Type"]):
             value = attributes.scrTypeAttribute(value)
-        elif key in larr(["Transistor Type"]):
+        elif key in larr(["Transistor Type", "FET Type"]):
             value = attributes.identifierListAttribute(value, "type")
         elif key in larr(["Number of Detents/Pulses (Incremental)"]):
             value = attributes.detentsPulsesAttribute(value)

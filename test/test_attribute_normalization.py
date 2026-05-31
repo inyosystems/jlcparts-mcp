@@ -2295,6 +2295,13 @@ def test_transistor_type_identifiers(value, expected, capsys):
     }
 
 
+def test_fet_type_identifiers(capsys):
+    values = normalized_values("FET Type", "External FET, Integrated FET", capsys)
+
+    assert values["type 1"] == ["External FET", "identifier"]
+    assert values["type 2"] == ["Integrated FET", "identifier"]
+
+
 def test_driver_receiver(capsys):
     values = normalized_values("Driver/Receiver", "1/1;2/2", capsys)
 
