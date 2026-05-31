@@ -2513,6 +2513,14 @@ def test_reference_series_identifiers(value, expected, capsys):
     }
 
 
+def test_safety_certification_identifiers(capsys):
+    values = normalized_values("Safety Certification", "UL;CUL;VDE;ENEC10;CQC;KC", capsys)
+
+    assert values["certification 1"] == ["UL", "identifier"]
+    assert values["certification 4"] == ["ENEC10", "identifier"]
+    assert values["certification 6"] == ["KC", "identifier"]
+
+
 @pytest.mark.parametrize("value", ["SP3T", "Double pole triple throw", "2P2T", "-"])
 def test_circuit_identifier(value, capsys):
     values = normalized_values("Circuit", value, capsys)
