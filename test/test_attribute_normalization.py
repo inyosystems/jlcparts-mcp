@@ -2864,6 +2864,12 @@ def test_head_type_attribute(capsys):
     assert values["head type"] == ["Circular ring (90°)", "identifier"]
 
 
+def test_coil_type_attribute(capsys):
+    values = normalized_values("Coil Type", "2 Coil", capsys)
+
+    assert values["coil type"] == ["2 Coil", "identifier"]
+
+
 def test_dimming_attribute(capsys):
     values = normalized_values("Dimming", "Analog, PWM, I2C", capsys)
 
