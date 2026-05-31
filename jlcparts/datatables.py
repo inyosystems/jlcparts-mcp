@@ -171,6 +171,14 @@ VOLTAGE_REFERENCE_ALIASES = {
     "-": "Unspecified",
 }
 
+TECHNOLOGY_ALIASES = {
+    "D-mode": "Depletion Mode",
+    "E-mode": "Enhancement Mode",
+    "No": "No",
+    "Yes": "Yes",
+    "-": "Unspecified",
+}
+
 LOGIC_GATE_TYPE_ALIASES = {
     "NORGate": "NOR Gate",
     "ORGate": "OR Gate",
@@ -1073,6 +1081,8 @@ def normalizeAttribute(key, value):
         elif key in larr(["Voltage Reference"]):
             reference = "Internal, external" if str(value).strip() == "Internal or external" else value
             value = attributes.identifierListAttribute(reference, "voltage reference", aliases=VOLTAGE_REFERENCE_ALIASES)
+        elif key in larr(["Technology"]):
+            value = attributes.identifierListAttribute(value, "technology", aliases=TECHNOLOGY_ALIASES)
         elif key in larr(["Working Mode", "Mode Support"]):
             value = attributes.identifierListAttribute(value, "mode")
         elif key in larr(["Characteristic"]):

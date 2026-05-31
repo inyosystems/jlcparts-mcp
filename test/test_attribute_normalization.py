@@ -2988,6 +2988,20 @@ def test_voltage_reference_identifiers(capsys):
     assert values["voltage reference 2"] == ["External", "identifier"]
 
 
+def test_technology_identifiers(capsys):
+    values = normalized_values("Technology", "E-mode", capsys)
+
+    assert values["technology 1"] == ["Enhancement Mode", "identifier"]
+
+    values = normalized_values("Technology", "D-mode", capsys)
+
+    assert values["technology 1"] == ["Depletion Mode", "identifier"]
+
+    values = normalized_values("Technology", "-", capsys)
+
+    assert values["technology 1"] == ["Unspecified", "identifier"]
+
+
 def test_modulation_system_identifiers(capsys):
     values = normalized_values("Modulation System", "FLRC, LORA, OCK", capsys)
 
