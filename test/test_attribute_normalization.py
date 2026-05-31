@@ -3363,6 +3363,14 @@ def test_installation_method_identifiers(capsys):
 
     assert values["installation method 1"] == ["Top Mount", "identifier"]
 
+    values = normalized_values("Installation Type", "Surface MountType", capsys)
+
+    assert values["installation type 1"] == ["Surface Mount", "identifier"]
+
+    values = normalized_values("Installation Type", "-", capsys)
+
+    assert values["installation type 1"] == ["Unspecified", "identifier"]
+
 
 def test_head_type_attribute(capsys):
     values = normalized_values("Head Type", "Circular ring (90°)", capsys)

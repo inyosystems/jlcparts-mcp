@@ -1169,6 +1169,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "mounting type", aliases=MOUNTING_TYPE_ALIASES)
         elif key in larr(["Installation Method"]):
             value = attributes.identifierListAttribute(value, "installation method", aliases=MOUNTING_TYPE_ALIASES)
+        elif key in larr(["Installation Type"]):
+            value = attributes.identifierListAttribute(value, "installation type", aliases=MOUNTING_TYPE_ALIASES)
         elif key in larr(["Head Type"]):
             value = attributes.identifierAttribute(value, "head type")
         elif key in larr(["Coil Type"]):
