@@ -4597,6 +4597,12 @@ def test_resistance_tolerance_temperature_value(capsys):
     assert_quantity(values["tolerance max"], 0.05, "temperature")
 
 
+def test_spring_buckle_count(capsys):
+    values = normalized_values("Spring Buckle", "2", capsys)
+
+    assert_quantity(values["count"], 2, "count")
+
+
 def test_wavelength_alias_labels(capsys):
     values = normalized_values("Wavelength", "R:625nm, G:525nm, B:470nm", capsys)
 

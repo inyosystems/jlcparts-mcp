@@ -864,7 +864,7 @@ def normalizeAttribute(key, value):
             value = attributes.barrierSideAttribute(value)
         elif key in larr(["Structure"]):
             value = attributes.connectorStructureAttribute(value)
-        elif key in larr(["Pin"]):
+        elif key in larr(["Pin", "Spring Buckle"]):
             value = attributes.countAttribute(value)
         elif key in larr(["Number of Stitches"]):
             value = attributes.pinCountOrPitchAttribute(value)
