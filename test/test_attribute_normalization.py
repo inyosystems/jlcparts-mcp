@@ -2325,6 +2325,10 @@ def test_filter_type_identifiers(capsys):
     assert values["filter type 2"] == ["High-Pass Filter", "identifier"]
     assert values["filter type 3"] == ["Three-Phase Wye Filter", "identifier"]
 
+    values = normalized_values("Type of Filter", "单相滤波器", capsys)
+
+    assert values["filter type 1"] == ["Single-Phase Filter", "identifier"]
+
 
 def test_certification_bodies_identifiers(capsys):
     values = normalized_values("Certification Bodies", "CB、CE,cURus,EAC", capsys)

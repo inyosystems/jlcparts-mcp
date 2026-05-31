@@ -206,12 +206,15 @@ GNSS_TYPE_ALIASES = {
 FILTER_TYPE_ALIASES = {
     "Bandpass": "Band-Pass Filter",
     "Bandpass Filter": "Band-Pass Filter",
+    "Band-Stop Filter": "Band-Stop Filter",
     "High pass": "High-Pass Filter",
     "High pass Filter": "High-Pass Filter",
+    "High-pass Filter": "High-Pass Filter",
     "Low Pass": "Low-Pass Filter",
     "Low pass filter": "Low-Pass Filter",
     "Low-pass Filter": "Low-Pass Filter",
     "Low-pass active filter": "Low-Pass Active Filter",
+    "单相滤波器": "Single-Phase Filter",
     "Three-Phase (Delta)": "Three-Phase Delta Filter",
     "Three-Phase (Y)": "Three-Phase Wye Filter",
     "-": "Unspecified",
@@ -1103,7 +1106,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "modulation", aliases=MODULATION_SYSTEM_ALIASES)
         elif key in larr(["GNSS Type"]):
             value = attributes.identifierListAttribute(value, "gnss", aliases=GNSS_TYPE_ALIASES)
-        elif key in larr(["Filter Type"]):
+        elif key in larr(["Filter Type", "Type of Filter"]):
             value = attributes.identifierListAttribute(value, "filter type", aliases=FILTER_TYPE_ALIASES)
         elif key in larr(["Standard Number"]):
             value = attributes.identifierListAttribute(value, "standard number")
