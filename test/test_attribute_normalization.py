@@ -2679,6 +2679,14 @@ def test_control_interface_attribute(value, expected, capsys):
     }
 
 
+def test_communication_interface_attribute(capsys):
+    values = normalized_values("Communication Interface", "SPI, JTAG, I2C", capsys)
+
+    assert values["interface 1"] == ["SPI", "identifier"]
+    assert values["interface 2"] == ["JTAG", "identifier"]
+    assert values["interface 3"] == ["I2C", "identifier"]
+
+
 def test_protocol_identifier_list(capsys):
     values = normalized_values("Protocol", "USB 3.1;DP 1.3", capsys)
 
