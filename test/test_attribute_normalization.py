@@ -5638,6 +5638,7 @@ def test_insulation_od_lengths(value, expected, capsys):
         ("Head Diameter", "5", 0.005),
         ("Blade Width", "6.4mm", 0.0064),
         ("Pin Spacing(Adjacent)", "8.75m", 0.00875),
+        ("Pin Spacing (Adjacent)", "5mm", 0.005),
         ("Insert Thickness", "0.303mm", 0.000303),
         ("Spacing - Connector", "0.118\"(3.00mm)", 0.003),
         ("Sheath (Insulation) Diameter", "0.200\"(5.08mm)", 0.00508),

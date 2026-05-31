@@ -1013,7 +1013,7 @@ def normalizeAttribute(key, value):
                 "Length of Copper Pipe", "Tail Width", "Spacing", "Slice Width",
                 "Needle Diameter", "Full Length of Copper Pipe",
                 "Length of Fit", "FFC, Fcb Thickness", "Tail Diameter",
-                "Head Diameter", "Blade Width", "Pin Spacing(Adjacent)",
+                "Head Diameter", "Blade Width", "Pin Spacing(Adjacent)", "Pin Spacing (Adjacent)",
                 "Total Length", "Insert Thickness", "Spacing - Connector",
                 "Sheath (Insulation) Diameter", "Line Length", "Thread Length",
                 "Wire Diameter", "Module Size", "Display Range", "Linear Range",
@@ -1043,7 +1043,7 @@ def normalizeAttribute(key, value):
                 else:
                     value = attributes.lengthRangeListAttribute(value, "length")
             elif key in larr(["Length of Fit", "FFC, Fcb Thickness", "Tail Diameter",
-                    "Head Diameter", "Blade Width", "Pin Spacing(Adjacent)",
+                    "Head Diameter", "Blade Width", "Pin Spacing(Adjacent)", "Pin Spacing (Adjacent)",
                     "Insert Thickness", "Spacing - Connector",
                     "Sheath (Insulation) Diameter", "Wire Diameter"]):
                 value = attributes.mechanicalLengthAttribute(value)
