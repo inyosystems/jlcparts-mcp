@@ -3238,6 +3238,23 @@ def test_illumination_color_attribute(value, expected, capsys):
     }
 
 
+def test_color_attribute_identifiers(capsys):
+    values = normalized_values("Color", "White, red, green, blue, yellow, black", capsys)
+
+    assert {
+        name: quantity
+        for name, (quantity, unit) in values.items()
+        if unit == "identifier"
+    } == {
+        "color 1": "White",
+        "color 2": "Red",
+        "color 3": "Green",
+        "color 4": "Blue",
+        "color 5": "Yellow",
+        "color 6": "Black",
+    }
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [

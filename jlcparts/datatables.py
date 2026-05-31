@@ -142,8 +142,10 @@ CONTACT_MATERIAL_ALIASES = {
 }
 
 COLOR_ALIASES = {
+    "black": "Black",
     "blue": "Blue",
     "green": "Green",
+    "red": "Red",
     "yellow": "Yellow",
     "emerald green": "Emerald Green",
     "Emerald green": "Emerald Green",
@@ -156,6 +158,11 @@ COLOR_ALIASES = {
     "Blue(RGB)": "Blue",
     "Blue to white": "Blue to White",
     "Cold White": "Cool White",
+    "Transparent color": "Transparent",
+    "silver color": "Silver",
+    "Natural color": "Natural",
+    "Natural aluminum color": "Natural Aluminum",
+    "Colorless transparence": "Colorless Transparent",
 }
 
 def saveJson(object, filename, hash=False, pretty=False, compress=False):
@@ -848,7 +855,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "topology", aliases=TOPOLOGY_ALIASES)
         elif key in larr(["Contact Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)
-        elif key in larr(["Illumination Color"]):
+        elif key in larr(["Illumination Color", "Color"]):
             value = attributes.identifierListAttribute(value, "color", aliases=COLOR_ALIASES)
         elif key in larr(["Category"]):
             value = attributes.categoryAttribute(value)
