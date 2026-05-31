@@ -3904,6 +3904,26 @@ def inductanceAtFrequency(value):
     }
 
 
+def inductanceAtFrequencyListAttribute(value):
+    parts = [x.strip() for x in re.split(r"[,;]", str(value)) if x.strip()]
+    values = {}
+    formats = []
+    multiple = len(parts) > 1
+    for index, part in enumerate(parts, start=1):
+        parsed = inductanceAtFrequency(part)
+        suffix = f" {index}" if multiple else ""
+        inductance_name = f"inductance{suffix}"
+        frequency_name = f"frequency{suffix}"
+        values[inductance_name] = parsed["values"]["inductance"]
+        values[frequency_name] = parsed["values"]["frequency"]
+        formats.append("${" + inductance_name + "} @ ${" + frequency_name + "}")
+    return {
+        "format": ", ".join(formats),
+        "primary": "inductance 1" if multiple else "inductance",
+        "values": values,
+    }
+
+
 def rdsOnMaxAtIdsAtVgs(value):
     """
     Given a string in format "<resistance> @ <current>, <voltage>" parse it and
