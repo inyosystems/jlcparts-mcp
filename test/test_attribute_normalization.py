@@ -2735,6 +2735,13 @@ def test_logic_type_attribute(capsys):
     assert values["logic type 2"] == ["Divide-by-10", "identifier"]
 
 
+def test_antenna_type_attribute(capsys):
+    values = normalized_values("Antenna Type", "Stamp Hole Antenna, IPEX interface", capsys)
+
+    assert values["antenna type 1"] == ["Stamp Hole Antenna", "identifier"]
+    assert values["antenna type 2"] == ["IPEX interface", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [

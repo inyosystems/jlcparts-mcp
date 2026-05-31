@@ -768,6 +768,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "type")
         elif key in larr(["Logic Type"]):
             value = attributes.identifierListAttribute(value, "logic type")
+        elif key in larr(["Antenna Type"]):
+            value = attributes.identifierListAttribute(value, "antenna type")
         elif key in larr(["Applications", "Applications Function"]):
             value = attributes.identifierListAttribute(value, "application")
         elif key in larr(["Connection Type"]):
