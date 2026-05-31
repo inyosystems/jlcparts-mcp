@@ -98,6 +98,10 @@ COMMUNICATION_SYSTEM_ALIASES = {
     "evdo": "EV-DO",
 }
 
+GENDER_ALIASES = {
+    "male": "Male",
+}
+
 CONTACT_MATERIAL_ALIASES = {
     "brass": "Brass",
     "bronze": "Bronze",
@@ -788,6 +792,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "antenna type")
         elif key in larr(["Sensor Type"]):
             value = attributes.identifierAttribute(value, "sensor type")
+        elif key in larr(["Gender"]):
+            value = attributes.identifierListAttribute(value, "gender", aliases=GENDER_ALIASES)
         elif key in larr(["Dimming"]):
             value = attributes.identifierListAttribute(value, "dimming")
         elif key in larr(["Applications", "Applications Function"]):

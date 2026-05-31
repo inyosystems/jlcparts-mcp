@@ -2785,6 +2785,17 @@ def test_sensor_type_attribute(capsys):
     assert values["sensor type"] == ["PM2.5 Dust Sensor", "identifier"]
 
 
+def test_gender_attribute(capsys):
+    values = normalized_values("Gender", "Female, male", capsys)
+
+    assert values["gender 1"] == ["Female", "identifier"]
+    assert values["gender 2"] == ["Male", "identifier"]
+
+    values = normalized_values("Gender", "Female(90°)", capsys)
+
+    assert values["gender 1"] == ["Female(90°)", "identifier"]
+
+
 def test_dimming_attribute(capsys):
     values = normalized_values("Dimming", "Analog, PWM, I2C", capsys)
 
