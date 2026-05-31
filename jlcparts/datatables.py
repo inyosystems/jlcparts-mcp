@@ -772,6 +772,7 @@ def normalizeAttribute(key, value):
                 "Level of Protection", "Ethernet Speed Standards", "Versions",
                 "Algorithm", "Input Type", "USB Protocol", "Application",
                 "Memory Format", "Memory Type", "Agreement", "CPU Core", "Crystal Type", "Standard",
+                "Nominal of Bolt",
                 "Pin Structure", "Interface Form", "Flame Retardant Rating", "Plastic Material",
                 "Specification", "Holes Structure", "Manufacturer", "Series",
                 "Lamp Holder Type", "Pin Style", "Material Quality", "Ip Rating"]):

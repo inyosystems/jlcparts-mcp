@@ -2468,6 +2468,7 @@ def test_material_quality_identifier(value, capsys):
         ("CPU Core", "ARM Cortex-M0"),
         ("Crystal Type", "49S Crystals"),
         ("Standard", "IEC 320-C8"),
+        ("Nominal of Bolt", "M12"),
         ("Pin Structure", "2x4P"),
         ("Interface Form", "M.2-B Key"),
         ("Flame Retardant Rating", "UL94V-0"),
