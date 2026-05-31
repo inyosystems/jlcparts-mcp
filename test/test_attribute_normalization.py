@@ -2648,6 +2648,14 @@ def test_working_mode_identifiers(capsys):
     assert values["mode 4"] == ["CRM", "identifier"]
 
 
+def test_modulation_system_identifiers(capsys):
+    values = normalized_values("Modulation System", "FLRC, LORA, OCK", capsys)
+
+    assert values["modulation 1"] == ["FLRC", "identifier"]
+    assert values["modulation 2"] == ["LoRa", "identifier"]
+    assert values["modulation 3"] == ["OOK", "identifier"]
+
+
 def test_characteristic_list_attribute(capsys):
     values = normalized_values("Characteristic", "Remote on/off, OCP, OVP, SCP", capsys)
 

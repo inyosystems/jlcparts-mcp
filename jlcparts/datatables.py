@@ -98,6 +98,11 @@ COMMUNICATION_SYSTEM_ALIASES = {
     "evdo": "EV-DO",
 }
 
+MODULATION_SYSTEM_ALIASES = {
+    "LORA": "LoRa",
+    "OCK": "OOK",
+}
+
 GENDER_ALIASES = {
     "male": "Male",
 }
@@ -825,6 +830,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "protocol")
         elif key in larr(["Communication System"]):
             value = attributes.identifierListAttribute(value, "communication system", aliases=COMMUNICATION_SYSTEM_ALIASES)
+        elif key in larr(["Modulation System"]):
+            value = attributes.identifierListAttribute(value, "modulation", aliases=MODULATION_SYSTEM_ALIASES)
         elif key in larr(["GNSS Type"]):
             value = attributes.identifierListAttribute(value, "gnss", aliases=GNSS_TYPE_ALIASES)
         elif key in larr(["Standard Number"]):
