@@ -3600,6 +3600,7 @@ def test_maximum_power_supply_range(value, expected, capsys):
         ("Voltage - Supply(Vccio)", "2.5V, 3.3V", {"voltage 1": 2.5, "voltage 2": 3.3}),
         ("Voltage - Supply (Ic)", "40V~57V", {"voltage min": 40.0, "voltage max": 57.0}),
         ("Voltage - Supply (Power)", "50V~57V", {"voltage min": 50.0, "voltage max": 57.0}),
+        ("Voltage - Output 2", "-12V", {"voltage": -12.0}),
         ("VGS", "±30V", {"voltage min": -30.0, "voltage max": 30.0}),
         ("Hi-Pot", "1.5kV", {"voltage": 1500.0}),
         ("Isolation Voltage(RMS)", "3.75kV;5kV", {"voltage 1": 3750.0, "voltage 2": 5000.0}),

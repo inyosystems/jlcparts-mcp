@@ -227,6 +227,7 @@ def normalizeAttribute(key, value):
                 "Voltage - Off State (Max)", "Voltage - Input", "Voltage - Input (Max)", "Voltage - Output (Max)",
                 "Input Voltage (Max)", "Input Voltage (Min)",
                 "Voltage - Output (Fixed)", "Voltage - Output (Min/Fixed)",
+                "Voltage - Output 2",
                 "Supply Voltage (Max)", "Supply Voltage (Min)", "Output Voltage",
                 "Voltage - Input (Min)", "Drain Source Voltage (Vdss)",
                 "Drain-Source Voltage (Vdss)", "Voltage - Input Offset(VOS)",
