@@ -2725,6 +2725,13 @@ def test_type_attribute(value, expected, capsys):
     }
 
 
+def test_logic_type_attribute(capsys):
+    values = normalized_values("Logic Type", "Divide-by-2, Divide-by-10", capsys)
+
+    assert values["logic type 1"] == ["Divide-by-2", "identifier"]
+    assert values["logic type 2"] == ["Divide-by-10", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
