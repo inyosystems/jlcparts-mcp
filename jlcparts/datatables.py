@@ -1383,7 +1383,7 @@ def normalizeAttribute(key, value):
                 "Continuous Adjustable Delay Range", "Time Intervals", "Access Time",
                 "Delay Time", "Switch Time(Toff)", "Operate Time",
                 "Release Time", "Write Cycle Time (Tw)", "Write Cycle Time(Tw)",
-                "Write Cycle Time (T Wc)", "Write Cycle Time(T Wc)",
+                "Write Cycle Time (T Wc)", "Write Cycle Time(T Wc)", "Write Cycle Time (Twc)",
                 "Time to First Fix", "Operation Time",
                 "Propagation Delay Tp Lh/Tp Hl", "Maximum Delay Time TPD", "Turn-Off Delay",
                 "Measuring Range", "Turn on Delay Time (Td(on))"]):

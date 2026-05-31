@@ -6325,6 +6325,7 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
         ("Write Cycle Time (Tw)", "5ms", {"time": 0.005}),
         ("Write Cycle Time(Tw)", "480us", {"time": 480e-6}),
         ("Write Cycle Time (T Wc)", "70ns", {"time": 70e-9}),
+        ("Write Cycle Time (Twc)", "25ns", {"time": 25e-9}),
         ("Time to First Fix", "30s, 5.5s", {"time 1": 30.0, "time 2": 5.5}),
         ("Switch Time(Toff)", "40ns", {"time": 40e-9}),
         ("Operate Time", "2.5min", {"time": 150.0}),
