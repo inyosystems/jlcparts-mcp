@@ -309,6 +309,7 @@ CONTACT_PLATING_ALIASES = {
 }
 
 COLOR_ALIASES = {
+    "-": "Unspecified",
     "black": "Black",
     "blue": "Blue",
     "green": "Green",
@@ -321,6 +322,7 @@ COLOR_ALIASES = {
     "Emerald green": "Emerald Green",
     "Emerald": "Emerald Green",
     "Deep red": "Deep Red",
+    "Dark Red": "Dark Red",
     "Red-orange": "Orange Red",
     "Orange-red": "Orange Red",
     "Orange-Red": "Orange Red",
@@ -1083,7 +1085,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "material", aliases=DIELECTRIC_MATERIAL_ALIASES)
         elif key in larr(["Contact Plating"]):
             value = attributes.identifierListAttribute(value, "plating", aliases=CONTACT_PLATING_ALIASES)
-        elif key in larr(["Illumination Color", "Color", "Actuator/Cap Color", "Detection Color", "Jacket Color", "Plastic Color"]):
+        elif key in larr(["Illumination Color", "Color", "Actuator/Cap Color", "Actuator Color", "Detection Color", "Jacket Color", "Plastic Color"]):
             value = attributes.identifierListAttribute(value, "color", aliases=COLOR_ALIASES)
         elif key in larr(["Emitted Color"]):
             value = attributes.identifierListAttribute(value, "color", separators=",;/", aliases=COLOR_ALIASES)
