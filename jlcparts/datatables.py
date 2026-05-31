@@ -191,6 +191,11 @@ RAIL_TO_RAIL_ALIASES = {
     "-": "Unspecified",
 }
 
+AMPLIFIER_CLASS_ALIASES = {
+    "Class H amplifier": "Class H",
+    "-": "Unspecified",
+}
+
 HOLDER_TYPE_ALIASES = {
     "Free-hanging": "Free Hanging",
     "Right-Angle": "Right Angle",
@@ -1020,6 +1025,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "input")
         elif key in larr(["Rail to Rail"]):
             value = attributes.identifierListAttribute(value, "rail to rail", aliases=RAIL_TO_RAIL_ALIASES)
+        elif key in larr(["Class"]):
+            value = attributes.identifierListAttribute(value, "class", aliases=AMPLIFIER_CLASS_ALIASES)
         elif key in larr(["Input Signal"]):
             value = attributes.identifierListAttribute(value, "input signal", aliases=SIGNAL_LEVEL_ALIASES)
         elif key in larr(["Peripheral/Function"]):

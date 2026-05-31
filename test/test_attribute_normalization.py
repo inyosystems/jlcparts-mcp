@@ -2420,6 +2420,18 @@ def test_rail_to_rail_identifiers(capsys):
     assert values["rail to rail 4"] == ["Push-Pull", "identifier"]
 
 
+def test_class_identifiers(capsys):
+    values = normalized_values("Class", "Class AB, Class D, Class H amplifier", capsys)
+
+    assert values["class 1"] == ["Class AB", "identifier"]
+    assert values["class 2"] == ["Class D", "identifier"]
+    assert values["class 3"] == ["Class H", "identifier"]
+
+    values = normalized_values("Class", "-", capsys)
+
+    assert values["class 1"] == ["Unspecified", "identifier"]
+
+
 def test_environmental_requirements(capsys):
     values = normalized_values(
         "Environmental Requirements",
