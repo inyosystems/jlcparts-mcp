@@ -2375,6 +2375,18 @@ def test_output_identifiers(capsys):
     assert values["output 2"] == ["TTL", "identifier"]
 
 
+def test_output_polarity_identifiers(capsys):
+    values = normalized_values("Output Polarity", "Positive electrode;Negative electrode", capsys)
+
+    assert values["polarity 1"] == ["Positive", "identifier"]
+    assert values["polarity 2"] == ["Negative", "identifier"]
+
+    values = normalized_values("Output Polarity", "Positive and Negative Poles", capsys)
+
+    assert values["polarity 1"] == ["Positive", "identifier"]
+    assert values["polarity 2"] == ["Negative", "identifier"]
+
+
 def test_output_level_identifiers(capsys):
     values = normalized_values("Output Level", "CML;HCSL;LVCMOS;LVDS;LVPECL", capsys)
 
