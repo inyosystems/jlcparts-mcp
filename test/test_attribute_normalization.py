@@ -2722,6 +2722,15 @@ def test_communication_interface_attribute(capsys):
     assert values["interface 2"] == ["SMBus", "identifier"]
 
 
+def test_io_type_attribute(capsys):
+    values = normalized_values("IO Type", "I2C;MII;RMII;SPI", capsys)
+
+    assert values["interface 1"] == ["I2C", "identifier"]
+    assert values["interface 2"] == ["MII", "identifier"]
+    assert values["interface 3"] == ["RMII", "identifier"]
+    assert values["interface 4"] == ["SPI", "identifier"]
+
+
 def test_protocol_identifier_list(capsys):
     values = normalized_values("Protocol", "USB 3.1;DP 1.3", capsys)
 
