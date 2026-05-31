@@ -2313,6 +2313,12 @@ def test_gnss_type_identifiers(capsys):
     assert values["gnss 6"] == ["BD3", "identifier"]
 
 
+def test_terminal_type_identifier(capsys):
+    values = normalized_values("Terminal Type", "Bidirectional Terminal (2 Tabs+1 Receptacle)", capsys)
+
+    assert values["terminal type"] == ["Bidirectional Terminal (2 Tabs+1 Receptacle)", "identifier"]
+
+
 def test_driver_receiver(capsys):
     values = normalized_values("Driver/Receiver", "1/1;2/2", capsys)
 
