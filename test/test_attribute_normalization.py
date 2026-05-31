@@ -2302,6 +2302,17 @@ def test_fet_type_identifiers(capsys):
     assert values["type 2"] == ["Integrated FET", "identifier"]
 
 
+def test_gnss_type_identifiers(capsys):
+    values = normalized_values("GNSS Type", "GPS, BDS, GLONASS, GALILEO, BD2, BD3", capsys)
+
+    assert values["gnss 1"] == ["GPS", "identifier"]
+    assert values["gnss 2"] == ["BeiDou", "identifier"]
+    assert values["gnss 3"] == ["GLONASS", "identifier"]
+    assert values["gnss 4"] == ["Galileo", "identifier"]
+    assert values["gnss 5"] == ["BD2", "identifier"]
+    assert values["gnss 6"] == ["BD3", "identifier"]
+
+
 def test_driver_receiver(capsys):
     values = normalized_values("Driver/Receiver", "1/1;2/2", capsys)
 

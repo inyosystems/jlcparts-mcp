@@ -102,6 +102,12 @@ GENDER_ALIASES = {
     "male": "Male",
 }
 
+GNSS_TYPE_ALIASES = {
+    "BD": "BeiDou",
+    "BDS": "BeiDou",
+    "GALILEO": "Galileo",
+}
+
 HOLDER_TYPE_ALIASES = {
     "Free-hanging": "Free Hanging",
     "Right-Angle": "Right Angle",
@@ -798,6 +804,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "protocol")
         elif key in larr(["Communication System"]):
             value = attributes.identifierListAttribute(value, "communication system", aliases=COMMUNICATION_SYSTEM_ALIASES)
+        elif key in larr(["GNSS Type"]):
+            value = attributes.identifierListAttribute(value, "gnss", aliases=GNSS_TYPE_ALIASES)
         elif key in larr(["Standard Number"]):
             value = attributes.identifierListAttribute(value, "standard number")
         elif key in larr(["Type"]):
