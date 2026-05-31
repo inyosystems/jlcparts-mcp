@@ -2780,6 +2780,12 @@ def test_communication_interface_attribute(capsys):
     assert values["interface 2"] == ["JTAG", "identifier"]
     assert values["interface 3"] == ["I2C", "identifier"]
 
+    values = normalized_values("Mac Interface", "MII, RMII, SNI", capsys)
+
+    assert values["interface 1"] == ["MII", "identifier"]
+    assert values["interface 2"] == ["RMII", "identifier"]
+    assert values["interface 3"] == ["SNI", "identifier"]
+
     values = normalized_values("Memory Interface", "I2C, SMBus", capsys)
 
     assert values["interface 1"] == ["I2C", "identifier"]
