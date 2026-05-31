@@ -499,6 +499,7 @@ def test_dc_spark_over_voltage(value, expected, capsys):
         }),
         ("Receiver Hysteresis", "50mV", {"voltage": 0.05}),
         ("High Level Range (VIH)", "1.75V~3.5V", {"voltage min": 1.75, "voltage max": 3.5}),
+        ("High Level Range (VOH)", "1.9V~5.34V", {"voltage min": 1.9, "voltage max": 5.34}),
         ("Input Logic Level -Low", "750mV~1.5V", {"voltage min": 0.75, "voltage max": 1.5}),
         ("Input Logic Level -Low", "900mV, 300mV, 600mV, 1.1V", {
             "voltage 1": 0.9,

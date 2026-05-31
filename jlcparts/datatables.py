@@ -348,7 +348,7 @@ def normalizeAttribute(key, value):
                 "voltage - supply (bus)", "voltage - supply (logic)",
                 "integrated power output voltage", "supply voltage(vcc)",
                 "esd protect", "supply voltage(single)", "mains input",
-                "receiver hysteresis", "high level range (vih)",
+                "receiver hysteresis", "high level range (vih)", "high level range (voh)",
                 "input logic level -low", "voltage - input(ac)",
                 "input voltage(vac)", "voltage - supply for logic",
                 "the power supply voltage", "controller operating voltage (vccq)",
