@@ -872,6 +872,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "output type", aliases=OUTPUT_TYPE_ALIASES)
         elif key in larr(["Output"]):
             value = attributes.identifierListAttribute(value, "output")
+        elif key in larr(["Input"]):
+            value = attributes.identifierListAttribute(value, "input")
         elif key in larr(["Peripheral/Function"]):
             value = attributes.identifierListAttribute(value, "peripheral", aliases=PERIPHERAL_FUNCTION_ALIASES)
         elif key in larr(["Topology"]):
