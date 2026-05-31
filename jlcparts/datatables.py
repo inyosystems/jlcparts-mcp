@@ -114,8 +114,13 @@ HOLDER_TYPE_ALIASES = {
 }
 
 MOUNTING_TYPE_ALIASES = {
+    "Base installation": "Base Mount",
+    "Free-hanging": "Free Hanging",
     "Panel Mounting": "Panel Mount",
+    "Panel installation": "Panel Mount",
     "Right-Angle": "Right Angle",
+    "SMD": "Surface Mount",
+    "Surface MountType": "Surface Mount",
     "Through hole": "Through Hole",
     "Through-hole": "Through Hole",
 }
@@ -833,7 +838,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "gender", aliases=GENDER_ALIASES)
         elif key in larr(["Holder Type"]):
             value = attributes.identifierListAttribute(value, "holder type", aliases=HOLDER_TYPE_ALIASES)
-        elif key in larr(["Mounting Type"]):
+        elif key in larr(["Mounting Type", "Mounting Style"]):
             value = attributes.identifierListAttribute(value, "mounting type", aliases=MOUNTING_TYPE_ALIASES)
         elif key in larr(["Head Type"]):
             value = attributes.identifierAttribute(value, "head type")

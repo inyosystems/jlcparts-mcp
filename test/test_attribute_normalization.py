@@ -2909,6 +2909,12 @@ def test_mounting_type_attribute(capsys):
 
     assert values["mounting type 1"] == ["Through Hole", "identifier"]
 
+    values = normalized_values("Mounting Style", "SMD, Panel installation, Free-hanging", capsys)
+
+    assert values["mounting type 1"] == ["Surface Mount", "identifier"]
+    assert values["mounting type 2"] == ["Panel Mount", "identifier"]
+    assert values["mounting type 3"] == ["Free Hanging", "identifier"]
+
 
 def test_head_type_attribute(capsys):
     values = normalized_values("Head Type", "Circular ring (90°)", capsys)
