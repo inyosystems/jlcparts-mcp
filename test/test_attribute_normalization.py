@@ -2976,6 +2976,18 @@ def test_appearance_shape_identifiers(capsys):
     assert values["appearance 1"] == ["Plug-In Type", "identifier"]
 
 
+def test_voltage_reference_identifiers(capsys):
+    values = normalized_values("Voltage Reference", "Built-in, External", capsys)
+
+    assert values["voltage reference 1"] == ["Built-In", "identifier"]
+    assert values["voltage reference 2"] == ["External", "identifier"]
+
+    values = normalized_values("Voltage Reference", "Internal or external", capsys)
+
+    assert values["voltage reference 1"] == ["Built-In", "identifier"]
+    assert values["voltage reference 2"] == ["External", "identifier"]
+
+
 def test_modulation_system_identifiers(capsys):
     values = normalized_values("Modulation System", "FLRC, LORA, OCK", capsys)
 

@@ -164,6 +164,13 @@ APPEARANCE_SHAPE_ALIASES = {
     "-": "Unspecified",
 }
 
+VOLTAGE_REFERENCE_ALIASES = {
+    "Built-in": "Built-In",
+    "Internal": "Built-In",
+    "external": "External",
+    "-": "Unspecified",
+}
+
 LOGIC_GATE_TYPE_ALIASES = {
     "NORGate": "NOR Gate",
     "ORGate": "OR Gate",
@@ -1063,6 +1070,9 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "amplifier type", aliases=AMPLIFIER_TYPE_ALIASES)
         elif key in larr(["Appearance and Shape"]):
             value = attributes.identifierListAttribute(value, "appearance", aliases=APPEARANCE_SHAPE_ALIASES)
+        elif key in larr(["Voltage Reference"]):
+            reference = "Internal, external" if str(value).strip() == "Internal or external" else value
+            value = attributes.identifierListAttribute(reference, "voltage reference", aliases=VOLTAGE_REFERENCE_ALIASES)
         elif key in larr(["Working Mode", "Mode Support"]):
             value = attributes.identifierListAttribute(value, "mode")
         elif key in larr(["Characteristic"]):
