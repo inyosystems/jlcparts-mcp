@@ -857,6 +857,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)
         elif key in larr(["Illumination Color", "Color"]):
             value = attributes.identifierListAttribute(value, "color", aliases=COLOR_ALIASES)
+        elif key in larr(["Lens Color"]):
+            value = attributes.identifierListAttribute(value, "lens color")
         elif key in larr(["Category"]):
             value = attributes.categoryAttribute(value)
         elif key in larr(["Texture of Material", "Shield Clip"]):
