@@ -164,6 +164,13 @@ APPEARANCE_SHAPE_ALIASES = {
     "-": "Unspecified",
 }
 
+APPLICATION_ALIASES = {
+    "MACController": "MAC Controller",
+    "PHYtransceiver": "PHY Transceiver",
+    "交换机": "Switch",
+    "-": "Unspecified",
+}
+
 VOLTAGE_REFERENCE_ALIASES = {
     "Built-in": "Built-In",
     "Internal": "Built-In",
@@ -1151,8 +1158,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierAttribute(value, "coil type")
         elif key in larr(["Dimming"]):
             value = attributes.identifierListAttribute(value, "dimming")
-        elif key in larr(["Applications", "Applications Function"]):
-            value = attributes.identifierListAttribute(value, "application")
+        elif key in larr(["Applications", "Applications Function", "Application Function"]):
+            value = attributes.identifierListAttribute(value, "application", aliases=APPLICATION_ALIASES)
         elif key in larr(["Connection Type"]):
             value = attributes.identifierAttribute(value, "connection type")
         elif key in larr(["Connector Type"]):

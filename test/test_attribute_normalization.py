@@ -3396,7 +3396,7 @@ def test_applications_attribute(value, expected, capsys):
         ("USB to UART, USB to SPI, USB to I2C", ["USB to UART", "USB to SPI", "USB to I2C"]),
         ("Buffers;Driver", ["Buffers", "Driver"]),
         ("USB to HUB; USB to SD/MMC", ["USB to HUB", "USB to SD/MMC"]),
-        ("-", ["-"]),
+        ("-", ["Unspecified"]),
     ],
 )
 def test_applications_function_attribute(value, expected, capsys):
@@ -3410,6 +3410,14 @@ def test_applications_function_attribute(value, expected, capsys):
         f"application {index}": token
         for index, token in enumerate(expected, start=1)
     }
+
+
+def test_application_function_identifiers(capsys):
+    values = normalized_values("Application Function", "PHYtransceiver, MACController, 交换机", capsys)
+
+    assert values["application 1"] == ["PHY Transceiver", "identifier"]
+    assert values["application 2"] == ["MAC Controller", "identifier"]
+    assert values["application 3"] == ["Switch", "identifier"]
 
 
 @pytest.mark.parametrize(
