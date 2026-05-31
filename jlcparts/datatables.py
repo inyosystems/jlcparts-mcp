@@ -540,6 +540,7 @@ def normalizeAttribute(key, value):
                 "minimum cathode current for regulation",
                 "holding current (ih)",
                 "current - max",
+                "standby current",
                 "standby current (iq)",
                 "current - gate trigger(igt)",
                 "balance current",
