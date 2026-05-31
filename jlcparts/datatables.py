@@ -177,6 +177,10 @@ SIGNAL_LEVEL_ALIASES = {
     "-": "Unspecified",
 }
 
+LOAD_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
 HOLDER_TYPE_ALIASES = {
     "Free-hanging": "Free Hanging",
     "Right-Angle": "Right Angle",
@@ -1000,6 +1004,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "output")
         elif key in larr(["Output Level"]):
             value = attributes.identifierListAttribute(value, "output level", aliases=SIGNAL_LEVEL_ALIASES)
+        elif key in larr(["Load Type"]):
+            value = attributes.identifierListAttribute(value, "load type", separators=",;、", aliases=LOAD_TYPE_ALIASES)
         elif key in larr(["Input"]):
             value = attributes.identifierListAttribute(value, "input")
         elif key in larr(["Input Signal"]):

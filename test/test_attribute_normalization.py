@@ -2365,6 +2365,24 @@ def test_output_level_identifiers(capsys):
     assert values["output level 1"] == ["Unspecified", "identifier"]
 
 
+def test_load_type_identifiers(capsys):
+    values = normalized_values("Load Type", "MOSFET、IGBT、SiC、GaN", capsys)
+
+    assert values["load type 1"] == ["MOSFET", "identifier"]
+    assert values["load type 2"] == ["IGBT", "identifier"]
+    assert values["load type 3"] == ["SiC", "identifier"]
+    assert values["load type 4"] == ["GaN", "identifier"]
+
+    values = normalized_values("Load Type", "AC,DC", capsys)
+
+    assert values["load type 1"] == ["AC", "identifier"]
+    assert values["load type 2"] == ["DC", "identifier"]
+
+    values = normalized_values("Load Type", "-", capsys)
+
+    assert values["load type 1"] == ["Unspecified", "identifier"]
+
+
 def test_input_identifiers(capsys):
     values = normalized_values("Input", "LVPECL, LVDS, LVCMOS", capsys)
 
