@@ -137,6 +137,14 @@ CHIP_TYPE_ALIASES = {
     "开关控制器": "Switch Controller",
 }
 
+POWER_MANAGEMENT_TYPE_ALIASES = {
+    "Voltage detector": "Voltage Detector",
+    "Multi-pressure monitor": "Multi-Voltage Monitor",
+    "看门狗电路": "Watchdog Circuit",
+    "电池备用电路": "Battery Backup Circuit",
+    "Reset timer": "Reset Timer",
+}
+
 LOGIC_GATE_TYPE_ALIASES = {
     "NORGate": "NOR Gate",
     "ORGate": "OR Gate",
@@ -1025,6 +1033,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "actuator type", aliases=ACTUATOR_STYLE_ALIASES)
         elif key in larr(["The Chip Type", "Chip Type"]):
             value = attributes.identifierListAttribute(value, "chip type", aliases=CHIP_TYPE_ALIASES)
+        elif key in larr(["Type of the Power Management Chip"]):
+            value = attributes.identifierListAttribute(value, "power management type", separators=",;/", aliases=POWER_MANAGEMENT_TYPE_ALIASES)
         elif key in larr(["Working Mode"]):
             value = attributes.identifierListAttribute(value, "mode")
         elif key in larr(["Characteristic"]):

@@ -2924,6 +2924,17 @@ def test_chip_type_identifiers(capsys):
     assert values["chip type 2"] == ["Switch Controller", "identifier"]
 
 
+def test_power_management_type_identifiers(capsys):
+    values = normalized_values("Type of the Power Management Chip", "Simple reset/Power-on reset", capsys)
+
+    assert values["power management type 1"] == ["Simple reset", "identifier"]
+    assert values["power management type 2"] == ["Power-on reset", "identifier"]
+
+    values = normalized_values("Type of the Power Management Chip", "看门狗电路", capsys)
+
+    assert values["power management type 1"] == ["Watchdog Circuit", "identifier"]
+
+
 def test_modulation_system_identifiers(capsys):
     values = normalized_values("Modulation System", "FLRC, LORA, OCK", capsys)
 
