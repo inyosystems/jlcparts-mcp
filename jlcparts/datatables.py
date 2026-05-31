@@ -153,6 +153,17 @@ PROGRAM_MEMORY_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+APPEARANCE_SHAPE_ALIASES = {
+    "Bench-shaped": "Bench-Shaped",
+    "Block-shaped": "Block-Shaped",
+    "Plug-in type": "Plug-In Type",
+    "Plug-in type (with screw)": "Plug-In Type (With Screw)",
+    "Sheet-like": "Sheet-Like",
+    "SMD type": "SMD Type",
+    "SMD type (with screw)": "SMD Type (With Screw)",
+    "-": "Unspecified",
+}
+
 LOGIC_GATE_TYPE_ALIASES = {
     "NORGate": "NOR Gate",
     "ORGate": "OR Gate",
@@ -1049,6 +1060,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "power management type", separators=",;/", aliases=POWER_MANAGEMENT_TYPE_ALIASES)
         elif key in larr(["Amplifier Type"]):
             value = attributes.identifierListAttribute(value, "amplifier type", aliases=AMPLIFIER_TYPE_ALIASES)
+        elif key in larr(["Appearance and Shape"]):
+            value = attributes.identifierListAttribute(value, "appearance", aliases=APPEARANCE_SHAPE_ALIASES)
         elif key in larr(["Working Mode"]):
             value = attributes.identifierListAttribute(value, "mode")
         elif key in larr(["Characteristic"]):

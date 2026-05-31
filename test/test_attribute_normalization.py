@@ -2961,6 +2961,16 @@ def test_amplifier_type_identifiers(capsys):
     assert values["amplifier type 1"] == ["Unspecified", "identifier"]
 
 
+def test_appearance_shape_identifiers(capsys):
+    values = normalized_values("Appearance and Shape", "SMD type (with screw)", capsys)
+
+    assert values["appearance 1"] == ["SMD Type (With Screw)", "identifier"]
+
+    values = normalized_values("Appearance and Shape", "Plug-in type", capsys)
+
+    assert values["appearance 1"] == ["Plug-In Type", "identifier"]
+
+
 def test_modulation_system_identifiers(capsys):
     values = normalized_values("Modulation System", "FLRC, LORA, OCK", capsys)
 
