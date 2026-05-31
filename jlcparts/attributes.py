@@ -3793,12 +3793,21 @@ def capacitanceAtVoltageAttribute(value, name="capacitance", voltage_name="volta
         parsed["format"] += " @ ${" + voltage_name + "}"
         return parsed
     capacitance, voltage = [x.strip() for x in value.split("@", 1)]
+    voltages = [x.strip() for x in re.split(r"[,，]", voltage) if x.strip()]
+    voltage_values = {}
+    if len(voltages) == 1:
+        voltage_values[voltage_name] = [readVoltage(voltages[0]), "voltage"]
+    else:
+        for index, voltage in enumerate(voltages, start=1):
+            voltage_values[f"{voltage_name} {index}"] = [readVoltage(voltage), "voltage"]
     return {
-        "format": "${" + name + "} @ ${" + voltage_name + "}",
+        "format": "${" + name + "} @ " + ", ".join(
+            "${" + key + "}" for key in voltage_values
+        ),
         "primary": name,
         "values": {
             name: [readCapacitance(capacitance), "capacitance"],
-            voltage_name: [readVoltage(voltage), "voltage"],
+            **voltage_values,
         },
     }
 

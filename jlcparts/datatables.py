@@ -943,6 +943,8 @@ def normalizeAttribute(key, value):
                 "External Load Capacitor", "Cww( P F Max )"]):
             if key == "diode capacitance":
                 value = attributes.diodeCapacitanceAttribute(value)
+            elif key == "input capacitance(cies)" and isinstance(value, str) and "@" in value:
+                value = attributes.capacitanceAtVoltageAttribute(value, "capacitance", "voltage")
             elif key == "input capacitance (cies@vce)":
                 value = attributes.capacitanceAtVoltageAttribute(value, "capacitance", "Vce")
             elif key == "capacitance" and isinstance(value, str) and "@" in value:

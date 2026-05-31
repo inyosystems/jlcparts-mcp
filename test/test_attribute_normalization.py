@@ -953,6 +953,7 @@ def test_capacitive_load_max(value, expected, capsys):
         ("Input Capacitance", "1.8pF", {"capacitance": 1.8e-12}),
         ("Input Capacitance", "-", {"capacitance": "NaN"}),
         ("Input Capacitance (Cies@VCE)", "3.29nF@25V", {"capacitance": 3.29e-9, "Vce": 25.0}),
+        ("Input Capacitance(Cies)", "3.8nF@30V,0V", {"capacitance": 3.8e-9, "voltage 1": 30.0, "voltage 2": 0.0}),
         ("Input Capacitance (Cies@VCE)", "-", {"capacitance": "NaN", "Vce": "NaN"}),
         ("Capacitance-Input", "1.5pF", {"capacitance": 1.5e-12}),
         ("Input Capacitiance(Ci)", "15pF", {"capacitance": 15e-12}),
@@ -974,7 +975,7 @@ def test_extra_capacitance_attributes(key, value, expected, capsys):
     values = normalized_values(key, value, capsys)
 
     for quantity, amount in expected.items():
-        unit = "voltage" if quantity == "Vce" else "capacitance"
+        unit = "voltage" if quantity == "Vce" or quantity.startswith("voltage") else "capacitance"
         assert_quantity(values[quantity], amount, unit)
 
 
