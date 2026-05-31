@@ -861,6 +861,7 @@ def normalizeAttribute(key, value):
         elif key in larr(["Number of Pins", "Number of Resistors", "Number of Loop",
                     "Number of Regulators", "Number of Outputs", "Number of Capacitors",
                     "Number of I/O", "Gpio Ports Number", "Number of Logic Elements/Blocks",
+                    "Number of Logic Gates",
                     "Logic Elements/Cells",
                     "Number of Differential Input Channels", "Number of Taps",
                     "Number of Voltages Monitored", "Number of Amplifiers",

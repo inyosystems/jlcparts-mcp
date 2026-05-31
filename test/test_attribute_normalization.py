@@ -3633,6 +3633,12 @@ def test_logic_elements_blocks_count(capsys):
     assert_quantity(values["count"], "NaN", "count")
 
 
+def test_logic_gates_count(capsys):
+    values = normalized_values("Number of Logic Gates", "125000", capsys)
+
+    assert_quantity(values["count"], 125000, "count")
+
+
 def test_logic_elements_cells_count(capsys):
     values = normalized_values("Logic Elements/Cells", "10320", capsys)
 
