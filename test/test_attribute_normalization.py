@@ -2376,6 +2376,16 @@ def test_output_signal_identifiers(capsys):
     assert values["output signal 1"] == ["Unspecified", "identifier"]
 
 
+def test_level_standard_identifiers(capsys):
+    values = normalized_values("Level Standard", "LVDS, LVCMOS, LVPECL, HSTL, SSTL", capsys)
+
+    assert values["level standard 1"] == ["LVDS", "identifier"]
+    assert values["level standard 2"] == ["LVCMOS", "identifier"]
+    assert values["level standard 3"] == ["LVPECL", "identifier"]
+    assert values["level standard 4"] == ["HSTL", "identifier"]
+    assert values["level standard 5"] == ["SSTL", "identifier"]
+
+
 def test_load_type_identifiers(capsys):
     values = normalized_values("Load Type", "MOSFET、IGBT、SiC、GaN", capsys)
 
