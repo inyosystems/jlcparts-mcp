@@ -1182,6 +1182,7 @@ def test_forward_voltage_vf_at_if_lists(value, expected, capsys):
         ("Sink Current", "12mA", "current", 0.012, "current"),
         ("Refresh Current", "8mA", "current", 0.008, "current"),
         ("Frequency (Max)", "6GHz", "frequency", 6e9, "frequency"),
+        ("Clock Frequency (Max)", "166MHz", "frequency", 166e6, "frequency"),
         ("Band Width", "45Hz~2kHz", "frequency min", 45.0, "frequency"),
         ("Band Width", "80kHz, 20kHz", "frequency 1", 80000.0, "frequency"),
         ("Clock Frequency(Fc)", "100MHz", "frequency", 100e6, "frequency"),

@@ -1266,7 +1266,7 @@ def normalizeAttribute(key, value):
                 "Gain Bandwidth Product (GBP)", "Resonant Frequency", "Count Rate",
                 "The Main Fclk", "Bandwidth (-3d B)", "-3db Bandwidth(G=1)",
                 "Frequency - Cutoff or Center", "Typical Application Frequency",
-                "Clock Frequency (Fc)", "Frequency (Max)", "Band Width",
+                "Clock Frequency (Fc)", "Clock Frequency (Max)", "Frequency (Max)", "Band Width",
                 "Clock Frequency(Fc)", "Maximum Speed", "Pass Bandwidth",
                 "Stop Bandwidth", "Passband Bandwidth", "Response Frequency",
                 "Central Frequency", "Lo Frequency Range", "IF Frequency Range",
