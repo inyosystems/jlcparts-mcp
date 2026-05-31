@@ -5701,6 +5701,7 @@ def test_additional_toleranced_lengths(key, value, expected, capsys):
         ("Line Length", "30cm, 23cm", {"length 1": 0.3, "length 2": 0.23}),
         ("Length", "7.7mm, 8.3mm", {"length 1": 0.0077, "length 2": 0.0083}),
         ("Width", "6mm, 6.6mm", {"length 1": 0.006, "length 2": 0.0066}),
+        ("Height", "3.3mm, 4mm", {"length 1": 0.0033, "length 2": 0.004}),
         ("Wire Diameter", "1.6mm, Rib Line Diameter 1.8MM", {
             "length 1": 0.0016,
             "length 2": 0.0018,
