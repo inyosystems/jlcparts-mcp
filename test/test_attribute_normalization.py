@@ -2326,6 +2326,19 @@ def test_filter_type_identifiers(capsys):
     assert values["filter type 3"] == ["Three-Phase Wye Filter", "identifier"]
 
 
+def test_certification_bodies_identifiers(capsys):
+    values = normalized_values("Certification Bodies", "CB、CE,cURus,EAC", capsys)
+
+    assert values["certification 1"] == ["CB", "identifier"]
+    assert values["certification 2"] == ["CE", "identifier"]
+    assert values["certification 3"] == ["cURus", "identifier"]
+    assert values["certification 4"] == ["EAC", "identifier"]
+
+    values = normalized_values("Certification Bodies", "-", capsys)
+
+    assert values["certification 1"] == ["Unspecified", "identifier"]
+
+
 def test_terminal_type_identifier(capsys):
     values = normalized_values("Terminal Type", "Bidirectional Terminal (2 Tabs+1 Receptacle)", capsys)
 

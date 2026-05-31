@@ -216,6 +216,10 @@ CARD_CONNECTION_MODE_ALIASES = {
     "-": "Unspecified",
 }
 
+CERTIFICATION_ALIASES = {
+    "-": "Unspecified",
+}
+
 DIRECTION_ALIASES = {
     "Bi-Directional": "Bidirectional",
     "Omni-directional": "Omnidirectional",
@@ -998,8 +1002,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "series")
         elif key in larr(["RF Series"]):
             value = attributes.identifierListAttribute(value, "series", separators=",;/")
-        elif key in larr(["Safety Certification"]):
-            value = attributes.identifierListAttribute(value, "certification")
+        elif key in larr(["Safety Certification", "Certification Bodies"]):
+            value = attributes.identifierListAttribute(value, "certification", separators=",;、", aliases=CERTIFICATION_ALIASES)
         elif key in larr(["Circuit"]):
             value = attributes.identifierAttribute(value, "circuit")
         elif key in larr(["Features", "Feature", "Function", "Supplementary Features"]):
