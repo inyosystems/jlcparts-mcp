@@ -860,6 +860,8 @@ def normalizeAttribute(key, value):
             value = attributes.platingThicknessAttribute(value)
         elif key in larr(["Surface Treatment"]):
             value = attributes.surfaceTreatmentAttribute(value)
+        elif key in larr(["Supplier Device Packaging"]):
+            value = attributes.supplierDevicePackagingAttribute(value)
         elif key in larr(["Packaging/Housing"]):
             value = attributes.packagePinCountAttribute(value)
         elif key in larr(["Viewing Direction"]):

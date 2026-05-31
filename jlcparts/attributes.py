@@ -1321,6 +1321,20 @@ def packagePinCountAttribute(value):
         "values": {"pins": [int(match.group(1)), "count"]}
     }
 
+def supplierDevicePackagingAttribute(value):
+    value = str(value).strip()
+    match = re.fullmatch(r"(\d+)\s*-\s*(.+)", value)
+    if match is None:
+        return identifierAttribute(value, "package")
+    return {
+        "format": "${pins}-${package}",
+        "primary": "pins",
+        "values": {
+            "pins": [int(match.group(1)), "count"],
+            "package": [match.group(2).strip(), "identifier"],
+        }
+    }
+
 def clockViewingDirectionAttribute(value):
     value = str(value).strip()
     match = re.fullmatch(r"(\d+(?:\.\d+)?)\s*o'?clock", value, flags=re.I)

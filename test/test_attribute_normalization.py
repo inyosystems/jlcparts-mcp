@@ -2416,6 +2416,10 @@ def test_display_switch_package_counts(capsys):
     values = normalized_values("Packaging/Housing", "3-SIP Module", capsys)
     assert_quantity(values["pins"], 3, "count")
 
+    values = normalized_values("Supplier Device Packaging", "3-SIP Module", capsys)
+    assert_quantity(values["pins"], 3, "count")
+    assert values["package"] == ["SIP Module", "identifier"]
+
 
 def test_memory_generation_and_material_attributes(capsys):
     values = normalized_values("Type of Memory", "1 FLASH +1 RAM", capsys)
