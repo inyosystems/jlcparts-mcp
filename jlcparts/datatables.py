@@ -498,7 +498,7 @@ def normalizeAttribute(key, value):
                     "Switching Current", "Maximum Load Current",
                     "Standby Supply Current (Isb)", "Battery Current",
                     "Supply Current (Program)", "Supply Current (Erase)",
-                    "Supply Current (Read)",
+                    "Supply Current (Read)", "Supply Current (Write)",
                     "Idle Current", "RMS on-State Current(It(RMS))",
                     "Current Dark", "Continuous Load Current",
                     "Threshold Current", "Collector Current (Max)",
