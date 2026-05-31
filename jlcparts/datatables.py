@@ -173,6 +173,10 @@ FILTER_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+SIGNAL_LEVEL_ALIASES = {
+    "-": "Unspecified",
+}
+
 HOLDER_TYPE_ALIASES = {
     "Free-hanging": "Free Hanging",
     "Right-Angle": "Right Angle",
@@ -996,6 +1000,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "output")
         elif key in larr(["Input"]):
             value = attributes.identifierListAttribute(value, "input")
+        elif key in larr(["Input Signal"]):
+            value = attributes.identifierListAttribute(value, "input signal", aliases=SIGNAL_LEVEL_ALIASES)
         elif key in larr(["Peripheral/Function"]):
             value = attributes.identifierListAttribute(value, "peripheral", aliases=PERIPHERAL_FUNCTION_ALIASES)
         elif key in larr(["Topology"]):

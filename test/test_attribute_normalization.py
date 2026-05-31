@@ -2359,6 +2359,21 @@ def test_input_identifiers(capsys):
     assert values["input 3"] == ["LVCMOS", "identifier"]
 
 
+def test_input_signal_identifiers(capsys):
+    values = normalized_values("Input Signal", "LVTTL, LVPECL, CML, LVDS, LVCMOS, HSTL", capsys)
+
+    assert values["input signal 1"] == ["LVTTL", "identifier"]
+    assert values["input signal 2"] == ["LVPECL", "identifier"]
+    assert values["input signal 3"] == ["CML", "identifier"]
+    assert values["input signal 4"] == ["LVDS", "identifier"]
+    assert values["input signal 5"] == ["LVCMOS", "identifier"]
+    assert values["input signal 6"] == ["HSTL", "identifier"]
+
+    values = normalized_values("Input Signal", "-", capsys)
+
+    assert values["input signal 1"] == ["Unspecified", "identifier"]
+
+
 def test_environmental_requirements(capsys):
     values = normalized_values(
         "Environmental Requirements",
