@@ -280,6 +280,8 @@ MOUNTING_TYPE_ALIASES = {
     "Surface MountType": "Surface Mount",
     "Through hole": "Through Hole",
     "Through-hole": "Through Hole",
+    "Top-mount": "Top Mount",
+    "Vertical welding": "Vertical Soldering",
     "正贴": "Front Mount",
     "-": "Unspecified",
 }
@@ -1067,6 +1069,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "holder type", aliases=HOLDER_TYPE_ALIASES)
         elif key in larr(["Mounting Type", "Mounting Style", "Mounting Sytle"]):
             value = attributes.identifierListAttribute(value, "mounting type", aliases=MOUNTING_TYPE_ALIASES)
+        elif key in larr(["Installation Method"]):
+            value = attributes.identifierListAttribute(value, "installation method", aliases=MOUNTING_TYPE_ALIASES)
         elif key in larr(["Head Type"]):
             value = attributes.identifierAttribute(value, "head type")
         elif key in larr(["Coil Type"]):

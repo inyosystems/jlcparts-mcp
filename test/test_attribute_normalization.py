@@ -3212,6 +3212,21 @@ def test_mounting_type_attribute(capsys):
     assert values["mounting type 3"] == ["Through Hole", "identifier"]
 
 
+def test_installation_method_identifiers(capsys):
+    values = normalized_values("Installation Method", "Vertical welding", capsys)
+
+    assert values["installation method 1"] == ["Vertical Soldering", "identifier"]
+
+    values = normalized_values("Installation Method", "Surface Mount, Right Angle", capsys)
+
+    assert values["installation method 1"] == ["Surface Mount", "identifier"]
+    assert values["installation method 2"] == ["Right Angle", "identifier"]
+
+    values = normalized_values("Installation Method", "Top-mount", capsys)
+
+    assert values["installation method 1"] == ["Top Mount", "identifier"]
+
+
 def test_head_type_attribute(capsys):
     values = normalized_values("Head Type", "Circular ring (90°)", capsys)
 
