@@ -2351,6 +2351,20 @@ def test_output_identifiers(capsys):
     assert values["output 2"] == ["TTL", "identifier"]
 
 
+def test_output_level_identifiers(capsys):
+    values = normalized_values("Output Level", "CML;HCSL;LVCMOS;LVDS;LVPECL", capsys)
+
+    assert values["output level 1"] == ["CML", "identifier"]
+    assert values["output level 2"] == ["HCSL", "identifier"]
+    assert values["output level 3"] == ["LVCMOS", "identifier"]
+    assert values["output level 4"] == ["LVDS", "identifier"]
+    assert values["output level 5"] == ["LVPECL", "identifier"]
+
+    values = normalized_values("Output Level", "-", capsys)
+
+    assert values["output level 1"] == ["Unspecified", "identifier"]
+
+
 def test_input_identifiers(capsys):
     values = normalized_values("Input", "LVPECL, LVDS, LVCMOS", capsys)
 

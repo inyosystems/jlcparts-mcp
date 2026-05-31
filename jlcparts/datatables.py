@@ -998,6 +998,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "output type", aliases=OUTPUT_TYPE_ALIASES)
         elif key in larr(["Output", "Output Mode"]):
             value = attributes.identifierListAttribute(value, "output")
+        elif key in larr(["Output Level"]):
+            value = attributes.identifierListAttribute(value, "output level", aliases=SIGNAL_LEVEL_ALIASES)
         elif key in larr(["Input"]):
             value = attributes.identifierListAttribute(value, "input")
         elif key in larr(["Input Signal"]):
