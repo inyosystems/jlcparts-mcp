@@ -1027,7 +1027,7 @@ def normalizeAttribute(key, value):
                 value = re.sub(r"^M\s*", "", value, flags=re.I) + "mm"
             if key == "length" and isinstance(value, str) and "(" in value:
                 value = attributes.lengthAttribute(value)
-            elif key == "length" and isinstance(value, str) and ("," in value or ";" in value):
+            elif key in larr(["Length", "Width"]) and isinstance(value, str) and ("," in value or ";" in value):
                 value = attributes.lengthRangeListAttribute(value, "length")
             elif key in larr(["Insulation Od", "Interface Length/Height", "Interface Diameter",
                     "System Fit Height", "Fuse Length", "Fuse Diameter (Φd)",
