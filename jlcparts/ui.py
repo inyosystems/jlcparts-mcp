@@ -9,6 +9,7 @@ from jlcparts.datatables import buildtables, normalizeAttribute
 from jlcparts.lcsc import pullPreferredComponents
 from jlcparts.partLib import (PartLibrary, PartLibraryDb, getLcscExtraNew,
                               loadJlcTable, loadJlcTableLazy, parsePrice)
+from jlcparts.sourceDb import SourceDb, migrateCache
 from jlcparts.webdb import buildwebdb
 
 
@@ -145,7 +146,7 @@ def fetchDb(db, checkpoint, max_seconds, age, limit, retries, retry_delay, verbo
     OLD = 0
     REFRESHED = 1
 
-    lib = PartLibraryDb(db)
+    lib = SourceDb(db)
     checkpointState = loadCheckpoint(checkpoint)
     count = int(checkpointState.get("count", 0))
     done = False
@@ -188,13 +189,10 @@ def fetchDb(db, checkpoint, max_seconds, age, limit, retries, retry_delay, verbo
 
         with lib.startTransaction():
             for apiComponent in page:
-                component = apiComponentToDbComponent(apiComponent)
-                if lib.exists(component["lcsc"]):
-                    lib.updateJlcPart(component, flag=REFRESHED)
-                else:
-                    component["extra"] = {}
-                    lib.addComponent(component, flag=REFRESHED)
-                    missing.add(component["lcsc"])
+                isNew = not lib.exists(apiComponent["componentCode"])
+                lib.updateJlcPayload(apiComponent, flag=REFRESHED)
+                if isNew:
+                    missing.add(apiComponent["componentCode"])
 
         count += len(page)
         if verbose:
@@ -214,8 +212,18 @@ def updatePreferred(db):
     Download list of preferred components from JLC PCB and mark them into the DB.
     """
     preferred = pullPreferredComponents()
-    lib = PartLibraryDb(db)
+    lib = SourceDb(db)
     lib.setPreferred(preferred)
+
+
+@click.command()
+@click.argument("source", type=click.Path(dir_okay=False, exists=True))
+@click.argument("output", type=click.Path(dir_okay=False), required=False)
+def migratecache(source, output):
+    """
+    Migrate a legacy cache.sqlite3 into the compact source-db-v2 format.
+    """
+    migrateCache(source, output)
 
 
 @click.command()
@@ -317,6 +325,7 @@ cli.add_command(listattributes)
 cli.add_command(buildtables)
 cli.add_command(buildwebdb)
 cli.add_command(updatePreferred)
+cli.add_command(migratecache)
 cli.add_command(fetchDetails)
 cli.add_command(fetchDb)
 cli.add_command(fetchTable)

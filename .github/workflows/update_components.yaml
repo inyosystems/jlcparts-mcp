@@ -91,6 +91,10 @@ jobs:
             echo "No published cache found, bootstrapping a fresh database"
           fi
 
+          if [ -f cache.sqlite3 ]; then
+            jlcparts migratecache cache.sqlite3
+          fi
+
           if [ "$WORKFLOW_EVENT_NAME" = "schedule" ]; then
             wget -q ${DATAURL}/parts.checkpoint.json || rm -f parts.checkpoint.json
 

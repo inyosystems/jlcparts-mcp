@@ -9,7 +9,7 @@ from collections import OrderedDict, defaultdict
 from pathlib import Path
 
 import click
-from jlcparts.partLib import PartLibraryDb
+from jlcparts.sourceDb import SourceDb
 from jlcparts.common import sha256file
 from jlcparts import attributes, descriptionAttributes
 from jlcparts.taxonomy import clean_label, normalize_category_pair, taxonomy_key
@@ -2589,10 +2589,11 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
     """
     Build datatables out of the LIBRARY and save them in OUTDIR
     """
-    lib = PartLibraryDb(library)
+    lib = SourceDb(library, create=False)
     Path(outdir).mkdir(parents=True, exist_ok=True)
     clearDir(outdir)
     del jobs  # kept for CLI compatibility with the previous builder
+    lib.prepareBuild()
 
     categories = lib.categories()
     sortedCategories = [
@@ -2772,3 +2773,4 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
         "files": files,
     }
     _writeJsonArtifact(manifest, os.path.join(outdir, "manifest.json"), compress=False)
+    lib.finalizeBuild()
