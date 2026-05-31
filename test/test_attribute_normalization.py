@@ -2796,6 +2796,17 @@ def test_gender_attribute(capsys):
     assert values["gender 1"] == ["Female(90°)", "identifier"]
 
 
+def test_holder_type_attribute(capsys):
+    values = normalized_values("Holder Type", "Surface Mount,Vertical", capsys)
+
+    assert values["holder type 1"] == ["Surface Mount", "identifier"]
+    assert values["holder type 2"] == ["Vertical", "identifier"]
+
+    values = normalized_values("Holder Type", "Right-Angle", capsys)
+
+    assert values["holder type 1"] == ["Right Angle", "identifier"]
+
+
 def test_dimming_attribute(capsys):
     values = normalized_values("Dimming", "Analog, PWM, I2C", capsys)
 

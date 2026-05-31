@@ -102,6 +102,11 @@ GENDER_ALIASES = {
     "male": "Male",
 }
 
+HOLDER_TYPE_ALIASES = {
+    "Free-hanging": "Free Hanging",
+    "Right-Angle": "Right Angle",
+}
+
 CONTACT_MATERIAL_ALIASES = {
     "brass": "Brass",
     "bronze": "Bronze",
@@ -794,6 +799,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierAttribute(value, "sensor type")
         elif key in larr(["Gender"]):
             value = attributes.identifierListAttribute(value, "gender", aliases=GENDER_ALIASES)
+        elif key in larr(["Holder Type"]):
+            value = attributes.identifierListAttribute(value, "holder type", aliases=HOLDER_TYPE_ALIASES)
         elif key in larr(["Dimming"]):
             value = attributes.identifierListAttribute(value, "dimming")
         elif key in larr(["Applications", "Applications Function"]):
