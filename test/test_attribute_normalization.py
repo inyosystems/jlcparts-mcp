@@ -2326,6 +2326,13 @@ def test_input_output_identifiers(capsys):
     assert values["output"] == ["1.13 cable black", "identifier"]
 
 
+def test_output_identifiers(capsys):
+    values = normalized_values("Output", "LVCMOS, HCSL", capsys)
+
+    assert values["output 1"] == ["LVCMOS", "identifier"]
+    assert values["output 2"] == ["HCSL", "identifier"]
+
+
 def test_environmental_requirements(capsys):
     values = normalized_values(
         "Environmental Requirements",
