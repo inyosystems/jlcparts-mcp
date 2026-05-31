@@ -192,6 +192,11 @@ RAIL_TO_RAIL_ALIASES = {
 }
 
 AMPLIFIER_CLASS_ALIASES = {
+    "AB Class Amplifier": "Class AB",
+    "AB类功放": "Class AB",
+    "Class D Amplifier": "Class D",
+    "D类功放": "Class D",
+    "Class G amplifier": "Class G",
     "Class H amplifier": "Class H",
     "-": "Unspecified",
 }
@@ -1063,7 +1068,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "input")
         elif key in larr(["Rail to Rail"]):
             value = attributes.identifierListAttribute(value, "rail to rail", aliases=RAIL_TO_RAIL_ALIASES)
-        elif key in larr(["Class"]):
+        elif key in larr(["Class", "Type of Power Amplifier"]):
             value = attributes.identifierListAttribute(value, "class", aliases=AMPLIFIER_CLASS_ALIASES)
         elif key in larr(["Card Type"]):
             value = attributes.identifierListAttribute(value, "card type", aliases=CARD_TYPE_ALIASES)

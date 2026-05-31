@@ -2443,6 +2443,18 @@ def test_class_identifiers(capsys):
     assert values["class 1"] == ["Unspecified", "identifier"]
 
 
+def test_power_amplifier_class_identifiers(capsys):
+    values = normalized_values("Type of Power Amplifier", "AB Class Amplifier;Class D Amplifier", capsys)
+
+    assert values["class 1"] == ["Class AB", "identifier"]
+    assert values["class 2"] == ["Class D", "identifier"]
+
+    values = normalized_values("Type of Power Amplifier", "AB类功放;D类功放", capsys)
+
+    assert values["class 1"] == ["Class AB", "identifier"]
+    assert values["class 2"] == ["Class D", "identifier"]
+
+
 def test_card_type_identifiers(capsys):
     values = normalized_values("Card Type", "MicroSD card (TF card), UFS Card", capsys)
 
