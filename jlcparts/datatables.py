@@ -211,6 +211,17 @@ DIRECTION_ALIASES = {
     "-": "Unspecified",
 }
 
+CONTACT_TYPE_ALIASES = {
+    "Double-Sided Contacts": "Double-Sided Contact",
+    "Dual-sided contacts": "Double-Sided Contact",
+    "top and bottom connection": "Top and Bottom Entry",
+    "Single-side Contact": "Single-Sided Contact",
+    "Single-sided contact points": "Single-Sided Contact",
+    "Normally closed": "Normally Closed",
+    "Normal Open": "Normally Open",
+    "-": "Unspecified",
+}
+
 HOLDER_TYPE_ALIASES = {
     "Free-hanging": "Free Hanging",
     "Right-Angle": "Right Angle",
@@ -1059,6 +1070,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "topology", aliases=TOPOLOGY_ALIASES)
         elif key in larr(["Contact Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)
+        elif key in larr(["Contact Type"]):
+            value = attributes.identifierListAttribute(value, "contact type", separators=",;/", aliases=CONTACT_TYPE_ALIASES)
         elif key in larr(["Dielectric Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=DIELECTRIC_MATERIAL_ALIASES)
         elif key in larr(["Contact Plating"]):

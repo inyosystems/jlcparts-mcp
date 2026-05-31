@@ -3438,6 +3438,23 @@ def test_contact_material_attribute(value, expected, capsys):
     }
 
 
+def test_contact_type_identifiers(capsys):
+    values = normalized_values("Contact Type", "Dual-sided contacts / top and bottom connection", capsys)
+
+    assert values["contact type 1"] == ["Double-Sided Contact", "identifier"]
+    assert values["contact type 2"] == ["Top and Bottom Entry", "identifier"]
+
+    values = normalized_values("Contact Type", "Single-sided contact points/Vertical", capsys)
+
+    assert values["contact type 1"] == ["Single-Sided Contact", "identifier"]
+    assert values["contact type 2"] == ["Vertical", "identifier"]
+
+    values = normalized_values("Contact Type", "Normally closed, Normal Open", capsys)
+
+    assert values["contact type 1"] == ["Normally Closed", "identifier"]
+    assert values["contact type 2"] == ["Normally Open", "identifier"]
+
+
 def test_dielectric_material_attribute(capsys):
     values = normalized_values(
         "Dielectric Material",
