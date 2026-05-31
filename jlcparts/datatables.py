@@ -292,13 +292,17 @@ DIELECTRIC_MATERIAL_ALIASES = {
 }
 
 CONTACT_PLATING_ALIASES = {
+    "-": "Unspecified",
     "silver": "Silver",
     "silver plating": "Silver",
     "Gold Plated": "Gold",
     "Gold plating": "Gold",
     "Tin Plated": "Tin",
     "Tinning": "Tin",
+    "Lead-tin": "Lead-Tin",
+    "铅锡": "Lead-Tin",
     "Copper alloy": "Copper Alloy",
+    "Phosphor coppe": "Phosphor Copper",
     "黄铜": "Brass",
     "Gold-钯": "Gold-Palladium",
     "AuPd": "Gold-Palladium",
@@ -1072,6 +1076,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)
         elif key in larr(["Contact Type"]):
             value = attributes.identifierListAttribute(value, "contact type", separators=",;/", aliases=CONTACT_TYPE_ALIASES)
+        elif key in larr(["Contact Finish"]):
+            value = attributes.identifierListAttribute(value, "finish", aliases=CONTACT_PLATING_ALIASES)
         elif key in larr(["Dielectric Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=DIELECTRIC_MATERIAL_ALIASES)
         elif key in larr(["Contact Plating"]):
