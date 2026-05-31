@@ -171,6 +171,15 @@ APPLICATION_ALIASES = {
     "-": "Unspecified",
 }
 
+SIGNAL_CONDITIONING_ALIASES = {
+    "Input balance": "Input Equalization",
+    "Input equalization": "Input Equalization",
+    "InputEquAlization": "Input Equalization",
+    "output de-emphasis": "Output De-Emphasis",
+    "output pre-emphasis": "Output Pre-Emphasis",
+    "-": "Unspecified",
+}
+
 VOLTAGE_REFERENCE_ALIASES = {
     "Built-in": "Built-In",
     "Internal": "Built-In",
@@ -1102,6 +1111,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "technology", aliases=TECHNOLOGY_ALIASES)
         elif key in larr(["Interrupt Output"]):
             value = attributes.identifierListAttribute(value, "interrupt output", aliases=INTERRUPT_OUTPUT_ALIASES)
+        elif key in larr(["Signal Conditioning"]):
+            value = attributes.identifierListAttribute(value, "signal conditioning", aliases=SIGNAL_CONDITIONING_ALIASES)
         elif key in larr(["Working Mode", "Mode Support"]):
             value = attributes.identifierListAttribute(value, "mode")
         elif key in larr(["Characteristic"]):
