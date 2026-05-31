@@ -2463,6 +2463,7 @@ def test_material_quality_identifier(value, capsys):
         ("USB Protocol", "USB 2.0"),
         ("Application", "I2C"),
         ("Memory Format", "DDR3 SDRAM"),
+        ("Memory Type", "50-TP"),
         ("Agreement", "FeliCa,ISO 14443A,ISO 14443B,ISO 15693,MIFARE,NFC"),
         ("CPU Core", "ARM Cortex-M0"),
         ("Crystal Type", "49S Crystals"),
