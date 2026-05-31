@@ -1146,7 +1146,10 @@ def normalizeAttribute(key, value):
                 "Energy Efficiency",
                 "Duty Cycle (Max)",
                 "B Constant Tolerance", "Resistance Tolerance"]):
-            value = attributes.flexiblePercentageAttribute(value)
+            if key == "resistance tolerance" and isinstance(value, str) and ("℃" in value or "°C" in value):
+                value = attributes.toleranceAttribute(value)
+            else:
+                value = attributes.flexiblePercentageAttribute(value)
         elif key in larr(["Dissipation Factor"]):
             value = attributes.dissipationFactorAttribute(value)
         elif key in larr(["Sensitivity Temperature Bleaching"]):

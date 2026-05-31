@@ -4590,6 +4590,13 @@ def test_sensing_angle(capsys):
     assert_quantity(values["angle 1"], 120, "angle")
 
 
+def test_resistance_tolerance_temperature_value(capsys):
+    values = normalized_values("Resistance Tolerance", "±0.05℃", capsys)
+
+    assert_quantity(values["tolerance min"], -0.05, "temperature")
+    assert_quantity(values["tolerance max"], 0.05, "temperature")
+
+
 def test_wavelength_alias_labels(capsys):
     values = normalized_values("Wavelength", "R:625nm, G:525nm, B:470nm", capsys)
 
