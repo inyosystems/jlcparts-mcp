@@ -122,10 +122,17 @@ ACTUATOR_STYLE_ALIASES = {
 }
 
 CHIP_TYPE_ALIASES = {
+    "Voltage monitor": "Voltage Monitor",
+    "Current monitor": "Current Monitor",
+    "Power monitor": "Power Monitor",
+    "Monitor circuit": "Monitor Circuit",
+    "Reset timer": "Reset Timer",
+    "Simple reset/Power-on reset": "Simple Reset/Power-On Reset",
     "Battery monitoring chip": "Battery Monitoring IC",
     "电池监测芯片": "Battery Monitoring IC",
     "电池保护芯片": "Battery Protection IC",
     "Boost charging chip": "Boost Charging IC",
+    "开关控制器": "Switch Controller",
 }
 
 LOGIC_GATE_TYPE_ALIASES = {
@@ -875,7 +882,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "feature")
         elif key in larr(["Actuator Style"]):
             value = attributes.identifierListAttribute(value, "actuator style", aliases=ACTUATOR_STYLE_ALIASES)
-        elif key in larr(["The Chip Type"]):
+        elif key in larr(["The Chip Type", "Chip Type"]):
             value = attributes.identifierListAttribute(value, "chip type", aliases=CHIP_TYPE_ALIASES)
         elif key in larr(["Working Mode"]):
             value = attributes.identifierListAttribute(value, "mode")

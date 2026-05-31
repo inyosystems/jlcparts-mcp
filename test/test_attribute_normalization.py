@@ -2683,6 +2683,11 @@ def test_chip_type_identifiers(capsys):
     assert values["chip type 1"] == ["Protection IC", "identifier"]
     assert values["chip type 2"] == ["Battery Monitoring IC", "identifier"]
 
+    values = normalized_values("Chip Type", "Voltage monitor, 开关控制器", capsys)
+
+    assert values["chip type 1"] == ["Voltage Monitor", "identifier"]
+    assert values["chip type 2"] == ["Switch Controller", "identifier"]
+
 
 def test_modulation_system_identifiers(capsys):
     values = normalized_values("Modulation System", "FLRC, LORA, OCK", capsys)
