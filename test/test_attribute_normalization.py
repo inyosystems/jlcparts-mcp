@@ -2594,6 +2594,14 @@ def test_reference_series_identifiers(value, expected, capsys):
     }
 
 
+def test_rf_series_identifiers(capsys):
+    values = normalized_values("RF Series", "MCX/MMCX, SMA", capsys)
+
+    assert values["series 1"] == ["MCX", "identifier"]
+    assert values["series 2"] == ["MMCX", "identifier"]
+    assert values["series 3"] == ["SMA", "identifier"]
+
+
 def test_safety_certification_identifiers(capsys):
     values = normalized_values("Safety Certification", "UL;CUL;VDE;ENEC10;CQC;KC", capsys)
 
