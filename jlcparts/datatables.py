@@ -780,7 +780,7 @@ def normalizeAttribute(key, value):
                 "Algorithm", "Input Type", "USB Protocol", "Application",
                 "Memory Format", "Memory Type", "Agreement", "CPU Core", "Crystal Type", "Standard",
                 "Nominal of Bolt",
-                "Pin Structure", "Interface Form", "Flame Retardant Rating", "Plastic Material",
+                "Pin Structure", "Interface Form", "Flame Retardant Rating", "Flame Retardant Grade", "Plastic Material",
                 "Specification", "Holes Structure", "Manufacturer", "Series",
                 "Lamp Holder Type", "Pin Style", "Material Quality", "Ip Rating"]):
             value = attributes.identifierAttribute(value)

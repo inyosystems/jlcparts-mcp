@@ -2508,6 +2508,7 @@ def test_material_quality_identifier(value, capsys):
         ("Pin Structure", "2x4P"),
         ("Interface Form", "M.2-B Key"),
         ("Flame Retardant Rating", "UL94V-0"),
+        ("Flame Retardant Grade", "UL94 V0"),
         ("Plastic Material", "PA46"),
         ("Specification", "6.35"),
         ("Holes Structure", "1x13P"),
