@@ -3373,6 +3373,15 @@ def test_actuator_cap_color_identifiers(capsys):
     assert values["color 1"] == ["Yellow", "identifier"]
 
 
+def test_detection_color_identifiers(capsys):
+    values = normalized_values("Detection Color", "Red, Green, Blue, IR", capsys)
+
+    assert values["color 1"] == ["Red", "identifier"]
+    assert values["color 2"] == ["Green", "identifier"]
+    assert values["color 3"] == ["Blue", "identifier"]
+    assert values["color 4"] == ["Infrared", "identifier"]
+
+
 def test_lens_color_identifiers(capsys):
     values = normalized_values("Lens Color", "Frosted Red Lens, Frosted Green Lens", capsys)
 
