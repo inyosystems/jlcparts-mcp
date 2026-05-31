@@ -584,7 +584,8 @@ def normalizeAttribute(key, value):
                 "Total Device Dissipation (Pd)",
                 "Average Gate Power Dissipation (Pg(Av))", "Radiant Flux",
                 "Quiescent Dissipation", "Power Consumption",
-                "Dissipation Power", "Corresponding Power", "Power Capacity"]):
+                "Dissipation Power", "Corresponding Power", "Power Capacity",
+                "Maximum Switching Power"]):
             if key == "radiant flux":
                 value = attributes.powerRangeListAttribute(value, "power") if compoundValue(value) or (isinstance(value, str) and "~" in value) else attributes.powerAtConditionAttribute(value, "power")
             elif key == "corresponding power":
