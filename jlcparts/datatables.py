@@ -897,7 +897,7 @@ def normalizeAttribute(key, value):
             value = attributes.pixelArrayAttribute(value)
         elif key in larr(["Optical Format(Inch)", "Optical Format (Inch)"]):
             value = attributes.opticalFormatAttribute(value)
-        elif key in larr(["SPI", "UART/Usart", "I2C", "I2s", "16bit Timer", "CAN"]):
+        elif key in larr(["SPI", "UART/Usart", "I2C", "I2s", "16bit Timer", "32bit Timer", "CAN"]):
             value = attributes.countAttribute(value)
         elif key in larr(["Rom Size"]):
             value = attributes.dataSizeAttribute(value)

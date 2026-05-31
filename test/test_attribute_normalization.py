@@ -1908,6 +1908,7 @@ def test_logic_array_blocks(value, expected, capsys):
         ("I2C", "3", {"count": 3}),
         ("I2s", "4", {"count": 4}),
         ("16bit Timer", "8", {"count": 8}),
+        ("32bit Timer", "4", {"count": 4}),
         ("CAN", "1", {"count": 1}),
         ("Number of Half Bridges", "3", {"count": 3}),
         ("Order", "2", {"count": 2}),
