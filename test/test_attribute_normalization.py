@@ -2994,6 +2994,12 @@ def test_mounting_type_attribute(capsys):
     assert values["mounting type 2"] == ["Panel Mount", "identifier"]
     assert values["mounting type 3"] == ["Free Hanging", "identifier"]
 
+    values = normalized_values("Mounting Sytle", "Positive Stick, Side sticker, Plug-in", capsys)
+
+    assert values["mounting type 1"] == ["Front Mount", "identifier"]
+    assert values["mounting type 2"] == ["Side Mount", "identifier"]
+    assert values["mounting type 3"] == ["Through Hole", "identifier"]
+
 
 def test_head_type_attribute(capsys):
     values = normalized_values("Head Type", "Circular ring (90°)", capsys)

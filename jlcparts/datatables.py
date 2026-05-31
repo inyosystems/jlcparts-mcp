@@ -166,14 +166,31 @@ HOLDER_TYPE_ALIASES = {
 
 MOUNTING_TYPE_ALIASES = {
     "Base installation": "Base Mount",
+    "Bolt Mounting": "Bolt Mount",
+    "Bolted": "Bolt Mount",
+    "Chip": "Surface Mount",
+    "Counterpost": "Reverse Mount",
     "Free-hanging": "Free Hanging",
+    "Patch": "Surface Mount",
     "Panel Mounting": "Panel Mount",
     "Panel installation": "Panel Mount",
+    "Plugin": "Through Hole",
+    "Plug-in": "Through Hole",
+    "Positive post": "Front Mount",
+    "Positive Stick": "Front Mount",
     "Right-Angle": "Right Angle",
+    "Screw fixing": "Screw Mount",
+    "Screw Fixing": "Screw Mount",
+    "Side Adhesive": "Side Mount",
+    "Side sticker": "Side Mount",
+    "Side stickers": "Side Mount",
     "SMD": "Surface Mount",
+    "Solder Pad": "Surface Mount",
     "Surface MountType": "Surface Mount",
     "Through hole": "Through Hole",
     "Through-hole": "Through Hole",
+    "正贴": "Front Mount",
+    "-": "Unspecified",
 }
 
 CONTACT_MATERIAL_ALIASES = {
@@ -943,7 +960,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "gender", aliases=GENDER_ALIASES)
         elif key in larr(["Holder Type"]):
             value = attributes.identifierListAttribute(value, "holder type", aliases=HOLDER_TYPE_ALIASES)
-        elif key in larr(["Mounting Type", "Mounting Style"]):
+        elif key in larr(["Mounting Type", "Mounting Style", "Mounting Sytle"]):
             value = attributes.identifierListAttribute(value, "mounting type", aliases=MOUNTING_TYPE_ALIASES)
         elif key in larr(["Head Type"]):
             value = attributes.identifierAttribute(value, "head type")
