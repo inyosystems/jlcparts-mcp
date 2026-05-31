@@ -2909,6 +2909,11 @@ def test_working_mode_identifiers(capsys):
     assert values["mode 3"] == ["QR", "identifier"]
     assert values["mode 4"] == ["CRM", "identifier"]
 
+    values = normalized_values("Mode Support", "PFM, PWM", capsys)
+
+    assert values["mode 1"] == ["PFM", "identifier"]
+    assert values["mode 2"] == ["PWM", "identifier"]
+
 
 def test_actuator_style_identifiers(capsys):
     values = normalized_values("Actuator Style", "Side Rotation, Oval button, 按片", capsys)

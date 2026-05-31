@@ -1063,7 +1063,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "amplifier type", aliases=AMPLIFIER_TYPE_ALIASES)
         elif key in larr(["Appearance and Shape"]):
             value = attributes.identifierListAttribute(value, "appearance", aliases=APPEARANCE_SHAPE_ALIASES)
-        elif key in larr(["Working Mode"]):
+        elif key in larr(["Working Mode", "Mode Support"]):
             value = attributes.identifierListAttribute(value, "mode")
         elif key in larr(["Characteristic"]):
             value = attributes.identifierListAttribute(value, "characteristic")
