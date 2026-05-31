@@ -2313,6 +2313,19 @@ def test_gnss_type_identifiers(capsys):
     assert values["gnss 6"] == ["BD3", "identifier"]
 
 
+def test_filter_type_identifiers(capsys):
+    values = normalized_values("Filter Type", "Butterworth Filter;Low pass filter", capsys)
+
+    assert values["filter type 1"] == ["Butterworth Filter", "identifier"]
+    assert values["filter type 2"] == ["Low-Pass Filter", "identifier"]
+
+    values = normalized_values("Filter Type", "Bandpass, High pass, Three-Phase (Y)", capsys)
+
+    assert values["filter type 1"] == ["Band-Pass Filter", "identifier"]
+    assert values["filter type 2"] == ["High-Pass Filter", "identifier"]
+    assert values["filter type 3"] == ["Three-Phase Wye Filter", "identifier"]
+
+
 def test_terminal_type_identifier(capsys):
     values = normalized_values("Terminal Type", "Bidirectional Terminal (2 Tabs+1 Receptacle)", capsys)
 

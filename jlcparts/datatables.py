@@ -159,6 +159,20 @@ GNSS_TYPE_ALIASES = {
     "GALILEO": "Galileo",
 }
 
+FILTER_TYPE_ALIASES = {
+    "Bandpass": "Band-Pass Filter",
+    "Bandpass Filter": "Band-Pass Filter",
+    "High pass": "High-Pass Filter",
+    "High pass Filter": "High-Pass Filter",
+    "Low Pass": "Low-Pass Filter",
+    "Low pass filter": "Low-Pass Filter",
+    "Low-pass Filter": "Low-Pass Filter",
+    "Low-pass active filter": "Low-Pass Active Filter",
+    "Three-Phase (Delta)": "Three-Phase Delta Filter",
+    "Three-Phase (Y)": "Three-Phase Wye Filter",
+    "-": "Unspecified",
+}
+
 HOLDER_TYPE_ALIASES = {
     "Free-hanging": "Free Hanging",
     "Right-Angle": "Right Angle",
@@ -938,6 +952,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "modulation", aliases=MODULATION_SYSTEM_ALIASES)
         elif key in larr(["GNSS Type"]):
             value = attributes.identifierListAttribute(value, "gnss", aliases=GNSS_TYPE_ALIASES)
+        elif key in larr(["Filter Type"]):
+            value = attributes.identifierListAttribute(value, "filter type", aliases=FILTER_TYPE_ALIASES)
         elif key in larr(["Standard Number"]):
             value = attributes.identifierListAttribute(value, "standard number")
         elif key in larr(["Type"]):
