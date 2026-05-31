@@ -145,6 +145,10 @@ POWER_MANAGEMENT_TYPE_ALIASES = {
     "Reset timer": "Reset Timer",
 }
 
+AMPLIFIER_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
 LOGIC_GATE_TYPE_ALIASES = {
     "NORGate": "NOR Gate",
     "ORGate": "OR Gate",
@@ -1035,6 +1039,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "chip type", aliases=CHIP_TYPE_ALIASES)
         elif key in larr(["Type of the Power Management Chip"]):
             value = attributes.identifierListAttribute(value, "power management type", separators=",;/", aliases=POWER_MANAGEMENT_TYPE_ALIASES)
+        elif key in larr(["Amplifier Type"]):
+            value = attributes.identifierListAttribute(value, "amplifier type", aliases=AMPLIFIER_TYPE_ALIASES)
         elif key in larr(["Working Mode"]):
             value = attributes.identifierListAttribute(value, "mode")
         elif key in larr(["Characteristic"]):

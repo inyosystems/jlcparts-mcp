@@ -2935,6 +2935,16 @@ def test_power_management_type_identifiers(capsys):
     assert values["power management type 1"] == ["Watchdog Circuit", "identifier"]
 
 
+def test_amplifier_type_identifiers(capsys):
+    values = normalized_values("Amplifier Type", "Transimpedance Amplifier", capsys)
+
+    assert values["amplifier type 1"] == ["Transimpedance Amplifier", "identifier"]
+
+    values = normalized_values("Amplifier Type", "-", capsys)
+
+    assert values["amplifier type 1"] == ["Unspecified", "identifier"]
+
+
 def test_modulation_system_identifiers(capsys):
     values = normalized_values("Modulation System", "FLRC, LORA, OCK", capsys)
 
