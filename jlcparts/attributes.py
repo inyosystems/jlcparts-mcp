@@ -3223,6 +3223,17 @@ def powerListAttribute(value, name="power"):
     value = str(value).replace(";", ",")
     return scalarListAttribute(value, readPower, "power", name)
 
+def voltagePowerAttribute(value):
+    voltage_part, power_part = [x.strip() for x in str(value).split("/", 1)]
+    return {
+        "format": "${voltage}/${power}",
+        "primary": "voltage",
+        "values": {
+            "voltage": [readVoltage(voltage_part), "voltage"],
+            "power": [readPower(power_part), "power"],
+        }
+    }
+
 def powerAtPulseListAttribute(value, name="power"):
     def parsePulseCondition(condition, suffix, values, format_parts):
         condition = condition.strip().strip("()")

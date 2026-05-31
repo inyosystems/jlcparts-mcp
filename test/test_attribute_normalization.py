@@ -2889,6 +2889,17 @@ def test_power_attribute(value, expected, capsys):
         assert_quantity(values[quantity], expected_value, "power")
 
 
+def test_remarks_voltage_power(capsys):
+    values = normalized_values("Remarks", "24V/60W", capsys)
+
+    assert_quantity(values["voltage"], 24.0, "voltage")
+    assert_quantity(values["power"], 60.0, "power")
+
+    values = normalized_values("Remarks", "Output Voltage + Output Current (Max)", capsys)
+
+    assert values["remark"] == ["Output Voltage + Output Current (Max)", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [

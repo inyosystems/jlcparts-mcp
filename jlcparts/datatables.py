@@ -790,6 +790,8 @@ def normalizeAttribute(key, value):
             value = attributes.specificationsAttribute(value)
         elif key in larr(["Size"]):
             value = attributes.sizeAttribute(value)
+        elif key in larr(["Remarks"]):
+            value = attributes.voltagePowerAttribute(value) if isinstance(value, str) and re.fullmatch(r"\s*[-+]?\d+(?:\.\d+)?\s*[fpnumkKMGT]?V\s*/\s*[-+]?\d+(?:\.\d+)?\s*[fpnumkKMGT]?W\s*", value) else attributes.identifierAttribute(value, "remark")
         elif key in larr(["Product Description"]):
             value = attributes.metricProductDescriptionAttribute(value)
         elif key in larr(["Electroplate"]):
