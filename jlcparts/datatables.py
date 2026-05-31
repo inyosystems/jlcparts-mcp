@@ -199,6 +199,15 @@ TECHNOLOGY_ALIASES = {
     "-": "Unspecified",
 }
 
+DRIVE_MOTOR_TYPE_ALIASES = {
+    "Brush DC Motor": "Brushed DC Motor",
+    "Brushless DC Motor": "Brushless DC Motor",
+    "Step Motor Drive": "Stepper Motor",
+    "无刷直流BLDC": "Brushless DC Motor",
+    "无刷直流电机": "Brushless DC Motor",
+    "-": "Unspecified",
+}
+
 INTERRUPT_OUTPUT_ALIASES = {
     "With Interrupt Output": "Interrupt Output",
     "有中断输出": "Interrupt Output",
@@ -1115,6 +1124,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(reference, "voltage reference", aliases=VOLTAGE_REFERENCE_ALIASES)
         elif key in larr(["Technology"]):
             value = attributes.identifierListAttribute(value, "technology", aliases=TECHNOLOGY_ALIASES)
+        elif key in larr(["Drive Motor Type"]):
+            value = attributes.identifierListAttribute(value, "motor type", aliases=DRIVE_MOTOR_TYPE_ALIASES)
         elif key in larr(["Interrupt Output"]):
             value = attributes.identifierListAttribute(value, "interrupt output", aliases=INTERRUPT_OUTPUT_ALIASES)
         elif key in larr(["Signal Conditioning"]):

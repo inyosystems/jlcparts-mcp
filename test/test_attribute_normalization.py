@@ -3012,6 +3012,20 @@ def test_technology_identifiers(capsys):
     assert values["technology 1"] == ["Unspecified", "identifier"]
 
 
+def test_drive_motor_type_identifiers(capsys):
+    values = normalized_values("Drive Motor Type", "Brush DC Motor", capsys)
+
+    assert values["motor type 1"] == ["Brushed DC Motor", "identifier"]
+
+    values = normalized_values("Drive Motor Type", "无刷直流电机", capsys)
+
+    assert values["motor type 1"] == ["Brushless DC Motor", "identifier"]
+
+    values = normalized_values("Drive Motor Type", "Step Motor Drive", capsys)
+
+    assert values["motor type 1"] == ["Stepper Motor", "identifier"]
+
+
 def test_interrupt_output_identifiers(capsys):
     values = normalized_values("Interrupt Output", "有中断输出", capsys)
 
