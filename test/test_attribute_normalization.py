@@ -2332,6 +2332,11 @@ def test_output_identifiers(capsys):
     assert values["output 1"] == ["LVCMOS", "identifier"]
     assert values["output 2"] == ["HCSL", "identifier"]
 
+    values = normalized_values("Output Mode", "CMOS;TTL", capsys)
+
+    assert values["output 1"] == ["CMOS", "identifier"]
+    assert values["output 2"] == ["TTL", "identifier"]
+
 
 def test_input_identifiers(capsys):
     values = normalized_values("Input", "LVPECL, LVDS, LVCMOS", capsys)

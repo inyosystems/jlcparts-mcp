@@ -908,7 +908,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "connector type")
         elif key in larr(["Output Type", "Out Type"]):
             value = attributes.identifierListAttribute(value, "output type", aliases=OUTPUT_TYPE_ALIASES)
-        elif key in larr(["Output"]):
+        elif key in larr(["Output", "Output Mode"]):
             value = attributes.identifierListAttribute(value, "output")
         elif key in larr(["Input"]):
             value = attributes.identifierListAttribute(value, "input")
