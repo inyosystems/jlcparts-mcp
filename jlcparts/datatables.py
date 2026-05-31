@@ -197,6 +197,20 @@ CONTACT_MATERIAL_ALIASES = {
     "前金后锡": "Gold Front Tin Back",
 }
 
+DIELECTRIC_MATERIAL_ALIASES = {
+    "Metalized polyester film": "Metallized Polyester",
+    "Metalized Polyester Film Capacitor": "Metallized Polyester",
+    "Metallized Polyester Film": "Metallized Polyester",
+    "Metallized Polyester Film Capacitor": "Metallized Polyester",
+    "Metallized Polyethylene Terephthalate (PET)": "Metallized PET",
+    "Polyethylene Terephthalate (PET)": "PET",
+    "Polyphenylene Sulfide (PPS)": "PPS",
+    "Metallized polyphenylene sulfide film": "Metallized PPS",
+    "Metallized Polypropylene Film": "Metallized Polypropylene",
+    "Polypropylene Film": "Polypropylene",
+    "Polypropylene film capacitor": "Polypropylene",
+}
+
 CONTACT_PLATING_ALIASES = {
     "silver": "Silver",
     "silver plating": "Silver",
@@ -952,6 +966,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "topology", aliases=TOPOLOGY_ALIASES)
         elif key in larr(["Contact Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)
+        elif key in larr(["Dielectric Material"]):
+            value = attributes.identifierListAttribute(value, "material", aliases=DIELECTRIC_MATERIAL_ALIASES)
         elif key in larr(["Contact Plating"]):
             value = attributes.identifierListAttribute(value, "plating", aliases=CONTACT_PLATING_ALIASES)
         elif key in larr(["Illumination Color", "Color", "Actuator/Cap Color"]):

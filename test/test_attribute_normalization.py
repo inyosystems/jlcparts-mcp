@@ -3307,6 +3307,17 @@ def test_contact_material_attribute(value, expected, capsys):
     }
 
 
+def test_dielectric_material_attribute(capsys):
+    values = normalized_values(
+        "Dielectric Material",
+        "Metallized Polyester, Metallized Polyethylene Terephthalate (PET)",
+        capsys,
+    )
+
+    assert values["material 1"] == ["Metallized Polyester", "identifier"]
+    assert values["material 2"] == ["Metallized PET", "identifier"]
+
+
 def test_contact_plating_attribute(capsys):
     values = normalized_values("Contact Plating", "silver plating;Gold Plated;AuPd", capsys)
 
