@@ -229,6 +229,8 @@ CARD_TYPE_ALIASES = {
 
 CARD_CONNECTION_MODE_ALIASES = {
     "Flip type": "Flip Type",
+    "Front insertion and back flip type": "Front Insertion and Back Flip Type",
+    "No lock": "No Lock",
     "Self-bouncing": "Self-Bouncing",
     "Self bomb": "Self-Bouncing",
     "-": "Unspecified",
@@ -1134,6 +1136,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "card type", aliases=CARD_TYPE_ALIASES)
         elif key in larr(["Card Connection Mode"]):
             value = attributes.identifierListAttribute(value, "card connection mode", aliases=CARD_CONNECTION_MODE_ALIASES)
+        elif key in larr(["Locking Feature"]):
+            value = attributes.identifierListAttribute(value, "locking feature", aliases=CARD_CONNECTION_MODE_ALIASES)
         elif key in larr(["Direction"]):
             value = attributes.identifierListAttribute(value, "direction", aliases=DIRECTION_ALIASES)
         elif key in larr(["Input Signal"]):

@@ -2545,6 +2545,16 @@ def test_card_connection_mode_identifiers(capsys):
     assert values["card connection mode 1"] == ["Unspecified", "identifier"]
 
 
+def test_locking_feature_identifiers(capsys):
+    values = normalized_values("Locking Feature", "Flip type", capsys)
+
+    assert values["locking feature 1"] == ["Flip Type", "identifier"]
+
+    values = normalized_values("Locking Feature", "No lock", capsys)
+
+    assert values["locking feature 1"] == ["No Lock", "identifier"]
+
+
 def test_direction_identifiers(capsys):
     values = normalized_values("Direction", "Omni-directional, Bi-Directional, 向上计数器", capsys)
 
