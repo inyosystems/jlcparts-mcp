@@ -1171,7 +1171,7 @@ def normalizeAttribute(key, value):
             value = attributes.angleRangeListAttribute(value)
         elif key in larr(["Angle of Throw", "Half Angle"]):
             value = attributes.angleRangeListAttribute(value)
-        elif key in larr(["Press Force", "Operating Force"]):
+        elif key in larr(["Press Force", "Operating Force", "Apply Force"]):
             value = attributes.forceRangeListAttribute(value)
         elif key in larr(["Operation Force"]):
             value = attributes.forceRangeListAttribute(value)

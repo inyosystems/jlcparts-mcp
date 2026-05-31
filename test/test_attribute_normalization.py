@@ -4089,6 +4089,11 @@ def test_operating_force(capsys):
     assert_quantity(values["force 1 min"], 0.0, "force")
     assert_quantity(values["force 1 max"], 15.0, "force")
 
+    values = normalized_values("Apply Force", "4N~7N", capsys)
+
+    assert_quantity(values["force 1 min"], 4.0, "force")
+    assert_quantity(values["force 1 max"], 7.0, "force")
+
     values = normalized_values("Operating Force", "260gf@±50gf", capsys)
     assert_quantity(values["force 1"], 260 * 0.00980665, "force")
 
