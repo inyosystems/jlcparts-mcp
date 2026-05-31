@@ -1252,7 +1252,7 @@ def normalizeAttribute(key, value):
             value = attributes.slewRateAttribute(value, "cmti" if key in ["cmti(k v/us)", "common mode transient immunity (cmti)"] else ("droop rate" if key == "droop rate" else ("dv/dt" if key == "static dv/dt" else "slew rate")))
         elif key in larr(["Program Storage Size", "Ram Size", "Embedded Block Ram",
                 "Memory Size", "Memory Space", "Cache Size", "Flash Size", "Fifo'S",
-                "Eeprom", "Memory Size of Flash", "Memory Size of Ram"]):
+                "Eeprom", "Memory Size of Flash", "Memory Size of Ram", "Density"]):
             value = attributes.dataSizeListAttribute(value) if key in ["ram size", "memory size"] and isinstance(value, str) and ("," in value or ";" in value) else attributes.dataSizeAttribute(value)
         elif key in larr(["Frequency - self resonant", "Output frequency (max)",
                 "Frequency - Switching", "Frequency Range", "Frequency", "Clock Frequency",

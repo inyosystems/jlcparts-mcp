@@ -4137,6 +4137,7 @@ def test_embedded_block_ram(value, expected, capsys):
         ("Flash Size", "-", "NaN"),
         ("Memory Size of Flash", "256Mbit", 256 * 1024 * 1024 / 8),
         ("Memory Size of Ram", "64Mbit", 64 * 1024 * 1024 / 8),
+        ("Density", "32GB", 32 * 1024 * 1024 * 1024),
     ],
 )
 def test_additional_memory_size_aliases(key, value, expected, capsys):
