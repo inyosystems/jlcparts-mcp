@@ -196,6 +196,14 @@ AMPLIFIER_CLASS_ALIASES = {
     "-": "Unspecified",
 }
 
+CARD_TYPE_ALIASES = {
+    "MicroSD card (TF card)": "MicroSD Card (TF Card)",
+    "MicroSIM Card": "Micro-SIM Card",
+    "Nano SIM card": "Nano-SIM Card",
+    "MiniSD Card": "MiniSD Card",
+    "-": "Unspecified",
+}
+
 HOLDER_TYPE_ALIASES = {
     "Free-hanging": "Free Hanging",
     "Right-Angle": "Right Angle",
@@ -1030,6 +1038,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "rail to rail", aliases=RAIL_TO_RAIL_ALIASES)
         elif key in larr(["Class"]):
             value = attributes.identifierListAttribute(value, "class", aliases=AMPLIFIER_CLASS_ALIASES)
+        elif key in larr(["Card Type"]):
+            value = attributes.identifierListAttribute(value, "card type", aliases=CARD_TYPE_ALIASES)
         elif key in larr(["Input Signal"]):
             value = attributes.identifierListAttribute(value, "input signal", aliases=SIGNAL_LEVEL_ALIASES)
         elif key in larr(["Peripheral/Function"]):

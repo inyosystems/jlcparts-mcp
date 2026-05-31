@@ -2432,6 +2432,22 @@ def test_class_identifiers(capsys):
     assert values["class 1"] == ["Unspecified", "identifier"]
 
 
+def test_card_type_identifiers(capsys):
+    values = normalized_values("Card Type", "MicroSD card (TF card), UFS Card", capsys)
+
+    assert values["card type 1"] == ["MicroSD Card (TF Card)", "identifier"]
+    assert values["card type 2"] == ["UFS Card", "identifier"]
+
+    values = normalized_values("Card Type", "MicroSIM Card, Nano SIM card", capsys)
+
+    assert values["card type 1"] == ["Micro-SIM Card", "identifier"]
+    assert values["card type 2"] == ["Nano-SIM Card", "identifier"]
+
+    values = normalized_values("Card Type", "-", capsys)
+
+    assert values["card type 1"] == ["Unspecified", "identifier"]
+
+
 def test_environmental_requirements(capsys):
     values = normalized_values(
         "Environmental Requirements",
