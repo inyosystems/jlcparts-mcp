@@ -786,6 +786,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "logic type")
         elif key in larr(["Antenna Type"]):
             value = attributes.identifierListAttribute(value, "antenna type")
+        elif key in larr(["Sensor Type"]):
+            value = attributes.identifierAttribute(value, "sensor type")
         elif key in larr(["Dimming"]):
             value = attributes.identifierListAttribute(value, "dimming")
         elif key in larr(["Applications", "Applications Function"]):

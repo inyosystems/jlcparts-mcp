@@ -2777,6 +2777,12 @@ def test_antenna_type_attribute(capsys):
     assert values["antenna type 2"] == ["IPEX interface", "identifier"]
 
 
+def test_sensor_type_attribute(capsys):
+    values = normalized_values("Sensor Type", "PM2.5 Dust Sensor", capsys)
+
+    assert values["sensor type"] == ["PM2.5 Dust Sensor", "identifier"]
+
+
 def test_dimming_attribute(capsys):
     values = normalized_values("Dimming", "Analog, PWM, I2C", capsys)
 
