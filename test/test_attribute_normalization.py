@@ -2711,6 +2711,11 @@ def test_communication_interface_attribute(capsys):
     assert values["interface 2"] == ["JTAG", "identifier"]
     assert values["interface 3"] == ["I2C", "identifier"]
 
+    values = normalized_values("Memory Interface", "I2C, SMBus", capsys)
+
+    assert values["interface 1"] == ["I2C", "identifier"]
+    assert values["interface 2"] == ["SMBus", "identifier"]
+
 
 def test_protocol_identifier_list(capsys):
     values = normalized_values("Protocol", "USB 3.1;DP 1.3", capsys)
