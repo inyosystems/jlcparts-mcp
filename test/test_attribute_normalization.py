@@ -2639,6 +2639,15 @@ def test_feature_list_attributes(key, value, expected, capsys):
     }
 
 
+def test_working_mode_identifiers(capsys):
+    values = normalized_values("Working Mode", "CCM, DCM, QR, CRM", capsys)
+
+    assert values["mode 1"] == ["CCM", "identifier"]
+    assert values["mode 2"] == ["DCM", "identifier"]
+    assert values["mode 3"] == ["QR", "identifier"]
+    assert values["mode 4"] == ["CRM", "identifier"]
+
+
 def test_characteristic_list_attribute(capsys):
     values = normalized_values("Characteristic", "Remote on/off, OCP, OVP, SCP", capsys)
 
