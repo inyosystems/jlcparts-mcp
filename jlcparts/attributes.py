@@ -544,12 +544,13 @@ def readMagneticFluxDensity(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
         return "NaN"
-    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(mT|Gs)", value, re.I)
+    match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(T|mT|Gs)", value, re.I)
     if match is None:
         raise ValueError(f"Cannot parse magnetic flux density {value}")
     number = float(match.group(1))
     unit = match.group(2).lower()
     scales = {
+        "t": 1,
         "mt": 1e-3,
         "gs": 1e-4,
     }

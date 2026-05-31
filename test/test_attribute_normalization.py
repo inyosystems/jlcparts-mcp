@@ -4525,6 +4525,7 @@ def test_core_wire_gauge(capsys):
         ("2mT", {"field 1": 0.002}),
         ("9Gs", {"field 1": 0.0009}),
         ("±3.8mT", {"field 1 min": -0.0038, "field 1 max": 0.0038}),
+        ("±4T", {"field 1 min": -4.0, "field 1 max": 4.0}),
         ("2mT~15mT", {"field 1 min": 0.002, "field 1 max": 0.015}),
         ("2.5mT, -2.5mT", {"field 1": 0.0025, "field 2": -0.0025}),
         ("6Gs~6mT, -6mT~-6Gs", {
