@@ -1868,6 +1868,7 @@ def test_logic_array_blocks(value, expected, capsys):
         ("Number of Poles", "3", {"count": 3}),
         ("Number of Poles", "-", {"count": "NaN"}),
         ("Number of Nodes", "256", {"count": 256}),
+        ("Node Number", "128", {"count": 128}),
         ("Unidirectional Channels", "8", {"count": 8}),
         ("Bidirectional Channels", "0", {"count": 0}),
         ("Mac Address Support", "4096", {"count": 4096}),
