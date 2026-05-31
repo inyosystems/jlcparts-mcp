@@ -6048,6 +6048,21 @@ def test_total_gate_charge_with_current_voltage_conditions(capsys):
     assert_quantity(values["voltage"], 15.0, "voltage")
 
 
+def test_total_gate_charge_list(capsys):
+    values = normalized_values(
+        "Total Gate Charge (Qg @ Vgs)",
+        "23nC@20V;14nC@20V;30.2nC@100V",
+        capsys,
+    )
+
+    assert_quantity(values["charge 1"], 23e-9, "charge")
+    assert_quantity(values["voltage 1"], 20.0, "voltage")
+    assert_quantity(values["charge 2"], 14e-9, "charge")
+    assert_quantity(values["voltage 2"], 20.0, "voltage")
+    assert_quantity(values["charge 3"], 30.2e-9, "charge")
+    assert_quantity(values["voltage 3"], 100.0, "voltage")
+
+
 @pytest.mark.parametrize(
     ("key", "value", "capacitance"),
     [

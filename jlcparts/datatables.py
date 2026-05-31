@@ -1258,7 +1258,7 @@ def normalizeAttribute(key, value):
             value = attributes.capacityAtVoltage(value)
         elif key in larr(["Total Gate Charge (Qg@Vgs)", "Total Gate Charge (Qg @ Vgs)",
                 "Total Gate Charge (Qg@IC,VGE)"]):
-            value = attributes.stringAttribute(value) if isinstance(value, str) and value.count(";") != 0 else attributes.chargeAtVoltage(value)
+            value = attributes.chargeAtVoltage(value)
         elif key in larr(["Data Rate", "Data Rate (Max)", "Signaling Rate"]):
             value = attributes.dataRateListAttribute(value) if compoundValue(value) else attributes.dataRateAttribute(value)
         elif key in larr(["Reading Speed in Sequence", "Writing Speed in Sequence",

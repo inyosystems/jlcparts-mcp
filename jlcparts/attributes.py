@@ -4689,12 +4689,13 @@ def chargeAtVoltage(value):
     """
     Parses <charge> @ <voltage>
     """
+    value = str(value).strip()
     if value == "-":
         return {
             "format": "-",
             "default": "charge",
             "values": {
-                "charge": ["NaN", "capacitance"],
+                "charge": ["NaN", "charge"],
                 "voltage": ["NaN", "voltage"]
             }
         }
@@ -4719,18 +4720,19 @@ def chargeAtVoltage(value):
         return q, v
 
     if ";" in value:
-        a, b = tuple(value.split(";"))
-        q1, v1 = readTheTuple(a)
-        q2, v2 = readTheTuple(b)
+        values = {}
+        formats = []
+        for index, part in enumerate(value.split(";"), start=1):
+            q, v = readTheTuple(part)
+            charge_name = f"charge {index}"
+            voltage_name = f"voltage {index}"
+            values[charge_name] = [q, "charge"]
+            values[voltage_name] = [v, "voltage"]
+            formats.append("${" + charge_name + "} @ ${" + voltage_name + "}")
         return {
-            "format": "${charge 1} @ ${voltage 1}; ${charge 2} @ ${voltage 2}",
+            "format": "; ".join(formats),
             "default": "charge 1",
-            "values": {
-                "charge 1": [q1, "charge"],
-                "voltage 1": [v2, "voltage"],
-                "charge 2": [q2, "charge"],
-                "voltage 2": [v2, "voltage"]
-            }
+            "values": values
         }
 
     q, v = readTheTuple(value)
