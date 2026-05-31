@@ -2553,6 +2553,15 @@ def test_feature_list_attributes(key, value, expected, capsys):
     }
 
 
+def test_characteristic_list_attribute(capsys):
+    values = normalized_values("Characteristic", "Remote on/off, OCP, OVP, SCP", capsys)
+
+    assert values["characteristic 1"] == ["Remote on/off", "identifier"]
+    assert values["characteristic 2"] == ["OCP", "identifier"]
+    assert values["characteristic 3"] == ["OVP", "identifier"]
+    assert values["characteristic 4"] == ["SCP", "identifier"]
+
+
 def test_category_attribute(capsys):
     values = normalized_values(
         "Category",
