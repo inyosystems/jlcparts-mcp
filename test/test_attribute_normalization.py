@@ -2902,6 +2902,16 @@ def test_actuator_style_identifiers(capsys):
     assert values["actuator style 3"] == ["Press Button", "identifier"]
 
 
+def test_actuator_type_identifiers(capsys):
+    values = normalized_values("Actuator Type", "凹形弯曲", capsys)
+
+    assert values["actuator type 1"] == ["Concave Bend", "identifier"]
+
+    values = normalized_values("Actuator Type", "-", capsys)
+
+    assert values["actuator type 1"] == ["Unspecified", "identifier"]
+
+
 def test_chip_type_identifiers(capsys):
     values = normalized_values("The Chip Type", "Protection IC, 电池监测芯片", capsys)
 

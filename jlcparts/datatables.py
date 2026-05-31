@@ -113,12 +113,14 @@ MODULATION_SYSTEM_ALIASES = {
 }
 
 ACTUATOR_STYLE_ALIASES = {
+    "凹形弯曲": "Concave Bend",
     "Oval button": "Oval Button",
     "Round plunger": "Round Plunger",
     "Rectangular columnar": "Rectangular Columnar",
     "Press button": "Press Button",
     "按片": "Press Button",
     "脚按动": "Foot Actuated",
+    "-": "Unspecified",
 }
 
 CHIP_TYPE_ALIASES = {
@@ -1019,6 +1021,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "feature")
         elif key in larr(["Actuator Style"]):
             value = attributes.identifierListAttribute(value, "actuator style", aliases=ACTUATOR_STYLE_ALIASES)
+        elif key in larr(["Actuator Type"]):
+            value = attributes.identifierListAttribute(value, "actuator type", aliases=ACTUATOR_STYLE_ALIASES)
         elif key in larr(["The Chip Type", "Chip Type"]):
             value = attributes.identifierListAttribute(value, "chip type", aliases=CHIP_TYPE_ALIASES)
         elif key in larr(["Working Mode"]):
