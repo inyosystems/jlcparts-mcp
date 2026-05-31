@@ -2664,6 +2664,14 @@ def test_working_mode_identifiers(capsys):
     assert values["mode 4"] == ["CRM", "identifier"]
 
 
+def test_actuator_style_identifiers(capsys):
+    values = normalized_values("Actuator Style", "Side Rotation, Oval button, 按片", capsys)
+
+    assert values["actuator style 1"] == ["Side Rotation", "identifier"]
+    assert values["actuator style 2"] == ["Oval Button", "identifier"]
+    assert values["actuator style 3"] == ["Press Button", "identifier"]
+
+
 def test_modulation_system_identifiers(capsys):
     values = normalized_values("Modulation System", "FLRC, LORA, OCK", capsys)
 

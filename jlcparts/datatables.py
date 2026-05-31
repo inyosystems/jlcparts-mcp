@@ -103,6 +103,15 @@ MODULATION_SYSTEM_ALIASES = {
     "OCK": "OOK",
 }
 
+ACTUATOR_STYLE_ALIASES = {
+    "Oval button": "Oval Button",
+    "Round plunger": "Round Plunger",
+    "Rectangular columnar": "Rectangular Columnar",
+    "Press button": "Press Button",
+    "按片": "Press Button",
+    "脚按动": "Foot Actuated",
+}
+
 GENDER_ALIASES = {
     "male": "Male",
 }
@@ -831,6 +840,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierAttribute(value, "circuit")
         elif key in larr(["Features", "Feature", "Function", "Supplementary Features"]):
             value = attributes.identifierListAttribute(value, "feature")
+        elif key in larr(["Actuator Style"]):
+            value = attributes.identifierListAttribute(value, "actuator style", aliases=ACTUATOR_STYLE_ALIASES)
         elif key in larr(["Working Mode"]):
             value = attributes.identifierListAttribute(value, "mode")
         elif key in larr(["Characteristic"]):
