@@ -197,11 +197,14 @@ COLOR_ALIASES = {
     "Blue to white": "Blue to White",
     "Cold White": "Cool White",
     "White light": "White",
+    "Yellow Cap": "Yellow",
+    "White Cap": "White",
     "Transparent color": "Transparent",
     "silver color": "Silver",
     "Natural color": "Natural",
     "Natural aluminum color": "Natural Aluminum",
     "Colorless transparence": "Colorless Transparent",
+    "白色带淡绿": "White Light Green",
 }
 
 def saveJson(object, filename, hash=False, pretty=False, compress=False):
@@ -908,7 +911,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)
         elif key in larr(["Contact Plating"]):
             value = attributes.identifierListAttribute(value, "plating", aliases=CONTACT_PLATING_ALIASES)
-        elif key in larr(["Illumination Color", "Color"]):
+        elif key in larr(["Illumination Color", "Color", "Actuator/Cap Color"]):
             value = attributes.identifierListAttribute(value, "color", aliases=COLOR_ALIASES)
         elif key in larr(["Emitted Color"]):
             value = attributes.identifierListAttribute(value, "color", separators=",;/", aliases=COLOR_ALIASES)

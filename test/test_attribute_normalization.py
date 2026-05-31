@@ -3323,6 +3323,12 @@ def test_color_attribute_identifiers(capsys):
     }
 
 
+def test_actuator_cap_color_identifiers(capsys):
+    values = normalized_values("Actuator/Cap Color", "Yellow Cap", capsys)
+
+    assert values["color 1"] == ["Yellow", "identifier"]
+
+
 def test_lens_color_identifiers(capsys):
     values = normalized_values("Lens Color", "Frosted Red Lens, Frosted Green Lens", capsys)
 
