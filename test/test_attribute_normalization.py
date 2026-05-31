@@ -4676,11 +4676,13 @@ def test_coil_rated_power(value, expected, capsys):
     [
         ("470mW, 294mW", {"power 1": 0.47, "power 2": 0.294}),
         ("500mW@UVA, 240mW@UVC", {"power 1": 0.5, "power 2": 0.24}),
+        ("420mW(UVA), 300mW(UVC)", {"power 1": 0.42, "power 2": 0.3}),
         ("330mW, 400mW, 580mW", {"power 1": 0.33, "power 2": 0.4, "power 3": 0.58}),
     ],
 )
 def test_power_dissipation_pd_list(value, expected, capsys):
-    values = normalized_values("Power Dissipation (Pd)", value, capsys)
+    key = "Power Dissipation" if value == "420mW(UVA), 300mW(UVC)" else "Power Dissipation (Pd)"
+    values = normalized_values(key, value, capsys)
 
     for quantity, power in expected.items():
         assert_quantity(values[quantity], power, "power")

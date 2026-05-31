@@ -612,7 +612,7 @@ def normalizeAttribute(key, value):
                 value = attributes.powerAtPulseListAttribute(value, "power")
             elif key == "peak pulse power(ppp)@8/20us" and isinstance(value, str) and ("," in value or ";" in value):
                 value = attributes.powerListAttribute(value, "power")
-            elif key in ["power dissipation (pd)", "coil rated power"] and compoundValue(value):
+            elif key in ["power dissipation (pd)", "power dissipation", "coil rated power"] and compoundValue(value):
                 value = attributes.powerListAttribute(value, "power")
             else:
                 value = attributes.stringAttribute(value) if multiScalarValue(value) else attributes.powerAtConditionAttribute(value, "power")

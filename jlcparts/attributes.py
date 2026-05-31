@@ -3224,6 +3224,7 @@ def powerAtConditionAttribute(value, name="power"):
 
 def powerListAttribute(value, name="power"):
     value = str(value).replace(";", ",")
+    value = re.sub(r"\([^)]*\)", "", value)
     return scalarListAttribute(value, readPower, "power", name)
 
 def voltagePowerAttribute(value):
