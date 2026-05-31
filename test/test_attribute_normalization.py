@@ -3356,6 +3356,19 @@ def test_emitted_color_identifiers(capsys):
     assert values["color 3"] == ["Yellow Green", "identifier"]
 
 
+def test_with_lamp_attribute(capsys):
+    values = normalized_values("With Lamp", "No", capsys)
+
+    assert_quantity(values["with lamp"], 0, "count")
+
+    values = normalized_values("With Lamp", "Red, green, blue", capsys)
+
+    assert_quantity(values["with lamp"], 1, "count")
+    assert values["color 1"] == ["Red", "identifier"]
+    assert values["color 2"] == ["Green", "identifier"]
+    assert values["color 3"] == ["Blue", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [

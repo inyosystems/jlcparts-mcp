@@ -74,6 +74,23 @@ def identifierListAttribute(value, name="identifier", separators=",;", aliases=N
         }
     }
 
+def withLampAttribute(value, colorAliases=None):
+    value = str(value).strip()
+    if value.lower() in {"-", "no", "none", "without", "non-illuminated"}:
+        return {
+            "format": "${with lamp}",
+            "primary": "with lamp",
+            "values": {"with lamp": [0, "count"]},
+        }
+    colors = identifierListAttribute(value, "color", aliases=colorAliases)
+    values = {"with lamp": [1, "count"]}
+    values.update(colors["values"])
+    return {
+        "format": "${with lamp}, " + colors["format"],
+        "primary": "with lamp",
+        "values": values,
+    }
+
 def configurationAttribute(value):
     tokens = splitIdentifierList(value, ",;")
     parsed = []
