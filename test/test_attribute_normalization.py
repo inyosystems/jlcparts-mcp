@@ -6283,6 +6283,7 @@ def test_propagation_delay_tpd_times(value, expected, capsys):
         ("Delay Time", "250ns", {"time": 250e-9}),
         ("Rise Time(Tr)", "2us", {"time": 2e-6}),
         ("Rise Time (Tr)", "1.5us", {"time": 1.5e-6}),
+        ("Rise Time", "25ns, 24ns", {"time 1": 25e-9, "time 2": 24e-9}),
         ("Write Cycle Time (Tw)", "5ms", {"time": 0.005}),
         ("Write Cycle Time(Tw)", "480us", {"time": 480e-6}),
         ("Write Cycle Time (T Wc)", "70ns", {"time": 70e-9}),
