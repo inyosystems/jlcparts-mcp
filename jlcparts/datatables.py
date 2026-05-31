@@ -151,6 +151,19 @@ CONTACT_MATERIAL_ALIASES = {
     "前金后锡": "Gold Front Tin Back",
 }
 
+CONTACT_PLATING_ALIASES = {
+    "silver": "Silver",
+    "silver plating": "Silver",
+    "Gold Plated": "Gold",
+    "Gold plating": "Gold",
+    "Tin Plated": "Tin",
+    "Tinning": "Tin",
+    "Copper alloy": "Copper Alloy",
+    "黄铜": "Brass",
+    "Gold-钯": "Gold-Palladium",
+    "AuPd": "Gold-Palladium",
+}
+
 COLOR_ALIASES = {
     "black": "Black",
     "blue": "Blue",
@@ -880,6 +893,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "topology", aliases=TOPOLOGY_ALIASES)
         elif key in larr(["Contact Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)
+        elif key in larr(["Contact Plating"]):
+            value = attributes.identifierListAttribute(value, "plating", aliases=CONTACT_PLATING_ALIASES)
         elif key in larr(["Illumination Color", "Color"]):
             value = attributes.identifierListAttribute(value, "color", aliases=COLOR_ALIASES)
         elif key in larr(["Emitted Color"]):

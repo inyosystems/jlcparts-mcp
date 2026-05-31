@@ -3258,6 +3258,14 @@ def test_contact_material_attribute(value, expected, capsys):
     }
 
 
+def test_contact_plating_attribute(capsys):
+    values = normalized_values("Contact Plating", "silver plating;Gold Plated;AuPd", capsys)
+
+    assert values["plating 1"] == ["Silver", "identifier"]
+    assert values["plating 2"] == ["Gold", "identifier"]
+    assert values["plating 3"] == ["Gold-Palladium", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
