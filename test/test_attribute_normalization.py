@@ -1898,6 +1898,7 @@ def test_logic_array_blocks(value, expected, capsys):
         ("Connectable Bits", "-", {"count": "NaN"}),
         ("Pin Number in Each Row", "18", {"count": 18}),
         ("Needle Number", "12", {"count": 12}),
+        ("Number of Nails", "2", {"count": 2}),
         ("Channels", "16", {"count": 16}),
         ("Number of Characters", "4", {"count": 4}),
         ("Number of Terminals", "4", {"count": 4}),

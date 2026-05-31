@@ -891,7 +891,7 @@ def normalizeAttribute(key, value):
                 "Numberof Channels", "Mac Address Support", "Vlan Support",
                 "Pin Number Per Port", "Number of Inserts", "Number of Leg",
                 "Connection Number (Max)", "Connectable Bits",
-                    "Pin Number in Each Row", "Needle Number", "Channels",
+                    "Pin Number in Each Row", "Needle Number", "Number of Nails", "Channels",
                     "Number of Characters", "Number of Terminals",
                     "Turns", "Number of Turns", "Number of Coded Gears",
                     "Number of Half Bridges", "Number of H-Bridges", "Order",
