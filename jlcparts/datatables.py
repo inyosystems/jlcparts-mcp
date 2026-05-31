@@ -1229,7 +1229,7 @@ def normalizeAttribute(key, value):
             value = attributes.magneticFluxDensityRangeListAttribute(value)
         elif key in larr(["View Angle"]):
             value = attributes.labeledAngleListAttribute(value)
-        elif key in larr(["Viewing Angle", "Differential Phase"]):
+        elif key in larr(["Viewing Angle", "Differential Phase", "Sensing Angle"]):
             value = attributes.angleListAttribute(value)
         elif key.startswith("continuous drain current"):
             value = attributes.continuousTransistorCurrent(value, "Id")

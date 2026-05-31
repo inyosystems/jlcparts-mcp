@@ -4584,6 +4584,12 @@ def test_peak_wavelength_aliases(key, capsys):
     assert_quantity(values["wavelength"], 540e-9, "length")
 
 
+def test_sensing_angle(capsys):
+    values = normalized_values("Sensing Angle", "120°", capsys)
+
+    assert_quantity(values["angle 1"], 120, "angle")
+
+
 def test_wavelength_alias_labels(capsys):
     values = normalized_values("Wavelength", "R:625nm, G:525nm, B:470nm", capsys)
 
