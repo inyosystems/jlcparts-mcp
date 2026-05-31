@@ -1910,6 +1910,7 @@ def test_logic_array_blocks(value, expected, capsys):
         ("UART/Usart", "4", {"count": 4}),
         ("I2C", "3", {"count": 3}),
         ("I2s", "4", {"count": 4}),
+        ("8bit Timer", "2", {"count": 2}),
         ("16bit Timer", "8", {"count": 8}),
         ("32bit Timer", "4", {"count": 4}),
         ("CAN", "1", {"count": 1}),
