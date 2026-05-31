@@ -149,6 +149,10 @@ AMPLIFIER_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+PROGRAM_MEMORY_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
 LOGIC_GATE_TYPE_ALIASES = {
     "NORGate": "NOR Gate",
     "ORGate": "OR Gate",
@@ -1002,6 +1006,8 @@ def normalizeAttribute(key, value):
             value = attributes.switchWayAttribute(value)
         elif key in larr(["Type of Memory"]):
             value = attributes.memoryCompositionAttribute(value)
+        elif key in larr(["Program Memory Type"]):
+            value = attributes.identifierListAttribute(value, "program memory type", aliases=PROGRAM_MEMORY_TYPE_ALIASES)
         elif key in larr(["Ipex Algebra"]):
             value = attributes.generationAttribute(value)
         elif key in larr(["Battery Type", "Applicable Battery Specifications",

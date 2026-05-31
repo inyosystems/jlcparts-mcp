@@ -2695,6 +2695,12 @@ def test_memory_generation_and_material_attributes(capsys):
     assert_quantity(values["flash"], 1, "count")
     assert_quantity(values["ram"], 1, "count")
 
+    values = normalized_values("Program Memory Type", "FLASH", capsys)
+    assert values["program memory type 1"] == ["FLASH", "identifier"]
+
+    values = normalized_values("Program Memory Type", "-", capsys)
+    assert values["program memory type 1"] == ["Unspecified", "identifier"]
+
     values = normalized_values("Ipex Algebra", "Gen 3", capsys)
     assert_quantity(values["generation"], 3, "count")
 
