@@ -2682,6 +2682,12 @@ def test_display_switch_package_counts(capsys):
     values = normalized_values("Switch Type", "Square Tilt 5-Way", capsys)
     assert_quantity(values["ways"], 5, "count")
 
+    values = normalized_values("Switch Type", "High-side switch", capsys)
+    assert values["switch type"] == ["High-Side Switch", "identifier"]
+
+    values = normalized_values("Switch Type", "高侧开关", capsys)
+    assert values["switch type"] == ["High-Side Switch", "identifier"]
+
     values = normalized_values("Packaging/Housing", "3-SIP Module", capsys)
     assert_quantity(values["pins"], 3, "count")
 

@@ -1342,7 +1342,14 @@ def switchWayAttribute(value):
     value = str(value).strip()
     match = re.search(r"(\d+)\s*-\s*Way", value, flags=re.I)
     if match is None:
-        raise ValueError(f"Cannot parse switch way count {value}")
+        aliases = {
+            "High-side switch": "High-Side Switch",
+            "Low-side switch": "Low-Side Switch",
+            "高侧开关": "High-Side Switch",
+            "Square pentagonal shape": "Square Pentagonal Shape",
+            "-": "Unspecified",
+        }
+        return identifierAttribute(aliases.get(value, value), "switch type")
     return {
         "format": "${ways}",
         "primary": "ways",
