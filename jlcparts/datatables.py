@@ -364,7 +364,7 @@ def normalizeAttribute(key, value):
             value = attributes.voltageRangeListAttribute(value) if compoundValue(value) else attributes.voltageRangeAttribute(value, "voltage")
         elif key in larr(["High-Side Bias Voltage(Vbs)"]):
             value = attributes.voltageRangeAttribute(value, "voltage")
-        elif key in larr(["Human Body Model", "Contact Discharge Vesd"]):
+        elif key in larr(["Human Body Model", "Contact Discharge Vesd", "Machine Model"]):
             value = attributes.voltageRangeAttribute(value, "voltage")
         elif key in larr(["Input Voltage", "Frequency Input Voltage", "Zener Voltage (Range)",
                 "Single Supply", "Dual Supply", "Operating Voltage", "Voltage - Input(DC)",

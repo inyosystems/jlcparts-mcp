@@ -533,6 +533,7 @@ def test_extra_voltage_ranges(key, value, expected, capsys):
         ("Peak Off - State Voltage(Vdrm)", "1.2kV", {"voltage": 1200.0}),
         ("Human Body Model", "±30kV", {"voltage min": -30000.0, "voltage max": 30000.0}),
         ("Human Body Model", "-", {"voltage": "NaN"}),
+        ("Machine Model", "±15kV", {"voltage min": -15000.0, "voltage max": 15000.0}),
         ("Contact Discharge Vesd", "±8kV", {"voltage min": -8000.0, "voltage max": 8000.0}),
         ("Contact Discharge Vesd", "30kV", {"voltage": 30000.0}),
         ("On State Voltage", "1V", {"voltage": 1.0}),
