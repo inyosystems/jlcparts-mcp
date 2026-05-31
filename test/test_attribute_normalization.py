@@ -335,6 +335,8 @@ def test_impedance_at_frequency_lists(value, measurements, capsys):
         ("Operating Voltage Range", "1.2V", 1.2),
         ("Low Level Range (VIL)", "700mV~800mV", (0.7, 0.8)),
         ("Low Level Range (VIL)", "0.8V", 0.8),
+        ("Low Level Range (VOL)", "100mV~260mV", (0.1, 0.26)),
+        ("Low Level Range (VOL)", "0.05V", 0.05),
         ("Operating Voltage", "-", "NaN"),
     ],
 )

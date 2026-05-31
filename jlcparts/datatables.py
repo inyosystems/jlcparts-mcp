@@ -368,7 +368,7 @@ def normalizeAttribute(key, value):
             value = attributes.voltageRangeAttribute(value, "voltage")
         elif key in larr(["Input Voltage", "Frequency Input Voltage", "Zener Voltage (Range)",
                 "Single Supply", "Dual Supply", "Operating Voltage", "Voltage - Input(DC)",
-                "Low Level Range (VIL)"]):
+                "Low Level Range (VIL)", "Low Level Range (VOL)"]):
             complexVoltageAlternatives = isinstance(value, str) and ("/" in value or "、" in value)
             if key == "input voltage":
                 value = attributes.voltageRangeListAttribute(value, "voltage")
