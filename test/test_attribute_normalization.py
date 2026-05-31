@@ -3554,6 +3554,16 @@ def test_jacket_color_identifiers(capsys):
     assert values["color 1"] == ["None", "identifier"]
 
 
+def test_plastic_color_identifiers(capsys):
+    values = normalized_values("Plastic Color", "Non-Plastic", capsys)
+
+    assert values["color 1"] == ["Non-Plastic", "identifier"]
+
+    values = normalized_values("Plastic Color", "Blue", capsys)
+
+    assert values["color 1"] == ["Blue", "identifier"]
+
+
 def test_lens_color_identifiers(capsys):
     values = normalized_values("Lens Color", "Frosted Red Lens, Frosted Green Lens", capsys)
 
