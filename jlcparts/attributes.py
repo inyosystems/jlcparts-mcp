@@ -91,6 +91,28 @@ def withLampAttribute(value, colorAliases=None):
         "values": values,
     }
 
+def bracketPresenceAttribute(value):
+    value = str(value).strip()
+    aliases = {
+        "yes": 1,
+        "with": 1,
+        "with bracket": 1,
+        "带支架": 1,
+        "no": 0,
+        "without": 0,
+        "without bracket": 0,
+        "不带": 0,
+        "不带支架": 0,
+    }
+    count = "NaN" if value in ["-", "--", "null"] else aliases.get(value.lower())
+    if count is None:
+        raise ValueError(f"Cannot parse bracket presence {value}")
+    return {
+        "format": "${with bracket}",
+        "primary": "with bracket",
+        "values": {"with bracket": [count, "count"]},
+    }
+
 def configurationAttribute(value):
     tokens = splitIdentifierList(value, ",;")
     parsed = []

@@ -1132,6 +1132,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "color", separators=",;/", aliases=COLOR_ALIASES)
         elif key in larr(["With Lamp"]):
             value = attributes.withLampAttribute(value, colorAliases=COLOR_ALIASES)
+        elif key in larr(["Strike Gundam"]):
+            value = attributes.bracketPresenceAttribute(value)
         elif key in larr(["Lens Color"]):
             value = attributes.identifierListAttribute(value, "lens color")
         elif key in larr(["Category"]):
