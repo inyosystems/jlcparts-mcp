@@ -2406,6 +2406,20 @@ def test_input_signal_identifiers(capsys):
     assert values["input signal 1"] == ["Unspecified", "identifier"]
 
 
+def test_rail_to_rail_identifiers(capsys):
+    values = normalized_values("Rail to Rail", "Rail-to-rail output, Rail-to-Rail Input", capsys)
+
+    assert values["rail to rail 1"] == ["Rail-to-Rail Output", "identifier"]
+    assert values["rail to rail 2"] == ["Rail-to-Rail Input", "identifier"]
+
+    values = normalized_values("Rail to Rail", "Differential;轨到轨;轨到轨输出;Push Pull", capsys)
+
+    assert values["rail to rail 1"] == ["Differential", "identifier"]
+    assert values["rail to rail 2"] == ["Rail-to-Rail", "identifier"]
+    assert values["rail to rail 3"] == ["Rail-to-Rail Output", "identifier"]
+    assert values["rail to rail 4"] == ["Push-Pull", "identifier"]
+
+
 def test_environmental_requirements(capsys):
     values = normalized_values(
         "Environmental Requirements",

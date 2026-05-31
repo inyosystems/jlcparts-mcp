@@ -181,6 +181,16 @@ LOAD_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+RAIL_TO_RAIL_ALIASES = {
+    "Rail-to-rail input": "Rail-to-Rail Input",
+    "Rail-to-rail output": "Rail-to-Rail Output",
+    "rail-to-rail output": "Rail-to-Rail Output",
+    "轨到轨": "Rail-to-Rail",
+    "轨到轨输出": "Rail-to-Rail Output",
+    "Push Pull": "Push-Pull",
+    "-": "Unspecified",
+}
+
 HOLDER_TYPE_ALIASES = {
     "Free-hanging": "Free Hanging",
     "Right-Angle": "Right Angle",
@@ -1008,6 +1018,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "load type", separators=",;、", aliases=LOAD_TYPE_ALIASES)
         elif key in larr(["Input"]):
             value = attributes.identifierListAttribute(value, "input")
+        elif key in larr(["Rail to Rail"]):
+            value = attributes.identifierListAttribute(value, "rail to rail", aliases=RAIL_TO_RAIL_ALIASES)
         elif key in larr(["Input Signal"]):
             value = attributes.identifierListAttribute(value, "input signal", aliases=SIGNAL_LEVEL_ALIASES)
         elif key in larr(["Peripheral/Function"]):
