@@ -2612,6 +2612,11 @@ def test_circuit_identifier(value, capsys):
             "Power-on reset, Power-down mode, Integrated buffer",
             ["Power-on reset", "Power-down mode", "Integrated buffer"],
         ),
+        (
+            "Supplementary Features",
+            "Fuse Holder, With Switch Position",
+            ["Fuse Holder", "With Switch Position"],
+        ),
     ],
 )
 def test_feature_list_attributes(key, value, expected, capsys):
