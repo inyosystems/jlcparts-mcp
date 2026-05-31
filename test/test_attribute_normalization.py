@@ -2339,6 +2339,20 @@ def test_certification_bodies_identifiers(capsys):
     assert values["certification 1"] == ["Unspecified", "identifier"]
 
 
+def test_certifications_identifiers(capsys):
+    values = normalized_values("Certifications", "UL , RoHS , CSA , TUV", capsys)
+
+    assert values["certification 1"] == ["UL", "identifier"]
+    assert values["certification 2"] == ["RoHS", "identifier"]
+    assert values["certification 3"] == ["CSA", "identifier"]
+    assert values["certification 4"] == ["TUV", "identifier"]
+
+    values = normalized_values("Certifications", "ELV/RoHS", capsys)
+
+    assert values["certification 1"] == ["ELV", "identifier"]
+    assert values["certification 2"] == ["RoHS", "identifier"]
+
+
 def test_terminal_type_identifier(capsys):
     values = normalized_values("Terminal Type", "Bidirectional Terminal (2 Tabs+1 Receptacle)", capsys)
 

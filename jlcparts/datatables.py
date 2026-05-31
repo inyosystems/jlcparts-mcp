@@ -1011,8 +1011,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "series")
         elif key in larr(["RF Series"]):
             value = attributes.identifierListAttribute(value, "series", separators=",;/")
-        elif key in larr(["Safety Certification", "Certification Bodies"]):
-            value = attributes.identifierListAttribute(value, "certification", separators=",;、", aliases=CERTIFICATION_ALIASES)
+        elif key in larr(["Safety Certification", "Certification Bodies", "Certifications"]):
+            value = attributes.identifierListAttribute(value, "certification", separators=",;/、", aliases=CERTIFICATION_ALIASES)
         elif key in larr(["Circuit"]):
             value = attributes.identifierAttribute(value, "circuit")
         elif key in larr(["Features", "Feature", "Function", "Supplementary Features"]):
