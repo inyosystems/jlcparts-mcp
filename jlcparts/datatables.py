@@ -209,6 +209,13 @@ CARD_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+CARD_CONNECTION_MODE_ALIASES = {
+    "Flip type": "Flip Type",
+    "Self-bouncing": "Self-Bouncing",
+    "Self bomb": "Self-Bouncing",
+    "-": "Unspecified",
+}
+
 DIRECTION_ALIASES = {
     "Bi-Directional": "Bidirectional",
     "Omni-directional": "Omnidirectional",
@@ -1081,6 +1088,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "class", aliases=AMPLIFIER_CLASS_ALIASES)
         elif key in larr(["Card Type"]):
             value = attributes.identifierListAttribute(value, "card type", aliases=CARD_TYPE_ALIASES)
+        elif key in larr(["Card Connection Mode"]):
+            value = attributes.identifierListAttribute(value, "card connection mode", aliases=CARD_CONNECTION_MODE_ALIASES)
         elif key in larr(["Direction"]):
             value = attributes.identifierListAttribute(value, "direction", aliases=DIRECTION_ALIASES)
         elif key in larr(["Input Signal"]):

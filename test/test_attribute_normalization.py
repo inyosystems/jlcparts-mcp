@@ -2492,6 +2492,20 @@ def test_card_type_identifiers(capsys):
     assert values["card type 1"] == ["Unspecified", "identifier"]
 
 
+def test_card_connection_mode_identifiers(capsys):
+    values = normalized_values("Card Connection Mode", "Self bomb", capsys)
+
+    assert values["card connection mode 1"] == ["Self-Bouncing", "identifier"]
+
+    values = normalized_values("Card Connection Mode", "Flip type", capsys)
+
+    assert values["card connection mode 1"] == ["Flip Type", "identifier"]
+
+    values = normalized_values("Card Connection Mode", "-", capsys)
+
+    assert values["card connection mode 1"] == ["Unspecified", "identifier"]
+
+
 def test_direction_identifiers(capsys):
     values = normalized_values("Direction", "Omni-directional, Bi-Directional, 向上计数器", capsys)
 
