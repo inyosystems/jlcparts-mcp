@@ -2715,6 +2715,12 @@ def test_memory_generation_and_material_attributes(capsys):
     values = normalized_values("Program Memory Type", "-", capsys)
     assert values["program memory type 1"] == ["Unspecified", "identifier"]
 
+    values = normalized_values("Adaptation Package Type", "PLCC", capsys)
+    assert values["package type 1"] == ["PLCC", "identifier"]
+
+    values = normalized_values("Adaptation Package Type", "-", capsys)
+    assert values["package type 1"] == ["Unspecified", "identifier"]
+
     values = normalized_values("Ipex Algebra", "Gen 3", capsys)
     assert_quantity(values["generation"], 3, "count")
 

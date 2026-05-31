@@ -153,6 +153,10 @@ PROGRAM_MEMORY_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+PACKAGE_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
 APPEARANCE_SHAPE_ALIASES = {
     "Bench-shaped": "Bench-Shaped",
     "Block-shaped": "Block-Shaped",
@@ -1063,6 +1067,8 @@ def normalizeAttribute(key, value):
             value = attributes.memoryCompositionAttribute(value)
         elif key in larr(["Program Memory Type"]):
             value = attributes.identifierListAttribute(value, "program memory type", aliases=PROGRAM_MEMORY_TYPE_ALIASES)
+        elif key in larr(["Adaptation Package Type"]):
+            value = attributes.identifierListAttribute(value, "package type", aliases=PACKAGE_TYPE_ALIASES)
         elif key in larr(["Ipex Algebra"]):
             value = attributes.generationAttribute(value)
         elif key in larr(["Battery Type", "Applicable Battery Specifications",
