@@ -2743,6 +2743,13 @@ def test_communication_system_identifier_list(capsys):
     assert values["communication system 3"] == ["EV-DO", "identifier"]
 
 
+def test_standard_number_identifier_list(capsys):
+    values = normalized_values("Standard Number", "60950-1; 62368-1", capsys)
+
+    assert values["standard number 1"] == ["60950-1", "identifier"]
+    assert values["standard number 2"] == ["62368-1", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
