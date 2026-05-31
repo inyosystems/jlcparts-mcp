@@ -820,6 +820,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierAttribute(value, "terminal type")
         elif key in larr(["Input/Output"]):
             value = attributes.inputOutputAttribute(value)
+        elif key in larr(["Environmental Requirements"]):
+            value = attributes.environmentalRequirementsAttribute(value)
         elif key in larr(["Gender"]):
             value = attributes.identifierListAttribute(value, "gender", aliases=GENDER_ALIASES)
         elif key in larr(["Holder Type"]):

@@ -1349,6 +1349,33 @@ def inputOutputAttribute(value):
         }
     }
 
+def environmentalRequirementsAttribute(value):
+    value = str(value).strip()
+    values = {}
+    formats = []
+    requirements = []
+    if re.search(r"\bRoHS\b", value, flags=re.I):
+        requirements.append("RoHS")
+    if re.search(r"\bREACH\b", value, flags=re.I):
+        requirements.append("REACH")
+    for index, requirement in enumerate(requirements, start=1):
+        name = f"requirement {index}"
+        values[name] = [requirement, "identifier"]
+        formats.append("${" + name + "}")
+
+    salt_spray = re.search(r"Salt\s+Spray\s+([0-9.]+\s*(?:hours?|hrs?|h))", value, flags=re.I)
+    if salt_spray is not None:
+        values["salt spray"] = [readTime(salt_spray.group(1)), "time"]
+        formats.append("${salt spray}")
+
+    if not values:
+        return identifierAttribute(value, "requirement")
+    return {
+        "format": ", ".join(formats),
+        "primary": next(iter(values)),
+        "values": values
+    }
+
 def clockViewingDirectionAttribute(value):
     value = str(value).strip()
     match = re.fullmatch(r"(\d+(?:\.\d+)?)\s*o'?clock", value, flags=re.I)

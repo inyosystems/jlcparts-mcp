@@ -2326,6 +2326,17 @@ def test_input_output_identifiers(capsys):
     assert values["output"] == ["1.13 cable black", "identifier"]
 
 
+def test_environmental_requirements(capsys):
+    values = normalized_values(
+        "Environmental Requirements",
+        "Compliant with RoHS Environmental Requirements, Salt Spray 48 Hours",
+        capsys,
+    )
+
+    assert values["requirement 1"] == ["RoHS", "identifier"]
+    assert_quantity(values["salt spray"], 48 * 3600, "time")
+
+
 def test_driver_receiver(capsys):
     values = normalized_values("Driver/Receiver", "1/1;2/2", capsys)
 
