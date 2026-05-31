@@ -112,6 +112,13 @@ ACTUATOR_STYLE_ALIASES = {
     "脚按动": "Foot Actuated",
 }
 
+CHIP_TYPE_ALIASES = {
+    "Battery monitoring chip": "Battery Monitoring IC",
+    "电池监测芯片": "Battery Monitoring IC",
+    "电池保护芯片": "Battery Protection IC",
+    "Boost charging chip": "Boost Charging IC",
+}
+
 GENDER_ALIASES = {
     "male": "Male",
 }
@@ -845,6 +852,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "feature")
         elif key in larr(["Actuator Style"]):
             value = attributes.identifierListAttribute(value, "actuator style", aliases=ACTUATOR_STYLE_ALIASES)
+        elif key in larr(["The Chip Type"]):
+            value = attributes.identifierListAttribute(value, "chip type", aliases=CHIP_TYPE_ALIASES)
         elif key in larr(["Working Mode"]):
             value = attributes.identifierListAttribute(value, "mode")
         elif key in larr(["Characteristic"]):

@@ -2672,6 +2672,13 @@ def test_actuator_style_identifiers(capsys):
     assert values["actuator style 3"] == ["Press Button", "identifier"]
 
 
+def test_chip_type_identifiers(capsys):
+    values = normalized_values("The Chip Type", "Protection IC, 电池监测芯片", capsys)
+
+    assert values["chip type 1"] == ["Protection IC", "identifier"]
+    assert values["chip type 2"] == ["Battery Monitoring IC", "identifier"]
+
+
 def test_modulation_system_identifiers(capsys):
     values = normalized_values("Modulation System", "FLRC, LORA, OCK", capsys)
 
