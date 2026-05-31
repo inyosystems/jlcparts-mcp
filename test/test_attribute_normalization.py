@@ -2612,6 +2612,20 @@ def test_display_switch_package_counts(capsys):
     assert values["package"] == ["SIP Module", "identifier"]
 
 
+def test_switch_circuit_identifiers(capsys):
+    values = normalized_values("Switch Circuit", "SPDT(SPDT)", capsys)
+
+    assert values["switch circuit"] == ["SPDT", "identifier"]
+
+    values = normalized_values("Switch Circuit", "Single-pole single-throw (SPST) - Normally closed", capsys)
+
+    assert values["switch circuit"] == ["SPST-NC", "identifier"]
+
+    values = normalized_values("Switch Circuit", "SPST (Single Pole Single Throw) - Normally Open", capsys)
+
+    assert values["switch circuit"] == ["SPST-NO", "identifier"]
+
+
 def test_memory_generation_and_material_attributes(capsys):
     values = normalized_values("Type of Memory", "1 FLASH +1 RAM", capsys)
     assert_quantity(values["flash"], 1, "count")

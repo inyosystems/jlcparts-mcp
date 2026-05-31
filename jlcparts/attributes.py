@@ -3855,7 +3855,15 @@ def switchCircuitAttribute(value):
     value = str(value).strip()
     if value in ["-", "--", "null"] or re.fullmatch(r"\d+(?:\.\d+)?\s*:\s*\d+(?:\.\d+)?", value):
         return colonRatioListAttribute(value, "ratio")
-    return stringAttribute(value)
+    aliases = {
+        "DPDT(DPDT)": "DPDT",
+        "SPDT(SPDT)": "SPDT",
+        "SPST(SPST)": "SPST",
+        "SPST(SPST)-Normal Open": "SPST-NO",
+        "SPST (Single Pole Single Throw) - Normally Open": "SPST-NO",
+        "Single-pole single-throw (SPST) - Normally closed": "SPST-NC",
+    }
+    return identifierAttribute(aliases.get(value, value), "switch circuit")
 
 def capacitanceAtConditionAttribute(value, name="capacitance"):
     return scalarAttribute(value, readCapacitance, "capacitance", name)
