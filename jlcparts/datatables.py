@@ -506,6 +506,7 @@ def normalizeAttribute(key, value):
                 "operating current",
                 "collector current (ic)",
                 "current consumption",
+                "peak pulse current (ipp) @ 10/1000us",
                 "peak pulse current(ipp)@8/20us",
                 "output current",
                 "peak output current(sink)",

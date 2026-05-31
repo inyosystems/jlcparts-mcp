@@ -1667,6 +1667,7 @@ def test_frequency_center_lists(value, expected, capsys):
         ("Current - Surge(Itsm@F)", "170A@60Hz, 155A@50Hz", [170.0, 155.0]),
         ("Send Current", "9.5mA, 16mA", [0.0095, 0.016]),
         ("Current of Transmitting", "7.1mA, 3.5mA", [0.0071, 0.0035]),
+        ("Peak Pulse Current (Ipp) @ 10/1000us", "80A, 250A", [80.0, 250.0]),
         ("Current - Collector Cutoff", "100uA, 500uA", [100e-6, 500e-6]),
         ("Load Current", "900mA, 1.2A", [0.9, 1.2]),
         ("Steady State Current (Max)", "440uA, 400uA", [440e-6, 400e-6]),
