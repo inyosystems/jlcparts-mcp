@@ -2767,6 +2767,14 @@ def test_antenna_type_attribute(capsys):
     assert values["antenna type 2"] == ["IPEX interface", "identifier"]
 
 
+def test_dimming_attribute(capsys):
+    values = normalized_values("Dimming", "Analog, PWM, I2C", capsys)
+
+    assert values["dimming 1"] == ["Analog", "identifier"]
+    assert values["dimming 2"] == ["PWM", "identifier"]
+    assert values["dimming 3"] == ["I2C", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
