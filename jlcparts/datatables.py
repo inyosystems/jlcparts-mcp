@@ -1125,6 +1125,8 @@ def normalizeAttribute(key, value):
             value = attributes.forceRangeListAttribute(value)
         elif key in larr(["Operation Force"]):
             value = attributes.forceRangeListAttribute(value)
+        elif key in larr(["Under Pressure"]):
+            value = attributes.forceRangeListAttribute(value) if isinstance(value, str) and re.search(r"\d\s*N(?:\.|\s|$)", value, flags=re.I) else attributes.identifierListAttribute(value, "under pressure")
         elif key in larr(["Acceleration Measurement Range (Max)"]):
             value = attributes.accelerationRangeAttribute(value)
         elif key in larr(["Humidity", "Humidity Tolerance"]):

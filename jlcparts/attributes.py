@@ -391,6 +391,7 @@ def readForce(value):
     value = value.strip()
     if value in ["-", "--", "null"]:
         return "NaN"
+    value = re.sub(r"\.?\s*min$", "", value, flags=re.I).strip()
     match = re.fullmatch(r"([+-]?\d+(?:\.\d+)?)\s*(N|gf)", value, flags=re.I)
     if match is None:
         raise ValueError(f"Cannot parse force {value}")

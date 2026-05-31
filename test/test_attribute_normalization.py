@@ -3957,6 +3957,17 @@ def test_operating_force(capsys):
     assert_quantity(values["force 1"], 50 * 0.00980665, "force")
 
 
+def test_under_pressure(capsys):
+    values = normalized_values("Under Pressure", "0.3N.Min", capsys)
+
+    assert_quantity(values["force 1"], 0.3, "force")
+
+    values = normalized_values("Under Pressure", "Twist 45°/1000mm, arch 5mm/1000mm", capsys)
+
+    assert values["under pressure 1"] == ["Twist 45°/1000mm", "identifier"]
+    assert values["under pressure 2"] == ["arch 5mm/1000mm", "identifier"]
+
+
 def test_acceleration_measurement_range(capsys):
     values = normalized_values("Acceleration Measurement Range (Max)", "±16g", capsys)
 
