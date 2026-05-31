@@ -4603,6 +4603,12 @@ def test_spring_buckle_count(capsys):
     assert_quantity(values["count"], 2, "count")
 
 
+def test_number_of_internal_switches_tubes(capsys):
+    values = normalized_values("Number of Internal Switches Tubes", "4", capsys)
+
+    assert_quantity(values["count"], 4, "count")
+
+
 def test_wavelength_alias_labels(capsys):
     values = normalized_values("Wavelength", "R:625nm, G:525nm, B:470nm", capsys)
 

@@ -889,7 +889,7 @@ def normalizeAttribute(key, value):
                 "Number of Ports", "Number of Supporting Devices",
                 "Number of Receiver", "Number of Driver", "Input Number",
                 "Number of Pins Per Row", "Parallel Bit Count Per Channel",
-                "Step Resolution"]):
+                "Step Resolution", "Number of Internal Switches Tubes"]):
             value = attributes.countListAttribute(value)
         elif key in larr(["Internal Comparator"]):
             value = attributes.countAttribute(value) if str(value).strip() in ["-", "--", "null"] or re.fullmatch(r"\d+", str(value).strip()) else attributes.identifierAttribute(value, "internal comparator")
