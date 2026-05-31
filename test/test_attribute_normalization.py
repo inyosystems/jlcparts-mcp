@@ -3439,6 +3439,16 @@ def test_number_of_bits_per_element_count(capsys):
     assert_quantity(values["count 2"], 2, "count")
 
 
+def test_internal_comparator_attribute(capsys):
+    values = normalized_values("Internal Comparator", "2", capsys)
+
+    assert_quantity(values["count"], 2, "count")
+
+    values = normalized_values("Internal Comparator", "Yes", capsys)
+
+    assert values["internal comparator"] == ["Yes", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("key", "value", "expected"),
     [

@@ -885,6 +885,8 @@ def normalizeAttribute(key, value):
                 "Number of Pins Per Row", "Parallel Bit Count Per Channel",
                 "Step Resolution"]):
             value = attributes.countListAttribute(value)
+        elif key in larr(["Internal Comparator"]):
+            value = attributes.countAttribute(value) if str(value).strip() in ["-", "--", "null"] or re.fullmatch(r"\d+", str(value).strip()) else attributes.identifierAttribute(value, "internal comparator")
         elif key in larr(["Word Size"]):
             value = attributes.wordSizeAttribute(value)
         elif key in larr(["Number of Inputs"]):
