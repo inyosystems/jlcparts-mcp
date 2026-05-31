@@ -2938,10 +2938,12 @@ def test_connection_type_identifier(capsys):
         ("漏极开路;Push-pull", ["Open Drain", "Push-Pull"]),
         ("CMOS;互补;轨到轨;TTL", ["CMOS", "Complementary", "Rail-to-Rail", "TTL"]),
         ("Clipped sine wave", ["Clipped Sine Wave"]),
+        ("SPI, I2C", ["SPI", "I2C"]),
     ],
 )
 def test_output_type_attribute(value, expected, capsys):
-    values = normalized_values("Output Type", value, capsys)
+    key = "Out Type" if value == "SPI, I2C" else "Output Type"
+    values = normalized_values(key, value, capsys)
 
     assert {
         name: quantity
