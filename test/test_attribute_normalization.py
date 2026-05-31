@@ -2929,6 +2929,14 @@ def test_logic_type_attribute(capsys):
     assert values["logic type 2"] == ["Divide-by-10", "identifier"]
 
 
+def test_logic_gate_type_attribute(capsys):
+    values = normalized_values("Logic Gate Type", "With Non-Gate;ORGate;可配置多功能门", capsys)
+
+    assert values["logic gate 1"] == ["NOT Gate", "identifier"]
+    assert values["logic gate 2"] == ["OR Gate", "identifier"]
+    assert values["logic gate 3"] == ["Configurable Multiple Function", "identifier"]
+
+
 def test_antenna_type_attribute(capsys):
     values = normalized_values("Antenna Type", "Stamp Hole Antenna, IPEX interface", capsys)
 

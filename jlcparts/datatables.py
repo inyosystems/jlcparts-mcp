@@ -119,6 +119,20 @@ CHIP_TYPE_ALIASES = {
     "Boost charging chip": "Boost Charging IC",
 }
 
+LOGIC_GATE_TYPE_ALIASES = {
+    "NORGate": "NOR Gate",
+    "ORGate": "OR Gate",
+    "XORGate": "XOR Gate",
+    "XOR gate": "XOR Gate",
+    "NAND Gates": "NAND Gate",
+    "And": "AND Gate",
+    "With Door": "AND Gate",
+    "With Non-Gate": "NOT Gate",
+    "非门": "NOT Gate",
+    "ConfigurableMultipleFunction": "Configurable Multiple Function",
+    "可配置多功能门": "Configurable Multiple Function",
+}
+
 GENDER_ALIASES = {
     "male": "Male",
 }
@@ -878,6 +892,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "type")
         elif key in larr(["Logic Type"]):
             value = attributes.identifierListAttribute(value, "logic type")
+        elif key in larr(["Logic Gate Type"]):
+            value = attributes.identifierListAttribute(value, "logic gate", aliases=LOGIC_GATE_TYPE_ALIASES)
         elif key in larr(["Antenna Type"]):
             value = attributes.identifierListAttribute(value, "antenna type")
         elif key in larr(["Sensor Type"]):
