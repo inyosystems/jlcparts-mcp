@@ -2857,6 +2857,12 @@ def test_mounting_type_attribute(capsys):
     assert values["mounting type 1"] == ["Through Hole", "identifier"]
 
 
+def test_head_type_attribute(capsys):
+    values = normalized_values("Head Type", "Circular ring (90°)", capsys)
+
+    assert values["head type"] == ["Circular ring (90°)", "identifier"]
+
+
 def test_dimming_attribute(capsys):
     values = normalized_values("Dimming", "Analog, PWM, I2C", capsys)
 

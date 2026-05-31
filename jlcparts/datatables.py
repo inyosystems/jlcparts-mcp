@@ -813,6 +813,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "holder type", aliases=HOLDER_TYPE_ALIASES)
         elif key in larr(["Mounting Type"]):
             value = attributes.identifierListAttribute(value, "mounting type", aliases=MOUNTING_TYPE_ALIASES)
+        elif key in larr(["Head Type"]):
+            value = attributes.identifierAttribute(value, "head type")
         elif key in larr(["Dimming"]):
             value = attributes.identifierListAttribute(value, "dimming")
         elif key in larr(["Applications", "Applications Function"]):
