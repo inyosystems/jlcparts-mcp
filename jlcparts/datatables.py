@@ -746,7 +746,7 @@ def normalizeAttribute(key, value):
                 "Logic Family", "Type of Battery", "Ratings", "Subclass",
                 "Level of Protection", "Ethernet Speed Standards", "Versions",
                 "Algorithm", "Input Type", "USB Protocol", "Application",
-                "Memory Format", "Agreement", "CPU Core", "Standard",
+                "Memory Format", "Agreement", "CPU Core", "Crystal Type", "Standard",
                 "Pin Structure", "Interface Form", "Flame Retardant Rating", "Plastic Material",
                 "Specification", "Holes Structure", "Manufacturer", "Series",
                 "Lamp Holder Type", "Material Quality", "Ip Rating"]):

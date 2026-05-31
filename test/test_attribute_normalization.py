@@ -2453,6 +2453,7 @@ def test_material_quality_identifier(value, capsys):
         ("Memory Format", "DDR3 SDRAM"),
         ("Agreement", "FeliCa,ISO 14443A,ISO 14443B,ISO 15693,MIFARE,NFC"),
         ("CPU Core", "ARM Cortex-M0"),
+        ("Crystal Type", "49S Crystals"),
         ("Standard", "IEC 320-C8"),
         ("Pin Structure", "2x4P"),
         ("Interface Form", "M.2-B Key"),
