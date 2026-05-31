@@ -1161,7 +1161,7 @@ def normalizeAttribute(key, value):
         elif key in larr(["Wire Gauge - MM2", "Wire Gauge - Mm", "Wire Gauge - Sqmm",
                 "Wire Gauge - Sqmm (Per)", "Wire Gauge - MM2 (Not Stranded Wire)"]):
             value = attributes.areaMm2RangeListAttribute(value)
-        elif key in larr(["Wire Gauge - Awg", "Wire Gauge", "Wire Gauge - Awg (Per)",
+        elif key in larr(["Wire Gauge - Awg", "Wire Gauge", "Recommended Wire Gauge", "Wire Gauge - Awg (Per)",
                 "Wire Gauge - Awg (Not Stranded Wire)"]):
             value = attributes.awgRangeListAttribute(value)
         elif key in larr(["Wire Rod"]):

@@ -2583,6 +2583,8 @@ def awgRangeListAttribute(value):
     value = re.sub(r"\s*AWG$", "", value, flags=re.I)
     if value == "~":
         value = "-"
+    if "/" in value and "~" not in value and not re.fullmatch(r"\d+/0", value):
+        value = value.replace("/", ",")
     parts = [x.strip() for x in value.split(",")]
     values = {}
     formats = []

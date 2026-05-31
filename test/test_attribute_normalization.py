@@ -4323,6 +4323,7 @@ def test_wire_gauge_mm2(key, value, expected, capsys):
             "awg 2 max": 20.0,
         }),
         ("10, 12", {"awg 1": 10.0, "awg 2": 12.0}),
+        ("16/18/20AWG", {"awg 1": 16.0, "awg 2": 18.0, "awg 3": 20.0}),
         ("1/0", {"awg 1": 0}),
         ("2/0~10", {"awg 1 min": -1, "awg 1 max": 10.0}),
         ("3/0~500", {"awg 1 min": -2, "awg 1 max": 500.0}),
@@ -4331,7 +4332,7 @@ def test_wire_gauge_mm2(key, value, expected, capsys):
         ("-", {"awg 1": "NaN"}),
     ],
 )
-@pytest.mark.parametrize("key", ["Wire Gauge - Awg", "Wire Gauge", "Wire Gauge - Awg (Per)", "Wire Gauge - Awg (Not Stranded Wire)"])
+@pytest.mark.parametrize("key", ["Wire Gauge - Awg", "Wire Gauge", "Recommended Wire Gauge", "Wire Gauge - Awg (Per)", "Wire Gauge - Awg (Not Stranded Wire)"])
 def test_wire_gauge_awg(key, value, expected, capsys):
     values = normalized_values(key, value, capsys)
 
