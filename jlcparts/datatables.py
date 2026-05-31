@@ -179,6 +179,13 @@ TECHNOLOGY_ALIASES = {
     "-": "Unspecified",
 }
 
+INTERRUPT_OUTPUT_ALIASES = {
+    "With Interrupt Output": "Interrupt Output",
+    "有中断输出": "Interrupt Output",
+    "无中断输出": "No Interrupt Output",
+    "-": "Unspecified",
+}
+
 LOGIC_GATE_TYPE_ALIASES = {
     "NORGate": "NOR Gate",
     "ORGate": "OR Gate",
@@ -1086,6 +1093,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(reference, "voltage reference", aliases=VOLTAGE_REFERENCE_ALIASES)
         elif key in larr(["Technology"]):
             value = attributes.identifierListAttribute(value, "technology", aliases=TECHNOLOGY_ALIASES)
+        elif key in larr(["Interrupt Output"]):
+            value = attributes.identifierListAttribute(value, "interrupt output", aliases=INTERRUPT_OUTPUT_ALIASES)
         elif key in larr(["Working Mode", "Mode Support"]):
             value = attributes.identifierListAttribute(value, "mode")
         elif key in larr(["Characteristic"]):

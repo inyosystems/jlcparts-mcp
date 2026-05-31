@@ -3006,6 +3006,20 @@ def test_technology_identifiers(capsys):
     assert values["technology 1"] == ["Unspecified", "identifier"]
 
 
+def test_interrupt_output_identifiers(capsys):
+    values = normalized_values("Interrupt Output", "有中断输出", capsys)
+
+    assert values["interrupt output 1"] == ["Interrupt Output", "identifier"]
+
+    values = normalized_values("Interrupt Output", "无中断输出", capsys)
+
+    assert values["interrupt output 1"] == ["No Interrupt Output", "identifier"]
+
+    values = normalized_values("Interrupt Output", "-", capsys)
+
+    assert values["interrupt output 1"] == ["Unspecified", "identifier"]
+
+
 def test_modulation_system_identifiers(capsys):
     values = normalized_values("Modulation System", "FLRC, LORA, OCK", capsys)
 
