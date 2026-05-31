@@ -91,6 +91,13 @@ TOPOLOGY_ALIASES = {
     "Totem pole": "Totem Pole",
 }
 
+COMMUNICATION_SYSTEM_ALIASES = {
+    "CAT-M": "Cat-M",
+    "cat-m": "Cat-M",
+    "EVDO": "EV-DO",
+    "evdo": "EV-DO",
+}
+
 CONTACT_MATERIAL_ALIASES = {
     "brass": "Brass",
     "bronze": "Bronze",
@@ -770,6 +777,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "interface")
         elif key in larr(["Protocol", "Interface Protocol"]):
             value = attributes.identifierListAttribute(value, "protocol")
+        elif key in larr(["Communication System"]):
+            value = attributes.identifierListAttribute(value, "communication system", aliases=COMMUNICATION_SYSTEM_ALIASES)
         elif key in larr(["Type"]):
             value = attributes.identifierListAttribute(value, "type")
         elif key in larr(["Logic Type"]):

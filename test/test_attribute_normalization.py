@@ -2733,6 +2733,14 @@ def test_protocol_identifier_list(capsys):
     assert values["protocol 3"] == ["UART", "identifier"]
 
 
+def test_communication_system_identifier_list(capsys):
+    values = normalized_values("Communication System", "NB-IoT, CAT-M, EVDO", capsys)
+
+    assert values["communication system 1"] == ["NB-IoT", "identifier"]
+    assert values["communication system 2"] == ["Cat-M", "identifier"]
+    assert values["communication system 3"] == ["EV-DO", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
