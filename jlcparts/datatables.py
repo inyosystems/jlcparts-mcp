@@ -1331,7 +1331,7 @@ def normalizeAttribute(key, value):
                         "Block Erase Time (T Be)",
                         "Temperature Conversion Time", "Setup Time", "Page Programming Time (Tpp)",
                         "Page Program Time (Tprog)", "Page Program Time (Tpp)",
-                        "Thermal Time Constant", "Hold Time", "Phase Jitter",
+                        "Reverse Recovery Time (Trr)", "Thermal Time Constant", "Hold Time", "Phase Jitter",
                         "Action Time (Ton)", "Cycle-to-Cycle Jitter",
                         "Period Jitter", "Operate Time", "Release Time",
                         "Time to First Fix", "Propagation Delay Tp Lh/Tp Hl"]) and isinstance(value, str) and ("," in value or ";" in value):
