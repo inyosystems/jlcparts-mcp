@@ -2297,6 +2297,7 @@ WEB_FILE_FORMAT_VERSION = 4
 LOOKUP_BUCKET_SIZE_DEFAULT = 100000
 MAX_COMPONENTS_PER_SHARD_DEFAULT = 1000
 BROWSE_COMPONENTS_PER_SHARD_DEFAULT = 20000
+GZIP_COMPRESSLEVEL = 6
 TRIGRAM_SIZE = 3
 MAX_TRIGRAM_BUCKET_ROWS = 100000
 TRIGRAM_GROUP_PREFIX_SIZE = 2
@@ -2343,13 +2344,14 @@ def _stableComponentFilebase(catName, subcatName):
 
 def _writeJsonArtifact(data, filename, compress=False):
     openFn = gzip.open if compress else open
-    with openFn(filename, "wt", encoding="utf-8") as f:
+    kwargs = {"compresslevel": GZIP_COMPRESSLEVEL} if compress else {}
+    with openFn(filename, "wt", encoding="utf-8", **kwargs) as f:
         json.dump(data, f, separators=(",", ":"), sort_keys=True)
     return sha256file(filename)
 
 
 def _writeJsonLinesArtifact(rows, filename):
-    with gzip.open(filename, "wt", encoding="utf-8") as f:
+    with gzip.open(filename, "wt", encoding="utf-8", compresslevel=GZIP_COMPRESSLEVEL) as f:
         for row in rows:
             json.dump(row, f, separators=(",", ":"), sort_keys=False)
             f.write("\n")
@@ -2367,7 +2369,10 @@ def _isUsableCategory(catName, subcatName):
 def _componentRows(components, subcategoryId, attributeLut):
     rows = [COMPONENT_ROW_SCHEMA]
     for component in components:
-        values = extractComponent(component, COMPONENT_SOURCE_SCHEMA)
+        values = component.get("_componentValues")
+        if values is None:
+            values = extractComponent(component, COMPONENT_SOURCE_SCHEMA)
+            component["_componentValues"] = values
         attrIds = [
             updateLut(attributeLut, [name, value])
             for name, value in values[COMPONENT_ROW_SCHEMA["attributes"]].items()
@@ -2389,6 +2394,13 @@ def _componentRows(components, subcategoryId, attributeLut):
 
 
 def _componentSearchText(component):
+    values = component.get("_componentValues")
+    if values is not None:
+        return " ".join([
+            str(values[COMPONENT_ROW_SCHEMA["lcsc"]]),
+            str(values[COMPONENT_ROW_SCHEMA["mfr"]]),
+            str(values[COMPONENT_ROW_SCHEMA["description"]]),
+        ]).lower()
     return " ".join([
         str(component.get("lcsc", "")),
         str(component.get("mfr", "")),
@@ -2519,7 +2531,7 @@ def _writeTrigramIndexes(searchIndexPath, outdir, files, totalComponents, trigra
     for group, tempPath in sorted(groupTempFiles.items()):
         filename = _trigramGroupFileName(group)
         outPath = os.path.join(outdir, filename)
-        with open(tempPath, "rt", encoding="utf-8") as src, gzip.open(outPath, "wt", encoding="utf-8") as dst:
+        with open(tempPath, "rt", encoding="utf-8") as src, gzip.open(outPath, "wt", encoding="utf-8", compresslevel=GZIP_COMPRESSLEVEL) as dst:
             shutil.copyfileobj(src, dst)
         fileHash = sha256file(outPath)
         files[filename] = {
@@ -2618,7 +2630,10 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
     categoryId = 0
     searchIndexFilename = "search-index.tsv.gz"
     searchIndexPath = os.path.join(outdir, searchIndexFilename)
-    searchIndexFile = gzip.open(searchIndexPath, "wt", encoding="utf-8")
+    searchIndexFile = gzip.open(
+        searchIndexPath, "wt", encoding="utf-8",
+        compresslevel=GZIP_COMPRESSLEVEL
+    )
 
     try:
         for catName, subcategories in sortedCategories:
@@ -2721,6 +2736,7 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
                 categoryEntry["browseShards"].extend(browseShardNames)
     finally:
         searchIndexFile.close()
+        lib.finalizeBuild()
 
     searchIndexHash = sha256file(searchIndexPath)
     files[searchIndexFilename] = {
@@ -2773,4 +2789,3 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
         "files": files,
     }
     _writeJsonArtifact(manifest, os.path.join(outdir, "manifest.json"), compress=False)
-    lib.finalizeBuild()
