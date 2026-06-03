@@ -184,6 +184,7 @@ ISOLATION_FLAG_VALUES = {
     "yes": 1,
     "no": 0,
     "non-insulated": 0,
+    "non-isolated": 0,
     "-": "NaN",
 }
 
@@ -1461,7 +1462,7 @@ def normalizeAttribute(key, value):
                     "synchronous rectifier": [has_synchronous_rectifier, "count"],
                 },
             }
-        elif key in larr(["Whether the Isolation"]):
+        elif key in larr(["Output Isolation", "Whether the Isolation"]):
             is_isolated = ISOLATION_FLAG_VALUES.get(str(value).strip().lower(), "NaN")
             value = {
                 "format": "${is isolated}",

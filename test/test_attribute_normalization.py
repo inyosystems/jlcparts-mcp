@@ -3705,11 +3705,13 @@ def test_synchronous_rectifier_attribute(key, value, expected, capsys):
         ("Isolation", 1),
         ("NO", 0),
         ("Non-Insulated", 0),
+        ("Non-isolated", 0),
         ("-", "NaN"),
     ],
 )
-def test_whether_the_isolation_attribute(value, expected, capsys):
-    values = normalized_values("Whether the Isolation", value, capsys)
+@pytest.mark.parametrize("key", ["Output Isolation", "Whether the Isolation"])
+def test_isolation_flag_attribute(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
 
     assert_quantity(values["is isolated"], expected, "count")
 
