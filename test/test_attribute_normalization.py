@@ -3558,6 +3558,17 @@ def test_types_attribute(capsys):
     assert values["type 1"] == ["Unspecified", "identifier"]
 
 
+def test_conversion_type_identifiers(capsys):
+    values = normalized_values("Conversion Type", "AC-DC, AC/DC-DC", capsys)
+
+    assert values["conversion type 1"] == ["AC-DC", "identifier"]
+    assert values["conversion type 2"] == ["AC/DC-DC", "identifier"]
+
+    values = normalized_values("Conversion Type", "-", capsys)
+
+    assert values["conversion type 1"] == ["Unspecified", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
