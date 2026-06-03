@@ -2567,6 +2567,14 @@ def test_applicable_cable_type_identifiers(capsys):
     assert values["cable type 3"] == ["Round Cable", "identifier"]
 
 
+def test_circuit_type_identifiers(capsys):
+    values = normalized_values("Circuit Type", "Independent, Isolation, -", capsys)
+
+    assert values["circuit type 1"] == ["Independent", "identifier"]
+    assert values["circuit type 2"] == ["Isolation", "identifier"]
+    assert values["circuit type 3"] == ["Unspecified", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [

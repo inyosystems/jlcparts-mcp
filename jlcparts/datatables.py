@@ -325,6 +325,10 @@ OSCILLATOR_CIRCUIT_ALIASES = {
     "-": "Unspecified",
 }
 
+CIRCUIT_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
 FUSE_TYPE_ALIASES = {
     "-": "Unspecified",
 }
@@ -1429,6 +1433,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "technology", aliases=TECHNOLOGY_ALIASES)
         elif key in larr(["Oscillator Circuit"]):
             value = attributes.identifierListAttribute(value, "oscillator circuit", aliases=OSCILLATOR_CIRCUIT_ALIASES)
+        elif key in larr(["Circuit Type"]):
+            value = attributes.identifierListAttribute(value, "circuit type", aliases=CIRCUIT_TYPE_ALIASES)
         elif key in larr(["Drive Motor Type"]):
             value = attributes.identifierListAttribute(value, "motor type", aliases=DRIVE_MOTOR_TYPE_ALIASES)
         elif key in larr(["Drive Type"]):
