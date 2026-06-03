@@ -3034,6 +3034,23 @@ def test_reference_type_identifiers(capsys):
     assert values["reference type 1"] == ["Unspecified", "identifier"]
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Built-in", "Built-In"),
+        ("内置", "Built-In"),
+        ("External", "External"),
+        ("外置", "External"),
+        ("Non Built-In", "External"),
+        ("-", "Unspecified"),
+    ],
+)
+def test_switch_tube_identifiers(value, expected, capsys):
+    values = normalized_values("Switch Tube (Built-in/External)", value, capsys)
+
+    assert values["switch tube 1"] == [expected, "identifier"]
+
+
 def test_technology_identifiers(capsys):
     values = normalized_values("Technology", "E-mode", capsys)
 
