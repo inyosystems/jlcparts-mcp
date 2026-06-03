@@ -4342,6 +4342,15 @@ def test_jacket_color_identifiers(capsys):
     assert values["color 1"] == ["None", "identifier"]
 
 
+def test_jacket_type_identifiers(capsys):
+    values = normalized_values("Jacket Type", "Uninsulated, Pre-insulated, Fully insulated, Heat shrink tube", capsys)
+
+    assert values["jacket type 1"] == ["Uninsulated", "identifier"]
+    assert values["jacket type 2"] == ["Pre-Insulated", "identifier"]
+    assert values["jacket type 3"] == ["Fully Insulated", "identifier"]
+    assert values["jacket type 4"] == ["Heat Shrink Tube", "identifier"]
+
+
 def test_plastic_color_identifiers(capsys):
     values = normalized_values("Plastic Color", "Non-Plastic", capsys)
 

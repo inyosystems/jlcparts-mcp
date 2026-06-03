@@ -536,6 +536,12 @@ HOLDER_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+JACKET_TYPE_ALIASES = {
+    "Pre-insulated": "Pre-Insulated",
+    "Fully insulated": "Fully Insulated",
+    "Heat shrink tube": "Heat Shrink Tube",
+}
+
 MOUNTING_TYPE_ALIASES = {
     "Base installation": "Base Mount",
     "Bolt Mounting": "Bolt Mount",
@@ -1439,6 +1445,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "gender", aliases=GENDER_ALIASES)
         elif key in larr(["Holder Type", "Fuseholder Type"]):
             value = attributes.identifierListAttribute(value, "holder type", aliases=HOLDER_TYPE_ALIASES)
+        elif key in larr(["Jacket Type"]):
+            value = attributes.identifierListAttribute(value, "jacket type", aliases=JACKET_TYPE_ALIASES)
         elif key in larr(["Fuse Type"]):
             value = attributes.identifierListAttribute(value, "fuse type", aliases=FUSE_TYPE_ALIASES)
         elif key in larr(["Style"]):
