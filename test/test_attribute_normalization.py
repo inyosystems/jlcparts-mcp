@@ -3716,6 +3716,15 @@ def test_control_input_logic_attribute(capsys):
     assert values["control input logic 1"] == ["Unspecified", "identifier"]
 
 
+def test_coding_scheme_attribute(capsys):
+    values = normalized_values("Coding Scheme", "D Code, A Code, B Code, X Code", capsys)
+
+    assert values["coding scheme 1"] == ["D Code", "identifier"]
+    assert values["coding scheme 2"] == ["A Code", "identifier"]
+    assert values["coding scheme 3"] == ["B Code", "identifier"]
+    assert values["coding scheme 4"] == ["X Code", "identifier"]
+
+
 def test_hole_shape_attribute(capsys):
     values = normalized_values("Circular Hole/Square Hole", "Square Holes, Round Hole, -", capsys)
 

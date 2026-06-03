@@ -1430,6 +1430,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "logic gate", aliases=LOGIC_GATE_TYPE_ALIASES)
         elif key in larr(["Control Input Logic"]):
             value = attributes.identifierListAttribute(value, "control input logic", aliases=CONTROL_INPUT_LOGIC_ALIASES)
+        elif key in larr(["Coding Scheme"]):
+            value = attributes.identifierListAttribute(value, "coding scheme")
         elif key in larr(["Circular Hole/Square Hole"]):
             value = attributes.identifierListAttribute(value, "hole shape", aliases=HOLE_SHAPE_ALIASES)
         elif key in larr(["Antenna Type"]):
