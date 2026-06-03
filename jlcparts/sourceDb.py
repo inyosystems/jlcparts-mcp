@@ -90,6 +90,22 @@ def _parameterAttributes(parameters):
     return attributes
 
 
+def _jlcPayloadAttributes(payload):
+    attributes = _parameterAttributes(payload.get("parameters", []))
+    for sourceKey, attrName in [
+        ("assemblyProcess", "Assembly Process"),
+        ("assemblyMode", "Assembly Mode"),
+        ("lossNumber", "Attrition"),
+        ("leastNumber", "Minimum Order Quantity"),
+        ("leastPatchNumber", "Minimum Placement Quantity"),
+        ("minPurchaseNum", "Minimum Purchase Quantity"),
+    ]:
+        value = payload.get(sourceKey)
+        if value is not None and value != "":
+            attributes[attrName] = str(value)
+    return attributes
+
+
 def _slugifyModel(value):
     value = re.sub(r"[^A-Za-z0-9]+", "-", value or "")
     return re.sub(r"-+", "-", value).strip("-").lower()
@@ -195,7 +211,7 @@ def _jlcSourceFromPayload(payload, lcsc=None):
         "datasheet": _datasheet(payload),
         "stock": int(payload.get("stockCount", 0) or 0),
         "price": _priceRangesToCsv(payload.get("priceRanges", [])),
-        "attributes": _parameterAttributes(payload.get("parameters", [])),
+        "attributes": _jlcPayloadAttributes(payload),
         "rohs": payload.get("rohsFlag"),
         "eccn": payload.get("eccnCode") or "",
         "assembly": payload.get("assemblyComponentFlag"),
@@ -345,6 +361,38 @@ class SourceDb:
     def vacuum(self):
         self.conn.execute("VACUUM")
 
+    def setMeta(self, key, value):
+        self.conn.execute("""
+            INSERT INTO meta(key, value) VALUES (?, ?)
+            ON CONFLICT(key) DO UPDATE SET value = excluded.value
+            """, (str(key), str(value)))
+        self._commit()
+
+    def setMetas(self, values):
+        self.conn.executemany("""
+            INSERT INTO meta(key, value) VALUES (?, ?)
+            ON CONFLICT(key) DO UPDATE SET value = excluded.value
+            """, [(str(key), str(value)) for key, value in values.items()])
+        self._commit()
+
+    def getMeta(self, key, default=None):
+        row = self.conn.execute(
+            "SELECT value FROM meta WHERE key = ? LIMIT 1",
+            (str(key),),
+        ).fetchone()
+        return default if row is None else row["value"]
+
+    def metaDict(self):
+        return {
+            row["key"]: row["value"]
+            for row in self.conn.execute("SELECT key, value FROM meta")
+        }
+
+    def componentCount(self):
+        return self.conn.execute("""
+            SELECT COUNT(*) FROM jlc_components WHERE present = 1
+            """).fetchone()[0]
+
     def prepareBuild(self):
         self.conn.executescript("""
             CREATE INDEX IF NOT EXISTS jlc_components_build_category
@@ -381,7 +429,98 @@ class SourceDb:
         row = _jlcSourceFromPayload(payload)
         self._upsertJlc(row, present=1, syncSeen=flag)
 
+    def updateWebsiteEnrichment(self, lcscNumber, enrichment):
+        if not isinstance(enrichment, dict):
+            return False
+
+        lcsc = lcscToDb(lcscNumber)
+        row = self.conn.execute("""
+            SELECT attrition, attributes
+            FROM jlc_components
+            WHERE lcsc = ? AND present = 1
+            LIMIT 1
+            """, (lcsc,)).fetchone()
+        if row is None:
+            return False
+
+        attrition = _jsonLoadsDict(row["attrition"])
+        attributes = _jsonLoadsDict(row["attributes"])
+        for key in ["lossNumber", "leastNumber", "leastPatchNumber", "minPurchaseNum"]:
+            value = enrichment.get(key)
+            if value is not None:
+                attrition[key] = value
+        for sourceKey, attrName in [
+            ("assemblyProcess", "Assembly Process"),
+            ("assemblyMode", "Assembly Mode"),
+            ("lossNumber", "Attrition"),
+            ("leastNumber", "Minimum Order Quantity"),
+            ("leastPatchNumber", "Minimum Placement Quantity"),
+            ("minPurchaseNum", "Minimum Purchase Quantity"),
+        ]:
+            value = enrichment.get(sourceKey)
+            if value is not None and value != "":
+                attributes[attrName] = str(value)
+
+        self.conn.execute("""
+            UPDATE jlc_components
+            SET
+                assembly_process = COALESCE(?, assembly_process),
+                assembly_mode = COALESCE(?, assembly_mode),
+                website_component_id = COALESCE(?, website_component_id),
+                attributes = ?,
+                attrition = ?
+            WHERE lcsc = ? AND present = 1
+            """, (
+                enrichment.get("assemblyProcess"),
+                enrichment.get("assemblyMode"),
+                None if enrichment.get("websiteComponentId") is None else str(enrichment.get("websiteComponentId")),
+                _jsonDumps(attributes),
+                _jsonDumps(attrition),
+                lcsc,
+            ))
+        self._commit()
+        return True
+
+    def iterWebsiteEnrichmentCandidates(self, includeExisting=False, limit=None, fetchSize=1000):
+        where = "present = 1"
+        if not includeExisting:
+            where += " AND website_component_id IS NULL"
+        limitSql = "" if limit is None else "LIMIT ?"
+        params = [] if limit is None else [int(limit)]
+        cursor = self.conn.execute(f"""
+            SELECT lcsc
+            FROM jlc_components
+            WHERE {where}
+            ORDER BY lcsc
+            {limitSql}
+            """, params)
+        while True:
+            rows = cursor.fetchmany(fetchSize)
+            if not rows:
+                break
+            for row in rows:
+                yield lcscFromDb(row["lcsc"])
+
     def _upsertJlc(self, row, present=1, syncSeen=1):
+        existing = self.conn.execute("""
+            SELECT attributes
+            FROM jlc_components
+            WHERE lcsc = ?
+            LIMIT 1
+            """, (row["lcsc"],)).fetchone()
+        if existing is not None:
+            existingAttributes = _jsonLoadsDict(existing["attributes"])
+            for attrName in [
+                "Assembly Process",
+                "Assembly Mode",
+                "Attrition",
+                "Minimum Order Quantity",
+                "Minimum Placement Quantity",
+                "Minimum Purchase Quantity",
+            ]:
+                if attrName in existingAttributes and attrName not in row["attributes"]:
+                    row["attributes"][attrName] = existingAttributes[attrName]
+
         now = int(time.time())
         lastOnStock = now if int(row["stock"]) != 0 else None
         self.conn.execute("""
@@ -420,10 +559,13 @@ class SourceDb:
                 rohs = excluded.rohs,
                 eccn = excluded.eccn,
                 assembly = excluded.assembly,
-                assembly_process = excluded.assembly_process,
-                assembly_mode = excluded.assembly_mode,
-                website_component_id = excluded.website_component_id,
-                attrition = excluded.attrition
+                assembly_process = COALESCE(excluded.assembly_process, jlc_components.assembly_process),
+                assembly_mode = COALESCE(excluded.assembly_mode, jlc_components.assembly_mode),
+                website_component_id = COALESCE(excluded.website_component_id, jlc_components.website_component_id),
+                attrition = CASE
+                    WHEN excluded.attrition != '{}' THEN excluded.attrition
+                    ELSE jlc_components.attrition
+                END
             """, (
                 row["lcsc"], now, present, syncSeen, row["category"], row["subcategory"],
                 row["mfr"], row["package"], row["joints"], row["manufacturer"],

@@ -1,4 +1,5 @@
 from multiprocessing import Pool
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import os
 import time
@@ -61,6 +62,311 @@ def apiComponentToDbComponent(component):
         "jlc_extra": c["jlcExtra"],
         "jlc_raw": component,
     }
+
+
+def refreshSourceDb(
+    db,
+    checkpoint=None,
+    max_seconds=None,
+    age=0,
+    limit=10000,
+    retries=10,
+    retry_delay=5,
+    verbose=False,
+    credentials=None,
+    enrich_website=False,
+):
+    """
+    Fetch JLC PCB component data directly into a SourceDb cache.
+    """
+    from .jlcpcb import (
+        createComponentInterface,
+        enrichComponentsFromWebsite,
+        loadCheckpoint,
+        writeCheckpoint,
+    )
+
+    if max_seconds is not None and checkpoint is None:
+        raise RuntimeError("max-seconds requires a checkpoint so the fetch can resume")
+
+    OLD = 0
+    REFRESHED = 1
+
+    lib = SourceDb(db)
+    lib.setMeta("last_refresh_started_at", str(int(time.time())))
+    checkpointState = loadCheckpoint(checkpoint)
+    count = int(checkpointState.get("count", 0))
+    done = False
+    missing = set()
+
+    if checkpointState.get("done"):
+        component_count = lib.componentCount()
+        if checkpoint and os.path.exists(checkpoint):
+            os.remove(checkpoint)
+        lib.close()
+        return {
+            "done": True,
+            "count": count,
+            "checkpointed": False,
+            "component_count": component_count,
+        }
+
+    try:
+        if not checkpointState:
+            with lib.startTransaction():
+                lib.resetFlag(value=OLD)
+
+        interf = createComponentInterface(
+            lastKey=checkpointState.get("lastKey"),
+            credentials=credentials,
+        )
+        start = time.monotonic()
+
+        while True:
+            if max_seconds is not None and time.monotonic() - start >= max_seconds:
+                writeCheckpoint(checkpoint, db, interf.lastPage, count, False)
+                break
+
+            for i in range(retries):
+                try:
+                    page = interf.getPage()
+                    break
+                except Exception as e:
+                    if i == retries - 1:
+                        raise e from None
+                    time.sleep(retry_delay)
+            if page is None:
+                with lib.startTransaction():
+                    lib.removeWithFlag(value=OLD)
+                if checkpoint and os.path.exists(checkpoint):
+                    os.remove(checkpoint)
+                done = True
+                break
+
+            if enrich_website:
+                page = enrichComponentsFromWebsite(page)
+
+            with lib.startTransaction():
+                for apiComponent in page:
+                    isNew = not lib.exists(apiComponent["componentCode"])
+                    lib.updateJlcPayload(apiComponent, flag=REFRESHED)
+                    if isNew:
+                        missing.add(apiComponent["componentCode"])
+
+            count += len(page)
+            if verbose:
+                print(f"Fetched {count}")
+            writeCheckpoint(checkpoint, db, interf.lastPage, count, False)
+
+        refreshExtraData(lib, missing, age, limit)
+        component_count = lib.componentCount()
+        if done:
+            lib.setMetas({
+                "last_successful_refresh": str(int(time.time())),
+                "last_refresh_count": count,
+                "component_count": component_count,
+                "last_refresh_error": "",
+            })
+        if verbose:
+            print("Fetch complete" if done else "Fetch checkpointed")
+        return {
+            "done": done,
+            "count": count,
+            "checkpointed": not done,
+            "component_count": component_count,
+            "website_enrichment": bool(enrich_website),
+        }
+    except Exception as e:
+        lib.setMeta("last_refresh_error", f"{type(e).__name__}: {e}")
+        raise
+    finally:
+        lib.close()
+
+
+def enrichWebsiteDetails(
+    db,
+    limit=None,
+    include_existing=False,
+    workers=8,
+    verbose=False,
+    query_cache=None,
+):
+    """
+    Enrich an existing SourceDb cache with best-effort JLCPCB website fields.
+    """
+    from .jlcpcb import _website_component_enrichment
+    from .query_cache import build_query_cache
+
+    lib = None
+    try:
+        lib = SourceDb(db)
+        started_at = int(time.time())
+        lib.setMetas({
+            "last_website_enrichment_started_at": str(started_at),
+            "last_website_enrichment_error": "",
+        })
+        candidates = list(lib.iterWebsiteEnrichmentCandidates(
+            includeExisting=include_existing,
+            limit=limit,
+        ))
+        total = len(candidates)
+        enriched = 0
+        failed = 0
+        started = time.monotonic()
+        executor = ThreadPoolExecutor(max_workers=max(1, int(workers)))
+        futures = {
+            executor.submit(_website_component_enrichment, lcsc): lcsc
+            for lcsc in candidates
+        }
+        try:
+            for index, future in enumerate(as_completed(futures), start=1):
+                lcsc = futures[future]
+                try:
+                    enrichment = future.result()
+                    if lib.updateWebsiteEnrichment(lcsc, enrichment):
+                        enriched += 1
+                        if verbose:
+                            print(f"  {lcsc} enriched. {(index / total * 100):.2f} %")
+                    else:
+                        failed += 1
+                        if verbose:
+                            print(f"  {lcsc} skipped; not present in cache. {(index / total * 100):.2f} %")
+                except Exception as e:
+                    failed += 1
+                    if verbose:
+                        print(f"  {lcsc} skipped. {(index / total * 100):.2f} % ({type(e).__name__}: {e})")
+        except BaseException:
+            executor.shutdown(wait=False, cancel_futures=True)
+            lib.close()
+            raise
+        else:
+            executor.shutdown(wait=True)
+
+        completed_at = int(time.time())
+        lib.setMetas({
+            "last_successful_website_enrichment": str(completed_at),
+            "last_website_enrichment_count": str(enriched),
+            "last_website_enrichment_failed": str(failed),
+            "last_website_enrichment_candidate_count": str(total),
+            "last_website_enrichment_seconds": f"{time.monotonic() - started:.2f}",
+            "last_website_enrichment_error": "",
+        })
+        lib.close()
+    except Exception as e:
+        try:
+            if lib is not None:
+                lib.setMeta("last_website_enrichment_error", f"{type(e).__name__}: {e}")
+                lib.close()
+        except Exception:
+            pass
+        raise
+
+    rebuilt_query_cache = False
+    if query_cache:
+        build_query_cache(db, query_cache)
+        rebuilt_query_cache = True
+
+    return {
+        "candidate_count": total,
+        "enriched": enriched,
+        "failed": failed,
+        "seconds": time.monotonic() - started,
+        "rebuilt_query_cache": rebuilt_query_cache,
+    }
+
+
+def _credentialsFromOptions(app_id, access_key, secret_key):
+    from .jlcpcb import JlcPcbCredentials
+
+    return JlcPcbCredentials(
+        app_id=app_id or os.environ.get("JLCPCB_APP_ID"),
+        access_key=access_key or os.environ.get("JLCPCB_ACCESS_KEY"),
+        secret_key=secret_key or os.environ.get("JLCPCB_SECRET_KEY"),
+    )
+
+
+def _defaultQueryCachePath(cache):
+    return os.path.join(os.path.dirname(cache), "query-cache.sqlite3")
+
+
+def _defaultCheckpointPath(cache):
+    return os.path.join(os.path.dirname(cache), "refresh-checkpoint.json")
+
+
+@click.command("refresh-cache")
+@click.option("--cache", "cache_path", default="~/.cache/jlcparts/cache.sqlite3",
+    help="Source cache SQLite path")
+@click.option("--query-cache", default=None,
+    help="Query index SQLite path")
+@click.option("--checkpoint", default=None,
+    help="Read/write a checkpoint JSON for resumable refreshes")
+@click.option("--max-seconds", type=int, default=None,
+    help="Stop after roughly this many seconds and save the checkpoint")
+@click.option("--age", type=int, default=0,
+    help="Automatically discard n oldest LCSC extra records and fetch them again")
+@click.option("--limit", type=int, default=10000,
+    help="Limit number of newly added LCSC extra records")
+@click.option("--retries", type=int, default=10,
+    help="Retry failed JLCPCB API pages this many times")
+@click.option("--retry-delay", type=int, default=5,
+    help="Wait this many seconds between JLCPCB API retries")
+@click.option("--jlcpcb-app-id", default=None,
+    help="JLCPCB OpenAPI app id")
+@click.option("--jlcpcb-access-key", default=None,
+    help="JLCPCB OpenAPI access key")
+@click.option("--jlcpcb-secret-key", default=None,
+    help="JLCPCB OpenAPI secret key")
+@click.option("--verbose", is_flag=True,
+    help="Be verbose")
+def refreshCache(cache_path, query_cache, checkpoint, max_seconds, age, limit,
+                 retries, retry_delay, jlcpcb_app_id, jlcpcb_access_key,
+                 jlcpcb_secret_key, verbose):
+    """
+    Run or resume a full official JLCPCB OpenAPI cache refresh.
+    """
+    from .query_cache import build_query_cache
+
+    cache_path = os.path.abspath(os.path.expanduser(cache_path))
+    query_cache = os.path.abspath(os.path.expanduser(
+        query_cache or _defaultQueryCachePath(cache_path)
+    ))
+    checkpoint = os.path.abspath(os.path.expanduser(
+        checkpoint or _defaultCheckpointPath(cache_path)
+    ))
+    os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+    os.makedirs(os.path.dirname(query_cache), exist_ok=True)
+    result = refreshSourceDb(
+        cache_path,
+        checkpoint=checkpoint,
+        max_seconds=max_seconds,
+        age=age,
+        limit=limit,
+        retries=retries,
+        retry_delay=retry_delay,
+        verbose=verbose,
+        credentials=_credentialsFromOptions(
+            jlcpcb_app_id,
+            jlcpcb_access_key,
+            jlcpcb_secret_key,
+        ),
+        enrich_website=False,
+    )
+    rebuilt_query_cache = False
+    if result.get("done"):
+        build_query_cache(cache_path, query_cache)
+        rebuilt_query_cache = True
+    print(json.dumps({
+        "cache_path": cache_path,
+        "query_cache_path": query_cache,
+        "checkpoint_path": checkpoint,
+        "refresh_result": result,
+        "rebuilt_query_cache": rebuilt_query_cache,
+        "monitoring": (
+            "If refresh_result.checkpointed is true, rerun this command with "
+            "the same cache/checkpoint paths to resume."
+        ),
+    }, indent=2, sort_keys=True))
+
 
 @click.command()
 @click.argument("source", type=click.Path(dir_okay=False, exists=True))
@@ -129,79 +435,50 @@ def getLibrary(source, db, age, limit, partial, skip):
     help="Wait this many seconds between JLCPCB API retries")
 @click.option("--verbose", is_flag=True,
     help="Be verbose")
-def fetchDb(db, checkpoint, max_seconds, age, limit, retries, retry_delay, verbose):
+@click.option("--enrich-website", is_flag=True,
+    help="Also fetch best-effort JLCPCB website enrichment during refresh")
+def fetchDb(db, checkpoint, max_seconds, age, limit, retries, retry_delay, verbose, enrich_website):
     """
     Fetch JLC PCB component data directly into DB.
     """
-    from .jlcpcb import (
-        createComponentInterface,
-        enrichComponentsFromWebsite,
-        loadCheckpoint,
-        writeCheckpoint,
+    refreshSourceDb(
+        db,
+        checkpoint=checkpoint,
+        max_seconds=max_seconds,
+        age=age,
+        limit=limit,
+        retries=retries,
+        retry_delay=retry_delay,
+        verbose=verbose,
+        enrich_website=enrich_website,
     )
 
-    if max_seconds is not None and checkpoint is None:
-        raise RuntimeError("max-seconds requires a checkpoint so the fetch can resume")
 
-    OLD = 0
-    REFRESHED = 1
-
-    lib = SourceDb(db)
-    checkpointState = loadCheckpoint(checkpoint)
-    count = int(checkpointState.get("count", 0))
-    done = False
-    missing = set()
-
-    if checkpointState.get("done"):
-        if checkpoint and os.path.exists(checkpoint):
-            os.remove(checkpoint)
-        return
-
-    if not checkpointState:
-        with lib.startTransaction():
-            lib.resetFlag(value=OLD)
-
-    interf = createComponentInterface(lastKey=checkpointState.get("lastKey"))
-    start = time.monotonic()
-
-    while True:
-        if max_seconds is not None and time.monotonic() - start >= max_seconds:
-            writeCheckpoint(checkpoint, db, interf.lastPage, count, False)
-            break
-
-        for i in range(retries):
-            try:
-                page = interf.getPage()
-                break
-            except Exception as e:
-                if i == retries - 1:
-                    raise e from None
-                time.sleep(retry_delay)
-        if page is None:
-            with lib.startTransaction():
-                lib.removeWithFlag(value=OLD)
-            if checkpoint and os.path.exists(checkpoint):
-                os.remove(checkpoint)
-            done = True
-            break
-
-        page = enrichComponentsFromWebsite(page)
-
-        with lib.startTransaction():
-            for apiComponent in page:
-                isNew = not lib.exists(apiComponent["componentCode"])
-                lib.updateJlcPayload(apiComponent, flag=REFRESHED)
-                if isNew:
-                    missing.add(apiComponent["componentCode"])
-
-        count += len(page)
-        if verbose:
-            print(f"Fetched {count}")
-        writeCheckpoint(checkpoint, db, interf.lastPage, count, False)
-
-    refreshExtraData(lib, missing, age, limit)
-    if verbose:
-        print("Fetch complete" if done else "Fetch checkpointed")
+@click.command("enrich-website")
+@click.argument("db", type=click.Path(dir_okay=False, exists=True, writable=True))
+@click.option("--limit", type=int, default=None,
+    help="Enrich at most this many components")
+@click.option("--all", "include_existing", is_flag=True,
+    help="Refresh all present components, including already enriched rows")
+@click.option("--workers", type=int, default=8,
+    help="Number of concurrent website requests")
+@click.option("--query-cache", type=click.Path(dir_okay=False), default=None,
+    help="Rebuild this query cache after enrichment")
+@click.option("--verbose", is_flag=True,
+    help="Be verbose")
+def enrichWebsite(db, limit, include_existing, workers, query_cache, verbose):
+    """
+    Fetch hidden/best-effort JLCPCB website fields for an existing SourceDb.
+    """
+    result = enrichWebsiteDetails(
+        db,
+        limit=limit,
+        include_existing=include_existing,
+        workers=workers,
+        verbose=verbose,
+        query_cache=query_cache,
+    )
+    print(json.dumps(result, indent=2, sort_keys=True))
 
 
 
@@ -327,7 +604,9 @@ cli.add_command(buildwebdb)
 cli.add_command(updatePreferred)
 cli.add_command(migratecache)
 cli.add_command(fetchDetails)
+cli.add_command(refreshCache)
 cli.add_command(fetchDb)
+cli.add_command(enrichWebsite)
 cli.add_command(fetchTable)
 cli.add_command(testComponent)
 

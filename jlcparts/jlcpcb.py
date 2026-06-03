@@ -9,14 +9,11 @@ import re
 import string
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass
 from typing import Optional, List, Any, Callable
 from urllib.parse import unquote
 
 import requests
-
-JLCPCB_APP_ID = os.environ.get("JLCPCB_APP_ID")
-JLCPCB_ACCESS_KEY = os.environ.get("JLCPCB_ACCESS_KEY")
-JLCPCB_SECRET_KEY = os.environ.get("JLCPCB_SECRET_KEY")
 
 JLCPCB_API_HOST = "https://open.jlcpcb.com"
 JLCPCB_COMPONENT_LIST_PATH = "/overseas/openapi/component/getComponentLibraryList"
@@ -190,11 +187,38 @@ def _requireCredential(name: str, value: Optional[str]) -> str:
         raise RuntimeError(f"Missing JLCPCB OpenAPI credential: {name}")
     return value
 
-def createComponentInterface(lastKey: Optional[str] = None) -> "JlcPcbInterface":
+
+@dataclass
+class JlcPcbCredentials:
+    app_id: Optional[str] = None
+    access_key: Optional[str] = None
+    secret_key: Optional[str] = None
+
+    @classmethod
+    def from_env(cls) -> "JlcPcbCredentials":
+        return cls(
+            app_id=os.environ.get("JLCPCB_APP_ID"),
+            access_key=os.environ.get("JLCPCB_ACCESS_KEY"),
+            secret_key=os.environ.get("JLCPCB_SECRET_KEY"),
+        )
+
+    def require(self) -> "JlcPcbCredentials":
+        _requireCredential("JLCPCB_APP_ID", self.app_id)
+        _requireCredential("JLCPCB_ACCESS_KEY", self.access_key)
+        _requireCredential("JLCPCB_SECRET_KEY", self.secret_key)
+        return self
+
+
+def createComponentInterface(lastKey: Optional[str] = None,
+                             credentials: Optional[JlcPcbCredentials] = None) -> "JlcPcbInterface":
+    if isinstance(lastKey, JlcPcbCredentials) and credentials is None:
+        credentials = lastKey
+        lastKey = None
+    credentials = (credentials or JlcPcbCredentials.from_env()).require()
     return JlcPcbInterface(
-        _requireCredential("JLCPCB_APP_ID", JLCPCB_APP_ID),
-        _requireCredential("JLCPCB_ACCESS_KEY", JLCPCB_ACCESS_KEY),
-        _requireCredential("JLCPCB_SECRET_KEY", JLCPCB_SECRET_KEY),
+        credentials.app_id,
+        credentials.access_key,
+        credentials.secret_key,
         lastKey=lastKey
     )
 
@@ -383,6 +407,9 @@ class JlcPcbInterface:
             raise RuntimeError(f"Missing component details for: {missing[:10]}")
         return [detailsByCode[code] for code in codes]
 
+    def getComponentDetails(self, codes: List[str]) -> List[Any]:
+        return self._getComponentDetails(codes)
+
     def getPage(self, limit: Optional[int] = None) -> Optional[List[Any]]:
         if self.done:
             return None
@@ -419,6 +446,34 @@ class JlcPcbInterface:
             }
             for componentSummary in componentList
         ]
+
+
+def live_lookup_component(lcsc, credentials=None, include_website_detail=True):
+    interface = createComponentInterface(credentials=credentials)
+    official_payload = interface.getComponentDetails([lcsc])[0]
+
+    website_detail = None
+    website_error = None
+    sources = ["jlcpcb_openapi"]
+    normalized_source = official_payload
+    if include_website_detail:
+        try:
+            website_detail = _website_component_enrichment(lcsc)
+            normalized_source = _apply_website_enrichment(official_payload, website_detail)
+            sources.append("jlcpcb_website")
+        except Exception as e:
+            website_error = f"{type(e).__name__}: {e}"
+
+    return {
+        "lcsc": lcsc,
+        "fetched_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "sources": sources,
+        "official_payload": official_payload,
+        "website_detail": website_detail,
+        "website_error": website_error,
+        "normalized_component": normalizeComponent(normalized_source),
+    }
+
 
 def dummyReporter(progress) -> None:
     return
