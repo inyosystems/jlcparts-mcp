@@ -3190,6 +3190,20 @@ def test_technology_identifiers(capsys):
     assert values["technology 1"] == ["Unspecified", "identifier"]
 
 
+def test_oscillator_circuit_identifiers(capsys):
+    values = normalized_values("Oscillator Circuit", "Active (driven circuit included)", capsys)
+
+    assert values["oscillator circuit 1"] == ["Active (Built-In Driver Circuit)", "identifier"]
+
+    values = normalized_values("Oscillator Circuit", "Passive (external drive)", capsys)
+
+    assert values["oscillator circuit 1"] == ["Passive (External Drive)", "identifier"]
+
+    values = normalized_values("Oscillator Circuit", "-", capsys)
+
+    assert values["oscillator circuit 1"] == ["Unspecified", "identifier"]
+
+
 def test_drive_motor_type_identifiers(capsys):
     values = normalized_values("Drive Motor Type", "Brush DC Motor", capsys)
 

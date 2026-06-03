@@ -279,6 +279,13 @@ TECHNOLOGY_ALIASES = {
     "-": "Unspecified",
 }
 
+OSCILLATOR_CIRCUIT_ALIASES = {
+    "Active (driven circuit included)": "Active (Built-In Driver Circuit)",
+    "Active (Built-in Driver Circuit)": "Active (Built-In Driver Circuit)",
+    "Passive (external drive)": "Passive (External Drive)",
+    "-": "Unspecified",
+}
+
 RESET_ACTIVE_LEVEL_ALIASES = {
     "-": "Unspecified",
 }
@@ -1232,6 +1239,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "pin type", aliases=PIN_TYPE_ALIASES)
         elif key in larr(["Technology", "Technology Type"]):
             value = attributes.identifierListAttribute(value, "technology", aliases=TECHNOLOGY_ALIASES)
+        elif key in larr(["Oscillator Circuit"]):
+            value = attributes.identifierListAttribute(value, "oscillator circuit", aliases=OSCILLATOR_CIRCUIT_ALIASES)
         elif key in larr(["Drive Motor Type"]):
             value = attributes.identifierListAttribute(value, "motor type", aliases=DRIVE_MOTOR_TYPE_ALIASES)
         elif key in larr(["Reset Active Level"]):
