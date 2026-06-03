@@ -2450,6 +2450,14 @@ def test_default_output_identifiers(capsys):
     assert values["default output 2"] == ["Low Level", "identifier"]
 
 
+def test_channel_type_identifiers(capsys):
+    values = normalized_values("Channel Type", "Bidirectional, Unidirectional, -", capsys)
+
+    assert values["channel type 1"] == ["Bidirectional", "identifier"]
+    assert values["channel type 2"] == ["Unidirectional", "identifier"]
+    assert values["channel type 3"] == ["Unspecified", "identifier"]
+
+
 def test_output_signal_identifiers(capsys):
     values = normalized_values("Output Signal", "LVTTL, LVCMOS", capsys)
 

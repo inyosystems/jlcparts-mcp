@@ -496,6 +496,10 @@ SIGNAL_LEVEL_ALIASES = {
     "-": "Unspecified",
 }
 
+CHANNEL_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
 LOAD_TYPE_ALIASES = {
     "-": "Unspecified",
 }
@@ -1626,6 +1630,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "output level", aliases=SIGNAL_LEVEL_ALIASES)
         elif key in larr(["Default Output"]):
             value = attributes.identifierListAttribute(value, "default output", aliases=SIGNAL_LEVEL_ALIASES)
+        elif key in larr(["Channel Type"]):
+            value = attributes.identifierListAttribute(value, "channel type", aliases=CHANNEL_TYPE_ALIASES)
         elif key in larr(["Output Signal"]):
             value = attributes.identifierListAttribute(value, "output signal", aliases=SIGNAL_LEVEL_ALIASES)
         elif key in larr(["Level Standard"]):
