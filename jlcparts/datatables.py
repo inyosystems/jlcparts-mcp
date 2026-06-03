@@ -290,6 +290,11 @@ FUSE_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+STYLE_ALIASES = {
+    "Bent tip": "Bent Tip",
+    "-": "Unspecified",
+}
+
 VOLTAGE_SUPPLY_SOURCE_ALIASES = {
     "Dual Power": "Dual Supply",
     "Single supply": "Single Supply",
@@ -1322,6 +1327,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "holder type", aliases=HOLDER_TYPE_ALIASES)
         elif key in larr(["Fuse Type"]):
             value = attributes.identifierListAttribute(value, "fuse type", aliases=FUSE_TYPE_ALIASES)
+        elif key in larr(["Style"]):
+            value = attributes.identifierListAttribute(value, "style", aliases=STYLE_ALIASES)
         elif key in larr(["Mounting Type", "Mounting Style", "Mounting Sytle"]):
             value = attributes.identifierListAttribute(value, "mounting type", aliases=MOUNTING_TYPE_ALIASES)
         elif key in larr(["Installation Method"]):

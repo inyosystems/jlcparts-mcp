@@ -3644,6 +3644,16 @@ def test_fuse_type_attribute(capsys):
     assert values["fuse type 1"] == ["Unspecified", "identifier"]
 
 
+def test_style_attribute(capsys):
+    values = normalized_values("Style", "Bent tip", capsys)
+
+    assert values["style 1"] == ["Bent Tip", "identifier"]
+
+    values = normalized_values("Style", "-", capsys)
+
+    assert values["style 1"] == ["Unspecified", "identifier"]
+
+
 def test_mounting_type_attribute(capsys):
     values = normalized_values("Mounting Type", "Surface Mount, Right-Angle, Socket", capsys)
 
