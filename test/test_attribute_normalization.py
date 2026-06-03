@@ -3061,6 +3061,20 @@ def test_chip_type_identifiers(capsys):
     assert values["chip type 1"] == ["Voltage Monitor", "identifier"]
     assert values["chip type 2"] == ["Switch Controller", "identifier"]
 
+    values = normalized_values(
+        "Chip Type Parameters/Description",
+        "立体声音频ADC, Audio decoding chip, Current transmitter",
+        capsys,
+    )
+
+    assert values["chip type 1"] == ["Stereo Audio ADC", "identifier"]
+    assert values["chip type 2"] == ["Audio Decoding IC", "identifier"]
+    assert values["chip type 3"] == ["Current Transmitter", "identifier"]
+
+    values = normalized_values("Chip Type Parameters/Description", "-", capsys)
+
+    assert values["chip type 1"] == ["Unspecified", "identifier"]
+
 
 def test_power_management_type_identifiers(capsys):
     values = normalized_values("Type of the Power Management Chip", "Simple reset/Power-on reset", capsys)

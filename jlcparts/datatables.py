@@ -124,6 +124,8 @@ ACTUATOR_STYLE_ALIASES = {
 }
 
 CHIP_TYPE_ALIASES = {
+    "Audio decoding chip": "Audio Decoding IC",
+    "Current transmitter": "Current Transmitter",
     "Voltage monitor": "Voltage Monitor",
     "Current monitor": "Current Monitor",
     "Power monitor": "Power Monitor",
@@ -135,6 +137,8 @@ CHIP_TYPE_ALIASES = {
     "电池保护芯片": "Battery Protection IC",
     "Boost charging chip": "Boost Charging IC",
     "开关控制器": "Switch Controller",
+    "立体声音频ADC": "Stereo Audio ADC",
+    "-": "Unspecified",
 }
 
 POWER_MANAGEMENT_TYPE_ALIASES = {
@@ -1208,7 +1212,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "actuator type", aliases=ACTUATOR_STYLE_ALIASES)
         elif key in larr(["Actuator Identifier"]):
             value = attributes.identifierListAttribute(value, "actuator marking", aliases=ACTUATOR_MARKING_ALIASES)
-        elif key in larr(["The Chip Type", "Chip Type"]):
+        elif key in larr(["The Chip Type", "Chip Type", "Chip Type Parameters/Description"]):
             value = attributes.identifierListAttribute(value, "chip type", aliases=CHIP_TYPE_ALIASES)
         elif key in larr(["Type of the Power Management Chip"]):
             value = attributes.identifierListAttribute(value, "power management type", separators=",;/", aliases=POWER_MANAGEMENT_TYPE_ALIASES)
