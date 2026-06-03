@@ -376,6 +376,11 @@ CONTROL_INPUT_LOGIC_ALIASES = {
     "-": "Unspecified",
 }
 
+HOLE_SHAPE_ALIASES = {
+    "Square Holes": "Square Hole",
+    "-": "Unspecified",
+}
+
 DRIVE_MOTOR_TYPE_ALIASES = {
     "Brush DC Motor": "Brushed DC Motor",
     "Brushless DC Motor": "Brushless DC Motor",
@@ -1414,6 +1419,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "logic gate", aliases=LOGIC_GATE_TYPE_ALIASES)
         elif key in larr(["Control Input Logic"]):
             value = attributes.identifierListAttribute(value, "control input logic", aliases=CONTROL_INPUT_LOGIC_ALIASES)
+        elif key in larr(["Circular Hole/Square Hole"]):
+            value = attributes.identifierListAttribute(value, "hole shape", aliases=HOLE_SHAPE_ALIASES)
         elif key in larr(["Antenna Type"]):
             value = attributes.identifierListAttribute(value, "antenna type")
         elif key in larr(["Polarization Type"]):

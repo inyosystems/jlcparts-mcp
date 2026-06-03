@@ -3716,6 +3716,14 @@ def test_control_input_logic_attribute(capsys):
     assert values["control input logic 1"] == ["Unspecified", "identifier"]
 
 
+def test_hole_shape_attribute(capsys):
+    values = normalized_values("Circular Hole/Square Hole", "Square Holes, Round Hole, -", capsys)
+
+    assert values["hole shape 1"] == ["Square Hole", "identifier"]
+    assert values["hole shape 2"] == ["Round Hole", "identifier"]
+    assert values["hole shape 3"] == ["Unspecified", "identifier"]
+
+
 def test_antenna_type_attribute(capsys):
     values = normalized_values("Antenna Type", "Stamp Hole Antenna, IPEX interface", capsys)
 
