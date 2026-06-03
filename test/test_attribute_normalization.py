@@ -2621,6 +2621,20 @@ def test_alarm_clock_output_flag(value, expected, capsys):
     ("value", "expected"),
     [
         ("Yes", 1),
+        ("No", 0),
+        ("-", "NaN"),
+    ],
+)
+def test_charge_pump_flag(value, expected, capsys):
+    values = normalized_values("Charge Pump", value, capsys)
+
+    assert_quantity(values["charge pump"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
         ("With Card Detect", 1),
         ("No", 0),
         ("No Card Detect", 0),

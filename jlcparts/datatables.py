@@ -1542,6 +1542,15 @@ def normalizeAttribute(key, value):
                     "alarm clock output": [has_alarm_clock_output, "count"],
                 },
             }
+        elif key in larr(["Charge Pump"]):
+            has_charge_pump = YES_NO_UNKNOWN_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${charge pump}",
+                "primary": "charge pump",
+                "values": {
+                    "charge pump": [has_charge_pump, "count"],
+                },
+            }
         elif key in larr(["Logic Type"]):
             value = attributes.identifierListAttribute(value, "logic type")
         elif key in larr(["Logic Gate Type"]):
