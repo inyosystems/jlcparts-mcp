@@ -1341,8 +1341,12 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "output type", aliases=OUTPUT_TYPE_ALIASES)
         elif key in larr(["Output", "Output Mode"]):
             value = attributes.identifierListAttribute(value, "output")
-        elif key in larr(["Output Polarity"]):
-            polarity = "Positive;Negative" if str(value).strip() == "Positive and Negative Poles" else value
+        elif key in larr(["Output Polarity", "Output Configuration"]):
+            polarity = str(value).strip()
+            if polarity in {"Positive and Negative Poles", "Positive and Negative"}:
+                polarity = "Positive;Negative"
+            else:
+                polarity = value
             value = attributes.identifierListAttribute(polarity, "polarity", aliases=OUTPUT_POLARITY_ALIASES)
         elif key in larr(["Polarity"]):
             value = attributes.identifierListAttribute(value, "polarity", aliases=POLARITY_ALIASES)

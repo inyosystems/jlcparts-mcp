@@ -2404,6 +2404,15 @@ def test_output_polarity_identifiers(capsys):
     assert values["polarity 1"] == ["Positive", "identifier"]
     assert values["polarity 2"] == ["Negative", "identifier"]
 
+    values = normalized_values("Output Configuration", "Positive and Negative", capsys)
+
+    assert values["polarity 1"] == ["Positive", "identifier"]
+    assert values["polarity 2"] == ["Negative", "identifier"]
+
+    values = normalized_values("Output Configuration", "Positive electrode", capsys)
+
+    assert values["polarity 1"] == ["Positive", "identifier"]
+
 
 def test_polarity_identifiers(capsys):
     values = normalized_values("Polarity", "Bi-Directional", capsys)
