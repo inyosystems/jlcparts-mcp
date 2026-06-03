@@ -4351,6 +4351,15 @@ def test_jacket_type_identifiers(capsys):
     assert values["jacket type 4"] == ["Heat Shrink Tube", "identifier"]
 
 
+def test_pin_location_identifiers(capsys):
+    values = normalized_values("Pin Location", "Mid Terminal, Side Mount, Corner, -", capsys)
+
+    assert values["pin location 1"] == ["Mid Terminal", "identifier"]
+    assert values["pin location 2"] == ["Side Mount", "identifier"]
+    assert values["pin location 3"] == ["Corner", "identifier"]
+    assert values["pin location 4"] == ["Unspecified", "identifier"]
+
+
 def test_plastic_color_identifiers(capsys):
     values = normalized_values("Plastic Color", "Non-Plastic", capsys)
 
