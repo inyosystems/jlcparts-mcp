@@ -194,6 +194,13 @@ SYNCHRONOUS_RECTIFIER_VALUES = {
     "-": "NaN",
 }
 
+LED_PRESENCE_VALUES = {
+    "with led": 1,
+    "non-led": 0,
+    "without led": 0,
+    "-": "NaN",
+}
+
 CARD_DETECTION_VALUES = {
     "yes": 1,
     "with card detect": 1,
@@ -1561,6 +1568,15 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "color", separators=",;/", aliases=COLOR_ALIASES)
         elif key in larr(["With Lamp"]):
             value = attributes.withLampAttribute(value, colorAliases=COLOR_ALIASES)
+        elif key in larr(["LED"]):
+            with_led = LED_PRESENCE_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${with led}",
+                "primary": "with led",
+                "values": {
+                    "with led": [with_led, "count"],
+                },
+            }
         elif key in larr(["Strike Gundam", "With Bracket"]):
             value = attributes.bracketPresenceAttribute(value)
         elif key in larr(["Lens Color"]):

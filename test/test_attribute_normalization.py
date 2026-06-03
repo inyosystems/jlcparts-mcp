@@ -4426,6 +4426,21 @@ def test_with_lamp_attribute(capsys):
     assert values["color 3"] == ["Blue", "identifier"]
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("With LED", 1),
+        ("Non-LED", 0),
+        ("Without LED", 0),
+        ("-", "NaN"),
+    ],
+)
+def test_led_presence_attribute(value, expected, capsys):
+    values = normalized_values("LED", value, capsys)
+
+    assert_quantity(values["with led"], expected, "count")
+
+
 def test_strike_gundam_bracket_presence(capsys):
     values = normalized_values("Strike Gundam", "With bracket", capsys)
 
