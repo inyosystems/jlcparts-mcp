@@ -3371,6 +3371,16 @@ def test_holder_type_attribute(capsys):
     assert values["holder type 1"] == ["Right Angle", "identifier"]
 
 
+def test_fuseholder_type_attribute(capsys):
+    values = normalized_values("Fuseholder Type", "Bracket type", capsys)
+
+    assert values["holder type 1"] == ["Bracket Type", "identifier"]
+
+    values = normalized_values("Fuseholder Type", "-", capsys)
+
+    assert values["holder type 1"] == ["Unspecified", "identifier"]
+
+
 def test_mounting_type_attribute(capsys):
     values = normalized_values("Mounting Type", "Surface Mount, Right-Angle, Socket", capsys)
 

@@ -345,8 +345,10 @@ CONTACT_TYPE_ALIASES = {
 }
 
 HOLDER_TYPE_ALIASES = {
+    "Bracket type": "Bracket Type",
     "Free-hanging": "Free Hanging",
     "Right-Angle": "Right Angle",
+    "-": "Unspecified",
 }
 
 MOUNTING_TYPE_ALIASES = {
@@ -1185,7 +1187,7 @@ def normalizeAttribute(key, value):
             value = attributes.environmentalRequirementsAttribute(value)
         elif key in larr(["Gender"]):
             value = attributes.identifierListAttribute(value, "gender", aliases=GENDER_ALIASES)
-        elif key in larr(["Holder Type"]):
+        elif key in larr(["Holder Type", "Fuseholder Type"]):
             value = attributes.identifierListAttribute(value, "holder type", aliases=HOLDER_TYPE_ALIASES)
         elif key in larr(["Mounting Type", "Mounting Style", "Mounting Sytle"]):
             value = attributes.identifierListAttribute(value, "mounting type", aliases=MOUNTING_TYPE_ALIASES)
