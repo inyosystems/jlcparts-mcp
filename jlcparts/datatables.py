@@ -107,6 +107,12 @@ COMMUNICATION_SYSTEM_ALIASES = {
     "evdo": "EV-DO",
 }
 
+OUTPUT_INTERFACE_ALIASES = {
+    "CAN Interface": "CAN",
+    "Differential output": "Differential Output",
+    "IO": "I/O",
+}
+
 MODULATION_SYSTEM_ALIASES = {
     "LORA": "LoRa",
     "OCK": "OOK",
@@ -1347,6 +1353,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "trigger type", aliases=TRIGGER_TYPE_ALIASES)
         elif key in larr(["Interface", "Control Interface", "Communication Interface", "Memory Interface", "IO Type", "The Interface Type", "Mac Interface"]):
             value = attributes.identifierListAttribute(value, "interface")
+        elif key in larr(["Output Interface"]):
+            value = attributes.identifierListAttribute(value, "interface", aliases=OUTPUT_INTERFACE_ALIASES)
         elif key in larr(["Interface Type"]):
             value = attributes.identifierListAttribute(value, "interface")
         elif key in larr(["Protocol", "Interface Protocol"]):

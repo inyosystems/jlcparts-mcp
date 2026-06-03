@@ -3497,6 +3497,15 @@ def test_communication_interface_attribute(capsys):
     assert values["interface 2"] == ["SMBus", "identifier"]
 
 
+def test_output_interface_attribute(capsys):
+    values = normalized_values("Output Interface", "IO, SPI, Differential output, CAN Interface", capsys)
+
+    assert values["interface 1"] == ["I/O", "identifier"]
+    assert values["interface 2"] == ["SPI", "identifier"]
+    assert values["interface 3"] == ["Differential Output", "identifier"]
+    assert values["interface 4"] == ["CAN", "identifier"]
+
+
 def test_io_type_attribute(capsys):
     values = normalized_values("IO Type", "I2C;MII;RMII;SPI", capsys)
 
