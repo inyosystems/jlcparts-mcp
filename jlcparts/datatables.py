@@ -1348,6 +1348,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "protocol", aliases=COMMUNICATION_PROTOCOL_ALIASES)
         elif key in larr(["Communication System"]):
             value = attributes.identifierListAttribute(value, "communication system", aliases=COMMUNICATION_SYSTEM_ALIASES)
+        elif key in larr(["Communication Mode"]):
+            value = attributes.identifierListAttribute(value, "communication mode")
         elif key in larr(["Modulation System"]):
             value = attributes.identifierListAttribute(value, "modulation", aliases=MODULATION_SYSTEM_ALIASES)
         elif key in larr(["GNSS Type"]):

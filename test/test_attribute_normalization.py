@@ -3559,6 +3559,13 @@ def test_communication_system_identifier_list(capsys):
     assert values["communication system 3"] == ["EV-DO", "identifier"]
 
 
+def test_communication_mode_identifier_list(capsys):
+    values = normalized_values("Communication Mode", "Half-Duplex, Full-Duplex", capsys)
+
+    assert values["communication mode 1"] == ["Half-Duplex", "identifier"]
+    assert values["communication mode 2"] == ["Full-Duplex", "identifier"]
+
+
 def test_standard_number_identifier_list(capsys):
     values = normalized_values("Standard Number", "60950-1; 62368-1", capsys)
 
