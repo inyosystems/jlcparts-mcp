@@ -152,10 +152,10 @@ class CacheManager:
         if status["source_stale"]:
             raise RuntimeError(
                 "JLCParts source cache is missing, invalid, or has no completed full "
-                "JLCPCB OpenAPI refresh. Run refresh_cache(force=true) from MCP or "
-                "run `jlcparts refresh-cache --cache ...` before using read tools. "
+                "JLCPCB OpenAPI refresh. Run `jlcparts refresh-cache --cache ...` "
+                "from the command line before using read tools. "
                 "A full catalog refresh can take minutes or longer and should be "
-                "monitored with cache_status."
+                "monitored from the command line."
             )
         if status["query_stale"]:
             try:
@@ -283,8 +283,9 @@ def create_mcp_server(config):
             "After research has narrowed the choice to specific LCSC parts, use "
             "live_lookup_component or get_component(live_verify=true) to confirm "
             "current official JLCPCB data and website enrichment for final "
-            "selection. Use refresh_cache only as an explicit monitored full "
-            "catalog refresh."
+            "selection. Full catalog refresh is intentionally not exposed as an "
+            "MCP tool because it can exceed client tool-call timeouts; run "
+            "`jlcparts refresh-cache` from the command line instead."
         ),
         host=config.host,
         port=config.port,
@@ -301,22 +302,6 @@ def create_mcp_server(config):
         final live checks. This status call does not contact JLCPCB.
         """
         return manager.cache_status()
-
-    @mcp.tool()
-    def refresh_cache(force: bool = False, max_seconds: int | None = None):
-        """Run or resume a full official JLCPCB OpenAPI cache refresh.
-
-        This is an explicit long-running operation, not something read tools
-        start automatically. The JLCPCB API does not expose a delta feed, so a
-        refresh walks the full PCBA component catalog and can take minutes or
-        longer. Use max_seconds for a bounded monitored run; if the result says
-        checkpointed=true, call cache_status to inspect refresh_checkpoint and
-        call refresh_cache again to resume. If force is false and the source is
-        already fully refreshed, only a missing/stale query index is rebuilt.
-        Hidden/best-effort JLCPCB website enrichment is intentionally not run
-        here; use `jlcparts enrich-website` for that maintenance pass.
-        """
-        return manager.refresh_cache(force=force, max_seconds=max_seconds)
 
     @mcp.tool()
     def live_lookup_component(lcsc: str, include_website_detail: bool = True):

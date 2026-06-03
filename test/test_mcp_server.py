@@ -79,7 +79,7 @@ def test_missing_cache_blocks_read_and_returns_actionable_refresh_error(tmp_path
     refresh = Mock(side_effect=RuntimeError("missing credential"))
     manager = CacheManager(config, refresh_func=refresh)
 
-    with pytest.raises(RuntimeError, match="Run refresh_cache"):
+    with pytest.raises(RuntimeError, match="jlcparts refresh-cache"):
         manager.ensure_ready()
 
     refresh.assert_not_called()
@@ -238,7 +238,6 @@ def test_fastmcp_lists_and_calls_tools_with_fresh_cache(tmp_path):
         names = {tool.name for tool in tools}
         assert {
             "cache_status",
-            "refresh_cache",
             "live_lookup_component",
             "list_categories",
             "list_attributes",
@@ -249,6 +248,7 @@ def test_fastmcp_lists_and_calls_tools_with_fresh_cache(tmp_path):
             "search",
             "fetch",
         }.issubset(names)
+        assert "refresh_cache" not in names
 
         status = _tool_json(await mcp.call_tool("cache_status", {}))
         assert status["source_exists"] is True

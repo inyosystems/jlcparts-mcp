@@ -58,9 +58,9 @@ $ uv run jlcparts-mcp --transport http --host 127.0.0.1 --port 8765
 ### Codex Setup
 
 Populate the source cache and query index once before doing normal cached
-research. The MCP server can also run a full refresh explicitly through
-`refresh_cache(force=true)`, but read tools do not start a full remote catalog
-download implicitly:
+research. Full refresh is intentionally a command-line operation because it can
+run longer than MCP client tool-call timeouts. MCP read tools do not start a
+full remote catalog download implicitly:
 
 ```
 $ export JLCPCB_APP_ID=...
@@ -140,8 +140,7 @@ reported by `cache_status()` as `last_full_api_refresh` and
 `last_full_api_refresh_age_seconds`; there is no arbitrary 24-hour freshness
 cutoff. Read tools require a completed full source refresh and a valid query
 index, but they do not automatically start a full remote catalog download.
-Use `refresh_cache(force=true)` or the standalone refresh command when you want
-to run a full refresh.
+Use the standalone refresh command when you want to run a full refresh.
 
 Run or resume a full official JLCPCB OpenAPI refresh outside the MCP server:
 
@@ -164,16 +163,15 @@ $ uv run jlcparts-refresh-cache --cache ~/.cache/jlcparts/cache.sqlite3
 The JLCPCB API does not currently expose a delta feed, so full refresh walks the
 whole PCBA component catalog. Use `--max-seconds N` for a bounded run; the
 command writes a checkpoint and can be rerun with the same cache/checkpoint
-paths to resume. The MCP `refresh_cache(force=true, max_seconds=N)` tool exposes
-the same checkpointed behavior and `cache_status()` reports `refresh_checkpoint`
-so an agent can monitor progress.
+paths to resume. `cache_status()` reports `refresh_checkpoint`, so an agent can
+inspect whether a command-line refresh is currently checkpointed or incomplete.
 
-MCP cache refresh uses the official JLCPCB OpenAPI only by default. The slower,
-best-effort website enrichment pass is intentionally separate so an agent does
-not block for hours while hidden website fields are fetched one component at a
-time. Run it as a maintenance job when you want fields such as website component
-IDs, assembly mode/process corrections, attrition, and minimum purchase or
-placement quantities:
+Command-line cache refresh uses the official JLCPCB OpenAPI only by default.
+The slower, best-effort website enrichment pass is intentionally separate so an
+agent does not block for hours while hidden website fields are fetched one
+component at a time. Run it as a maintenance job when you want fields such as
+website component IDs, assembly mode/process corrections, attrition, and minimum
+purchase or placement quantities:
 
 ```
 $ uv run jlcparts enrich-website ~/.cache/jlcparts/cache.sqlite3 \
@@ -203,7 +201,6 @@ rebuilds the query index, so subsequent cached searches see the updated part.
 Available MCP tools:
 
 - `cache_status()`
-- `refresh_cache(force=False, max_seconds=None)`
 - `live_lookup_component(lcsc, include_website_detail=True)`
 - `list_categories(search=None)`
 - `list_attributes(category_ids=None, text_query=None, limit=100)`
