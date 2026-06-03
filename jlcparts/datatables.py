@@ -1483,7 +1483,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "function type", aliases=FUNCTIONAL_TYPE_ALIASES)
         elif key in larr(["IGBT Type"]):
             value = attributes.identifierListAttribute(value, "igbt type", aliases=IGBT_TYPE_ALIASES)
-        elif key in larr(["Conversion Type"]):
+        elif key in larr(["Conversion Type", "Conversion Type VF/Fv"]):
             value = attributes.identifierListAttribute(value, "conversion type", aliases=CONVERSION_TYPE_ALIASES)
         elif key in larr(["Isolation Technology"]):
             value = attributes.identifierListAttribute(value, "isolation technology", aliases=ISOLATION_TECHNOLOGY_ALIASES)

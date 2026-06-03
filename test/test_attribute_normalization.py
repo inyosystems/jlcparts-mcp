@@ -3710,6 +3710,11 @@ def test_conversion_type_identifiers(capsys):
 
     assert values["conversion type 1"] == ["Unspecified", "identifier"]
 
+    values = normalized_values("Conversion Type VF/Fv", "V/F, F/V", capsys)
+
+    assert values["conversion type 1"] == ["V/F", "identifier"]
+    assert values["conversion type 2"] == ["F/V", "identifier"]
+
 
 def test_isolation_technology_attribute(capsys):
     values = normalized_values("Isolation Technology", "Magnetic isolation, 电容隔离, 巨磁隔离 (GMR), -", capsys)
