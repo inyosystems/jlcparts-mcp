@@ -3845,6 +3845,17 @@ def test_contact_material_attribute(value, expected, capsys):
     }
 
 
+def test_body_material_attribute(capsys):
+    values = normalized_values("Body Material", "Copper alloy, Red copper", capsys)
+
+    assert values["material 1"] == ["Copper Alloy", "identifier"]
+    assert values["material 2"] == ["Red Copper", "identifier"]
+
+    values = normalized_values("Body Material", "-", capsys)
+
+    assert values["material 1"] == ["Unspecified", "identifier"]
+
+
 def test_contact_type_identifiers(capsys):
     values = normalized_values("Contact Type", "Dual-sided contacts / top and bottom connection", capsys)
 

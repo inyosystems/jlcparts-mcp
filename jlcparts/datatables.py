@@ -440,10 +440,12 @@ CONTACT_MATERIAL_ALIASES = {
     "Aluminum alloy": "Aluminum Alloy",
     "High conductivity copper": "High Conductivity Copper",
     "Electrolytic copper": "Electrolytic Copper",
+    "Red copper": "Red Copper",
     "Nickelalloy": "Nickel Alloy",
     "锡磷青铜": "Tin Phosphor Bronze",
     "铜端": "Copper End",
     "前金后锡": "Gold Front Tin Back",
+    "-": "Unspecified",
 }
 
 DIELECTRIC_MATERIAL_ALIASES = {
@@ -1311,7 +1313,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "peripheral", aliases=PERIPHERAL_FUNCTION_ALIASES)
         elif key in larr(["Topology"]):
             value = attributes.identifierListAttribute(value, "topology", aliases=TOPOLOGY_ALIASES)
-        elif key in larr(["Contact Material"]):
+        elif key in larr(["Contact Material", "Body Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)
         elif key in larr(["Contact Type"]):
             value = attributes.identifierListAttribute(value, "contact type", separators=",;/", aliases=CONTACT_TYPE_ALIASES)
