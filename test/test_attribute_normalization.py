@@ -4601,6 +4601,20 @@ def test_manual_reset_presence_attribute(value, expected, capsys):
     assert_quantity(values["manual reset"], expected, "count")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
+        ("No", 0),
+        ("-", "NaN"),
+    ],
+)
+def test_differential_input_presence_attribute(value, expected, capsys):
+    values = normalized_values("Differential Input", value, capsys)
+
+    assert_quantity(values["differential input"], expected, "count")
+
+
 def test_strike_gundam_bracket_presence(capsys):
     values = normalized_values("Strike Gundam", "With bracket", capsys)
 
