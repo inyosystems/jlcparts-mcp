@@ -1624,6 +1624,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "polarity", aliases=POLARITY_ALIASES)
         elif key in larr(["Output Level"]):
             value = attributes.identifierListAttribute(value, "output level", aliases=SIGNAL_LEVEL_ALIASES)
+        elif key in larr(["Default Output"]):
+            value = attributes.identifierListAttribute(value, "default output", aliases=SIGNAL_LEVEL_ALIASES)
         elif key in larr(["Output Signal"]):
             value = attributes.identifierListAttribute(value, "output signal", aliases=SIGNAL_LEVEL_ALIASES)
         elif key in larr(["Level Standard"]):

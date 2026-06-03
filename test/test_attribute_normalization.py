@@ -2443,6 +2443,13 @@ def test_output_level_identifiers(capsys):
     assert values["output level 1"] == ["Unspecified", "identifier"]
 
 
+def test_default_output_identifiers(capsys):
+    values = normalized_values("Default Output", "High Level, Low Level", capsys)
+
+    assert values["default output 1"] == ["High Level", "identifier"]
+    assert values["default output 2"] == ["Low Level", "identifier"]
+
+
 def test_output_signal_identifiers(capsys):
     values = normalized_values("Output Signal", "LVTTL, LVCMOS", capsys)
 
