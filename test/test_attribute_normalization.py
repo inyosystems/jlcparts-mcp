@@ -5041,6 +5041,26 @@ def test_number_of_elements_count(value, expected, capsys):
 
     assert_quantity(values["count"], expected, "count")
 
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Single channel", {"count": 1}),
+        ("单通道", {"count": 1}),
+        ("五路", {"count": 5}),
+        ("Eight channels", {"count": 8}),
+        ("4/7", {"count 1": 4, "count 2": 7}),
+        ("2/4, 4/2", {"count 1": 2, "count 2": 4, "count 3": 4, "count 4": 2}),
+        ("4, 6", {"count 1": 4, "count 2": 6}),
+    ],
+)
+def test_number_of_lines_count(value, expected, capsys):
+    values = normalized_values("Number of Lines", value, capsys)
+
+    for quantity, count in expected.items():
+        assert_quantity(values[quantity], count, "count")
+
+
 @pytest.mark.parametrize(
     ("key", "value", "expected"),
     [
