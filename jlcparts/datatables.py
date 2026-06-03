@@ -313,6 +313,10 @@ CONVERSION_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+ARCHITECTURE_ALIASES = {
+    "-": "Unspecified",
+}
+
 VOLTAGE_SUPPLY_SOURCE_ALIASES = {
     "Dual Power": "Dual Supply",
     "Single supply": "Single Supply",
@@ -1436,6 +1440,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "peripheral", aliases=PERIPHERAL_FUNCTION_ALIASES)
         elif key in larr(["Topology"]):
             value = attributes.identifierListAttribute(value, "topology", aliases=TOPOLOGY_ALIASES)
+        elif key in larr(["Applicable to AC-DC Architecture"]):
+            value = attributes.identifierListAttribute(value, "architecture", aliases=ARCHITECTURE_ALIASES)
         elif key in larr(["Contact Material", "Body Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)
         elif key in larr(["Contact Type"]):
