@@ -1553,7 +1553,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "finish", aliases=CONTACT_PLATING_ALIASES)
         elif key in larr(["Dielectric Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=DIELECTRIC_MATERIAL_ALIASES)
-        elif key in larr(["Contact Plating", "Contact Coating"]):
+        elif key in larr(["Contact Plating", "Contact Coating", "Ontology Coating"]):
             value = attributes.identifierListAttribute(value, "plating", aliases=CONTACT_PLATING_ALIASES)
         elif key in larr(["Illumination Color", "Color", "Actuator/Cap Color", "Actuator Color", "Detection Color", "Jacket Color", "Plastic Color", "Luminous Color"]):
             value = attributes.identifierListAttribute(value, "color", aliases=COLOR_ALIASES)

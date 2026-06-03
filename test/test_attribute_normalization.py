@@ -4265,6 +4265,13 @@ def test_contact_plating_attribute(capsys):
     assert values["plating 3"] == ["Silver", "identifier"]
     assert values["plating 4"] == ["Tin-Nickel", "identifier"]
 
+    values = normalized_values("Ontology Coating", "Tin;Zinc;Nickel;-", capsys)
+
+    assert values["plating 1"] == ["Tin", "identifier"]
+    assert values["plating 2"] == ["Zinc", "identifier"]
+    assert values["plating 3"] == ["Nickel", "identifier"]
+    assert values["plating 4"] == ["Unspecified", "identifier"]
+
 
 def test_contact_finish_identifiers(capsys):
     values = normalized_values("Contact Finish", "silver", capsys)
