@@ -3156,6 +3156,18 @@ def test_voltage_reference_identifiers(capsys):
     assert values["voltage reference 2"] == ["External", "identifier"]
 
 
+def test_clock_oscillator_identifiers(capsys):
+    values = normalized_values("Clock/Oscillator", "External, Built-in", capsys)
+
+    assert values["clock source 1"] == ["External", "identifier"]
+    assert values["clock source 2"] == ["Built-In", "identifier"]
+
+    values = normalized_values("Clock/Oscillator", "Internal or external", capsys)
+
+    assert values["clock source 1"] == ["Built-In", "identifier"]
+    assert values["clock source 2"] == ["External", "identifier"]
+
+
 def test_reference_type_identifiers(capsys):
     values = normalized_values("Reference Type", "Series, Parallel", capsys)
 

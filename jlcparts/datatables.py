@@ -332,6 +332,13 @@ IGBT_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+CLOCK_SOURCE_ALIASES = {
+    "Built-in": "Built-In",
+    "Internal": "Built-In",
+    "external": "External",
+    "-": "Unspecified",
+}
+
 VOLTAGE_SUPPLY_SOURCE_ALIASES = {
     "Dual Power": "Dual Supply",
     "Single supply": "Single Supply",
@@ -1289,6 +1296,9 @@ def normalizeAttribute(key, value):
         elif key in larr(["Voltage Reference"]):
             reference = "Internal, external" if str(value).strip() == "Internal or external" else value
             value = attributes.identifierListAttribute(reference, "voltage reference", aliases=VOLTAGE_REFERENCE_ALIASES)
+        elif key in larr(["Clock/Oscillator"]):
+            source = "Internal, external" if str(value).strip() == "Internal or external" else value
+            value = attributes.identifierListAttribute(source, "clock source", aliases=CLOCK_SOURCE_ALIASES)
         elif key in larr(["Voltage Supply Source"]):
             value = attributes.identifierListAttribute(value, "supply source", aliases=VOLTAGE_SUPPLY_SOURCE_ALIASES)
         elif key in larr(["Reference Type"]):
