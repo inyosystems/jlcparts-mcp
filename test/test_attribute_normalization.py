@@ -3122,6 +3122,16 @@ def test_appearance_shape_identifiers(capsys):
     assert values["appearance 1"] == ["Plug-In Type", "identifier"]
 
 
+def test_shape_identifiers(capsys):
+    values = normalized_values("Shape", "UType", capsys)
+
+    assert values["shape 1"] == ["U-Type", "identifier"]
+
+    values = normalized_values("Shape", "-", capsys)
+
+    assert values["shape 1"] == ["Unspecified", "identifier"]
+
+
 def test_voltage_reference_identifiers(capsys):
     values = normalized_values("Voltage Reference", "Built-in, External", capsys)
 

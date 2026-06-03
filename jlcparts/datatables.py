@@ -228,6 +228,11 @@ APPEARANCE_SHAPE_ALIASES = {
     "-": "Unspecified",
 }
 
+SHAPE_ALIASES = {
+    "UType": "U-Type",
+    "-": "Unspecified",
+}
+
 APPLICATION_ALIASES = {
     "MACController": "MAC Controller",
     "PHYtransceiver": "PHY Transceiver",
@@ -1258,6 +1263,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "amplifier type", aliases=AMPLIFIER_TYPE_ALIASES)
         elif key in larr(["Appearance and Shape"]):
             value = attributes.identifierListAttribute(value, "appearance", aliases=APPEARANCE_SHAPE_ALIASES)
+        elif key in larr(["Shape"]):
+            value = attributes.identifierListAttribute(value, "shape", aliases=SHAPE_ALIASES)
         elif key in larr(["Voltage Reference"]):
             reference = "Internal, external" if str(value).strip() == "Internal or external" else value
             value = attributes.identifierListAttribute(reference, "voltage reference", aliases=VOLTAGE_REFERENCE_ALIASES)
