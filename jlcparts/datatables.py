@@ -1471,7 +1471,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "peripheral", aliases=PERIPHERAL_FUNCTION_ALIASES)
         elif key in larr(["Topology"]):
             value = attributes.identifierListAttribute(value, "topology", aliases=TOPOLOGY_ALIASES)
-        elif key in larr(["Applicable to AC-DC Architecture"]):
+        elif key in larr(["Applicable to AC-DC Architecture", "ADC Architecture"]):
             value = attributes.identifierListAttribute(value, "architecture", aliases=ARCHITECTURE_ALIASES)
         elif key in larr(["Contact Material", "Body Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)

@@ -3961,6 +3961,11 @@ def test_ac_dc_architecture_identifiers(capsys):
     assert values["architecture 2"] == ["LLC", "identifier"]
     assert values["architecture 3"] == ["Forward", "identifier"]
 
+    values = normalized_values("ADC Architecture", "SAR, Sigma-Delta", capsys)
+
+    assert values["architecture 1"] == ["SAR", "identifier"]
+    assert values["architecture 2"] == ["Sigma-Delta", "identifier"]
+
 
 def test_driven_configuration_identifiers(capsys):
     values = normalized_values("Driven Configuration", "Low-side, high-side, half-bridge", capsys)
