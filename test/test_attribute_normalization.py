@@ -3596,6 +3596,17 @@ def test_antenna_type_attribute(capsys):
     assert values["antenna type 2"] == ["IPEX interface", "identifier"]
 
 
+def test_polarization_type_attribute(capsys):
+    values = normalized_values("Polarization Type", "Linear Polarization, RHCP", capsys)
+
+    assert values["polarization 1"] == ["Linear", "identifier"]
+    assert values["polarization 2"] == ["RHCP", "identifier"]
+
+    values = normalized_values("Polarization Type", "-", capsys)
+
+    assert values["polarization 1"] == ["Unspecified", "identifier"]
+
+
 def test_sensor_type_attribute(capsys):
     values = normalized_values("Sensor Type", "PM2.5 Dust Sensor", capsys)
 

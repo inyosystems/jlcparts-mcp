@@ -299,6 +299,11 @@ TRIGGER_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+POLARIZATION_TYPE_ALIASES = {
+    "Linear Polarization": "Linear",
+    "-": "Unspecified",
+}
+
 VOLTAGE_SUPPLY_SOURCE_ALIASES = {
     "Dual Power": "Dual Supply",
     "Single supply": "Single Supply",
@@ -1317,6 +1322,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "logic gate", aliases=LOGIC_GATE_TYPE_ALIASES)
         elif key in larr(["Antenna Type"]):
             value = attributes.identifierListAttribute(value, "antenna type")
+        elif key in larr(["Polarization Type"]):
+            value = attributes.identifierListAttribute(value, "polarization", aliases=POLARIZATION_TYPE_ALIASES)
         elif key in larr(["Sensor Type"]):
             value = attributes.identifierAttribute(value, "sensor type")
         elif key in larr(["Terminal Type"]):
