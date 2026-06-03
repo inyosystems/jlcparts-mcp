@@ -3328,6 +3328,28 @@ def test_reset_active_level_identifiers(capsys):
     assert values["reset active level 1"] == ["Unspecified", "identifier"]
 
 
+def test_reset_style_identifiers(capsys):
+    values = normalized_values("Reset Style", "Asynchronous;Synchronous", capsys)
+
+    assert values["reset style 1"] == ["Asynchronous", "identifier"]
+    assert values["reset style 2"] == ["Synchronous", "identifier"]
+
+    values = normalized_values("Reset Style", "-", capsys)
+
+    assert values["reset style 1"] == ["Unspecified", "identifier"]
+
+
+def test_timing_mode_identifiers(capsys):
+    values = normalized_values("Timing Mode", "Synchronous;Asynchronous", capsys)
+
+    assert values["timing mode 1"] == ["Synchronous", "identifier"]
+    assert values["timing mode 2"] == ["Asynchronous", "identifier"]
+
+    values = normalized_values("Timing Mode", "-", capsys)
+
+    assert values["timing mode 1"] == ["Unspecified", "identifier"]
+
+
 def test_interrupt_output_identifiers(capsys):
     values = normalized_values("Interrupt Output", "有中断输出", capsys)
 

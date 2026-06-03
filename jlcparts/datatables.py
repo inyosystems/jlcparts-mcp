@@ -393,6 +393,10 @@ RESET_ACTIVE_LEVEL_ALIASES = {
     "-": "Unspecified",
 }
 
+TIMING_MODE_ALIASES = {
+    "-": "Unspecified",
+}
+
 CONTROL_INPUT_LOGIC_ALIASES = {
     "-": "Unspecified",
 }
@@ -1420,6 +1424,10 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "feedback system", aliases=FEEDBACK_SYSTEM_ALIASES)
         elif key in larr(["Reset Active Level"]):
             value = attributes.identifierListAttribute(value, "reset active level", aliases=RESET_ACTIVE_LEVEL_ALIASES)
+        elif key in larr(["Reset Style"]):
+            value = attributes.identifierListAttribute(value, "reset style", aliases=TIMING_MODE_ALIASES)
+        elif key in larr(["Timing Mode"]):
+            value = attributes.identifierListAttribute(value, "timing mode", aliases=TIMING_MODE_ALIASES)
         elif key in larr(["Interrupt Output"]):
             value = attributes.identifierListAttribute(value, "interrupt output", aliases=INTERRUPT_OUTPUT_ALIASES)
         elif key in larr(["Signal Conditioning"]):
