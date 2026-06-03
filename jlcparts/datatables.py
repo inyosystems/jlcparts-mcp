@@ -227,6 +227,12 @@ SWITCH_TUBE_ALIASES = {
     "-": "Unspecified",
 }
 
+PIN_TYPE_ALIASES = {
+    "Circular Pins": "Round Pin",
+    "Square Pins": "Square Pin",
+    "-": "Unspecified",
+}
+
 TECHNOLOGY_ALIASES = {
     "D-mode": "Depletion Mode",
     "E-mode": "Enhancement Mode",
@@ -1182,6 +1188,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "reference type", aliases=REFERENCE_TYPE_ALIASES)
         elif key in larr(["Switch Tube (Built-in/External)"]):
             value = attributes.identifierListAttribute(value, "switch tube", aliases=SWITCH_TUBE_ALIASES)
+        elif key in larr(["Circluar Pins/Square Pins"]):
+            value = attributes.identifierListAttribute(value, "pin type", aliases=PIN_TYPE_ALIASES)
         elif key in larr(["Technology"]):
             value = attributes.identifierListAttribute(value, "technology", aliases=TECHNOLOGY_ALIASES)
         elif key in larr(["Drive Motor Type"]):

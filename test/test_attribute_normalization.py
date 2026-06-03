@@ -3085,6 +3085,23 @@ def test_switch_tube_identifiers(value, expected, capsys):
     assert values["switch tube 1"] == [expected, "identifier"]
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Circular Pins", "Round Pin"),
+        ("Round Pin", "Round Pin"),
+        ("Square Pins", "Square Pin"),
+        ("Pin Header", "Pin Header"),
+        ("Policy", "Policy"),
+        ("-", "Unspecified"),
+    ],
+)
+def test_pin_type_identifiers(value, expected, capsys):
+    values = normalized_values("Circluar Pins/Square Pins", value, capsys)
+
+    assert values["pin type 1"] == [expected, "identifier"]
+
+
 def test_technology_identifiers(capsys):
     values = normalized_values("Technology", "E-mode", capsys)
 
