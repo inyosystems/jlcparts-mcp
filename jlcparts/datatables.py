@@ -517,6 +517,7 @@ MOUNTING_TYPE_ALIASES = {
     "Bolted": "Bolt Mount",
     "Chip": "Surface Mount",
     "Counterpost": "Reverse Mount",
+    "External connection wire": "External Connection Wire",
     "Free-hanging": "Free Hanging",
     "Patch": "Surface Mount",
     "Panel Mounting": "Panel Mount",
@@ -1404,7 +1405,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "mounting type", aliases=MOUNTING_TYPE_ALIASES)
         elif key in larr(["Installation Method"]):
             value = attributes.identifierListAttribute(value, "installation method", aliases=MOUNTING_TYPE_ALIASES)
-        elif key in larr(["Installation Type"]):
+        elif key in larr(["Install", "Installation Type"]):
             value = attributes.identifierListAttribute(value, "installation type", aliases=MOUNTING_TYPE_ALIASES)
         elif key in larr(["Head Type"]):
             value = attributes.identifierAttribute(value, "head type")

@@ -3796,6 +3796,12 @@ def test_installation_method_identifiers(capsys):
 
     assert values["installation type 1"] == ["Unspecified", "identifier"]
 
+    values = normalized_values("Install", "Surface MountType, External connection wire, -", capsys)
+
+    assert values["installation type 1"] == ["Surface Mount", "identifier"]
+    assert values["installation type 2"] == ["External Connection Wire", "identifier"]
+    assert values["installation type 3"] == ["Unspecified", "identifier"]
+
 
 def test_head_type_attribute(capsys):
     values = normalized_values("Head Type", "Circular ring (90°)", capsys)
