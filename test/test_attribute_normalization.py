@@ -2773,6 +2773,15 @@ def test_display_switch_package_counts(capsys):
     assert_quantity(values["pins"], 3, "count")
     assert values["package"] == ["SIP Module", "identifier"]
 
+    values = normalized_values("Packaging", "Tube-packed, Bag-packed, Box-packed", capsys)
+    assert values["packaging 1"] == ["Tube", "identifier"]
+    assert values["packaging 2"] == ["Bag", "identifier"]
+    assert values["packaging 3"] == ["Box", "identifier"]
+
+    values = normalized_values("Packaging", "Tape & Reel (TR), Tray", capsys)
+    assert values["packaging 1"] == ["Tape & Reel (TR)", "identifier"]
+    assert values["packaging 2"] == ["Tray", "identifier"]
+
 
 def test_switch_circuit_identifiers(capsys):
     values = normalized_values("Switch Circuit", "SPDT(SPDT)", capsys)

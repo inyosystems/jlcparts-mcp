@@ -157,6 +157,12 @@ PACKAGE_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+PACKAGING_ALIASES = {
+    "Tube-packed": "Tube",
+    "Bag-packed": "Bag",
+    "Box-packed": "Box",
+}
+
 TYPE_ALIASES = {
     "Receivers": "Receiver",
     "transceiver": "Transceiver",
@@ -1401,6 +1407,8 @@ def normalizeAttribute(key, value):
             value = attributes.surfaceTreatmentAttribute(value)
         elif key in larr(["Supplier Device Packaging"]):
             value = attributes.supplierDevicePackagingAttribute(value)
+        elif key in larr(["Packaging"]):
+            value = attributes.identifierListAttribute(value, "packaging", aliases=PACKAGING_ALIASES)
         elif key in larr(["Packaging/Housing"]):
             value = attributes.packagePinCountAttribute(value)
         elif key in larr(["Viewing Direction"]):
