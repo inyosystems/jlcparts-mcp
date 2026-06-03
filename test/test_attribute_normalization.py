@@ -3134,6 +3134,21 @@ def test_reference_type_identifiers(capsys):
     assert values["reference type 1"] == ["Unspecified", "identifier"]
 
 
+def test_voltage_supply_source_identifiers(capsys):
+    values = normalized_values("Voltage Supply Source", "Single Supply, Dual Supply", capsys)
+
+    assert values["supply source 1"] == ["Single Supply", "identifier"]
+    assert values["supply source 2"] == ["Dual Supply", "identifier"]
+
+    values = normalized_values("Voltage Supply Source", "Dual Power", capsys)
+
+    assert values["supply source 1"] == ["Dual Supply", "identifier"]
+
+    values = normalized_values("Voltage Supply Source", "Single supply", capsys)
+
+    assert values["supply source 1"] == ["Single Supply", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
