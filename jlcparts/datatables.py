@@ -1545,7 +1545,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "locking feature", aliases=CARD_CONNECTION_MODE_ALIASES)
         elif key in larr(["With Locker"]):
             value = attributes.identifierListAttribute(value, "locking feature", aliases=WITH_LOCKER_ALIASES)
-        elif key in larr(["Direction"]):
+        elif key in larr(["Direction", "Outlet Direction (Vertical Basis)"]):
             value = attributes.identifierListAttribute(value, "direction", aliases=DIRECTION_ALIASES)
         elif key in larr(["Sense of Rotation"]):
             value = attributes.identifierListAttribute(value, "rotation direction", aliases=ROTATION_DIRECTION_ALIASES)

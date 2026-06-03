@@ -2645,6 +2645,13 @@ def test_direction_identifiers(capsys):
 
     assert values["direction 1"] == ["Unspecified", "identifier"]
 
+    values = normalized_values("Outlet Direction (Vertical Basis)", "Top Entry, Horizontal Termination, Reverse Horizontal Termination, -", capsys)
+
+    assert values["direction 1"] == ["Top Entry", "identifier"]
+    assert values["direction 2"] == ["Horizontal Termination", "identifier"]
+    assert values["direction 3"] == ["Reverse Horizontal Termination", "identifier"]
+    assert values["direction 4"] == ["Unspecified", "identifier"]
+
 
 def test_rotation_direction_identifiers(capsys):
     values = normalized_values("Sense of Rotation", "CW,CCW", capsys)
