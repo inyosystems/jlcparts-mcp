@@ -187,6 +187,13 @@ ISOLATION_FLAG_VALUES = {
     "-": "NaN",
 }
 
+SYNCHRONOUS_RECTIFIER_VALUES = {
+    "yes": 1,
+    "no": 0,
+    "none": "NaN",
+    "-": "NaN",
+}
+
 CARD_DETECTION_VALUES = {
     "yes": 1,
     "with card detect": 1,
@@ -1383,6 +1390,15 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "conversion type", aliases=CONVERSION_TYPE_ALIASES)
         elif key in larr(["Isolation Technology"]):
             value = attributes.identifierListAttribute(value, "isolation technology", aliases=ISOLATION_TECHNOLOGY_ALIASES)
+        elif key in larr(["Synchronous Rectifier", "Synchronous Rectification"]):
+            has_synchronous_rectifier = SYNCHRONOUS_RECTIFIER_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${synchronous rectifier}",
+                "primary": "synchronous rectifier",
+                "values": {
+                    "synchronous rectifier": [has_synchronous_rectifier, "count"],
+                },
+            }
         elif key in larr(["Whether the Isolation"]):
             is_isolated = ISOLATION_FLAG_VALUES.get(str(value).strip().lower(), "NaN")
             value = {

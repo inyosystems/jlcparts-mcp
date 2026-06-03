@@ -3657,6 +3657,23 @@ def test_isolation_technology_attribute(capsys):
     assert values["isolation technology 4"] == ["Unspecified", "identifier"]
 
 
+@pytest.mark.parametrize("key", ["Synchronous Rectifier", "Synchronous Rectification"])
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
+        ("No", 0),
+        ("NO", 0),
+        ("NONE", "NaN"),
+        ("-", "NaN"),
+    ],
+)
+def test_synchronous_rectifier_attribute(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    assert_quantity(values["synchronous rectifier"], expected, "count")
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
