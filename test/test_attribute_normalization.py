@@ -2607,6 +2607,20 @@ def test_programmable_flag(value, expected, capsys):
     ("value", "expected"),
     [
         ("Yes", 1),
+        ("No", 0),
+        ("-", "NaN"),
+    ],
+)
+def test_alarm_clock_output_flag(value, expected, capsys):
+    values = normalized_values("The Alarm Clock Output", value, capsys)
+
+    assert_quantity(values["alarm clock output"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
         ("With Card Detect", 1),
         ("No", 0),
         ("No Card Detect", 0),

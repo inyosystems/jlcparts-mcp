@@ -1533,6 +1533,15 @@ def normalizeAttribute(key, value):
                     "programmable": [is_programmable, "count"],
                 },
             }
+        elif key in larr(["The Alarm Clock Output"]):
+            has_alarm_clock_output = YES_NO_UNKNOWN_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${alarm clock output}",
+                "primary": "alarm clock output",
+                "values": {
+                    "alarm clock output": [has_alarm_clock_output, "count"],
+                },
+            }
         elif key in larr(["Logic Type"]):
             value = attributes.identifierListAttribute(value, "logic type")
         elif key in larr(["Logic Gate Type"]):
