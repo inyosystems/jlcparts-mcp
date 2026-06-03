@@ -3325,6 +3325,15 @@ def test_input_voltage_type_identifiers(capsys):
     assert values["input voltage type 3"] == ["Unspecified", "identifier"]
 
 
+def test_isolation_regulation_identifiers(capsys):
+    values = normalized_values("Isolated or Voltage Regulation", "Isolated Regulated, Non-Isolated Regulator, Isolated Unregulated, -", capsys)
+
+    assert values["isolation/regulation 1"] == ["Isolated Regulated", "identifier"]
+    assert values["isolation/regulation 2"] == ["Non-Isolated Regulated", "identifier"]
+    assert values["isolation/regulation 3"] == ["Isolated Unregulated", "identifier"]
+    assert values["isolation/regulation 4"] == ["Unspecified", "identifier"]
+
+
 def test_reset_active_level_identifiers(capsys):
     values = normalized_values("Reset Active Level", "Active High;Active Low", capsys)
 

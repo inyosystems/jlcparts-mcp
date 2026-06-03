@@ -401,6 +401,11 @@ INPUT_VOLTAGE_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+ISOLATION_REGULATION_ALIASES = {
+    "Non-Isolated Regulator": "Non-Isolated Regulated",
+    "-": "Unspecified",
+}
+
 CONTROL_INPUT_LOGIC_ALIASES = {
     "-": "Unspecified",
 }
@@ -1428,6 +1433,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "feedback system", aliases=FEEDBACK_SYSTEM_ALIASES)
         elif key in larr(["Input Voltage Type"]):
             value = attributes.identifierListAttribute(value, "input voltage type", aliases=INPUT_VOLTAGE_TYPE_ALIASES)
+        elif key in larr(["Isolated or Voltage Regulation"]):
+            value = attributes.identifierListAttribute(value, "isolation/regulation", aliases=ISOLATION_REGULATION_ALIASES)
         elif key in larr(["Reset Active Level"]):
             value = attributes.identifierListAttribute(value, "reset active level", aliases=RESET_ACTIVE_LEVEL_ALIASES)
         elif key in larr(["Reset Style"]):
