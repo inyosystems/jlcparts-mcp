@@ -199,6 +199,10 @@ TECHNOLOGY_ALIASES = {
     "-": "Unspecified",
 }
 
+RESET_ACTIVE_LEVEL_ALIASES = {
+    "-": "Unspecified",
+}
+
 DRIVE_MOTOR_TYPE_ALIASES = {
     "Brush DC Motor": "Brushed DC Motor",
     "Brushless DC Motor": "Brushless DC Motor",
@@ -1126,6 +1130,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "technology", aliases=TECHNOLOGY_ALIASES)
         elif key in larr(["Drive Motor Type"]):
             value = attributes.identifierListAttribute(value, "motor type", aliases=DRIVE_MOTOR_TYPE_ALIASES)
+        elif key in larr(["Reset Active Level"]):
+            value = attributes.identifierListAttribute(value, "reset active level", aliases=RESET_ACTIVE_LEVEL_ALIASES)
         elif key in larr(["Interrupt Output"]):
             value = attributes.identifierListAttribute(value, "interrupt output", aliases=INTERRUPT_OUTPUT_ALIASES)
         elif key in larr(["Signal Conditioning"]):

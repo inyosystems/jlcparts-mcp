@@ -3032,6 +3032,17 @@ def test_drive_motor_type_identifiers(capsys):
     assert values["motor type 1"] == ["Stepper Motor", "identifier"]
 
 
+def test_reset_active_level_identifiers(capsys):
+    values = normalized_values("Reset Active Level", "Active High;Active Low", capsys)
+
+    assert values["reset active level 1"] == ["Active High", "identifier"]
+    assert values["reset active level 2"] == ["Active Low", "identifier"]
+
+    values = normalized_values("Reset Active Level", "-", capsys)
+
+    assert values["reset active level 1"] == ["Unspecified", "identifier"]
+
+
 def test_interrupt_output_identifiers(capsys):
     values = normalized_values("Interrupt Output", "有中断输出", capsys)
 
