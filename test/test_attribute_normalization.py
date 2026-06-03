@@ -4224,6 +4224,20 @@ def test_body_material_attribute(capsys):
     assert values["material 1"] == ["Unspecified", "identifier"]
 
 
+def test_material_attribute(capsys):
+    values = normalized_values(
+        "Material",
+        "Polyolefin Material with Appropriate Amount of Additives, Copper alloy, Stainless steel, Phosphor Bronze, Tin-plated",
+        capsys,
+    )
+
+    assert values["material 1"] == ["Polyolefin with Additives", "identifier"]
+    assert values["material 2"] == ["Copper Alloy", "identifier"]
+    assert values["material 3"] == ["Stainless Steel", "identifier"]
+    assert values["material 4"] == ["Phosphor Bronze", "identifier"]
+    assert values["material 5"] == ["Tin-Plated", "identifier"]
+
+
 def test_metal_material_attribute(capsys):
     values = normalized_values("Metal Material", "Gold Plated, 铜镀金, Gold-plated copper, -", capsys)
 

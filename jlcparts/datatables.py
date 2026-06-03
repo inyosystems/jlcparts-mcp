@@ -623,6 +623,12 @@ METAL_MATERIAL_ALIASES = {
     "-": "Unspecified",
 }
 
+GENERAL_MATERIAL_ALIASES = {
+    **CONTACT_MATERIAL_ALIASES,
+    "Polyolefin Material with Appropriate Amount of Additives": "Polyolefin with Additives",
+    "Tin-plated": "Tin-Plated",
+}
+
 DIELECTRIC_MATERIAL_ALIASES = {
     "Metalized polyester film": "Metallized Polyester",
     "Metalized Polyester Film Capacitor": "Metallized Polyester",
@@ -1570,6 +1576,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "architecture", aliases=ARCHITECTURE_ALIASES)
         elif key in larr(["Contact Material", "Body Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)
+        elif key in larr(["Material"]):
+            value = attributes.identifierListAttribute(value, "material", aliases=GENERAL_MATERIAL_ALIASES)
         elif key in larr(["Metal Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=METAL_MATERIAL_ALIASES)
         elif key in larr(["Connect Type", "Contact Type"]):
