@@ -420,6 +420,10 @@ CONTROL_INPUT_LOGIC_ALIASES = {
     "-": "Unspecified",
 }
 
+DUPLEX_ALIASES = {
+    "-": "Unspecified",
+}
+
 HOLE_SHAPE_ALIASES = {
     "Square Holes": "Square Hole",
     "-": "Unspecified",
@@ -1485,6 +1489,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "communication system", aliases=COMMUNICATION_SYSTEM_ALIASES)
         elif key in larr(["Communication Mode"]):
             value = attributes.identifierListAttribute(value, "communication mode")
+        elif key in larr(["Duplex"]):
+            value = attributes.identifierListAttribute(value, "duplex", aliases=DUPLEX_ALIASES)
         elif key in larr(["Modulation System"]):
             value = attributes.identifierListAttribute(value, "modulation", aliases=MODULATION_SYSTEM_ALIASES)
         elif key in larr(["GNSS Type"]):
