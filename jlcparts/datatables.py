@@ -397,6 +397,11 @@ DRIVE_MOTOR_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+DRIVE_TYPE_ALIASES = {
+    "Three Phase": "Three-Phase",
+    "Single Phase": "Single-Phase",
+}
+
 INTERRUPT_OUTPUT_ALIASES = {
     "With Interrupt Output": "Interrupt Output",
     "有中断输出": "Interrupt Output",
@@ -1390,6 +1395,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "oscillator circuit", aliases=OSCILLATOR_CIRCUIT_ALIASES)
         elif key in larr(["Drive Motor Type"]):
             value = attributes.identifierListAttribute(value, "motor type", aliases=DRIVE_MOTOR_TYPE_ALIASES)
+        elif key in larr(["Drive Type"]):
+            value = attributes.identifierListAttribute(value, "drive type", aliases=DRIVE_TYPE_ALIASES)
         elif key in larr(["Reset Active Level"]):
             value = attributes.identifierListAttribute(value, "reset active level", aliases=RESET_ACTIVE_LEVEL_ALIASES)
         elif key in larr(["Interrupt Output"]):

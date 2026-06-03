@@ -3300,6 +3300,15 @@ def test_drive_motor_type_identifiers(capsys):
     assert values["motor type 1"] == ["Stepper Motor", "identifier"]
 
 
+def test_drive_type_identifiers(capsys):
+    values = normalized_values("Drive Type", "Bipolar Driver, Three Phase, Single Phase, Unipolar Drive", capsys)
+
+    assert values["drive type 1"] == ["Bipolar Driver", "identifier"]
+    assert values["drive type 2"] == ["Three-Phase", "identifier"]
+    assert values["drive type 3"] == ["Single-Phase", "identifier"]
+    assert values["drive type 4"] == ["Unipolar Drive", "identifier"]
+
+
 def test_reset_active_level_identifiers(capsys):
     values = normalized_values("Reset Active Level", "Active High;Active Low", capsys)
 
