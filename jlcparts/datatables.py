@@ -180,6 +180,15 @@ CARD_DETECTION_VALUES = {
     "-": "NaN",
 }
 
+PORT_COUNT_VALUES = {
+    "single port": 1,
+    "单口": 1,
+    "dual port": 2,
+    "双口": 2,
+    "four ports": 4,
+    "四口": 4,
+}
+
 APPEARANCE_SHAPE_ALIASES = {
     "Bench-shaped": "Bench-Shaped",
     "Block-shaped": "Block-Shaped",
@@ -1305,6 +1314,15 @@ def normalizeAttribute(key, value):
                 "primary": "card detection",
                 "values": {
                     "card detection": [has_card_detection, "count"],
+                },
+            }
+        elif key in larr(["Port"]):
+            ports = PORT_COUNT_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${ports}",
+                "primary": "ports",
+                "values": {
+                    "ports": [ports, "count"],
                 },
             }
         elif key in larr(["Card Connection Mode"]):

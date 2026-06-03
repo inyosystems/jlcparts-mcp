@@ -2567,6 +2567,23 @@ def test_card_detection_values(value, expected, capsys):
     assert_quantity(values["card detection"], expected, "count")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Single port", 1),
+        ("单口", 1),
+        ("Dual Port", 2),
+        ("双口", 2),
+        ("Four Ports", 4),
+        ("四口", 4),
+    ],
+)
+def test_port_count_values(value, expected, capsys):
+    values = normalized_values("Port", value, capsys)
+
+    assert_quantity(values["ports"], expected, "count")
+
+
 def test_card_connection_mode_identifiers(capsys):
     values = normalized_values("Card Connection Mode", "Self bomb", capsys)
 
