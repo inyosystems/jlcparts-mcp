@@ -316,6 +316,11 @@ OUTPUT_POLARITY_ALIASES = {
     "-": "Unspecified",
 }
 
+POLARITY_ALIASES = {
+    "Bi-Directional": "Bidirectional",
+    "-": "Unspecified",
+}
+
 DIRECTION_ALIASES = {
     "Bi-Directional": "Bidirectional",
     "Omni-directional": "Omnidirectional",
@@ -1207,6 +1212,8 @@ def normalizeAttribute(key, value):
         elif key in larr(["Output Polarity"]):
             polarity = "Positive;Negative" if str(value).strip() == "Positive and Negative Poles" else value
             value = attributes.identifierListAttribute(polarity, "polarity", aliases=OUTPUT_POLARITY_ALIASES)
+        elif key in larr(["Polarity"]):
+            value = attributes.identifierListAttribute(value, "polarity", aliases=POLARITY_ALIASES)
         elif key in larr(["Output Level"]):
             value = attributes.identifierListAttribute(value, "output level", aliases=SIGNAL_LEVEL_ALIASES)
         elif key in larr(["Output Signal"]):
