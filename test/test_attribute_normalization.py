@@ -4398,6 +4398,15 @@ def test_pin_location_identifiers(capsys):
     assert values["pin location 4"] == ["Unspecified", "identifier"]
 
 
+def test_fixed_form_identifiers(capsys):
+    values = normalized_values("Fixed Form", "Screw fixed, Screw Fixing, Snap fastener, -", capsys)
+
+    assert values["fixing method 1"] == ["Screw Mount", "identifier"]
+    assert values["fixing method 2"] == ["Screw Mount", "identifier"]
+    assert values["fixing method 3"] == ["Snap Fastener", "identifier"]
+    assert values["fixing method 4"] == ["Unspecified", "identifier"]
+
+
 def test_plastic_color_identifiers(capsys):
     values = normalized_values("Plastic Color", "Non-Plastic", capsys)
 
