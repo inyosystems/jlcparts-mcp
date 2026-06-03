@@ -171,6 +171,15 @@ ISOLATION_FLAG_VALUES = {
     "-": "NaN",
 }
 
+CARD_DETECTION_VALUES = {
+    "yes": 1,
+    "with card detect": 1,
+    "no": 0,
+    "no card detect": 0,
+    "no card detection": 0,
+    "-": "NaN",
+}
+
 APPEARANCE_SHAPE_ALIASES = {
     "Bench-shaped": "Bench-Shaped",
     "Block-shaped": "Block-Shaped",
@@ -1279,6 +1288,15 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "class", aliases=AMPLIFIER_CLASS_ALIASES)
         elif key in larr(["Card Type"]):
             value = attributes.identifierListAttribute(value, "card type", aliases=CARD_TYPE_ALIASES)
+        elif key in larr(["Card Detection"]):
+            has_card_detection = CARD_DETECTION_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${card detection}",
+                "primary": "card detection",
+                "values": {
+                    "card detection": [has_card_detection, "count"],
+                },
+            }
         elif key in larr(["Card Connection Mode"]):
             value = attributes.identifierListAttribute(value, "card connection mode", aliases=CARD_CONNECTION_MODE_ALIASES)
         elif key in larr(["Locking Feature"]):

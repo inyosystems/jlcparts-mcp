@@ -2550,6 +2550,23 @@ def test_card_type_identifiers(capsys):
     assert values["card type 1"] == ["Unspecified", "identifier"]
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
+        ("With Card Detect", 1),
+        ("No", 0),
+        ("No Card Detect", 0),
+        ("No Card Detection", 0),
+        ("-", "NaN"),
+    ],
+)
+def test_card_detection_values(value, expected, capsys):
+    values = normalized_values("Card Detection", value, capsys)
+
+    assert_quantity(values["card detection"], expected, "count")
+
+
 def test_card_connection_mode_identifiers(capsys):
     values = normalized_values("Card Connection Mode", "Self bomb", capsys)
 
