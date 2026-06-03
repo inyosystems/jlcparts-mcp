@@ -4427,6 +4427,21 @@ def test_strike_gundam_bracket_presence(capsys):
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
+        ("With Bracket", 1),
+        ("Without Bracket", 0),
+        ("Without bracket", 0),
+        ("-", "NaN"),
+    ],
+)
+def test_with_bracket_presence(value, expected, capsys):
+    values = normalized_values("With Bracket", value, capsys)
+
+    assert_quantity(values["with bracket"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
         ("600kHz, 1MHz, 800kHz", {
             "frequency 1": 600e3,
             "frequency 2": 1e6,
