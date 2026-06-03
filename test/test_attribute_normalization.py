@@ -3384,6 +3384,27 @@ def test_protocol_identifier_list(capsys):
     assert values["protocol 3"] == ["UART", "identifier"]
 
 
+def test_communication_protocol_identifier_list(capsys):
+    values = normalized_values(
+        "Communication Protocol",
+        "Bluetooth protocol;Ethernet protocol;Zigbee Protocol",
+        capsys,
+    )
+
+    assert values["protocol 1"] == ["Bluetooth", "identifier"]
+    assert values["protocol 2"] == ["Ethernet", "identifier"]
+    assert values["protocol 3"] == ["Zigbee", "identifier"]
+
+    values = normalized_values("Communication Protocol", "UART协议,SPI协议", capsys)
+
+    assert values["protocol 1"] == ["UART", "identifier"]
+    assert values["protocol 2"] == ["SPI", "identifier"]
+
+    values = normalized_values("Communication Protocol", "-", capsys)
+
+    assert values["protocol 1"] == ["Unspecified", "identifier"]
+
+
 def test_communication_system_identifier_list(capsys):
     values = normalized_values("Communication System", "NB-IoT, CAT-M, EVDO", capsys)
 

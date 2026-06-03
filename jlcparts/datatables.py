@@ -189,6 +189,16 @@ PORT_COUNT_VALUES = {
     "四口": 4,
 }
 
+COMMUNICATION_PROTOCOL_ALIASES = {
+    "Bluetooth protocol": "Bluetooth",
+    "Ethernet protocol": "Ethernet",
+    "Zigbee Protocol": "Zigbee",
+    "UART协议": "UART",
+    "SPI协议": "SPI",
+    "以太网协议": "Ethernet",
+    "-": "Unspecified",
+}
+
 APPEARANCE_SHAPE_ALIASES = {
     "Bench-shaped": "Bench-Shaped",
     "Block-shaped": "Block-Shaped",
@@ -1223,6 +1233,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "interface")
         elif key in larr(["Protocol", "Interface Protocol"]):
             value = attributes.identifierListAttribute(value, "protocol")
+        elif key in larr(["Communication Protocol"]):
+            value = attributes.identifierListAttribute(value, "protocol", aliases=COMMUNICATION_PROTOCOL_ALIASES)
         elif key in larr(["Communication System"]):
             value = attributes.identifierListAttribute(value, "communication system", aliases=COMMUNICATION_SYSTEM_ALIASES)
         elif key in larr(["Modulation System"]):
