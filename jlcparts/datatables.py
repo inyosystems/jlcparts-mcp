@@ -195,6 +195,13 @@ SYNCHRONOUS_RECTIFIER_VALUES = {
     "-": "NaN",
 }
 
+YES_NO_UNKNOWN_VALUES = {
+    "yes": 1,
+    "no": 0,
+    "none": "NaN",
+    "-": "NaN",
+}
+
 LED_PRESENCE_VALUES = {
     "with led": 1,
     "non-led": 0,
@@ -1623,6 +1630,15 @@ def normalizeAttribute(key, value):
                 "primary": "with led",
                 "values": {
                     "with led": [with_led, "count"],
+                },
+            }
+        elif key in larr(["Watchdog"]):
+            watchdog = YES_NO_UNKNOWN_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${watchdog}",
+                "primary": "watchdog",
+                "values": {
+                    "watchdog": [watchdog, "count"],
                 },
             }
         elif key in larr(["Strike Gundam", "With Bracket"]):
