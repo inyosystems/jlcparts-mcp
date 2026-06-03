@@ -4527,6 +4527,14 @@ def test_lens_color_identifiers(capsys):
     assert values["lens color 2"] == ["Frosted Green Lens", "identifier"]
 
 
+def test_catalog_class_attribute(capsys):
+    values = normalized_values("Basic/Extended", "Extended, Basic, Preferred", capsys)
+
+    assert values["catalog class 1"] == ["Extended", "identifier"]
+    assert values["catalog class 2"] == ["Basic", "identifier"]
+    assert values["catalog class 3"] == ["Preferred", "identifier"]
+
+
 def test_emitted_color_identifiers(capsys):
     values = normalized_values("Emitted Color", "Red, General Green/Yellow-Green", capsys)
 
