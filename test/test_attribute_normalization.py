@@ -3663,6 +3663,17 @@ def test_logic_gate_type_attribute(capsys):
     assert values["logic gate 3"] == ["Configurable Multiple Function", "identifier"]
 
 
+def test_control_input_logic_attribute(capsys):
+    values = normalized_values("Control Input Logic", "Active High, Active Low", capsys)
+
+    assert values["control input logic 1"] == ["Active High", "identifier"]
+    assert values["control input logic 2"] == ["Active Low", "identifier"]
+
+    values = normalized_values("Control Input Logic", "-", capsys)
+
+    assert values["control input logic 1"] == ["Unspecified", "identifier"]
+
+
 def test_antenna_type_attribute(capsys):
     values = normalized_values("Antenna Type", "Stamp Hole Antenna, IPEX interface", capsys)
 
