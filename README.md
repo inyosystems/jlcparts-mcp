@@ -95,6 +95,10 @@ instead of rebuilding the whole generated database:
 $ PYTHONPATH=. pytest -q test/test_attribute_section_scan.py --attribute-section 'Peak Forward Surge Current'
 ```
 
+If `cache-v2.sqlite3` is present in the repository root, this command reads raw
+values for only that selected section directly from the compact source database.
+It does not rebuild the frontend datatables.
+
 Pass `--attribute-section` multiple times to test a small batch. To test raw
 values before rebuilding datatables, pass them directly:
 
@@ -104,14 +108,17 @@ $ PYTHONPATH=. pytest -q test/test_attribute_section_scan.py \
     --attribute-value '35V~45V'
 ```
 
-To test one section against the SQLite cache without rebuilding generated
-tables, point the same test at the local database:
+To test one section against a non-default compact source database path, point
+the same test at it explicitly:
 
 ```
 $ PYTHONPATH=. pytest -q test/test_attribute_section_scan.py \
     --attribute-section 'Peak Forward Surge Current' \
-    --attribute-sqlite cache.sqlite3
+    --attribute-source-db cache-v2.sqlite3
 ```
+
+The legacy `cache.sqlite3` format is also supported with `--attribute-sqlite`,
+but it is slower because raw attributes are stored inside larger JSON blobs.
 
 For textual sections whose values do not contain numbers, include all generated
 strings explicitly:

@@ -39,9 +39,18 @@ def pytest_addoption(parser):
         "--attribute-sqlite",
         default=None,
         help=(
-            "Optional source cache.sqlite3 path. The focused attribute section "
-            "scan reads only the selected raw attribute values from SQLite, "
-            "avoiding a full generated datatable rebuild."
+            "Optional legacy cache.sqlite3 path. This avoids a full generated "
+            "datatable rebuild, but can be slow because attributes are stored "
+            "inside JSON blobs."
+        ),
+    )
+    parser.addoption(
+        "--attribute-source-db",
+        default=None,
+        help=(
+            "Optional compact source-db-v2 SQLite path. The focused attribute "
+            "section scan reads only the selected raw attribute values from "
+            "SQLite, avoiding a full generated datatable rebuild."
         ),
     )
     parser.addoption(
