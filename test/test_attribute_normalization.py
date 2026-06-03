@@ -3309,6 +3309,14 @@ def test_drive_type_identifiers(capsys):
     assert values["drive type 4"] == ["Unipolar Drive", "identifier"]
 
 
+def test_feedback_system_identifiers(capsys):
+    values = normalized_values("Feedback System", "Secondary-Side Feedback, Primary-side feedback, -", capsys)
+
+    assert values["feedback system 1"] == ["Secondary-Side Feedback", "identifier"]
+    assert values["feedback system 2"] == ["Primary-Side Feedback", "identifier"]
+    assert values["feedback system 3"] == ["Unspecified", "identifier"]
+
+
 def test_reset_active_level_identifiers(capsys):
     values = normalized_values("Reset Active Level", "Active High;Active Low", capsys)
 

@@ -402,6 +402,11 @@ DRIVE_TYPE_ALIASES = {
     "Single Phase": "Single-Phase",
 }
 
+FEEDBACK_SYSTEM_ALIASES = {
+    "Primary-side feedback": "Primary-Side Feedback",
+    "-": "Unspecified",
+}
+
 INTERRUPT_OUTPUT_ALIASES = {
     "With Interrupt Output": "Interrupt Output",
     "有中断输出": "Interrupt Output",
@@ -1397,6 +1402,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "motor type", aliases=DRIVE_MOTOR_TYPE_ALIASES)
         elif key in larr(["Drive Type"]):
             value = attributes.identifierListAttribute(value, "drive type", aliases=DRIVE_TYPE_ALIASES)
+        elif key in larr(["Feedback System"]):
+            value = attributes.identifierListAttribute(value, "feedback system", aliases=FEEDBACK_SYSTEM_ALIASES)
         elif key in larr(["Reset Active Level"]):
             value = attributes.identifierListAttribute(value, "reset active level", aliases=RESET_ACTIVE_LEVEL_ALIASES)
         elif key in larr(["Interrupt Output"]):
