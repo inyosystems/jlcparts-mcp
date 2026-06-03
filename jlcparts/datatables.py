@@ -295,6 +295,10 @@ STYLE_ALIASES = {
     "-": "Unspecified",
 }
 
+TRIGGER_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
 VOLTAGE_SUPPLY_SOURCE_ALIASES = {
     "Dual Power": "Dual Supply",
     "Single supply": "Single Supply",
@@ -1276,6 +1280,8 @@ def normalizeAttribute(key, value):
             value = attributes.configurationAttribute(value)
         elif key in larr(["Driven Configuration"]):
             value = attributes.identifierListAttribute(value, "configuration", aliases=DRIVEN_CONFIGURATION_ALIASES)
+        elif key in larr(["Trigger Type"]):
+            value = attributes.identifierListAttribute(value, "trigger type", aliases=TRIGGER_TYPE_ALIASES)
         elif key in larr(["Interface", "Control Interface", "Communication Interface", "Memory Interface", "IO Type", "The Interface Type", "Mac Interface"]):
             value = attributes.identifierListAttribute(value, "interface")
         elif key in larr(["Interface Type"]):

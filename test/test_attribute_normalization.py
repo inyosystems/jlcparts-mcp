@@ -3888,6 +3888,17 @@ def test_driven_configuration_identifiers(capsys):
     assert values["configuration 3"] == ["Half-Bridge", "identifier"]
 
 
+def test_trigger_type_identifiers(capsys):
+    values = normalized_values("Trigger Type", "Falling Edge, Rising Edge", capsys)
+
+    assert values["trigger type 1"] == ["Falling Edge", "identifier"]
+    assert values["trigger type 2"] == ["Rising Edge", "identifier"]
+
+    values = normalized_values("Trigger Type", "-", capsys)
+
+    assert values["trigger type 1"] == ["Unspecified", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
