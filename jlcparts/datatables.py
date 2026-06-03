@@ -182,9 +182,11 @@ TYPE_ALIASES = {
 ISOLATION_FLAG_VALUES = {
     "isolation": 1,
     "yes": 1,
+    "带电压隔离": 1,
     "no": 0,
     "non-insulated": 0,
     "non-isolated": 0,
+    "without voltage isolation": 0,
     "-": "NaN",
 }
 
@@ -1506,7 +1508,7 @@ def normalizeAttribute(key, value):
                     "synchronous rectifier": [has_synchronous_rectifier, "count"],
                 },
             }
-        elif key in larr(["Output Isolation", "Whether the Isolation"]):
+        elif key in larr(["Output Isolation", "Whether the Isolation", "Voltage Isolation or Not"]):
             is_isolated = ISOLATION_FLAG_VALUES.get(str(value).strip().lower(), "NaN")
             value = {
                 "format": "${is isolated}",

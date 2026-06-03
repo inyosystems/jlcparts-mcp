@@ -3822,10 +3822,12 @@ def test_synchronous_rectifier_attribute(key, value, expected, capsys):
         ("NO", 0),
         ("Non-Insulated", 0),
         ("Non-isolated", 0),
+        ("Without voltage isolation", 0),
+        ("带电压隔离", 1),
         ("-", "NaN"),
     ],
 )
-@pytest.mark.parametrize("key", ["Output Isolation", "Whether the Isolation"])
+@pytest.mark.parametrize("key", ["Output Isolation", "Whether the Isolation", "Voltage Isolation or Not"])
 def test_isolation_flag_attribute(key, value, expected, capsys):
     values = normalized_values(key, value, capsys)
 
