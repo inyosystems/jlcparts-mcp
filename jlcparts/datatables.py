@@ -157,6 +157,12 @@ PACKAGE_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+TYPE_ALIASES = {
+    "Receivers": "Receiver",
+    "transceiver": "Transceiver",
+    "-": "Unspecified",
+}
+
 APPEARANCE_SHAPE_ALIASES = {
     "Bench-shaped": "Bench-Shaped",
     "Block-shaped": "Block-Shaped",
@@ -1167,8 +1173,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "filter type", aliases=FILTER_TYPE_ALIASES)
         elif key in larr(["Standard Number"]):
             value = attributes.identifierListAttribute(value, "standard number")
-        elif key in larr(["Type"]):
-            value = attributes.identifierListAttribute(value, "type")
+        elif key in larr(["Type", "Types"]):
+            value = attributes.identifierListAttribute(value, "type", aliases=TYPE_ALIASES)
         elif key in larr(["Logic Type"]):
             value = attributes.identifierListAttribute(value, "logic type")
         elif key in larr(["Logic Gate Type"]):

@@ -3321,6 +3321,21 @@ def test_type_attribute(value, expected, capsys):
     }
 
 
+def test_types_attribute(capsys):
+    values = normalized_values("Types", "transceiver;隔离器", capsys)
+
+    assert values["type 1"] == ["Transceiver", "identifier"]
+    assert values["type 2"] == ["隔离器", "identifier"]
+
+    values = normalized_values("Types", "Receivers", capsys)
+
+    assert values["type 1"] == ["Receiver", "identifier"]
+
+    values = normalized_values("Types", "-", capsys)
+
+    assert values["type 1"] == ["Unspecified", "identifier"]
+
+
 def test_logic_type_attribute(capsys):
     values = normalized_values("Logic Type", "Divide-by-2, Divide-by-10", capsys)
 
