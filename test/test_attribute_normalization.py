@@ -3580,6 +3580,17 @@ def test_types_attribute(capsys):
     assert values["type 1"] == ["Unspecified", "identifier"]
 
 
+def test_functional_type_identifiers(capsys):
+    values = normalized_values("Functional Type", "Split Transceiver, Receiver", capsys)
+
+    assert values["function type 1"] == ["Split Transceiver", "identifier"]
+    assert values["function type 2"] == ["Receiver", "identifier"]
+
+    values = normalized_values("Functional Type", "-", capsys)
+
+    assert values["function type 1"] == ["Unspecified", "identifier"]
+
+
 def test_conversion_type_identifiers(capsys):
     values = normalized_values("Conversion Type", "AC-DC, AC/DC-DC", capsys)
 

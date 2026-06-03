@@ -324,6 +324,10 @@ CHIP_FUNCTION_ALIASES = {
     "-": "Unspecified",
 }
 
+FUNCTIONAL_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
 VOLTAGE_SUPPLY_SOURCE_ALIASES = {
     "Dual Power": "Dual Supply",
     "Single supply": "Single Supply",
@@ -1331,6 +1335,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "standard number")
         elif key in larr(["Type", "Types"]):
             value = attributes.identifierListAttribute(value, "type", aliases=TYPE_ALIASES)
+        elif key in larr(["Functional Type"]):
+            value = attributes.identifierListAttribute(value, "function type", aliases=FUNCTIONAL_TYPE_ALIASES)
         elif key in larr(["Conversion Type"]):
             value = attributes.identifierListAttribute(value, "conversion type", aliases=CONVERSION_TYPE_ALIASES)
         elif key in larr(["Whether the Isolation"]):
