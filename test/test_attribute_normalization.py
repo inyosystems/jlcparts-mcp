@@ -3336,6 +3336,22 @@ def test_types_attribute(capsys):
     assert values["type 1"] == ["Unspecified", "identifier"]
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
+        ("Isolation", 1),
+        ("NO", 0),
+        ("Non-Insulated", 0),
+        ("-", "NaN"),
+    ],
+)
+def test_whether_the_isolation_attribute(value, expected, capsys):
+    values = normalized_values("Whether the Isolation", value, capsys)
+
+    assert_quantity(values["is isolated"], expected, "count")
+
+
 def test_logic_type_attribute(capsys):
     values = normalized_values("Logic Type", "Divide-by-2, Divide-by-10", capsys)
 

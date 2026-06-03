@@ -163,6 +163,14 @@ TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+ISOLATION_FLAG_VALUES = {
+    "isolation": 1,
+    "yes": 1,
+    "no": 0,
+    "non-insulated": 0,
+    "-": "NaN",
+}
+
 APPEARANCE_SHAPE_ALIASES = {
     "Bench-shaped": "Bench-Shaped",
     "Block-shaped": "Block-Shaped",
@@ -1175,6 +1183,15 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "standard number")
         elif key in larr(["Type", "Types"]):
             value = attributes.identifierListAttribute(value, "type", aliases=TYPE_ALIASES)
+        elif key in larr(["Whether the Isolation"]):
+            is_isolated = ISOLATION_FLAG_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${is isolated}",
+                "primary": "is isolated",
+                "values": {
+                    "is isolated": [is_isolated, "count"],
+                },
+            }
         elif key in larr(["Logic Type"]):
             value = attributes.identifierListAttribute(value, "logic type")
         elif key in larr(["Logic Gate Type"]):
