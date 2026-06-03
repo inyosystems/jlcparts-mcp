@@ -3019,6 +3019,21 @@ def test_voltage_reference_identifiers(capsys):
     assert values["voltage reference 2"] == ["External", "identifier"]
 
 
+def test_reference_type_identifiers(capsys):
+    values = normalized_values("Reference Type", "Series, Parallel", capsys)
+
+    assert values["reference type 1"] == ["Series", "identifier"]
+    assert values["reference type 2"] == ["Parallel", "identifier"]
+
+    values = normalized_values("Reference Type", "series connection", capsys)
+
+    assert values["reference type 1"] == ["Series", "identifier"]
+
+    values = normalized_values("Reference Type", "-", capsys)
+
+    assert values["reference type 1"] == ["Unspecified", "identifier"]
+
+
 def test_technology_identifiers(capsys):
     values = normalized_values("Technology", "E-mode", capsys)
 
