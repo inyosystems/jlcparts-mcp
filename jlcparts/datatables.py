@@ -707,6 +707,11 @@ COLOR_ALIASES = {
     "IR": "Infrared",
 }
 
+DISPLAY_COLOR_ALIASES = {
+    "Yellow green background blue text": "Yellow Green Background, Blue Text",
+    "Blue background white text": "Blue Background, White Text",
+}
+
 def saveJson(object, filename, hash=False, pretty=False, compress=False):
     openFn = gzip.open if compress else open
     with openFn(filename, "wt", encoding="utf-8") as f:
@@ -1588,6 +1593,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "material", aliases=DIELECTRIC_MATERIAL_ALIASES)
         elif key in larr(["Contact Plating", "Contact Coating", "Ontology Coating"]):
             value = attributes.identifierListAttribute(value, "plating", aliases=CONTACT_PLATING_ALIASES)
+        elif key in larr(["Display Color"]):
+            value = attributes.identifierListAttribute(value, "display color", aliases=DISPLAY_COLOR_ALIASES)
         elif key in larr(["Illumination Color", "Color", "Actuator/Cap Color", "Actuator Color", "Detection Color", "Jacket Color", "Plastic Color", "Luminous Color"]):
             value = attributes.identifierListAttribute(value, "color", aliases=COLOR_ALIASES)
         elif key in larr(["Emitted Color"]):

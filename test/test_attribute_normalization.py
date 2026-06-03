@@ -4358,6 +4358,15 @@ def test_color_attribute_identifiers(capsys):
     }
 
 
+def test_display_color_identifiers(capsys):
+    values = normalized_values("Display Color", "Yellow green background blue text, Blue background white text, White, Blue", capsys)
+
+    assert values["display color 1"] == ["Yellow Green Background, Blue Text", "identifier"]
+    assert values["display color 2"] == ["Blue Background, White Text", "identifier"]
+    assert values["display color 3"] == ["White", "identifier"]
+    assert values["display color 4"] == ["Blue", "identifier"]
+
+
 def test_actuator_cap_color_identifiers(capsys):
     values = normalized_values("Actuator/Cap Color", "Yellow Cap", capsys)
 
