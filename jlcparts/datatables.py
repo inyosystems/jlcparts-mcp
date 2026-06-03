@@ -203,6 +203,10 @@ AXIS_ALIASES = {
     "-": "Unspecified",
 }
 
+ACTUATOR_MARKING_ALIASES = {
+    "-": "Unspecified",
+}
+
 APPEARANCE_SHAPE_ALIASES = {
     "Bench-shaped": "Bench-Shaped",
     "Block-shaped": "Block-Shaped",
@@ -1196,6 +1200,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "actuator style", aliases=ACTUATOR_STYLE_ALIASES)
         elif key in larr(["Actuator Type"]):
             value = attributes.identifierListAttribute(value, "actuator type", aliases=ACTUATOR_STYLE_ALIASES)
+        elif key in larr(["Actuator Identifier"]):
+            value = attributes.identifierListAttribute(value, "actuator marking", aliases=ACTUATOR_MARKING_ALIASES)
         elif key in larr(["The Chip Type", "Chip Type"]):
             value = attributes.identifierListAttribute(value, "chip type", aliases=CHIP_TYPE_ALIASES)
         elif key in larr(["Type of the Power Management Chip"]):

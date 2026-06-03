@@ -3027,6 +3027,20 @@ def test_actuator_type_identifiers(capsys):
     assert values["actuator type 1"] == ["Unspecified", "identifier"]
 
 
+def test_actuator_identifier_markings(capsys):
+    values = normalized_values("Actuator Identifier", "- O =", capsys)
+
+    assert values["actuator marking 1"] == ["- O =", "identifier"]
+
+    values = normalized_values("Actuator Identifier", "Dot Display", capsys)
+
+    assert values["actuator marking 1"] == ["Dot Display", "identifier"]
+
+    values = normalized_values("Actuator Identifier", "-", capsys)
+
+    assert values["actuator marking 1"] == ["Unspecified", "identifier"]
+
+
 def test_chip_type_identifiers(capsys):
     values = normalized_values("The Chip Type", "Protection IC, 电池监测芯片", capsys)
 
