@@ -199,6 +199,10 @@ COMMUNICATION_PROTOCOL_ALIASES = {
     "-": "Unspecified",
 }
 
+AXIS_ALIASES = {
+    "-": "Unspecified",
+}
+
 APPEARANCE_SHAPE_ALIASES = {
     "Bench-shaped": "Bench-Shaped",
     "Block-shaped": "Block-Shaped",
@@ -1345,6 +1349,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "locking feature", aliases=WITH_LOCKER_ALIASES)
         elif key in larr(["Direction"]):
             value = attributes.identifierListAttribute(value, "direction", aliases=DIRECTION_ALIASES)
+        elif key in larr(["Axial Direction"]):
+            value = attributes.identifierListAttribute(value, "axis", aliases=AXIS_ALIASES)
         elif key in larr(["Input Signal"]):
             value = attributes.identifierListAttribute(value, "input signal", aliases=SIGNAL_LEVEL_ALIASES)
         elif key in larr(["Peripheral/Function"]):

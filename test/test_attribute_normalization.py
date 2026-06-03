@@ -2637,6 +2637,18 @@ def test_direction_identifiers(capsys):
     assert values["direction 1"] == ["Unspecified", "identifier"]
 
 
+def test_axial_direction_identifiers(capsys):
+    values = normalized_values("Axial Direction", "X,Y(Roll),Z(Yaw)", capsys)
+
+    assert values["axis 1"] == ["X", "identifier"]
+    assert values["axis 2"] == ["Y(Roll)", "identifier"]
+    assert values["axis 3"] == ["Z(Yaw)", "identifier"]
+
+    values = normalized_values("Axial Direction", "-", capsys)
+
+    assert values["axis 1"] == ["Unspecified", "identifier"]
+
+
 def test_environmental_requirements(capsys):
     values = normalized_values(
         "Environmental Requirements",
