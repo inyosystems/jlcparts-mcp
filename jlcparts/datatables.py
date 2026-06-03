@@ -332,6 +332,13 @@ CARD_CONNECTION_MODE_ALIASES = {
     "-": "Unspecified",
 }
 
+WITH_LOCKER_ALIASES = {
+    "With locking buckle": "Locking",
+    "带锁扣": "Locking",
+    "不带": "Non-Latching",
+    "-": "Unspecified",
+}
+
 CERTIFICATION_ALIASES = {
     "-": "Unspecified",
 }
@@ -1276,6 +1283,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "card connection mode", aliases=CARD_CONNECTION_MODE_ALIASES)
         elif key in larr(["Locking Feature"]):
             value = attributes.identifierListAttribute(value, "locking feature", aliases=CARD_CONNECTION_MODE_ALIASES)
+        elif key in larr(["With Locker"]):
+            value = attributes.identifierListAttribute(value, "locking feature", aliases=WITH_LOCKER_ALIASES)
         elif key in larr(["Direction"]):
             value = attributes.identifierListAttribute(value, "direction", aliases=DIRECTION_ALIASES)
         elif key in larr(["Input Signal"]):

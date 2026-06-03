@@ -2574,6 +2574,23 @@ def test_locking_feature_identifiers(capsys):
     assert values["locking feature 1"] == ["No Lock", "identifier"]
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Locking", "Locking"),
+        ("With locking buckle", "Locking"),
+        ("带锁扣", "Locking"),
+        ("Non-Latching", "Non-Latching"),
+        ("不带", "Non-Latching"),
+        ("-", "Unspecified"),
+    ],
+)
+def test_with_locker_identifiers(value, expected, capsys):
+    values = normalized_values("With Locker", value, capsys)
+
+    assert values["locking feature 1"] == [expected, "identifier"]
+
+
 def test_direction_identifiers(capsys):
     values = normalized_values("Direction", "Omni-directional, Bi-Directional, 向上计数器", capsys)
 
