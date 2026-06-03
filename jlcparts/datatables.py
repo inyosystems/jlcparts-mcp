@@ -528,7 +528,10 @@ CONTACT_PLATING_ALIASES = {
     "silver plating": "Silver",
     "Gold Plated": "Gold",
     "Gold plating": "Gold",
+    "Nickel plated": "Nickel",
     "Tin Plated": "Tin",
+    "Tin plated": "Tin",
+    "Tin-nickel plated": "Tin-Nickel",
     "Tinning": "Tin",
     "Lead-tin": "Lead-Tin",
     "铅锡": "Lead-Tin",
@@ -1408,7 +1411,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "finish", aliases=CONTACT_PLATING_ALIASES)
         elif key in larr(["Dielectric Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=DIELECTRIC_MATERIAL_ALIASES)
-        elif key in larr(["Contact Plating"]):
+        elif key in larr(["Contact Plating", "Contact Coating"]):
             value = attributes.identifierListAttribute(value, "plating", aliases=CONTACT_PLATING_ALIASES)
         elif key in larr(["Illumination Color", "Color", "Actuator/Cap Color", "Actuator Color", "Detection Color", "Jacket Color", "Plastic Color", "Luminous Color"]):
             value = attributes.identifierListAttribute(value, "color", aliases=COLOR_ALIASES)

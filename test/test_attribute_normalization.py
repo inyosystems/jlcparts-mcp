@@ -4057,6 +4057,13 @@ def test_contact_plating_attribute(capsys):
     assert values["plating 2"] == ["Gold", "identifier"]
     assert values["plating 3"] == ["Gold-Palladium", "identifier"]
 
+    values = normalized_values("Contact Coating", "Nickel plated;Tin plated;silver plating;Tin-nickel plated", capsys)
+
+    assert values["plating 1"] == ["Nickel", "identifier"]
+    assert values["plating 2"] == ["Tin", "identifier"]
+    assert values["plating 3"] == ["Silver", "identifier"]
+    assert values["plating 4"] == ["Tin-Nickel", "identifier"]
+
 
 def test_contact_finish_identifiers(capsys):
     values = normalized_values("Contact Finish", "silver", capsys)
