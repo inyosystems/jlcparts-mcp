@@ -609,6 +609,13 @@ CONTACT_MATERIAL_ALIASES = {
     "-": "Unspecified",
 }
 
+METAL_MATERIAL_ALIASES = {
+    "Gold Plated": "Gold-Plated",
+    "Gold-plated copper": "Gold-Plated Copper",
+    "铜镀金": "Gold-Plated Copper",
+    "-": "Unspecified",
+}
+
 DIELECTRIC_MATERIAL_ALIASES = {
     "Metalized polyester film": "Metallized Polyester",
     "Metalized Polyester Film Capacitor": "Metallized Polyester",
@@ -1554,6 +1561,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "architecture", aliases=ARCHITECTURE_ALIASES)
         elif key in larr(["Contact Material", "Body Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)
+        elif key in larr(["Metal Material"]):
+            value = attributes.identifierListAttribute(value, "material", aliases=METAL_MATERIAL_ALIASES)
         elif key in larr(["Connect Type", "Contact Type"]):
             value = attributes.identifierListAttribute(value, "contact type", separators=",;/", aliases=CONTACT_TYPE_ALIASES)
         elif key in larr(["Contact Finish"]):

@@ -4217,6 +4217,15 @@ def test_body_material_attribute(capsys):
     assert values["material 1"] == ["Unspecified", "identifier"]
 
 
+def test_metal_material_attribute(capsys):
+    values = normalized_values("Metal Material", "Gold Plated, 铜镀金, Gold-plated copper, -", capsys)
+
+    assert values["material 1"] == ["Gold-Plated", "identifier"]
+    assert values["material 2"] == ["Gold-Plated Copper", "identifier"]
+    assert values["material 3"] == ["Gold-Plated Copper", "identifier"]
+    assert values["material 4"] == ["Unspecified", "identifier"]
+
+
 def test_contact_type_identifiers(capsys):
     values = normalized_values("Contact Type", "Dual-sided contacts / top and bottom connection", capsys)
 
