@@ -1641,6 +1641,15 @@ def normalizeAttribute(key, value):
                     "watchdog": [watchdog, "count"],
                 },
             }
+        elif key in larr(["Manual Reset"]):
+            manual_reset = YES_NO_UNKNOWN_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${manual reset}",
+                "primary": "manual reset",
+                "values": {
+                    "manual reset": [manual_reset, "count"],
+                },
+            }
         elif key in larr(["Strike Gundam", "With Bracket"]):
             value = attributes.bracketPresenceAttribute(value)
         elif key in larr(["Lens Color"]):

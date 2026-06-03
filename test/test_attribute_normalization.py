@@ -4523,6 +4523,21 @@ def test_watchdog_presence_attribute(value, expected, capsys):
     assert_quantity(values["watchdog"], expected, "count")
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
+        ("No", 0),
+        ("None", "NaN"),
+        ("-", "NaN"),
+    ],
+)
+def test_manual_reset_presence_attribute(value, expected, capsys):
+    values = normalized_values("Manual Reset", value, capsys)
+
+    assert_quantity(values["manual reset"], expected, "count")
+
+
 def test_strike_gundam_bracket_presence(capsys):
     values = normalized_values("Strike Gundam", "With bracket", capsys)
 
