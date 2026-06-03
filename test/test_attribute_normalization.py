@@ -3019,6 +3019,18 @@ def test_feature_list_attributes(key, value, expected, capsys):
     }
 
 
+def test_chip_function_identifiers(capsys):
+    values = normalized_values("Chip Function", "电容式触摸, PWM控制, Capacitive touch", capsys)
+
+    assert values["function 1"] == ["Capacitive Touch", "identifier"]
+    assert values["function 2"] == ["PWM Control", "identifier"]
+    assert values["function 3"] == ["Capacitive Touch", "identifier"]
+
+    values = normalized_values("Chip Function", "-", capsys)
+
+    assert values["function 1"] == ["Unspecified", "identifier"]
+
+
 def test_working_mode_identifiers(capsys):
     values = normalized_values("Working Mode", "CCM, DCM, QR, CRM", capsys)
 

@@ -317,6 +317,13 @@ ARCHITECTURE_ALIASES = {
     "-": "Unspecified",
 }
 
+CHIP_FUNCTION_ALIASES = {
+    "Capacitive touch": "Capacitive Touch",
+    "电容式触摸": "Capacitive Touch",
+    "PWM控制": "PWM Control",
+    "-": "Unspecified",
+}
+
 VOLTAGE_SUPPLY_SOURCE_ALIASES = {
     "Dual Power": "Dual Supply",
     "Single supply": "Single Supply",
@@ -1253,6 +1260,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierAttribute(value, "circuit")
         elif key in larr(["Features", "Feature", "Function", "Supplementary Features"]):
             value = attributes.identifierListAttribute(value, "feature")
+        elif key in larr(["Chip Function"]):
+            value = attributes.identifierListAttribute(value, "function", aliases=CHIP_FUNCTION_ALIASES)
         elif key in larr(["Actuator Style"]):
             value = attributes.identifierListAttribute(value, "actuator style", aliases=ACTUATOR_STYLE_ALIASES)
         elif key in larr(["Actuator Type"]):
