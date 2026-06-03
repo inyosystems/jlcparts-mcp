@@ -339,6 +339,10 @@ CLOCK_SOURCE_ALIASES = {
     "-": "Unspecified",
 }
 
+ROTATION_DIRECTION_ALIASES = {
+    "-": "Unspecified",
+}
+
 VOLTAGE_SUPPLY_SOURCE_ALIASES = {
     "Dual Power": "Dual Supply",
     "Single supply": "Single Supply",
@@ -1463,6 +1467,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "locking feature", aliases=WITH_LOCKER_ALIASES)
         elif key in larr(["Direction"]):
             value = attributes.identifierListAttribute(value, "direction", aliases=DIRECTION_ALIASES)
+        elif key in larr(["Sense of Rotation"]):
+            value = attributes.identifierListAttribute(value, "rotation direction", aliases=ROTATION_DIRECTION_ALIASES)
         elif key in larr(["Axial Direction", "Accelerometer Sensing Axis"]):
             value = attributes.identifierListAttribute(value, "axis", aliases=AXIS_ALIASES)
         elif key in larr(["Input Signal"]):

@@ -2646,6 +2646,17 @@ def test_direction_identifiers(capsys):
     assert values["direction 1"] == ["Unspecified", "identifier"]
 
 
+def test_rotation_direction_identifiers(capsys):
+    values = normalized_values("Sense of Rotation", "CW,CCW", capsys)
+
+    assert values["rotation direction 1"] == ["CW", "identifier"]
+    assert values["rotation direction 2"] == ["CCW", "identifier"]
+
+    values = normalized_values("Sense of Rotation", "-", capsys)
+
+    assert values["rotation direction 1"] == ["Unspecified", "identifier"]
+
+
 def test_axial_direction_identifiers(capsys):
     values = normalized_values("Axial Direction", "X,Y(Roll),Z(Yaw)", capsys)
 
