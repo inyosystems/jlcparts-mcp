@@ -2657,6 +2657,12 @@ def test_axial_direction_identifiers(capsys):
 
     assert values["axis 1"] == ["Unspecified", "identifier"]
 
+    values = normalized_values("Accelerometer Sensing Axis", "X,Y,Z", capsys)
+
+    assert values["axis 1"] == ["X", "identifier"]
+    assert values["axis 2"] == ["Y", "identifier"]
+    assert values["axis 3"] == ["Z", "identifier"]
+
 
 def test_environmental_requirements(capsys):
     values = normalized_values(
