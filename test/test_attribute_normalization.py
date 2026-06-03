@@ -4224,6 +4224,12 @@ def test_contact_type_identifiers(capsys):
     assert values["contact type 1"] == ["Normally Closed", "identifier"]
     assert values["contact type 2"] == ["Normally Open", "identifier"]
 
+    values = normalized_values("Connect Type", "Blade Contact (Female), Spring contact type, Blade Contact (Male)", capsys)
+
+    assert values["contact type 1"] == ["Blade Contact (Female)", "identifier"]
+    assert values["contact type 2"] == ["Spring Contact Type", "identifier"]
+    assert values["contact type 3"] == ["Blade Contact (Male)", "identifier"]
+
 
 def test_dielectric_material_attribute(capsys):
     values = normalized_values(

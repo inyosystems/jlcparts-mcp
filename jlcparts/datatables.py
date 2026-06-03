@@ -526,6 +526,7 @@ CONTACT_TYPE_ALIASES = {
     "Single-sided contact points": "Single-Sided Contact",
     "Normally closed": "Normally Closed",
     "Normal Open": "Normally Open",
+    "Spring contact type": "Spring Contact Type",
     "-": "Unspecified",
 }
 
@@ -1544,7 +1545,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "architecture", aliases=ARCHITECTURE_ALIASES)
         elif key in larr(["Contact Material", "Body Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)
-        elif key in larr(["Contact Type"]):
+        elif key in larr(["Connect Type", "Contact Type"]):
             value = attributes.identifierListAttribute(value, "contact type", separators=",;/", aliases=CONTACT_TYPE_ALIASES)
         elif key in larr(["Contact Finish"]):
             value = attributes.identifierListAttribute(value, "finish", aliases=CONTACT_PLATING_ALIASES)
