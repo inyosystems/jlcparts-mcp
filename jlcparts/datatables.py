@@ -1515,6 +1515,15 @@ def normalizeAttribute(key, value):
                     "is isolated": [is_isolated, "count"],
                 },
             }
+        elif key in larr(["Alarm Output"]):
+            has_alarm_output = YES_NO_UNKNOWN_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${alarm output}",
+                "primary": "alarm output",
+                "values": {
+                    "alarm output": [has_alarm_output, "count"],
+                },
+            }
         elif key in larr(["Logic Type"]):
             value = attributes.identifierListAttribute(value, "logic type")
         elif key in larr(["Logic Gate Type"]):

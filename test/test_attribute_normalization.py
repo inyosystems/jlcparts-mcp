@@ -2579,6 +2579,20 @@ def test_circuit_type_identifiers(capsys):
     ("value", "expected"),
     [
         ("Yes", 1),
+        ("No", 0),
+        ("-", "NaN"),
+    ],
+)
+def test_alarm_output_flag(value, expected, capsys):
+    values = normalized_values("Alarm Output", value, capsys)
+
+    assert_quantity(values["alarm output"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
         ("With Card Detect", 1),
         ("No", 0),
         ("No Card Detect", 0),
