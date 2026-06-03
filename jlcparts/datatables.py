@@ -313,6 +313,13 @@ CONVERSION_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+ISOLATION_TECHNOLOGY_ALIASES = {
+    "Magnetic isolation": "Magnetic Isolation",
+    "电容隔离": "Capacitive Isolation",
+    "巨磁隔离 (GMR)": "GMR Isolation",
+    "-": "Unspecified",
+}
+
 ARCHITECTURE_ALIASES = {
     "-": "Unspecified",
 }
@@ -1366,6 +1373,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "igbt type", aliases=IGBT_TYPE_ALIASES)
         elif key in larr(["Conversion Type"]):
             value = attributes.identifierListAttribute(value, "conversion type", aliases=CONVERSION_TYPE_ALIASES)
+        elif key in larr(["Isolation Technology"]):
+            value = attributes.identifierListAttribute(value, "isolation technology", aliases=ISOLATION_TECHNOLOGY_ALIASES)
         elif key in larr(["Whether the Isolation"]):
             is_isolated = ISOLATION_FLAG_VALUES.get(str(value).strip().lower(), "NaN")
             value = {

@@ -3639,6 +3639,15 @@ def test_conversion_type_identifiers(capsys):
     assert values["conversion type 1"] == ["Unspecified", "identifier"]
 
 
+def test_isolation_technology_attribute(capsys):
+    values = normalized_values("Isolation Technology", "Magnetic isolation, 电容隔离, 巨磁隔离 (GMR), -", capsys)
+
+    assert values["isolation technology 1"] == ["Magnetic Isolation", "identifier"]
+    assert values["isolation technology 2"] == ["Capacitive Isolation", "identifier"]
+    assert values["isolation technology 3"] == ["GMR Isolation", "identifier"]
+    assert values["isolation technology 4"] == ["Unspecified", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
