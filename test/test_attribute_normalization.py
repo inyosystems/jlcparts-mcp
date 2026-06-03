@@ -3604,6 +3604,16 @@ def test_fuseholder_type_attribute(capsys):
     assert values["holder type 1"] == ["Unspecified", "identifier"]
 
 
+def test_fuse_type_attribute(capsys):
+    values = normalized_values("Fuse Type", "Screw Terminal", capsys)
+
+    assert values["fuse type 1"] == ["Screw Terminal", "identifier"]
+
+    values = normalized_values("Fuse Type", "-", capsys)
+
+    assert values["fuse type 1"] == ["Unspecified", "identifier"]
+
+
 def test_mounting_type_attribute(capsys):
     values = normalized_values("Mounting Type", "Surface Mount, Right-Angle, Socket", capsys)
 

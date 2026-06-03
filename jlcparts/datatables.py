@@ -286,6 +286,10 @@ OSCILLATOR_CIRCUIT_ALIASES = {
     "-": "Unspecified",
 }
 
+FUSE_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
 RESET_ACTIVE_LEVEL_ALIASES = {
     "-": "Unspecified",
 }
@@ -1306,6 +1310,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "gender", aliases=GENDER_ALIASES)
         elif key in larr(["Holder Type", "Fuseholder Type"]):
             value = attributes.identifierListAttribute(value, "holder type", aliases=HOLDER_TYPE_ALIASES)
+        elif key in larr(["Fuse Type"]):
+            value = attributes.identifierListAttribute(value, "fuse type", aliases=FUSE_TYPE_ALIASES)
         elif key in larr(["Mounting Type", "Mounting Style", "Mounting Sytle"]):
             value = attributes.identifierListAttribute(value, "mounting type", aliases=MOUNTING_TYPE_ALIASES)
         elif key in larr(["Installation Method"]):
