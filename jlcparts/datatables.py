@@ -202,6 +202,12 @@ YES_NO_UNKNOWN_VALUES = {
     "-": "NaN",
 }
 
+NUMBER_WORD_VALUES = {
+    "single": 1,
+    "double": 2,
+    "three": 3,
+}
+
 LED_PRESENCE_VALUES = {
     "with led": 1,
     "non-led": 0,
@@ -1701,6 +1707,21 @@ def normalizeAttribute(key, value):
         elif key in larr(["Number of Channels", "Number of Elements", "Number of Lines",
                 "Output Count"]):
             value = attributes.channelCountAttribute(value)
+        elif key in larr(["Number of Coils"]):
+            text = str(value).strip()
+            coil_match = re.search(r"\b(single|double|three)\s+coils?\b", text, flags=re.I)
+            layer_match = re.search(r"\b(single|double|three)\s+layers?\b", text, flags=re.I)
+            if coil_match and layer_match:
+                value = {
+                    "format": "${coils} coils, ${layers} layers",
+                    "primary": "coils",
+                    "values": {
+                        "coils": [NUMBER_WORD_VALUES[coil_match.group(1).lower()], "count"],
+                        "layers": [NUMBER_WORD_VALUES[layer_match.group(1).lower()], "count"],
+                    },
+                }
+            else:
+                value = attributes.identifierAttribute(value, "coil count")
         elif key in larr(["Resolution", "Resolution (Bits)", "Resolution(Bits)",
                 "Output Bits", "DAC (Bit)", "ADC (Bit)", "Pwm (Bit)",
                 "Core Size", "Temperature Resolution", "Output Bit",

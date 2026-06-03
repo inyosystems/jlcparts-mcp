@@ -3900,6 +3900,22 @@ def test_coil_type_attribute(capsys):
     assert values["coil type"] == ["2 Coil", "identifier"]
 
 
+@pytest.mark.parametrize(
+    ("value", "coils", "layers"),
+    [
+        ("Single Coil, Single Layer", 1, 1),
+        ("Three coils, single layer", 3, 1),
+        ("Single Coil, Double Layer", 1, 2),
+        ("Single coil, three layers", 1, 3),
+    ],
+)
+def test_number_of_coils_attribute(value, coils, layers, capsys):
+    values = normalized_values("Number of Coils", value, capsys)
+
+    assert_quantity(values["coils"], coils, "count")
+    assert_quantity(values["layers"], layers, "count")
+
+
 def test_dimming_attribute(capsys):
     values = normalized_values("Dimming", "Analog, PWM, I2C", capsys)
 
