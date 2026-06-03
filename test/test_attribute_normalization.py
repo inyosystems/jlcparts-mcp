@@ -2559,6 +2559,14 @@ def test_card_type_identifiers(capsys):
     assert values["card type 1"] == ["Unspecified", "identifier"]
 
 
+def test_applicable_cable_type_identifiers(capsys):
+    values = normalized_values("Applicable Cable Type", "Round Cable, Ribbon Cable, Round cable", capsys)
+
+    assert values["cable type 1"] == ["Round Cable", "identifier"]
+    assert values["cable type 2"] == ["Ribbon Cable", "identifier"]
+    assert values["cable type 3"] == ["Round Cable", "identifier"]
+
+
 @pytest.mark.parametrize(
     ("value", "expected"),
     [

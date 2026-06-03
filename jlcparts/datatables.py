@@ -406,6 +406,10 @@ ISOLATION_REGULATION_ALIASES = {
     "-": "Unspecified",
 }
 
+APPLICABLE_CABLE_TYPE_ALIASES = {
+    "Round cable": "Round Cable",
+}
+
 CONTROL_INPUT_LOGIC_ALIASES = {
     "-": "Unspecified",
 }
@@ -1590,6 +1594,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "class", aliases=AMPLIFIER_CLASS_ALIASES)
         elif key in larr(["Card Type"]):
             value = attributes.identifierListAttribute(value, "card type", aliases=CARD_TYPE_ALIASES)
+        elif key in larr(["Applicable Cable Type"]):
+            value = attributes.identifierListAttribute(value, "cable type", aliases=APPLICABLE_CABLE_TYPE_ALIASES)
         elif key in larr(["Card Detection"]):
             has_card_detection = CARD_DETECTION_VALUES.get(str(value).strip().lower(), "NaN")
             value = {
