@@ -3317,6 +3317,14 @@ def test_feedback_system_identifiers(capsys):
     assert values["feedback system 3"] == ["Unspecified", "identifier"]
 
 
+def test_input_voltage_type_identifiers(capsys):
+    values = normalized_values("Input Voltage Type", "AC,DC,-", capsys)
+
+    assert values["input voltage type 1"] == ["AC", "identifier"]
+    assert values["input voltage type 2"] == ["DC", "identifier"]
+    assert values["input voltage type 3"] == ["Unspecified", "identifier"]
+
+
 def test_reset_active_level_identifiers(capsys):
     values = normalized_values("Reset Active Level", "Active High;Active Low", capsys)
 

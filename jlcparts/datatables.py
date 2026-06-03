@@ -397,6 +397,10 @@ TIMING_MODE_ALIASES = {
     "-": "Unspecified",
 }
 
+INPUT_VOLTAGE_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
 CONTROL_INPUT_LOGIC_ALIASES = {
     "-": "Unspecified",
 }
@@ -1422,6 +1426,8 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "drive type", aliases=DRIVE_TYPE_ALIASES)
         elif key in larr(["Feedback System"]):
             value = attributes.identifierListAttribute(value, "feedback system", aliases=FEEDBACK_SYSTEM_ALIASES)
+        elif key in larr(["Input Voltage Type"]):
+            value = attributes.identifierListAttribute(value, "input voltage type", aliases=INPUT_VOLTAGE_TYPE_ALIASES)
         elif key in larr(["Reset Active Level"]):
             value = attributes.identifierListAttribute(value, "reset active level", aliases=RESET_ACTIVE_LEVEL_ALIASES)
         elif key in larr(["Reset Style"]):
