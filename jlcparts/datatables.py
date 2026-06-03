@@ -273,6 +273,7 @@ PIN_TYPE_ALIASES = {
 TECHNOLOGY_ALIASES = {
     "D-mode": "Depletion Mode",
     "E-mode": "Enhancement Mode",
+    "Electromagnetic Type": "Electromagnetic",
     "No": "No",
     "Yes": "Yes",
     "-": "Unspecified",
@@ -1229,7 +1230,7 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "switch tube", aliases=SWITCH_TUBE_ALIASES)
         elif key in larr(["Circluar Pins/Square Pins"]):
             value = attributes.identifierListAttribute(value, "pin type", aliases=PIN_TYPE_ALIASES)
-        elif key in larr(["Technology"]):
+        elif key in larr(["Technology", "Technology Type"]):
             value = attributes.identifierListAttribute(value, "technology", aliases=TECHNOLOGY_ALIASES)
         elif key in larr(["Drive Motor Type"]):
             value = attributes.identifierListAttribute(value, "motor type", aliases=DRIVE_MOTOR_TYPE_ALIASES)

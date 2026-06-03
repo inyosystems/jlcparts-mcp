@@ -3181,6 +3181,14 @@ def test_technology_identifiers(capsys):
 
     assert values["technology 1"] == ["Unspecified", "identifier"]
 
+    values = normalized_values("Technology Type", "Electromagnetic Type", capsys)
+
+    assert values["technology 1"] == ["Electromagnetic", "identifier"]
+
+    values = normalized_values("Technology Type", "-", capsys)
+
+    assert values["technology 1"] == ["Unspecified", "identifier"]
+
 
 def test_drive_motor_type_identifiers(capsys):
     values = normalized_values("Drive Motor Type", "Brush DC Motor", capsys)
