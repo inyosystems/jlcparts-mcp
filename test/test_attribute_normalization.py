@@ -3591,6 +3591,13 @@ def test_functional_type_identifiers(capsys):
     assert values["function type 1"] == ["Unspecified", "identifier"]
 
 
+def test_igbt_type_identifiers(capsys):
+    values = normalized_values("IGBT Type", "FS (Field Stop), NPT (Non-Punch Through)", capsys)
+
+    assert values["igbt type 1"] == ["FS (Field Stop)", "identifier"]
+    assert values["igbt type 2"] == ["NPT (Non-Punch Through)", "identifier"]
+
+
 def test_conversion_type_identifiers(capsys):
     values = normalized_values("Conversion Type", "AC-DC, AC/DC-DC", capsys)
 
