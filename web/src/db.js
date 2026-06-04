@@ -28,6 +28,8 @@ const SMALL_SHARD_ESTIMATED_ROWS = 1000;
 const BROWSE_SHARD_ESTIMATED_ROWS = 20000;
 const parsedFileCache = new Map();
 let manifestCache = undefined;
+let manifestCacheRevision = 0;
+let manifestLoadPromise = null;
 const libraryChangeListeners = new Set();
 
 function dataUrl(name) {
@@ -577,11 +579,30 @@ export async function getLocalManifest() {
     if (manifestCache !== undefined) {
         return manifestCache;
     }
-    manifestCache = (await getSetting("manifest")) ?? null;
-    return manifestCache;
+    if (manifestLoadPromise) {
+        return await manifestLoadPromise;
+    }
+
+    const loadRevision = manifestCacheRevision;
+    const loadPromise = (async () => {
+        const manifest = (await getSetting("manifest")) ?? null;
+        if (manifestCache === undefined && manifestCacheRevision === loadRevision) {
+            manifestCache = manifest;
+        }
+        return manifestCache !== undefined ? manifestCache : manifest;
+    })();
+    manifestLoadPromise = loadPromise;
+    try {
+        return await loadPromise;
+    } finally {
+        if (manifestLoadPromise === loadPromise) {
+            manifestLoadPromise = null;
+        }
+    }
 }
 
 async function storeManifest(manifest) {
+    manifestCacheRevision++;
     manifestCache = manifest;
     await Promise.all([
         setSetting("manifest", manifest),
