@@ -28,8 +28,6 @@ const SMALL_SHARD_ESTIMATED_ROWS = 1000;
 const BROWSE_SHARD_ESTIMATED_ROWS = 20000;
 const parsedFileCache = new Map();
 let manifestCache = undefined;
-let manifestCacheRevision = 0;
-let manifestLoadPromise = null;
 const libraryChangeListeners = new Set();
 
 function dataUrl(name) {
@@ -575,34 +573,24 @@ async function setSetting(key, value) {
     await db.settings.put({ key, value });
 }
 
-export async function getLocalManifest() {
-    if (manifestCache !== undefined) {
+async function readStoredManifest() {
+    return (await getSetting("manifest")) ?? null;
+}
+
+export async function getLocalManifest({ reload = false } = {}) {
+    if (!reload && manifestCache) {
         return manifestCache;
     }
-    if (manifestLoadPromise) {
-        return await manifestLoadPromise;
-    }
 
-    const loadRevision = manifestCacheRevision;
-    const loadPromise = (async () => {
-        const manifest = (await getSetting("manifest")) ?? null;
-        if (manifestCache === undefined && manifestCacheRevision === loadRevision) {
-            manifestCache = manifest;
-        }
-        return manifestCache !== undefined ? manifestCache : manifest;
-    })();
-    manifestLoadPromise = loadPromise;
-    try {
-        return await loadPromise;
-    } finally {
-        if (manifestLoadPromise === loadPromise) {
-            manifestLoadPromise = null;
-        }
+    const manifest = await readStoredManifest();
+    if (manifest) {
+        manifestCache = manifest;
+        return manifestCache;
     }
+    return manifestCache ?? null;
 }
 
 async function storeManifest(manifest) {
-    manifestCacheRevision++;
     manifestCache = manifest;
     await Promise.all([
         setSetting("manifest", manifest),
@@ -728,7 +716,7 @@ async function ensureJsonFile(name, onDownloadProgress) {
 }
 
 export async function getCategories() {
-    return (await getLocalManifest())?.categories ?? [];
+    return (await getLocalManifest({ reload: true }))?.categories ?? [];
 }
 
 export async function hasLocalComponentLibrary() {
