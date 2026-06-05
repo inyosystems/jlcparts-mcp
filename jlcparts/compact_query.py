@@ -1,5 +1,6 @@
 import datetime
 import json
+import re
 import sqlite3
 from pathlib import Path
 
@@ -256,6 +257,24 @@ class CompactQueryService:
 
     def lookup_component_website_detail(self, lcsc, lookup_func=None):
         lcsc = _normalize_lcsc(lcsc)
+        if not _is_exact_lcsc(lcsc):
+            return {
+                "lcsc": lcsc,
+                "found": False,
+                "error": "invalid_lcsc",
+                "note": "Website detail lookup requires an exact LCSC code such as C25804.",
+            }
+        cached = self.conn.execute(
+            "SELECT 1 FROM components WHERE lcsc = ?",
+            (lcsc,),
+        ).fetchone()
+        if cached is None:
+            return {
+                "lcsc": lcsc,
+                "found": False,
+                "error": "not_in_cache",
+                "note": "Website detail lookup is limited to exact LCSC parts already present in the local index.",
+            }
         if lookup_func is None:
             from .jlcpcb import _website_component_enrichment
 
@@ -750,6 +769,10 @@ def _normalize_lcsc(lcsc):
     if lcsc.isdigit():
         return f"C{lcsc}"
     return lcsc
+
+
+def _is_exact_lcsc(lcsc):
+    return bool(re.fullmatch(r"C\d+", str(lcsc)))
 
 
 def _normalize_category_ids(category_ids):

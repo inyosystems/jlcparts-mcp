@@ -1,5 +1,6 @@
 import argparse
 import asyncio
+import ipaddress
 import json
 import os
 from dataclasses import dataclass
@@ -363,12 +364,38 @@ def build_arg_parser():
     )
     parser.add_argument("--host", default="127.0.0.1", help="HTTP bind host")
     parser.add_argument("--port", type=int, default=8765, help="HTTP bind port")
+    parser.add_argument(
+        "--allow-remote-http",
+        action="store_true",
+        help="Allow HTTP transport to bind to a non-loopback host; put access control in front of it",
+    )
     return parser
+
+
+def validate_bind_args(args):
+    if args.transport != "http" or args.allow_remote_http or _is_loopback_host(args.host):
+        return None
+    return (
+        "--transport http only binds to loopback hosts by default; "
+        f"pass --allow-remote-http to bind {args.host}"
+    )
+
+
+def _is_loopback_host(host):
+    if host in {"localhost"}:
+        return True
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
 
 
 def main(argv=None):
     parser = build_arg_parser()
     args = parser.parse_args(argv)
+    bind_error = validate_bind_args(args)
+    if bind_error:
+        parser.error(bind_error)
     config = build_config(args)
     mcp = create_mcp_server(config)
     transport = "streamable-http" if args.transport == "http" else "stdio"

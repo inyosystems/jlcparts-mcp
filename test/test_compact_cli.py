@@ -10,10 +10,20 @@ def test_cli_exposes_compact_commands_and_hides_official_refresh():
     assert result.exit_code == 0
     assert "download-catalog" in result.output
     assert "build-index" in result.output
-    assert "enrich-cache" in result.output
     assert "mcp" in result.output
+    assert "enrich-cache" not in result.output
     assert "refresh-cache" not in result.output
     assert "fetchdb" not in result.output
+    assert "fetchtable" not in result.output
+    assert "fetchdetails" not in result.output
+    assert "getlibrary" not in result.output
+    assert "listcategories" not in result.output
+    assert "listattributes" not in result.output
+    assert "buildtables" not in result.output
+    assert "buildwebdb" not in result.output
+    assert "migratecache" not in result.output
+    assert "updatepreferred" not in result.output
+    assert "testcomponent" not in result.output
 
 
 def test_build_index_cli_builds_compact_index(tmp_path):

@@ -1,20 +1,33 @@
 [build-system]
-requires = ["setuptools>=61"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "jlcparts"
+name = "jlcparts-mcp"
 version = "0.1.0"
-description = "Better view of JLC PCB parts"
+description = "Cache-first MCP server for JLCPCB SMT assembly component search"
 readme = "README.md"
 requires-python = ">=3.10"
+license = "MIT"
 authors = [
-    { name = "Jan Mrázek", email = "email@honzamrazek.cz" },
+    { name = "Jan Mrázek" },
 ]
+maintainers = [
+    { name = "Inyo Systems" },
+]
+keywords = ["jlcpcb", "lcsc", "mcp", "electronics", "pcba", "smt"]
 classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Manufacturing",
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
     "click",
@@ -24,13 +37,17 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/RoboticsBrno/JLCPCB-Parts"
+Homepage = "https://github.com/inyosystems/jlcparts-mcp"
+Repository = "https://github.com/inyosystems/jlcparts-mcp"
+Issues = "https://github.com/inyosystems/jlcparts-mcp/issues"
+Changelog = "https://github.com/inyosystems/jlcparts-mcp/blob/master/CHANGELOG.md"
+"Upstream Project" = "https://github.com/yaqwsx/jlcparts"
+"Source Catalog" = "https://yaqwsx.github.io/jlcparts/data"
 
 [project.scripts]
 jlcparts = "jlcparts.ui:cli"
 jlcparts-download-catalog = "jlcparts.ui:downloadCatalog"
 jlcparts-build-index = "jlcparts.ui:buildIndex"
-jlcparts-enrich-cache = "jlcparts.ui:enrichCache"
 jlcparts-mcp = "jlcparts.mcp_server:main"
 
 [tool.setuptools.packages.find]

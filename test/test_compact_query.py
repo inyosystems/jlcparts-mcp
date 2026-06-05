@@ -93,3 +93,51 @@ def test_compact_query_connections_are_configured_for_concurrent_mcp_clients(tmp
     assert reader_busy_timeout_ms >= 30000
     assert query_only == 1
     assert result["total"] == 2
+
+
+def test_website_detail_lookup_rejects_invalid_lcsc_without_remote_call(tmp_path):
+    index_path = build_compact_index_fixture(tmp_path)
+    calls = []
+
+    def lookup_func(lcsc):
+        calls.append(lcsc)
+        return {"websiteComponentId": 123}
+
+    with CompactQueryService(index_path) as service:
+        result = service.lookup_component_website_detail("resistor 10k", lookup_func=lookup_func)
+
+    assert result["found"] is False
+    assert result["error"] == "invalid_lcsc"
+    assert calls == []
+
+
+def test_website_detail_lookup_rejects_non_cached_lcsc_without_remote_call(tmp_path):
+    index_path = build_compact_index_fixture(tmp_path)
+    calls = []
+
+    def lookup_func(lcsc):
+        calls.append(lcsc)
+        return {"websiteComponentId": 123}
+
+    with CompactQueryService(index_path) as service:
+        result = service.lookup_component_website_detail("C9999", lookup_func=lookup_func)
+
+    assert result["found"] is False
+    assert result["error"] == "not_in_cache"
+    assert calls == []
+
+
+def test_website_detail_lookup_allows_cached_exact_lcsc(tmp_path):
+    index_path = build_compact_index_fixture(tmp_path)
+    calls = []
+
+    def lookup_func(lcsc):
+        calls.append(lcsc)
+        return {"websiteComponentId": 123}
+
+    with CompactQueryService(index_path) as service:
+        result = service.lookup_component_website_detail("1001", lookup_func=lookup_func)
+
+    assert result["found"] is True
+    assert result["website_detail"] == {"websiteComponentId": 123}
+    assert calls == ["C1001"]

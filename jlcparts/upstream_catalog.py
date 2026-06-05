@@ -257,6 +257,18 @@ def _existing_result(
 ) -> CatalogDownloadResult:
     if not manifest_target.exists() or not metadata_target.exists():
         raise RuntimeError("upstream returned not-modified but local catalog is incomplete")
+    manifest = _load_manifest(manifest_target.read_bytes())
+    _validate_manifest(manifest)
+    missing_files = [
+        filename
+        for filename in _referenced_filenames(manifest)
+        if not (output_dir / filename).exists()
+    ]
+    if missing_files:
+        raise RuntimeError(
+            "upstream returned not-modified but local catalog is incomplete: "
+            + ", ".join(missing_files)
+        )
     metadata = _read_existing_metadata(metadata_target)
     return CatalogDownloadResult(
         output_dir=output_dir,

@@ -202,7 +202,21 @@ def test_download_manifest_source_validates_declared_sha256(tmp_path, catalog_se
 def test_download_manifest_source_reuses_existing_catalog_on_not_modified(tmp_path, catalog_server):
     server, handler = catalog_server
     base_url = f"http://127.0.0.1:{server.server_port}/data"
-    (tmp_path / "manifest.json").write_text("{}", encoding="utf-8")
+    manifest = {
+        "version": "web-v1",
+        "totalComponents": 12,
+        "attributesLut": "attributes-lut.json.gz",
+        "categories": [],
+        "files": {
+            "attributes-lut.json.gz": {
+                "name": "attributes-lut.json.gz",
+                "kind": "attributes-lut",
+                "sha256": _sha256(b"attributes"),
+            }
+        },
+    }
+    (tmp_path / "manifest.json").write_bytes(_json_bytes(manifest))
+    (tmp_path / "attributes-lut.json.gz").write_bytes(b"attributes")
     (tmp_path / "catalog-metadata.json").write_text(
         json.dumps(
             {
@@ -229,3 +243,39 @@ def test_download_manifest_source_reuses_existing_catalog_on_not_modified(tmp_pa
         handler.request_headers[0]["If-Modified-Since"]
         == "Thu, 04 Jun 2026 12:00:00 GMT"
     )
+
+
+def test_download_manifest_source_rejects_not_modified_when_local_shard_missing(tmp_path, catalog_server):
+    server, handler = catalog_server
+    base_url = f"http://127.0.0.1:{server.server_port}/data"
+    manifest = {
+        "version": "web-v1",
+        "totalComponents": 12,
+        "attributesLut": "attributes-lut.json.gz",
+        "categories": [],
+        "files": {
+            "attributes-lut.json.gz": {
+                "name": "attributes-lut.json.gz",
+                "kind": "attributes-lut",
+                "sha256": _sha256(b"attributes"),
+            }
+        },
+    }
+    (tmp_path / "manifest.json").write_bytes(_json_bytes(manifest))
+    (tmp_path / "catalog-metadata.json").write_text(
+        json.dumps(
+            {
+                "catalog_source": "upstream",
+                "source_url": base_url,
+                "downloaded_at": "2026-06-04T12:00:00Z",
+                "etag": '"existing"',
+                "component_count": 12,
+                "schema_version": "catalog-metadata-v1",
+            }
+        ),
+        encoding="utf-8",
+    )
+    handler.statuses_by_path = {"/data/manifest.json": 304}
+
+    with pytest.raises(RuntimeError, match="local catalog is incomplete"):
+        UpstreamCatalogDownloader().download_manifest_source(tmp_path, base_url)

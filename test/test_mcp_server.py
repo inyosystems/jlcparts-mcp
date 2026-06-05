@@ -7,6 +7,7 @@ from jlcparts.mcp_server import (
     build_arg_parser,
     build_config,
     create_mcp_server,
+    validate_bind_args,
 )
 from test_compact_index import build_compact_index_fixture
 
@@ -19,6 +20,27 @@ def test_mcp_config_defaults_to_compact_index_without_credentials(tmp_path, monk
 
     assert config.index_path.endswith("mcp-index.sqlite3")
     assert not hasattr(config, "credentials")
+
+
+def test_http_transport_rejects_non_loopback_host_without_explicit_opt_in():
+    args = build_arg_parser().parse_args(["--transport", "http", "--host", "0.0.0.0"])
+
+    assert validate_bind_args(args) == (
+        "--transport http only binds to loopback hosts by default; "
+        "pass --allow-remote-http to bind 0.0.0.0"
+    )
+
+
+def test_http_transport_allows_non_loopback_host_with_explicit_opt_in():
+    args = build_arg_parser().parse_args([
+        "--transport",
+        "http",
+        "--host",
+        "0.0.0.0",
+        "--allow-remote-http",
+    ])
+
+    assert validate_bind_args(args) is None
 
 
 def test_fastmcp_lists_compact_cache_first_tools(tmp_path):

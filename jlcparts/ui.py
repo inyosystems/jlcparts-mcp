@@ -378,85 +378,18 @@ def buildIndex(catalog_path, index_path, force, progress_interval):
     help="HTTP bind host")
 @click.option("--port", type=int, default=8765,
     help="HTTP bind port")
-def mcp(index_path, transport, host, port):
+@click.option("--allow-remote-http", is_flag=True,
+    help="Allow HTTP transport to bind to a non-loopback host")
+def mcp(index_path, transport, host, port, allow_remote_http):
     """
     Run the local cache-first MCP server.
     """
     from .mcp_server import main as mcp_main
 
     argv = ["--index", index_path, "--transport", transport, "--host", host, "--port", str(port)]
+    if allow_remote_http:
+        argv.append("--allow-remote-http")
     mcp_main(argv)
-
-
-@click.command("enrich-cache")
-@click.option("--index", "index_path", default="~/.cache/jlcparts/mcp-index.sqlite3",
-    help="Compact MCP index SQLite path")
-@click.option("--limit", type=int, default=0,
-    help="Enrich at most this many components; 0 means no artificial limit")
-@click.option("--verbose", is_flag=True,
-    help="Be verbose")
-def enrichCache(index_path, limit, verbose):
-    """
-    Fetch exact public website detail for indexed components as maintenance.
-    """
-    from .compact_query import CompactQueryService
-
-    index_path = os.path.abspath(os.path.expanduser(index_path))
-    max_count = None if limit == 0 else max(0, int(limit))
-    processed = 0
-    enriched = 0
-    failed = 0
-    conn = sqlite3.connect(index_path)
-    try:
-        rows = conn.execute(
-            """
-            SELECT lcsc FROM components
-            WHERE website_checked_at IS NULL
-            ORDER BY lcsc_number
-            """
-        ).fetchall()
-        if max_count is not None:
-            rows = rows[:max_count]
-        service = CompactQueryService(index_path)
-        try:
-            for row in rows:
-                lcsc = row[0]
-                processed += 1
-                result = service.lookup_component_website_detail(lcsc)
-                if result.get("found"):
-                    conn.execute(
-                        """
-                        INSERT OR REPLACE INTO website_component_details(
-                            lcsc, checked_at, website_json
-                        )
-                        VALUES (?, ?, ?)
-                        """,
-                        (
-                            lcsc,
-                            result["checked_at"],
-                            json.dumps(result.get("website_detail"), separators=(",", ":")),
-                        ),
-                    )
-                    conn.execute(
-                        "UPDATE components SET website_checked_at = ? WHERE lcsc = ?",
-                        (result["checked_at"], lcsc),
-                    )
-                    enriched += 1
-                else:
-                    failed += 1
-                if verbose:
-                    print(f"{lcsc}: {'enriched' if result.get('found') else 'failed'}")
-        finally:
-            service.close()
-        conn.commit()
-    finally:
-        conn.close()
-    print(json.dumps({
-        "index_path": index_path,
-        "processed": processed,
-        "enriched": enriched,
-        "failed": failed,
-    }, indent=2, sort_keys=True))
 
 
 @click.command("refresh-cache")
@@ -762,20 +695,9 @@ def testComponent(lcsc):
 def cli():
     pass
 
-cli.add_command(getLibrary)
-cli.add_command(listcategories)
-cli.add_command(listattributes)
 cli.add_command(downloadCatalog)
 cli.add_command(buildIndex)
-cli.add_command(enrichCache)
 cli.add_command(mcp)
-cli.add_command(buildtables)
-cli.add_command(buildwebdb)
-cli.add_command(updatePreferred)
-cli.add_command(migratecache)
-cli.add_command(fetchDetails)
-cli.add_command(fetchTable)
-cli.add_command(testComponent)
 
 if __name__ == "__main__":
     cli()
