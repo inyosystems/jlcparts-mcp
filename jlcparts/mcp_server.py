@@ -1,4 +1,5 @@
 import argparse
+import asyncio
 import json
 import os
 from dataclasses import dataclass
@@ -78,8 +79,11 @@ def create_mcp_server(config):
         port=config.port,
     )
 
+    async def run_blocking(func):
+        return await asyncio.to_thread(func)
+
     @mcp.tool()
-    def cache_status():
+    async def cache_status():
         """Return compact index readiness and upstream catalog metadata.
 
         Cache-only status tool; does not contact JLCPCB. Use this before
@@ -87,10 +91,10 @@ def create_mcp_server(config):
         upstream catalog source URL, source timestamp, build timestamp, schema
         version, and component count.
         """
-        return manager.cache_status()
+        return await run_blocking(manager.cache_status)
 
     @mcp.tool()
-    def list_categories(search: str | None = None, limit: int = 200):
+    async def list_categories(search: str | None = None, limit: int = 200):
         """List JLCPCB component categories available in the local index.
 
         Cache-only research tool; does not contact JLCPCB. Use this to obtain
@@ -98,11 +102,14 @@ def create_mcp_server(config):
         filters category paths such as resistor, capacitor, connector, or
         voltage regulator.
         """
-        with manager.query_service() as service:
-            return service.list_categories(search=search, limit=limit)
+        def query():
+            with manager.query_service() as service:
+                return service.list_categories(search=search, limit=limit)
+
+        return await run_blocking(query)
 
     @mcp.tool()
-    def list_attributes(
+    async def list_attributes(
         category_ids: list[int] | None = None,
         text_query: str | None = None,
         limit: int = 100,
@@ -116,11 +123,14 @@ def create_mcp_server(config):
         count, and normalized quantity types such as resistance, voltage,
         capacitance, current, temperature, count, identifier, and string.
         """
-        with manager.query_service() as service:
-            return service.list_attributes(category_ids, text_query, limit)
+        def query():
+            with manager.query_service() as service:
+                return service.list_attributes(category_ids, text_query, limit)
+
+        return await run_blocking(query)
 
     @mcp.tool()
-    def list_attribute_values(
+    async def list_attribute_values(
         attribute: str,
         category_ids: list[int] | None = None,
         text_query: str | None = None,
@@ -133,11 +143,14 @@ def create_mcp_server(config):
         search_components exact_filters. Use numeric.ranges[].unit with
         numeric_filters for range searches.
         """
-        with manager.query_service() as service:
-            return service.list_attribute_values(attribute, category_ids, text_query, limit)
+        def query():
+            with manager.query_service() as service:
+                return service.list_attribute_values(attribute, category_ids, text_query, limit)
+
+        return await run_blocking(query)
 
     @mcp.tool()
-    def search_components(
+    async def search_components(
         category_ids: list[int] | None = None,
         text_query: str = "",
         exact_filters: dict | list | None = None,
@@ -182,39 +195,42 @@ def create_mcp_server(config):
         manufacturer, description, category, stock, price, library_type, or use
         sort_attribute for an attribute column.
         """
-        with manager.query_service() as service:
-            return service.search_components(
-                category_ids=category_ids,
-                text_query=text_query,
-                exact_filters=exact_filters,
-                numeric_filters=numeric_filters,
-                required_attributes=required_attributes,
-                quantity=quantity,
-                in_stock=in_stock,
-                library_types=library_types,
-                rohs=rohs,
-                eccn=eccn,
-                assembly=assembly,
-                assembly_process=assembly_process,
-                assembly_mode=assembly_mode,
-                has_website_detail=has_website_detail,
-                category_path=category_path,
-                manufacturers=manufacturers,
-                packages=packages,
-                stock_min=stock_min,
-                basic=basic,
-                preferred=preferred,
-                discontinued=discontinued,
-                sort=sort,
-                sort_direction=sort_direction,
-                sort_attribute=sort_attribute,
-                offset=offset,
-                limit=limit,
-                include_attributes=include_attributes,
-            )
+        def query():
+            with manager.query_service() as service:
+                return service.search_components(
+                    category_ids=category_ids,
+                    text_query=text_query,
+                    exact_filters=exact_filters,
+                    numeric_filters=numeric_filters,
+                    required_attributes=required_attributes,
+                    quantity=quantity,
+                    in_stock=in_stock,
+                    library_types=library_types,
+                    rohs=rohs,
+                    eccn=eccn,
+                    assembly=assembly,
+                    assembly_process=assembly_process,
+                    assembly_mode=assembly_mode,
+                    has_website_detail=has_website_detail,
+                    category_path=category_path,
+                    manufacturers=manufacturers,
+                    packages=packages,
+                    stock_min=stock_min,
+                    basic=basic,
+                    preferred=preferred,
+                    discontinued=discontinued,
+                    sort=sort,
+                    sort_direction=sort_direction,
+                    sort_attribute=sort_attribute,
+                    offset=offset,
+                    limit=limit,
+                    include_attributes=include_attributes,
+                )
+
+        return await run_blocking(query)
 
     @mcp.tool()
-    def get_component(lcsc: str, include_website_detail: bool = False):
+    async def get_component(lcsc: str, include_website_detail: bool = False):
         """Return full local detail for one LCSC component code.
 
         Cache-only by default; does not contact JLCPCB unless
@@ -224,10 +240,16 @@ def create_mcp_server(config):
         that exact code and returns website data separately from upstream
         catalog fields.
         """
-        with manager.writable_query_service() as service:
-            component = service.get_component(lcsc)
-            if component is not None and include_website_detail:
-                component = {
+        def query():
+            if not include_website_detail:
+                with manager.query_service() as service:
+                    return service.get_component(lcsc)
+
+            with manager.writable_query_service() as service:
+                component = service.get_component(lcsc)
+                if component is None:
+                    return None
+                return {
                     **component,
                     "website_detail_lookup": service.lookup_component_website_detail(lcsc),
                     "field_sources": {
@@ -235,10 +257,11 @@ def create_mcp_server(config):
                         "website_detail_lookup": "public JLCPCB website exact lookup",
                     },
                 }
-            return component
+
+        return await run_blocking(query)
 
     @mcp.tool()
-    def lookup_component_website_detail(lcsc: str):
+    async def lookup_component_website_detail(lcsc: str):
         """Fetch public website detail for one exact LCSC candidate.
 
         Use only after cache-based research/design has narrowed to a specific
@@ -247,11 +270,14 @@ def create_mcp_server(config):
         best-effort detail or an actionable failure message. No JLCPCB
         credentials are used.
         """
-        with manager.writable_query_service() as service:
-            return service.lookup_component_website_detail(lcsc)
+        def query():
+            with manager.writable_query_service() as service:
+                return service.lookup_component_website_detail(lcsc)
+
+        return await run_blocking(query)
 
     @mcp.tool()
-    def compare_components(
+    async def compare_components(
         lcsc_codes: list[str],
         quantity: int = 1,
         attributes: list[str] | None = None,
@@ -268,18 +294,21 @@ def create_mcp_server(config):
         normalized attributes. only_differences returns only attributes whose
         normalized values differ across found components.
         """
-        with manager.query_service() as service:
-            return service.compare_components(
-                lcsc_codes,
-                quantity=quantity,
-                attributes=attributes,
-                only_differences=only_differences,
-                keep_order=keep_order,
-                in_stock=in_stock,
-            )
+        def query():
+            with manager.query_service() as service:
+                return service.compare_components(
+                    lcsc_codes,
+                    quantity=quantity,
+                    attributes=attributes,
+                    only_differences=only_differences,
+                    keep_order=keep_order,
+                    in_stock=in_stock,
+                )
+
+        return await run_blocking(query)
 
     @mcp.tool()
-    def search(query: str):
+    async def search(query: str):
         """Generic MCP search wrapper for JLCPCB/LCSC components.
 
         Cache-only compatibility wrapper; does not contact JLCPCB. Use for
@@ -287,11 +316,14 @@ def create_mcp_server(config):
         search_components for category, stock, price, Basic/Extended/Preferred,
         exact attribute, or numeric parametric filtering.
         """
-        with manager.query_service() as service:
-            return service.search_components(text_query=query, limit=10)
+        def search_query():
+            with manager.query_service() as service:
+                return service.search_components(text_query=query, limit=10)
+
+        return await run_blocking(search_query)
 
     @mcp.tool()
-    def fetch(id: str):
+    async def fetch(id: str):
         """Generic MCP fetch wrapper for one cached component.
 
         Cache-only compatibility wrapper; does not contact JLCPCB. id may be a
@@ -299,9 +331,12 @@ def create_mcp_server(config):
         Returns the same local component detail as get_component with
         include_website_detail=false.
         """
-        lcsc = str(id).split(":", 1)[-1]
-        with manager.query_service() as service:
-            return service.get_component(lcsc)
+        def query():
+            lcsc = str(id).split(":", 1)[-1]
+            with manager.query_service() as service:
+                return service.get_component(lcsc)
+
+        return await run_blocking(query)
 
     return mcp
 

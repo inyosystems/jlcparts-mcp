@@ -8,15 +8,26 @@ from .query_cache import _canonical_json, attribute_sort_key, tokenize_text_quer
 from .query_service import _image_urls, _lcsc_sort_number, _normalize_sort_direction, _normalize_sort_key
 
 
+SQLITE_BUSY_TIMEOUT_MS = 30000
+
+
 class CompactQueryService:
     def __init__(self, index_path, read_only=True):
         self.index_path = str(Path(index_path).expanduser())
         self.read_only = bool(read_only)
         if self.read_only:
-            self.conn = sqlite3.connect(f"file:{self.index_path}?mode=ro", uri=True)
+            self.conn = sqlite3.connect(
+                f"file:{self.index_path}?mode=ro",
+                uri=True,
+                timeout=SQLITE_BUSY_TIMEOUT_MS / 1000,
+            )
         else:
-            self.conn = sqlite3.connect(self.index_path)
+            self.conn = sqlite3.connect(
+                self.index_path,
+                timeout=SQLITE_BUSY_TIMEOUT_MS / 1000,
+            )
         self.conn.row_factory = sqlite3.Row
+        self._configure_connection()
 
     def close(self):
         if self.conn is not None:
@@ -28,6 +39,14 @@ class CompactQueryService:
 
     def __exit__(self, exc_type, exc, traceback):
         self.close()
+
+    def _configure_connection(self):
+        self.conn.execute(f"PRAGMA busy_timeout = {SQLITE_BUSY_TIMEOUT_MS}")
+        if self.read_only:
+            self.conn.execute("PRAGMA query_only = ON")
+        else:
+            self.conn.execute("PRAGMA journal_mode = WAL")
+            self.conn.execute("PRAGMA synchronous = NORMAL")
 
     def cache_status(self):
         metadata = self._metadata_dict()

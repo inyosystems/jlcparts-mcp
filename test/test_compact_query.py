@@ -74,3 +74,22 @@ def test_compact_query_get_and_compare(tmp_path):
     assert [component["lcsc"] for component in comparison["components"]] == ["C1002", "C1001"]
     assert set(comparison["differing_attributes"]) == {"Basic/Extended", "Resistance"}
     assert all("Package" not in component["attributes"] for component in comparison["components"])
+
+
+def test_compact_query_connections_are_configured_for_concurrent_mcp_clients(tmp_path):
+    index_path = build_compact_index_fixture(tmp_path)
+
+    with CompactQueryService(index_path, read_only=False) as writer:
+        journal_mode = writer.conn.execute("PRAGMA journal_mode").fetchone()[0]
+        writer_busy_timeout_ms = writer.conn.execute("PRAGMA busy_timeout").fetchone()[0]
+
+    with CompactQueryService(index_path) as reader:
+        reader_busy_timeout_ms = reader.conn.execute("PRAGMA busy_timeout").fetchone()[0]
+        query_only = reader.conn.execute("PRAGMA query_only").fetchone()[0]
+        result = reader.search_components(text_query="resistor", limit=1)
+
+    assert journal_mode.lower() == "wal"
+    assert writer_busy_timeout_ms >= 30000
+    assert reader_busy_timeout_ms >= 30000
+    assert query_only == 1
+    assert result["total"] == 2
