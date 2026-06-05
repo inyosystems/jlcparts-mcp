@@ -1,0 +1,76 @@
+from jlcparts.compact_query import CompactQueryService
+from test_compact_index import build_compact_index_fixture
+
+
+def test_compact_query_search_filters_and_sorts(tmp_path):
+    index_path = build_compact_index_fixture(tmp_path)
+
+    with CompactQueryService(index_path) as service:
+        categories = service.list_categories(search="resistor")
+        package_values = service.list_attribute_values("Package", limit=10)
+        package_0603 = next(
+            item["value"]
+            for item in package_values["values"]
+            if item["display"] == "0603"
+        )
+        results = service.search_components(
+            text_query="resistor",
+            category_ids=[categories[0]["category_id"]],
+            exact_filters={"Package": package_0603},
+            numeric_filters=[{"name": "Resistance", "unit": "resistance", "min": 9000, "max": 11000}],
+            quantity=100,
+            in_stock=True,
+            library_types=["basic"],
+            sort="price",
+            limit=10,
+            include_attributes=["Resistance", "Package", "Basic/Extended"],
+        )
+
+    assert categories[0]["path"] == "Resistors / Chip Resistor - Surface Mount"
+    assert results["total"] == 1
+    component = results["components"][0]
+    assert component["lcsc"] == "C1001"
+    assert component["manufacturer"] == "Acme"
+    assert component["package"] == "0603"
+    assert component["selected_price"] == 0.005
+    assert set(component["attributes"]) == {"Resistance", "Package", "Basic/Extended"}
+
+
+def test_compact_query_facets_pagination_and_exact_lcsc(tmp_path):
+    index_path = build_compact_index_fixture(tmp_path)
+
+    with CompactQueryService(index_path) as service:
+        attributes = service.list_attributes(text_query="resistor")
+        resistance_values = service.list_attribute_values("Resistance", text_query="resistor")
+        exact = service.search_components(text_query="C1003", limit=10)
+        page = service.search_components(sort="stock", sort_direction="desc", offset=1, limit=1)
+
+    assert {item["name"] for item in attributes} >= {"Resistance", "Package", "Manufacturer"}
+    assert resistance_values["numeric"]["ranges"] == [
+        {"unit": "resistance", "min": 1000.0, "max": 10000.0}
+    ]
+    assert [component["lcsc"] for component in exact["components"]] == ["C1003"]
+    assert page["total"] == 3
+    assert [component["lcsc"] for component in page["components"]] == ["C1003"]
+
+
+def test_compact_query_get_and_compare(tmp_path):
+    index_path = build_compact_index_fixture(tmp_path)
+
+    with CompactQueryService(index_path) as service:
+        component = service.get_component("1001")
+        comparison = service.compare_components(
+            ["C1002", "C9999", "C1001"],
+            quantity=100,
+            attributes=["Resistance", "Package", "Basic/Extended"],
+            only_differences=True,
+        )
+
+    assert component["lcsc"] == "C1001"
+    assert component["lcsc_url"] == "https://lcsc.com/product-detail/Chip-Resistor-Acme-R0603-10K_C1001.html"
+    assert component["image_urls"]["small"].endswith("/R0603_C1001_front.jpg")
+    assert component["source"] == "upstream_catalog"
+    assert comparison["missing_lcsc"] == ["C9999"]
+    assert [component["lcsc"] for component in comparison["components"]] == ["C1002", "C1001"]
+    assert set(comparison["differing_attributes"]) == {"Basic/Extended", "Resistance"}
+    assert all("Package" not in component["attributes"] for component in comparison["components"])

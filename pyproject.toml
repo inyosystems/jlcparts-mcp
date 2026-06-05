@@ -28,8 +28,9 @@ Homepage = "https://github.com/RoboticsBrno/JLCPCB-Parts"
 
 [project.scripts]
 jlcparts = "jlcparts.ui:cli"
-jlcparts-enrich-website = "jlcparts.ui:enrichWebsite"
-jlcparts-refresh-cache = "jlcparts.ui:refreshCache"
+jlcparts-download-catalog = "jlcparts.ui:downloadCatalog"
+jlcparts-build-index = "jlcparts.ui:buildIndex"
+jlcparts-enrich-cache = "jlcparts.ui:enrichCache"
 jlcparts-mcp = "jlcparts.mcp_server:main"
 
 [tool.setuptools.packages.find]

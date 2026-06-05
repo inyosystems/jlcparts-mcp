@@ -3,9 +3,15 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import os
 import time
+from pathlib import Path
 
 import click
 
+from jlcparts.compact_index import CompactIndexBuilder
+from jlcparts.upstream_catalog import (
+    DEFAULT_UPSTREAM_DATA_URL,
+    UpstreamCatalogDownloader,
+)
 from jlcparts.datatables import buildtables, normalizeAttribute
 from jlcparts.lcsc import pullPreferredComponents
 from jlcparts.partLib import (PartLibrary, PartLibraryDb, getLcscExtraNew,
@@ -291,6 +297,166 @@ def _defaultQueryCachePath(cache):
 
 def _defaultCheckpointPath(cache):
     return os.path.join(os.path.dirname(cache), "refresh-checkpoint.json")
+
+
+def _defaultCatalogPath():
+    return os.path.abspath(os.path.expanduser("~/.cache/jlcparts/catalog"))
+
+
+def _defaultIndexPath():
+    return os.path.abspath(os.path.expanduser("~/.cache/jlcparts/mcp-index.sqlite3"))
+
+
+@click.command("download-catalog")
+@click.option("--catalog", "catalog_path", default="~/.cache/jlcparts/catalog",
+    help="Directory for the upstream generated catalog")
+@click.option("--data-url", default=DEFAULT_UPSTREAM_DATA_URL,
+    help="Upstream generated catalog data URL")
+@click.option("--force", is_flag=True,
+    help="Overwrite local catalog files even if present")
+@click.option("--workers", type=int, default=8,
+    help="Number of concurrent catalog file downloads")
+def downloadCatalog(catalog_path, data_url, force, workers):
+    """
+    Download the upstream generated yaqwsx component catalog.
+    """
+    catalog_path = os.path.abspath(os.path.expanduser(catalog_path))
+    result = UpstreamCatalogDownloader(workers=workers).download_manifest_source(
+        Path(catalog_path),
+        data_url=data_url,
+        force=force,
+    )
+    print(json.dumps({
+        "catalog_path": str(result.output_dir),
+        "manifest_path": str(result.manifest_path),
+        "metadata_path": str(result.metadata_path),
+        "downloaded_files": len(result.downloaded_files),
+        "source_url": result.source_url,
+        "component_count": result.component_count,
+        "etag": result.etag,
+        "last_modified": result.last_modified,
+        "sha256": result.sha256,
+    }, indent=2, sort_keys=True))
+
+
+@click.command("build-index")
+@click.option("--catalog", "catalog_path", default="~/.cache/jlcparts/catalog",
+    help="Directory containing the upstream generated catalog")
+@click.option("--index", "index_path", default="~/.cache/jlcparts/mcp-index.sqlite3",
+    help="Compact MCP index SQLite path")
+@click.option("--force", is_flag=True,
+    help="Overwrite an existing compact MCP index")
+@click.option("--progress-interval", type=int, default=10000,
+    help="Print progress every N indexed components; 0 disables progress")
+def buildIndex(catalog_path, index_path, force, progress_interval):
+    """
+    Build the compact MCP SQLite index from the upstream catalog.
+    """
+    catalog_path = os.path.abspath(os.path.expanduser(catalog_path))
+    index_path = os.path.abspath(os.path.expanduser(index_path))
+    result = CompactIndexBuilder(
+        Path(catalog_path),
+        Path(index_path),
+        progress_interval=progress_interval,
+    ).build(force=force)
+    print(json.dumps({
+        "index_path": result.index_path,
+        "component_count": result.component_count,
+        "category_count": result.category_count,
+        "attribute_key_count": result.attribute_key_count,
+        "attribute_value_count": result.attribute_value_count,
+        "build_seconds": result.build_seconds,
+    }, indent=2, sort_keys=True))
+
+
+@click.command("mcp")
+@click.option("--index", "index_path", default="~/.cache/jlcparts/mcp-index.sqlite3",
+    help="Compact MCP index SQLite path")
+@click.option("--transport", type=click.Choice(["stdio", "http"]), default="stdio",
+    help="MCP transport")
+@click.option("--host", default="127.0.0.1",
+    help="HTTP bind host")
+@click.option("--port", type=int, default=8765,
+    help="HTTP bind port")
+def mcp(index_path, transport, host, port):
+    """
+    Run the local cache-first MCP server.
+    """
+    from .mcp_server import main as mcp_main
+
+    argv = ["--index", index_path, "--transport", transport, "--host", host, "--port", str(port)]
+    mcp_main(argv)
+
+
+@click.command("enrich-cache")
+@click.option("--index", "index_path", default="~/.cache/jlcparts/mcp-index.sqlite3",
+    help="Compact MCP index SQLite path")
+@click.option("--limit", type=int, default=0,
+    help="Enrich at most this many components; 0 means no artificial limit")
+@click.option("--verbose", is_flag=True,
+    help="Be verbose")
+def enrichCache(index_path, limit, verbose):
+    """
+    Fetch exact public website detail for indexed components as maintenance.
+    """
+    from .compact_query import CompactQueryService
+
+    index_path = os.path.abspath(os.path.expanduser(index_path))
+    max_count = None if limit == 0 else max(0, int(limit))
+    processed = 0
+    enriched = 0
+    failed = 0
+    conn = sqlite3.connect(index_path)
+    try:
+        rows = conn.execute(
+            """
+            SELECT lcsc FROM components
+            WHERE website_checked_at IS NULL
+            ORDER BY lcsc_number
+            """
+        ).fetchall()
+        if max_count is not None:
+            rows = rows[:max_count]
+        service = CompactQueryService(index_path)
+        try:
+            for row in rows:
+                lcsc = row[0]
+                processed += 1
+                result = service.lookup_component_website_detail(lcsc)
+                if result.get("found"):
+                    conn.execute(
+                        """
+                        INSERT OR REPLACE INTO website_component_details(
+                            lcsc, checked_at, website_json
+                        )
+                        VALUES (?, ?, ?)
+                        """,
+                        (
+                            lcsc,
+                            result["checked_at"],
+                            json.dumps(result.get("website_detail"), separators=(",", ":")),
+                        ),
+                    )
+                    conn.execute(
+                        "UPDATE components SET website_checked_at = ? WHERE lcsc = ?",
+                        (result["checked_at"], lcsc),
+                    )
+                    enriched += 1
+                else:
+                    failed += 1
+                if verbose:
+                    print(f"{lcsc}: {'enriched' if result.get('found') else 'failed'}")
+        finally:
+            service.close()
+        conn.commit()
+    finally:
+        conn.close()
+    print(json.dumps({
+        "index_path": index_path,
+        "processed": processed,
+        "enriched": enriched,
+        "failed": failed,
+    }, indent=2, sort_keys=True))
 
 
 @click.command("refresh-cache")
@@ -599,14 +765,15 @@ def cli():
 cli.add_command(getLibrary)
 cli.add_command(listcategories)
 cli.add_command(listattributes)
+cli.add_command(downloadCatalog)
+cli.add_command(buildIndex)
+cli.add_command(enrichCache)
+cli.add_command(mcp)
 cli.add_command(buildtables)
 cli.add_command(buildwebdb)
 cli.add_command(updatePreferred)
 cli.add_command(migratecache)
 cli.add_command(fetchDetails)
-cli.add_command(refreshCache)
-cli.add_command(fetchDb)
-cli.add_command(enrichWebsite)
 cli.add_command(fetchTable)
 cli.add_command(testComponent)
 
