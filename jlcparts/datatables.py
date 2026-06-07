@@ -107,6 +107,12 @@ COMMUNICATION_SYSTEM_ALIASES = {
     "evdo": "EV-DO",
 }
 
+OUTPUT_INTERFACE_ALIASES = {
+    "CAN Interface": "CAN",
+    "Differential output": "Differential Output",
+    "IO": "I/O",
+}
+
 MODULATION_SYSTEM_ALIASES = {
     "LORA": "LoRa",
     "OCK": "OOK",
@@ -124,6 +130,8 @@ ACTUATOR_STYLE_ALIASES = {
 }
 
 CHIP_TYPE_ALIASES = {
+    "Audio decoding chip": "Audio Decoding IC",
+    "Current transmitter": "Current Transmitter",
     "Voltage monitor": "Voltage Monitor",
     "Current monitor": "Current Monitor",
     "Power monitor": "Power Monitor",
@@ -135,6 +143,8 @@ CHIP_TYPE_ALIASES = {
     "电池保护芯片": "Battery Protection IC",
     "Boost charging chip": "Boost Charging IC",
     "开关控制器": "Switch Controller",
+    "立体声音频ADC": "Stereo Audio ADC",
+    "-": "Unspecified",
 }
 
 POWER_MANAGEMENT_TYPE_ALIASES = {
@@ -157,6 +167,92 @@ PACKAGE_TYPE_ALIASES = {
     "-": "Unspecified",
 }
 
+PACKAGING_ALIASES = {
+    "Tube-packed": "Tube",
+    "Bag-packed": "Bag",
+    "Box-packed": "Box",
+}
+
+TYPE_ALIASES = {
+    "Receivers": "Receiver",
+    "transceiver": "Transceiver",
+    "-": "Unspecified",
+}
+
+ISOLATION_FLAG_VALUES = {
+    "isolation": 1,
+    "yes": 1,
+    "带电压隔离": 1,
+    "no": 0,
+    "non-insulated": 0,
+    "non-isolated": 0,
+    "without voltage isolation": 0,
+    "-": "NaN",
+}
+
+SYNCHRONOUS_RECTIFIER_VALUES = {
+    "yes": 1,
+    "no": 0,
+    "none": "NaN",
+    "-": "NaN",
+}
+
+YES_NO_UNKNOWN_VALUES = {
+    "yes": 1,
+    "no": 0,
+    "none": "NaN",
+    "-": "NaN",
+}
+
+NUMBER_WORD_VALUES = {
+    "single": 1,
+    "double": 2,
+    "three": 3,
+}
+
+LED_PRESENCE_VALUES = {
+    "with led": 1,
+    "non-led": 0,
+    "without led": 0,
+    "-": "NaN",
+}
+
+CARD_DETECTION_VALUES = {
+    "yes": 1,
+    "with card detect": 1,
+    "no": 0,
+    "no card detect": 0,
+    "no card detection": 0,
+    "-": "NaN",
+}
+
+PORT_COUNT_VALUES = {
+    "single port": 1,
+    "单口": 1,
+    "dual port": 2,
+    "双口": 2,
+    "four ports": 4,
+    "四口": 4,
+}
+
+COMMUNICATION_PROTOCOL_ALIASES = {
+    "Bluetooth protocol": "Bluetooth",
+    "Ethernet protocol": "Ethernet",
+    "Zigbee Protocol": "Zigbee",
+    "UART协议": "UART",
+    "SPI协议": "SPI",
+    "以太网协议": "Ethernet",
+    "-": "Unspecified",
+}
+
+AXIS_ALIASES = {
+    "-": "Unspecified",
+}
+
+ACTUATOR_MARKING_ALIASES = {
+    "-": "Unspecified",
+}
+
 APPEARANCE_SHAPE_ALIASES = {
     "Bench-shaped": "Bench-Shaped",
     "Block-shaped": "Block-Shaped",
@@ -165,6 +261,11 @@ APPEARANCE_SHAPE_ALIASES = {
     "Sheet-like": "Sheet-Like",
     "SMD type": "SMD Type",
     "SMD type (with screw)": "SMD Type (With Screw)",
+    "-": "Unspecified",
+}
+
+SHAPE_ALIASES = {
+    "UType": "U-Type",
     "-": "Unspecified",
 }
 
@@ -191,11 +292,140 @@ VOLTAGE_REFERENCE_ALIASES = {
     "-": "Unspecified",
 }
 
+REFERENCE_TYPE_ALIASES = {
+    "series connection": "Series",
+    "-": "Unspecified",
+}
+
+SWITCH_TUBE_ALIASES = {
+    "Built-in": "Built-In",
+    "Non Built-In": "External",
+    "内置": "Built-In",
+    "外置": "External",
+    "-": "Unspecified",
+}
+
+PIN_TYPE_ALIASES = {
+    "Circular Pins": "Round Pin",
+    "Square Pins": "Square Pin",
+    "-": "Unspecified",
+}
+
 TECHNOLOGY_ALIASES = {
     "D-mode": "Depletion Mode",
     "E-mode": "Enhancement Mode",
+    "Electromagnetic Type": "Electromagnetic",
     "No": "No",
     "Yes": "Yes",
+    "-": "Unspecified",
+}
+
+OSCILLATOR_CIRCUIT_ALIASES = {
+    "Active (driven circuit included)": "Active (Built-In Driver Circuit)",
+    "Active (Built-in Driver Circuit)": "Active (Built-In Driver Circuit)",
+    "Passive (external drive)": "Passive (External Drive)",
+    "-": "Unspecified",
+}
+
+CIRCUIT_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
+FUSE_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
+STYLE_ALIASES = {
+    "Bent tip": "Bent Tip",
+    "-": "Unspecified",
+}
+
+TRIGGER_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
+POLARIZATION_TYPE_ALIASES = {
+    "Linear Polarization": "Linear",
+    "-": "Unspecified",
+}
+
+CONVERSION_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
+ISOLATION_TECHNOLOGY_ALIASES = {
+    "Magnetic isolation": "Magnetic Isolation",
+    "电容隔离": "Capacitive Isolation",
+    "巨磁隔离 (GMR)": "GMR Isolation",
+    "-": "Unspecified",
+}
+
+ARCHITECTURE_ALIASES = {
+    "-": "Unspecified",
+}
+
+CHIP_FUNCTION_ALIASES = {
+    "Capacitive touch": "Capacitive Touch",
+    "电容式触摸": "Capacitive Touch",
+    "PWM控制": "PWM Control",
+    "-": "Unspecified",
+}
+
+FUNCTIONAL_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
+IGBT_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
+CLOCK_SOURCE_ALIASES = {
+    "Built-in": "Built-In",
+    "Internal": "Built-In",
+    "external": "External",
+    "-": "Unspecified",
+}
+
+ROTATION_DIRECTION_ALIASES = {
+    "-": "Unspecified",
+}
+
+VOLTAGE_SUPPLY_SOURCE_ALIASES = {
+    "Dual Power": "Dual Supply",
+    "Single supply": "Single Supply",
+}
+
+RESET_ACTIVE_LEVEL_ALIASES = {
+    "-": "Unspecified",
+}
+
+TIMING_MODE_ALIASES = {
+    "-": "Unspecified",
+}
+
+INPUT_VOLTAGE_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
+ISOLATION_REGULATION_ALIASES = {
+    "Non-Isolated Regulator": "Non-Isolated Regulated",
+    "-": "Unspecified",
+}
+
+APPLICABLE_CABLE_TYPE_ALIASES = {
+    "Round cable": "Round Cable",
+}
+
+CONTROL_INPUT_LOGIC_ALIASES = {
+    "-": "Unspecified",
+}
+
+DUPLEX_ALIASES = {
+    "-": "Unspecified",
+}
+
+HOLE_SHAPE_ALIASES = {
+    "Square Holes": "Square Hole",
     "-": "Unspecified",
 }
 
@@ -205,6 +435,16 @@ DRIVE_MOTOR_TYPE_ALIASES = {
     "Step Motor Drive": "Stepper Motor",
     "无刷直流BLDC": "Brushless DC Motor",
     "无刷直流电机": "Brushless DC Motor",
+    "-": "Unspecified",
+}
+
+DRIVE_TYPE_ALIASES = {
+    "Three Phase": "Three-Phase",
+    "Single Phase": "Single-Phase",
+}
+
+FEEDBACK_SYSTEM_ALIASES = {
+    "Primary-side feedback": "Primary-Side Feedback",
     "-": "Unspecified",
 }
 
@@ -260,6 +500,10 @@ SIGNAL_LEVEL_ALIASES = {
     "-": "Unspecified",
 }
 
+CHANNEL_TYPE_ALIASES = {
+    "-": "Unspecified",
+}
+
 LOAD_TYPE_ALIASES = {
     "-": "Unspecified",
 }
@@ -301,6 +545,13 @@ CARD_CONNECTION_MODE_ALIASES = {
     "-": "Unspecified",
 }
 
+WITH_LOCKER_ALIASES = {
+    "With locking buckle": "Locking",
+    "带锁扣": "Locking",
+    "不带": "Non-Latching",
+    "-": "Unspecified",
+}
+
 CERTIFICATION_ALIASES = {
     "-": "Unspecified",
 }
@@ -309,6 +560,11 @@ OUTPUT_POLARITY_ALIASES = {
     "positive": "Positive",
     "Positive electrode": "Positive",
     "Negative electrode": "Negative",
+    "-": "Unspecified",
+}
+
+POLARITY_ALIASES = {
+    "Bi-Directional": "Bidirectional",
     "-": "Unspecified",
 }
 
@@ -332,12 +588,32 @@ CONTACT_TYPE_ALIASES = {
     "Single-sided contact points": "Single-Sided Contact",
     "Normally closed": "Normally Closed",
     "Normal Open": "Normally Open",
+    "Spring contact type": "Spring Contact Type",
     "-": "Unspecified",
 }
 
 HOLDER_TYPE_ALIASES = {
+    "Bracket type": "Bracket Type",
     "Free-hanging": "Free Hanging",
     "Right-Angle": "Right Angle",
+    "-": "Unspecified",
+}
+
+JACKET_TYPE_ALIASES = {
+    "Pre-insulated": "Pre-Insulated",
+    "Fully insulated": "Fully Insulated",
+    "Heat shrink tube": "Heat Shrink Tube",
+}
+
+PIN_LOCATION_ALIASES = {
+    "-": "Unspecified",
+}
+
+FIXED_FORM_ALIASES = {
+    "Screw fixed": "Screw Mount",
+    "Screw Fixing": "Screw Mount",
+    "Snap fastener": "Snap Fastener",
+    "-": "Unspecified",
 }
 
 MOUNTING_TYPE_ALIASES = {
@@ -346,6 +622,7 @@ MOUNTING_TYPE_ALIASES = {
     "Bolted": "Bolt Mount",
     "Chip": "Surface Mount",
     "Counterpost": "Reverse Mount",
+    "External connection wire": "External Connection Wire",
     "Free-hanging": "Free Hanging",
     "Patch": "Surface Mount",
     "Panel Mounting": "Panel Mount",
@@ -386,10 +663,25 @@ CONTACT_MATERIAL_ALIASES = {
     "Aluminum alloy": "Aluminum Alloy",
     "High conductivity copper": "High Conductivity Copper",
     "Electrolytic copper": "Electrolytic Copper",
+    "Red copper": "Red Copper",
     "Nickelalloy": "Nickel Alloy",
     "锡磷青铜": "Tin Phosphor Bronze",
     "铜端": "Copper End",
     "前金后锡": "Gold Front Tin Back",
+    "-": "Unspecified",
+}
+
+METAL_MATERIAL_ALIASES = {
+    "Gold Plated": "Gold-Plated",
+    "Gold-plated copper": "Gold-Plated Copper",
+    "铜镀金": "Gold-Plated Copper",
+    "-": "Unspecified",
+}
+
+GENERAL_MATERIAL_ALIASES = {
+    **CONTACT_MATERIAL_ALIASES,
+    "Polyolefin Material with Appropriate Amount of Additives": "Polyolefin with Additives",
+    "Tin-plated": "Tin-Plated",
 }
 
 DIELECTRIC_MATERIAL_ALIASES = {
@@ -412,7 +704,10 @@ CONTACT_PLATING_ALIASES = {
     "silver plating": "Silver",
     "Gold Plated": "Gold",
     "Gold plating": "Gold",
+    "Nickel plated": "Nickel",
     "Tin Plated": "Tin",
+    "Tin plated": "Tin",
+    "Tin-nickel plated": "Tin-Nickel",
     "Tinning": "Tin",
     "Lead-tin": "Lead-Tin",
     "铅锡": "Lead-Tin",
@@ -465,6 +760,11 @@ COLOR_ALIASES = {
     "Colorless transparence": "Colorless Transparent",
     "白色带淡绿": "White Light Green",
     "IR": "Infrared",
+}
+
+DISPLAY_COLOR_ALIASES = {
+    "Yellow green background blue text": "Yellow Green Background, Blue Text",
+    "Blue background white text": "Blue Background, White Text",
 }
 
 def saveJson(object, filename, hash=False, pretty=False, compress=False):
@@ -1107,11 +1407,15 @@ def normalizeAttribute(key, value):
             value = attributes.identifierAttribute(value, "circuit")
         elif key in larr(["Features", "Feature", "Function", "Supplementary Features"]):
             value = attributes.identifierListAttribute(value, "feature")
+        elif key in larr(["Chip Function"]):
+            value = attributes.identifierListAttribute(value, "function", aliases=CHIP_FUNCTION_ALIASES)
         elif key in larr(["Actuator Style"]):
             value = attributes.identifierListAttribute(value, "actuator style", aliases=ACTUATOR_STYLE_ALIASES)
         elif key in larr(["Actuator Type"]):
             value = attributes.identifierListAttribute(value, "actuator type", aliases=ACTUATOR_STYLE_ALIASES)
-        elif key in larr(["The Chip Type", "Chip Type"]):
+        elif key in larr(["Actuator Identifier"]):
+            value = attributes.identifierListAttribute(value, "actuator marking", aliases=ACTUATOR_MARKING_ALIASES)
+        elif key in larr(["The Chip Type", "Chip Type", "Chip Type Parameters/Description"]):
             value = attributes.identifierListAttribute(value, "chip type", aliases=CHIP_TYPE_ALIASES)
         elif key in larr(["Type of the Power Management Chip"]):
             value = attributes.identifierListAttribute(value, "power management type", separators=",;/", aliases=POWER_MANAGEMENT_TYPE_ALIASES)
@@ -1119,13 +1423,44 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "amplifier type", aliases=AMPLIFIER_TYPE_ALIASES)
         elif key in larr(["Appearance and Shape"]):
             value = attributes.identifierListAttribute(value, "appearance", aliases=APPEARANCE_SHAPE_ALIASES)
+        elif key in larr(["Shape"]):
+            value = attributes.identifierListAttribute(value, "shape", aliases=SHAPE_ALIASES)
         elif key in larr(["Voltage Reference"]):
             reference = "Internal, external" if str(value).strip() == "Internal or external" else value
             value = attributes.identifierListAttribute(reference, "voltage reference", aliases=VOLTAGE_REFERENCE_ALIASES)
-        elif key in larr(["Technology"]):
+        elif key in larr(["Clock/Oscillator"]):
+            source = "Internal, external" if str(value).strip() == "Internal or external" else value
+            value = attributes.identifierListAttribute(source, "clock source", aliases=CLOCK_SOURCE_ALIASES)
+        elif key in larr(["Voltage Supply Source"]):
+            value = attributes.identifierListAttribute(value, "supply source", aliases=VOLTAGE_SUPPLY_SOURCE_ALIASES)
+        elif key in larr(["Reference Type"]):
+            value = attributes.identifierListAttribute(value, "reference type", aliases=REFERENCE_TYPE_ALIASES)
+        elif key in larr(["Switch Tube (Built-in/External)"]):
+            value = attributes.identifierListAttribute(value, "switch tube", aliases=SWITCH_TUBE_ALIASES)
+        elif key in larr(["Circluar Pins/Square Pins"]):
+            value = attributes.identifierListAttribute(value, "pin type", aliases=PIN_TYPE_ALIASES)
+        elif key in larr(["Technology", "Technology Type"]):
             value = attributes.identifierListAttribute(value, "technology", aliases=TECHNOLOGY_ALIASES)
+        elif key in larr(["Oscillator Circuit"]):
+            value = attributes.identifierListAttribute(value, "oscillator circuit", aliases=OSCILLATOR_CIRCUIT_ALIASES)
+        elif key in larr(["Circuit Type"]):
+            value = attributes.identifierListAttribute(value, "circuit type", aliases=CIRCUIT_TYPE_ALIASES)
         elif key in larr(["Drive Motor Type"]):
             value = attributes.identifierListAttribute(value, "motor type", aliases=DRIVE_MOTOR_TYPE_ALIASES)
+        elif key in larr(["Drive Type"]):
+            value = attributes.identifierListAttribute(value, "drive type", aliases=DRIVE_TYPE_ALIASES)
+        elif key in larr(["Feedback System"]):
+            value = attributes.identifierListAttribute(value, "feedback system", aliases=FEEDBACK_SYSTEM_ALIASES)
+        elif key in larr(["Input Voltage Type"]):
+            value = attributes.identifierListAttribute(value, "input voltage type", aliases=INPUT_VOLTAGE_TYPE_ALIASES)
+        elif key in larr(["Isolated or Voltage Regulation"]):
+            value = attributes.identifierListAttribute(value, "isolation/regulation", aliases=ISOLATION_REGULATION_ALIASES)
+        elif key in larr(["Reset Active Level"]):
+            value = attributes.identifierListAttribute(value, "reset active level", aliases=RESET_ACTIVE_LEVEL_ALIASES)
+        elif key in larr(["Reset Style"]):
+            value = attributes.identifierListAttribute(value, "reset style", aliases=TIMING_MODE_ALIASES)
+        elif key in larr(["Timing Mode"]):
+            value = attributes.identifierListAttribute(value, "timing mode", aliases=TIMING_MODE_ALIASES)
         elif key in larr(["Interrupt Output"]):
             value = attributes.identifierListAttribute(value, "interrupt output", aliases=INTERRUPT_OUTPUT_ALIASES)
         elif key in larr(["Signal Conditioning"]):
@@ -1138,14 +1473,24 @@ def normalizeAttribute(key, value):
             value = attributes.configurationAttribute(value)
         elif key in larr(["Driven Configuration"]):
             value = attributes.identifierListAttribute(value, "configuration", aliases=DRIVEN_CONFIGURATION_ALIASES)
+        elif key in larr(["Trigger Type"]):
+            value = attributes.identifierListAttribute(value, "trigger type", aliases=TRIGGER_TYPE_ALIASES)
         elif key in larr(["Interface", "Control Interface", "Communication Interface", "Memory Interface", "IO Type", "The Interface Type", "Mac Interface"]):
             value = attributes.identifierListAttribute(value, "interface")
+        elif key in larr(["Output Interface"]):
+            value = attributes.identifierListAttribute(value, "interface", aliases=OUTPUT_INTERFACE_ALIASES)
         elif key in larr(["Interface Type"]):
             value = attributes.identifierListAttribute(value, "interface")
         elif key in larr(["Protocol", "Interface Protocol"]):
             value = attributes.identifierListAttribute(value, "protocol")
+        elif key in larr(["Communication Protocol"]):
+            value = attributes.identifierListAttribute(value, "protocol", aliases=COMMUNICATION_PROTOCOL_ALIASES)
         elif key in larr(["Communication System"]):
             value = attributes.identifierListAttribute(value, "communication system", aliases=COMMUNICATION_SYSTEM_ALIASES)
+        elif key in larr(["Communication Mode"]):
+            value = attributes.identifierListAttribute(value, "communication mode")
+        elif key in larr(["Duplex"]):
+            value = attributes.identifierListAttribute(value, "duplex", aliases=DUPLEX_ALIASES)
         elif key in larr(["Modulation System"]):
             value = attributes.identifierListAttribute(value, "modulation", aliases=MODULATION_SYSTEM_ALIASES)
         elif key in larr(["GNSS Type"]):
@@ -1154,14 +1499,84 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "filter type", aliases=FILTER_TYPE_ALIASES)
         elif key in larr(["Standard Number"]):
             value = attributes.identifierListAttribute(value, "standard number")
-        elif key in larr(["Type"]):
-            value = attributes.identifierListAttribute(value, "type")
+        elif key in larr(["Type", "Types"]):
+            value = attributes.identifierListAttribute(value, "type", aliases=TYPE_ALIASES)
+        elif key in larr(["Functional Type"]):
+            value = attributes.identifierListAttribute(value, "function type", aliases=FUNCTIONAL_TYPE_ALIASES)
+        elif key in larr(["IGBT Type"]):
+            value = attributes.identifierListAttribute(value, "igbt type", aliases=IGBT_TYPE_ALIASES)
+        elif key in larr(["Conversion Type", "Conversion Type VF/Fv"]):
+            value = attributes.identifierListAttribute(value, "conversion type", aliases=CONVERSION_TYPE_ALIASES)
+        elif key in larr(["Isolation Technology"]):
+            value = attributes.identifierListAttribute(value, "isolation technology", aliases=ISOLATION_TECHNOLOGY_ALIASES)
+        elif key in larr(["Synchronous Rectifier", "Synchronous Rectification"]):
+            has_synchronous_rectifier = SYNCHRONOUS_RECTIFIER_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${synchronous rectifier}",
+                "primary": "synchronous rectifier",
+                "values": {
+                    "synchronous rectifier": [has_synchronous_rectifier, "count"],
+                },
+            }
+        elif key in larr(["Output Isolation", "Whether the Isolation", "Voltage Isolation or Not"]):
+            is_isolated = ISOLATION_FLAG_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${is isolated}",
+                "primary": "is isolated",
+                "values": {
+                    "is isolated": [is_isolated, "count"],
+                },
+            }
+        elif key in larr(["Alarm Output"]):
+            has_alarm_output = YES_NO_UNKNOWN_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${alarm output}",
+                "primary": "alarm output",
+                "values": {
+                    "alarm output": [has_alarm_output, "count"],
+                },
+            }
+        elif key in larr(["Programmable"]):
+            is_programmable = YES_NO_UNKNOWN_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${programmable}",
+                "primary": "programmable",
+                "values": {
+                    "programmable": [is_programmable, "count"],
+                },
+            }
+        elif key in larr(["The Alarm Clock Output"]):
+            has_alarm_clock_output = YES_NO_UNKNOWN_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${alarm clock output}",
+                "primary": "alarm clock output",
+                "values": {
+                    "alarm clock output": [has_alarm_clock_output, "count"],
+                },
+            }
+        elif key in larr(["Charge Pump"]):
+            has_charge_pump = YES_NO_UNKNOWN_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${charge pump}",
+                "primary": "charge pump",
+                "values": {
+                    "charge pump": [has_charge_pump, "count"],
+                },
+            }
         elif key in larr(["Logic Type"]):
             value = attributes.identifierListAttribute(value, "logic type")
         elif key in larr(["Logic Gate Type"]):
             value = attributes.identifierListAttribute(value, "logic gate", aliases=LOGIC_GATE_TYPE_ALIASES)
+        elif key in larr(["Control Input Logic"]):
+            value = attributes.identifierListAttribute(value, "control input logic", aliases=CONTROL_INPUT_LOGIC_ALIASES)
+        elif key in larr(["Coding Scheme"]):
+            value = attributes.identifierListAttribute(value, "coding scheme")
+        elif key in larr(["Circular Hole/Square Hole"]):
+            value = attributes.identifierListAttribute(value, "hole shape", aliases=HOLE_SHAPE_ALIASES)
         elif key in larr(["Antenna Type"]):
             value = attributes.identifierListAttribute(value, "antenna type")
+        elif key in larr(["Polarization Type"]):
+            value = attributes.identifierListAttribute(value, "polarization", aliases=POLARIZATION_TYPE_ALIASES)
         elif key in larr(["Sensor Type"]):
             value = attributes.identifierAttribute(value, "sensor type")
         elif key in larr(["Terminal Type"]):
@@ -1174,13 +1589,23 @@ def normalizeAttribute(key, value):
             value = attributes.environmentalRequirementsAttribute(value)
         elif key in larr(["Gender"]):
             value = attributes.identifierListAttribute(value, "gender", aliases=GENDER_ALIASES)
-        elif key in larr(["Holder Type"]):
+        elif key in larr(["Holder Type", "Fuseholder Type"]):
             value = attributes.identifierListAttribute(value, "holder type", aliases=HOLDER_TYPE_ALIASES)
+        elif key in larr(["Jacket Type"]):
+            value = attributes.identifierListAttribute(value, "jacket type", aliases=JACKET_TYPE_ALIASES)
+        elif key in larr(["Pin Location"]):
+            value = attributes.identifierListAttribute(value, "pin location", aliases=PIN_LOCATION_ALIASES)
+        elif key in larr(["Fixed Form"]):
+            value = attributes.identifierListAttribute(value, "fixing method", aliases=FIXED_FORM_ALIASES)
+        elif key in larr(["Fuse Type"]):
+            value = attributes.identifierListAttribute(value, "fuse type", aliases=FUSE_TYPE_ALIASES)
+        elif key in larr(["Style"]):
+            value = attributes.identifierListAttribute(value, "style", aliases=STYLE_ALIASES)
         elif key in larr(["Mounting Type", "Mounting Style", "Mounting Sytle"]):
             value = attributes.identifierListAttribute(value, "mounting type", aliases=MOUNTING_TYPE_ALIASES)
         elif key in larr(["Installation Method"]):
             value = attributes.identifierListAttribute(value, "installation method", aliases=MOUNTING_TYPE_ALIASES)
-        elif key in larr(["Installation Type"]):
+        elif key in larr(["Install", "Installation Type"]):
             value = attributes.identifierListAttribute(value, "installation type", aliases=MOUNTING_TYPE_ALIASES)
         elif key in larr(["Head Type"]):
             value = attributes.identifierAttribute(value, "head type")
@@ -1198,11 +1623,21 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "output type", aliases=OUTPUT_TYPE_ALIASES)
         elif key in larr(["Output", "Output Mode"]):
             value = attributes.identifierListAttribute(value, "output")
-        elif key in larr(["Output Polarity"]):
-            polarity = "Positive;Negative" if str(value).strip() == "Positive and Negative Poles" else value
+        elif key in larr(["Output Polarity", "Output Configuration"]):
+            polarity = str(value).strip()
+            if polarity in {"Positive and Negative Poles", "Positive and Negative"}:
+                polarity = "Positive;Negative"
+            else:
+                polarity = value
             value = attributes.identifierListAttribute(polarity, "polarity", aliases=OUTPUT_POLARITY_ALIASES)
+        elif key in larr(["Polarity"]):
+            value = attributes.identifierListAttribute(value, "polarity", aliases=POLARITY_ALIASES)
         elif key in larr(["Output Level"]):
             value = attributes.identifierListAttribute(value, "output level", aliases=SIGNAL_LEVEL_ALIASES)
+        elif key in larr(["Default Output"]):
+            value = attributes.identifierListAttribute(value, "default output", aliases=SIGNAL_LEVEL_ALIASES)
+        elif key in larr(["Channel Type"]):
+            value = attributes.identifierListAttribute(value, "channel type", aliases=CHANNEL_TYPE_ALIASES)
         elif key in larr(["Output Signal"]):
             value = attributes.identifierListAttribute(value, "output signal", aliases=SIGNAL_LEVEL_ALIASES)
         elif key in larr(["Level Standard"]):
@@ -1217,40 +1652,112 @@ def normalizeAttribute(key, value):
             value = attributes.identifierListAttribute(value, "class", aliases=AMPLIFIER_CLASS_ALIASES)
         elif key in larr(["Card Type"]):
             value = attributes.identifierListAttribute(value, "card type", aliases=CARD_TYPE_ALIASES)
+        elif key in larr(["Applicable Cable Type"]):
+            value = attributes.identifierListAttribute(value, "cable type", aliases=APPLICABLE_CABLE_TYPE_ALIASES)
+        elif key in larr(["Card Detection"]):
+            has_card_detection = CARD_DETECTION_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${card detection}",
+                "primary": "card detection",
+                "values": {
+                    "card detection": [has_card_detection, "count"],
+                },
+            }
+        elif key in larr(["Port"]):
+            ports = PORT_COUNT_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${ports}",
+                "primary": "ports",
+                "values": {
+                    "ports": [ports, "count"],
+                },
+            }
         elif key in larr(["Card Connection Mode"]):
             value = attributes.identifierListAttribute(value, "card connection mode", aliases=CARD_CONNECTION_MODE_ALIASES)
         elif key in larr(["Locking Feature"]):
             value = attributes.identifierListAttribute(value, "locking feature", aliases=CARD_CONNECTION_MODE_ALIASES)
-        elif key in larr(["Direction"]):
+        elif key in larr(["With Locker"]):
+            value = attributes.identifierListAttribute(value, "locking feature", aliases=WITH_LOCKER_ALIASES)
+        elif key in larr(["Direction", "Outlet Direction (Vertical Basis)"]):
             value = attributes.identifierListAttribute(value, "direction", aliases=DIRECTION_ALIASES)
+        elif key in larr(["Sense of Rotation"]):
+            value = attributes.identifierListAttribute(value, "rotation direction", aliases=ROTATION_DIRECTION_ALIASES)
+        elif key in larr(["Axial Direction", "Accelerometer Sensing Axis"]):
+            value = attributes.identifierListAttribute(value, "axis", aliases=AXIS_ALIASES)
         elif key in larr(["Input Signal"]):
             value = attributes.identifierListAttribute(value, "input signal", aliases=SIGNAL_LEVEL_ALIASES)
         elif key in larr(["Peripheral/Function"]):
             value = attributes.identifierListAttribute(value, "peripheral", aliases=PERIPHERAL_FUNCTION_ALIASES)
         elif key in larr(["Topology"]):
             value = attributes.identifierListAttribute(value, "topology", aliases=TOPOLOGY_ALIASES)
-        elif key in larr(["Contact Material"]):
+        elif key in larr(["Applicable to AC-DC Architecture", "ADC Architecture"]):
+            value = attributes.identifierListAttribute(value, "architecture", aliases=ARCHITECTURE_ALIASES)
+        elif key in larr(["Contact Material", "Body Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=CONTACT_MATERIAL_ALIASES)
-        elif key in larr(["Contact Type"]):
+        elif key in larr(["Material"]):
+            value = attributes.identifierListAttribute(value, "material", aliases=GENERAL_MATERIAL_ALIASES)
+        elif key in larr(["Metal Material"]):
+            value = attributes.identifierListAttribute(value, "material", aliases=METAL_MATERIAL_ALIASES)
+        elif key in larr(["Connect Type", "Contact Type"]):
             value = attributes.identifierListAttribute(value, "contact type", separators=",;/", aliases=CONTACT_TYPE_ALIASES)
         elif key in larr(["Contact Finish"]):
             value = attributes.identifierListAttribute(value, "finish", aliases=CONTACT_PLATING_ALIASES)
         elif key in larr(["Dielectric Material"]):
             value = attributes.identifierListAttribute(value, "material", aliases=DIELECTRIC_MATERIAL_ALIASES)
-        elif key in larr(["Contact Plating"]):
+        elif key in larr(["Contact Plating", "Contact Coating", "Ontology Coating"]):
             value = attributes.identifierListAttribute(value, "plating", aliases=CONTACT_PLATING_ALIASES)
+        elif key in larr(["Display Color"]):
+            value = attributes.identifierListAttribute(value, "display color", aliases=DISPLAY_COLOR_ALIASES)
         elif key in larr(["Illumination Color", "Color", "Actuator/Cap Color", "Actuator Color", "Detection Color", "Jacket Color", "Plastic Color", "Luminous Color"]):
             value = attributes.identifierListAttribute(value, "color", aliases=COLOR_ALIASES)
         elif key in larr(["Emitted Color"]):
             value = attributes.identifierListAttribute(value, "color", separators=",;/", aliases=COLOR_ALIASES)
         elif key in larr(["With Lamp"]):
             value = attributes.withLampAttribute(value, colorAliases=COLOR_ALIASES)
-        elif key in larr(["Strike Gundam"]):
+        elif key in larr(["LED"]):
+            with_led = LED_PRESENCE_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${with led}",
+                "primary": "with led",
+                "values": {
+                    "with led": [with_led, "count"],
+                },
+            }
+        elif key in larr(["Watchdog"]):
+            watchdog = YES_NO_UNKNOWN_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${watchdog}",
+                "primary": "watchdog",
+                "values": {
+                    "watchdog": [watchdog, "count"],
+                },
+            }
+        elif key in larr(["Manual Reset"]):
+            manual_reset = YES_NO_UNKNOWN_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${manual reset}",
+                "primary": "manual reset",
+                "values": {
+                    "manual reset": [manual_reset, "count"],
+                },
+            }
+        elif key in larr(["Differential Input"]):
+            differential_input = YES_NO_UNKNOWN_VALUES.get(str(value).strip().lower(), "NaN")
+            value = {
+                "format": "${differential input}",
+                "primary": "differential input",
+                "values": {
+                    "differential input": [differential_input, "count"],
+                },
+            }
+        elif key in larr(["Strike Gundam", "With Bracket"]):
             value = attributes.bracketPresenceAttribute(value)
         elif key in larr(["Lens Color"]):
             value = attributes.identifierListAttribute(value, "lens color")
         elif key in larr(["Category"]):
             value = attributes.categoryAttribute(value)
+        elif key in larr(["Basic/Extended"]):
+            value = attributes.identifierListAttribute(value, "catalog class")
         elif key in larr(["Texture of Material", "Shield Clip"]):
             value = attributes.materialGradeAttribute(value)
         elif key in larr(["Specifications"]):
@@ -1267,6 +1774,8 @@ def normalizeAttribute(key, value):
             value = attributes.surfaceTreatmentAttribute(value)
         elif key in larr(["Supplier Device Packaging"]):
             value = attributes.supplierDevicePackagingAttribute(value)
+        elif key in larr(["Packaging"]):
+            value = attributes.identifierListAttribute(value, "packaging", aliases=PACKAGING_ALIASES)
         elif key in larr(["Packaging/Housing"]):
             value = attributes.packagePinCountAttribute(value)
         elif key in larr(["Viewing Direction"]):
@@ -1294,6 +1803,21 @@ def normalizeAttribute(key, value):
         elif key in larr(["Number of Channels", "Number of Elements", "Number of Lines",
                 "Output Count"]):
             value = attributes.channelCountAttribute(value)
+        elif key in larr(["Number of Coils"]):
+            text = str(value).strip()
+            coil_match = re.search(r"\b(single|double|three)\s+coils?\b", text, flags=re.I)
+            layer_match = re.search(r"\b(single|double|three)\s+layers?\b", text, flags=re.I)
+            if coil_match and layer_match:
+                value = {
+                    "format": "${coils} coils, ${layers} layers",
+                    "primary": "coils",
+                    "values": {
+                        "coils": [NUMBER_WORD_VALUES[coil_match.group(1).lower()], "count"],
+                        "layers": [NUMBER_WORD_VALUES[layer_match.group(1).lower()], "count"],
+                    },
+                }
+            else:
+                value = attributes.identifierAttribute(value, "coil count")
         elif key in larr(["Resolution", "Resolution (Bits)", "Resolution(Bits)",
                 "Output Bits", "DAC (Bit)", "ADC (Bit)", "Pwm (Bit)",
                 "Core Size", "Temperature Resolution", "Output Bit",
@@ -2297,6 +2821,7 @@ WEB_FILE_FORMAT_VERSION = 4
 LOOKUP_BUCKET_SIZE_DEFAULT = 100000
 MAX_COMPONENTS_PER_SHARD_DEFAULT = 1000
 BROWSE_COMPONENTS_PER_SHARD_DEFAULT = 20000
+GZIP_COMPRESSLEVEL = 6
 TRIGRAM_SIZE = 3
 MAX_TRIGRAM_BUCKET_ROWS = 100000
 TRIGRAM_GROUP_PREFIX_SIZE = 2
@@ -2343,13 +2868,14 @@ def _stableComponentFilebase(catName, subcatName):
 
 def _writeJsonArtifact(data, filename, compress=False):
     openFn = gzip.open if compress else open
-    with openFn(filename, "wt", encoding="utf-8") as f:
+    kwargs = {"compresslevel": GZIP_COMPRESSLEVEL} if compress else {}
+    with openFn(filename, "wt", encoding="utf-8", **kwargs) as f:
         json.dump(data, f, separators=(",", ":"), sort_keys=True)
     return sha256file(filename)
 
 
 def _writeJsonLinesArtifact(rows, filename):
-    with gzip.open(filename, "wt", encoding="utf-8") as f:
+    with gzip.open(filename, "wt", encoding="utf-8", compresslevel=GZIP_COMPRESSLEVEL) as f:
         for row in rows:
             json.dump(row, f, separators=(",", ":"), sort_keys=False)
             f.write("\n")
@@ -2367,7 +2893,10 @@ def _isUsableCategory(catName, subcatName):
 def _componentRows(components, subcategoryId, attributeLut):
     rows = [COMPONENT_ROW_SCHEMA]
     for component in components:
-        values = extractComponent(component, COMPONENT_SOURCE_SCHEMA)
+        values = component.get("_componentValues")
+        if values is None:
+            values = extractComponent(component, COMPONENT_SOURCE_SCHEMA)
+            component["_componentValues"] = values
         attrIds = [
             updateLut(attributeLut, [name, value])
             for name, value in values[COMPONENT_ROW_SCHEMA["attributes"]].items()
@@ -2389,6 +2918,13 @@ def _componentRows(components, subcategoryId, attributeLut):
 
 
 def _componentSearchText(component):
+    values = component.get("_componentValues")
+    if values is not None:
+        return " ".join([
+            str(values[COMPONENT_ROW_SCHEMA["lcsc"]]),
+            str(values[COMPONENT_ROW_SCHEMA["mfr"]]),
+            str(values[COMPONENT_ROW_SCHEMA["description"]]),
+        ]).lower()
     return " ".join([
         str(component.get("lcsc", "")),
         str(component.get("mfr", "")),
@@ -2519,7 +3055,7 @@ def _writeTrigramIndexes(searchIndexPath, outdir, files, totalComponents, trigra
     for group, tempPath in sorted(groupTempFiles.items()):
         filename = _trigramGroupFileName(group)
         outPath = os.path.join(outdir, filename)
-        with open(tempPath, "rt", encoding="utf-8") as src, gzip.open(outPath, "wt", encoding="utf-8") as dst:
+        with open(tempPath, "rt", encoding="utf-8") as src, gzip.open(outPath, "wt", encoding="utf-8", compresslevel=GZIP_COMPRESSLEVEL) as dst:
             shutil.copyfileobj(src, dst)
         fileHash = sha256file(outPath)
         files[filename] = {
@@ -2618,7 +3154,10 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
     categoryId = 0
     searchIndexFilename = "search-index.tsv.gz"
     searchIndexPath = os.path.join(outdir, searchIndexFilename)
-    searchIndexFile = gzip.open(searchIndexPath, "wt", encoding="utf-8")
+    searchIndexFile = gzip.open(
+        searchIndexPath, "wt", encoding="utf-8",
+        compresslevel=GZIP_COMPRESSLEVEL
+    )
 
     try:
         for catName, subcategories in sortedCategories:
@@ -2721,6 +3260,7 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
                 categoryEntry["browseShards"].extend(browseShardNames)
     finally:
         searchIndexFile.close()
+        lib.finalizeBuild()
 
     searchIndexHash = sha256file(searchIndexPath)
     files[searchIndexFilename] = {
@@ -2773,4 +3313,3 @@ def buildtables(library, outdir, ignoreoldstock, jobs, max_components_per_shard,
         "files": files,
     }
     _writeJsonArtifact(manifest, os.path.join(outdir, "manifest.json"), compress=False)
-    lib.finalizeBuild()

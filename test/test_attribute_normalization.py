@@ -2404,6 +2404,30 @@ def test_output_polarity_identifiers(capsys):
     assert values["polarity 1"] == ["Positive", "identifier"]
     assert values["polarity 2"] == ["Negative", "identifier"]
 
+    values = normalized_values("Output Configuration", "Positive and Negative", capsys)
+
+    assert values["polarity 1"] == ["Positive", "identifier"]
+    assert values["polarity 2"] == ["Negative", "identifier"]
+
+    values = normalized_values("Output Configuration", "Positive electrode", capsys)
+
+    assert values["polarity 1"] == ["Positive", "identifier"]
+
+
+def test_polarity_identifiers(capsys):
+    values = normalized_values("Polarity", "Bi-Directional", capsys)
+
+    assert values["polarity 1"] == ["Bidirectional", "identifier"]
+
+    values = normalized_values("Polarity", "Common Cathode, Common Anode", capsys)
+
+    assert values["polarity 1"] == ["Common Cathode", "identifier"]
+    assert values["polarity 2"] == ["Common Anode", "identifier"]
+
+    values = normalized_values("Polarity", "-", capsys)
+
+    assert values["polarity 1"] == ["Unspecified", "identifier"]
+
 
 def test_output_level_identifiers(capsys):
     values = normalized_values("Output Level", "CML;HCSL;LVCMOS;LVDS;LVPECL", capsys)
@@ -2417,6 +2441,21 @@ def test_output_level_identifiers(capsys):
     values = normalized_values("Output Level", "-", capsys)
 
     assert values["output level 1"] == ["Unspecified", "identifier"]
+
+
+def test_default_output_identifiers(capsys):
+    values = normalized_values("Default Output", "High Level, Low Level", capsys)
+
+    assert values["default output 1"] == ["High Level", "identifier"]
+    assert values["default output 2"] == ["Low Level", "identifier"]
+
+
+def test_channel_type_identifiers(capsys):
+    values = normalized_values("Channel Type", "Bidirectional, Unidirectional, -", capsys)
+
+    assert values["channel type 1"] == ["Bidirectional", "identifier"]
+    assert values["channel type 2"] == ["Unidirectional", "identifier"]
+    assert values["channel type 3"] == ["Unspecified", "identifier"]
 
 
 def test_output_signal_identifiers(capsys):
@@ -2535,6 +2574,112 @@ def test_card_type_identifiers(capsys):
     assert values["card type 1"] == ["Unspecified", "identifier"]
 
 
+def test_applicable_cable_type_identifiers(capsys):
+    values = normalized_values("Applicable Cable Type", "Round Cable, Ribbon Cable, Round cable", capsys)
+
+    assert values["cable type 1"] == ["Round Cable", "identifier"]
+    assert values["cable type 2"] == ["Ribbon Cable", "identifier"]
+    assert values["cable type 3"] == ["Round Cable", "identifier"]
+
+
+def test_circuit_type_identifiers(capsys):
+    values = normalized_values("Circuit Type", "Independent, Isolation, -", capsys)
+
+    assert values["circuit type 1"] == ["Independent", "identifier"]
+    assert values["circuit type 2"] == ["Isolation", "identifier"]
+    assert values["circuit type 3"] == ["Unspecified", "identifier"]
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
+        ("No", 0),
+        ("-", "NaN"),
+    ],
+)
+def test_alarm_output_flag(value, expected, capsys):
+    values = normalized_values("Alarm Output", value, capsys)
+
+    assert_quantity(values["alarm output"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
+        ("No", 0),
+        ("-", "NaN"),
+    ],
+)
+def test_programmable_flag(value, expected, capsys):
+    values = normalized_values("Programmable", value, capsys)
+
+    assert_quantity(values["programmable"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
+        ("No", 0),
+        ("-", "NaN"),
+    ],
+)
+def test_alarm_clock_output_flag(value, expected, capsys):
+    values = normalized_values("The Alarm Clock Output", value, capsys)
+
+    assert_quantity(values["alarm clock output"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
+        ("No", 0),
+        ("-", "NaN"),
+    ],
+)
+def test_charge_pump_flag(value, expected, capsys):
+    values = normalized_values("Charge Pump", value, capsys)
+
+    assert_quantity(values["charge pump"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
+        ("With Card Detect", 1),
+        ("No", 0),
+        ("No Card Detect", 0),
+        ("No Card Detection", 0),
+        ("-", "NaN"),
+    ],
+)
+def test_card_detection_values(value, expected, capsys):
+    values = normalized_values("Card Detection", value, capsys)
+
+    assert_quantity(values["card detection"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Single port", 1),
+        ("单口", 1),
+        ("Dual Port", 2),
+        ("双口", 2),
+        ("Four Ports", 4),
+        ("四口", 4),
+    ],
+)
+def test_port_count_values(value, expected, capsys):
+    values = normalized_values("Port", value, capsys)
+
+    assert_quantity(values["ports"], expected, "count")
+
+
 def test_card_connection_mode_identifiers(capsys):
     values = normalized_values("Card Connection Mode", "Self bomb", capsys)
 
@@ -2559,6 +2704,23 @@ def test_locking_feature_identifiers(capsys):
     assert values["locking feature 1"] == ["No Lock", "identifier"]
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Locking", "Locking"),
+        ("With locking buckle", "Locking"),
+        ("带锁扣", "Locking"),
+        ("Non-Latching", "Non-Latching"),
+        ("不带", "Non-Latching"),
+        ("-", "Unspecified"),
+    ],
+)
+def test_with_locker_identifiers(value, expected, capsys):
+    values = normalized_values("With Locker", value, capsys)
+
+    assert values["locking feature 1"] == [expected, "identifier"]
+
+
 def test_direction_identifiers(capsys):
     values = normalized_values("Direction", "Omni-directional, Bi-Directional, 向上计数器", capsys)
 
@@ -2569,6 +2731,42 @@ def test_direction_identifiers(capsys):
     values = normalized_values("Direction", "-", capsys)
 
     assert values["direction 1"] == ["Unspecified", "identifier"]
+
+    values = normalized_values("Outlet Direction (Vertical Basis)", "Top Entry, Horizontal Termination, Reverse Horizontal Termination, -", capsys)
+
+    assert values["direction 1"] == ["Top Entry", "identifier"]
+    assert values["direction 2"] == ["Horizontal Termination", "identifier"]
+    assert values["direction 3"] == ["Reverse Horizontal Termination", "identifier"]
+    assert values["direction 4"] == ["Unspecified", "identifier"]
+
+
+def test_rotation_direction_identifiers(capsys):
+    values = normalized_values("Sense of Rotation", "CW,CCW", capsys)
+
+    assert values["rotation direction 1"] == ["CW", "identifier"]
+    assert values["rotation direction 2"] == ["CCW", "identifier"]
+
+    values = normalized_values("Sense of Rotation", "-", capsys)
+
+    assert values["rotation direction 1"] == ["Unspecified", "identifier"]
+
+
+def test_axial_direction_identifiers(capsys):
+    values = normalized_values("Axial Direction", "X,Y(Roll),Z(Yaw)", capsys)
+
+    assert values["axis 1"] == ["X", "identifier"]
+    assert values["axis 2"] == ["Y(Roll)", "identifier"]
+    assert values["axis 3"] == ["Z(Yaw)", "identifier"]
+
+    values = normalized_values("Axial Direction", "-", capsys)
+
+    assert values["axis 1"] == ["Unspecified", "identifier"]
+
+    values = normalized_values("Accelerometer Sensing Axis", "X,Y,Z", capsys)
+
+    assert values["axis 1"] == ["X", "identifier"]
+    assert values["axis 2"] == ["Y", "identifier"]
+    assert values["axis 3"] == ["Z", "identifier"]
 
 
 def test_environmental_requirements(capsys):
@@ -2694,6 +2892,15 @@ def test_display_switch_package_counts(capsys):
     values = normalized_values("Supplier Device Packaging", "3-SIP Module", capsys)
     assert_quantity(values["pins"], 3, "count")
     assert values["package"] == ["SIP Module", "identifier"]
+
+    values = normalized_values("Packaging", "Tube-packed, Bag-packed, Box-packed", capsys)
+    assert values["packaging 1"] == ["Tube", "identifier"]
+    assert values["packaging 2"] == ["Bag", "identifier"]
+    assert values["packaging 3"] == ["Box", "identifier"]
+
+    values = normalized_values("Packaging", "Tape & Reel (TR), Tray", capsys)
+    assert values["packaging 1"] == ["Tape & Reel (TR)", "identifier"]
+    assert values["packaging 2"] == ["Tray", "identifier"]
 
 
 def test_switch_circuit_identifiers(capsys):
@@ -2917,6 +3124,18 @@ def test_feature_list_attributes(key, value, expected, capsys):
     }
 
 
+def test_chip_function_identifiers(capsys):
+    values = normalized_values("Chip Function", "电容式触摸, PWM控制, Capacitive touch", capsys)
+
+    assert values["function 1"] == ["Capacitive Touch", "identifier"]
+    assert values["function 2"] == ["PWM Control", "identifier"]
+    assert values["function 3"] == ["Capacitive Touch", "identifier"]
+
+    values = normalized_values("Chip Function", "-", capsys)
+
+    assert values["function 1"] == ["Unspecified", "identifier"]
+
+
 def test_working_mode_identifiers(capsys):
     values = normalized_values("Working Mode", "CCM, DCM, QR, CRM", capsys)
 
@@ -2949,6 +3168,20 @@ def test_actuator_type_identifiers(capsys):
     assert values["actuator type 1"] == ["Unspecified", "identifier"]
 
 
+def test_actuator_identifier_markings(capsys):
+    values = normalized_values("Actuator Identifier", "- O =", capsys)
+
+    assert values["actuator marking 1"] == ["- O =", "identifier"]
+
+    values = normalized_values("Actuator Identifier", "Dot Display", capsys)
+
+    assert values["actuator marking 1"] == ["Dot Display", "identifier"]
+
+    values = normalized_values("Actuator Identifier", "-", capsys)
+
+    assert values["actuator marking 1"] == ["Unspecified", "identifier"]
+
+
 def test_chip_type_identifiers(capsys):
     values = normalized_values("The Chip Type", "Protection IC, 电池监测芯片", capsys)
 
@@ -2959,6 +3192,20 @@ def test_chip_type_identifiers(capsys):
 
     assert values["chip type 1"] == ["Voltage Monitor", "identifier"]
     assert values["chip type 2"] == ["Switch Controller", "identifier"]
+
+    values = normalized_values(
+        "Chip Type Parameters/Description",
+        "立体声音频ADC, Audio decoding chip, Current transmitter",
+        capsys,
+    )
+
+    assert values["chip type 1"] == ["Stereo Audio ADC", "identifier"]
+    assert values["chip type 2"] == ["Audio Decoding IC", "identifier"]
+    assert values["chip type 3"] == ["Current Transmitter", "identifier"]
+
+    values = normalized_values("Chip Type Parameters/Description", "-", capsys)
+
+    assert values["chip type 1"] == ["Unspecified", "identifier"]
 
 
 def test_power_management_type_identifiers(capsys):
@@ -2992,6 +3239,16 @@ def test_appearance_shape_identifiers(capsys):
     assert values["appearance 1"] == ["Plug-In Type", "identifier"]
 
 
+def test_shape_identifiers(capsys):
+    values = normalized_values("Shape", "UType", capsys)
+
+    assert values["shape 1"] == ["U-Type", "identifier"]
+
+    values = normalized_values("Shape", "-", capsys)
+
+    assert values["shape 1"] == ["Unspecified", "identifier"]
+
+
 def test_voltage_reference_identifiers(capsys):
     values = normalized_values("Voltage Reference", "Built-in, External", capsys)
 
@@ -3002,6 +3259,82 @@ def test_voltage_reference_identifiers(capsys):
 
     assert values["voltage reference 1"] == ["Built-In", "identifier"]
     assert values["voltage reference 2"] == ["External", "identifier"]
+
+
+def test_clock_oscillator_identifiers(capsys):
+    values = normalized_values("Clock/Oscillator", "External, Built-in", capsys)
+
+    assert values["clock source 1"] == ["External", "identifier"]
+    assert values["clock source 2"] == ["Built-In", "identifier"]
+
+    values = normalized_values("Clock/Oscillator", "Internal or external", capsys)
+
+    assert values["clock source 1"] == ["Built-In", "identifier"]
+    assert values["clock source 2"] == ["External", "identifier"]
+
+
+def test_reference_type_identifiers(capsys):
+    values = normalized_values("Reference Type", "Series, Parallel", capsys)
+
+    assert values["reference type 1"] == ["Series", "identifier"]
+    assert values["reference type 2"] == ["Parallel", "identifier"]
+
+    values = normalized_values("Reference Type", "series connection", capsys)
+
+    assert values["reference type 1"] == ["Series", "identifier"]
+
+    values = normalized_values("Reference Type", "-", capsys)
+
+    assert values["reference type 1"] == ["Unspecified", "identifier"]
+
+
+def test_voltage_supply_source_identifiers(capsys):
+    values = normalized_values("Voltage Supply Source", "Single Supply, Dual Supply", capsys)
+
+    assert values["supply source 1"] == ["Single Supply", "identifier"]
+    assert values["supply source 2"] == ["Dual Supply", "identifier"]
+
+    values = normalized_values("Voltage Supply Source", "Dual Power", capsys)
+
+    assert values["supply source 1"] == ["Dual Supply", "identifier"]
+
+    values = normalized_values("Voltage Supply Source", "Single supply", capsys)
+
+    assert values["supply source 1"] == ["Single Supply", "identifier"]
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Built-in", "Built-In"),
+        ("内置", "Built-In"),
+        ("External", "External"),
+        ("外置", "External"),
+        ("Non Built-In", "External"),
+        ("-", "Unspecified"),
+    ],
+)
+def test_switch_tube_identifiers(value, expected, capsys):
+    values = normalized_values("Switch Tube (Built-in/External)", value, capsys)
+
+    assert values["switch tube 1"] == [expected, "identifier"]
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Circular Pins", "Round Pin"),
+        ("Round Pin", "Round Pin"),
+        ("Square Pins", "Square Pin"),
+        ("Pin Header", "Pin Header"),
+        ("Policy", "Policy"),
+        ("-", "Unspecified"),
+    ],
+)
+def test_pin_type_identifiers(value, expected, capsys):
+    values = normalized_values("Circluar Pins/Square Pins", value, capsys)
+
+    assert values["pin type 1"] == [expected, "identifier"]
 
 
 def test_technology_identifiers(capsys):
@@ -3017,6 +3350,28 @@ def test_technology_identifiers(capsys):
 
     assert values["technology 1"] == ["Unspecified", "identifier"]
 
+    values = normalized_values("Technology Type", "Electromagnetic Type", capsys)
+
+    assert values["technology 1"] == ["Electromagnetic", "identifier"]
+
+    values = normalized_values("Technology Type", "-", capsys)
+
+    assert values["technology 1"] == ["Unspecified", "identifier"]
+
+
+def test_oscillator_circuit_identifiers(capsys):
+    values = normalized_values("Oscillator Circuit", "Active (driven circuit included)", capsys)
+
+    assert values["oscillator circuit 1"] == ["Active (Built-In Driver Circuit)", "identifier"]
+
+    values = normalized_values("Oscillator Circuit", "Passive (external drive)", capsys)
+
+    assert values["oscillator circuit 1"] == ["Passive (External Drive)", "identifier"]
+
+    values = normalized_values("Oscillator Circuit", "-", capsys)
+
+    assert values["oscillator circuit 1"] == ["Unspecified", "identifier"]
+
 
 def test_drive_motor_type_identifiers(capsys):
     values = normalized_values("Drive Motor Type", "Brush DC Motor", capsys)
@@ -3030,6 +3385,73 @@ def test_drive_motor_type_identifiers(capsys):
     values = normalized_values("Drive Motor Type", "Step Motor Drive", capsys)
 
     assert values["motor type 1"] == ["Stepper Motor", "identifier"]
+
+
+def test_drive_type_identifiers(capsys):
+    values = normalized_values("Drive Type", "Bipolar Driver, Three Phase, Single Phase, Unipolar Drive", capsys)
+
+    assert values["drive type 1"] == ["Bipolar Driver", "identifier"]
+    assert values["drive type 2"] == ["Three-Phase", "identifier"]
+    assert values["drive type 3"] == ["Single-Phase", "identifier"]
+    assert values["drive type 4"] == ["Unipolar Drive", "identifier"]
+
+
+def test_feedback_system_identifiers(capsys):
+    values = normalized_values("Feedback System", "Secondary-Side Feedback, Primary-side feedback, -", capsys)
+
+    assert values["feedback system 1"] == ["Secondary-Side Feedback", "identifier"]
+    assert values["feedback system 2"] == ["Primary-Side Feedback", "identifier"]
+    assert values["feedback system 3"] == ["Unspecified", "identifier"]
+
+
+def test_input_voltage_type_identifiers(capsys):
+    values = normalized_values("Input Voltage Type", "AC,DC,-", capsys)
+
+    assert values["input voltage type 1"] == ["AC", "identifier"]
+    assert values["input voltage type 2"] == ["DC", "identifier"]
+    assert values["input voltage type 3"] == ["Unspecified", "identifier"]
+
+
+def test_isolation_regulation_identifiers(capsys):
+    values = normalized_values("Isolated or Voltage Regulation", "Isolated Regulated, Non-Isolated Regulator, Isolated Unregulated, -", capsys)
+
+    assert values["isolation/regulation 1"] == ["Isolated Regulated", "identifier"]
+    assert values["isolation/regulation 2"] == ["Non-Isolated Regulated", "identifier"]
+    assert values["isolation/regulation 3"] == ["Isolated Unregulated", "identifier"]
+    assert values["isolation/regulation 4"] == ["Unspecified", "identifier"]
+
+
+def test_reset_active_level_identifiers(capsys):
+    values = normalized_values("Reset Active Level", "Active High;Active Low", capsys)
+
+    assert values["reset active level 1"] == ["Active High", "identifier"]
+    assert values["reset active level 2"] == ["Active Low", "identifier"]
+
+    values = normalized_values("Reset Active Level", "-", capsys)
+
+    assert values["reset active level 1"] == ["Unspecified", "identifier"]
+
+
+def test_reset_style_identifiers(capsys):
+    values = normalized_values("Reset Style", "Asynchronous;Synchronous", capsys)
+
+    assert values["reset style 1"] == ["Asynchronous", "identifier"]
+    assert values["reset style 2"] == ["Synchronous", "identifier"]
+
+    values = normalized_values("Reset Style", "-", capsys)
+
+    assert values["reset style 1"] == ["Unspecified", "identifier"]
+
+
+def test_timing_mode_identifiers(capsys):
+    values = normalized_values("Timing Mode", "Synchronous;Asynchronous", capsys)
+
+    assert values["timing mode 1"] == ["Synchronous", "identifier"]
+    assert values["timing mode 2"] == ["Asynchronous", "identifier"]
+
+    values = normalized_values("Timing Mode", "-", capsys)
+
+    assert values["timing mode 1"] == ["Unspecified", "identifier"]
 
 
 def test_interrupt_output_identifiers(capsys):
@@ -3225,6 +3647,15 @@ def test_communication_interface_attribute(capsys):
     assert values["interface 2"] == ["SMBus", "identifier"]
 
 
+def test_output_interface_attribute(capsys):
+    values = normalized_values("Output Interface", "IO, SPI, Differential output, CAN Interface", capsys)
+
+    assert values["interface 1"] == ["I/O", "identifier"]
+    assert values["interface 2"] == ["SPI", "identifier"]
+    assert values["interface 3"] == ["Differential Output", "identifier"]
+    assert values["interface 4"] == ["CAN", "identifier"]
+
+
 def test_io_type_attribute(capsys):
     values = normalized_values("IO Type", "I2C;MII;RMII;SPI", capsys)
 
@@ -3258,12 +3689,48 @@ def test_protocol_identifier_list(capsys):
     assert values["protocol 3"] == ["UART", "identifier"]
 
 
+def test_communication_protocol_identifier_list(capsys):
+    values = normalized_values(
+        "Communication Protocol",
+        "Bluetooth protocol;Ethernet protocol;Zigbee Protocol",
+        capsys,
+    )
+
+    assert values["protocol 1"] == ["Bluetooth", "identifier"]
+    assert values["protocol 2"] == ["Ethernet", "identifier"]
+    assert values["protocol 3"] == ["Zigbee", "identifier"]
+
+    values = normalized_values("Communication Protocol", "UART协议,SPI协议", capsys)
+
+    assert values["protocol 1"] == ["UART", "identifier"]
+    assert values["protocol 2"] == ["SPI", "identifier"]
+
+    values = normalized_values("Communication Protocol", "-", capsys)
+
+    assert values["protocol 1"] == ["Unspecified", "identifier"]
+
+
 def test_communication_system_identifier_list(capsys):
     values = normalized_values("Communication System", "NB-IoT, CAT-M, EVDO", capsys)
 
     assert values["communication system 1"] == ["NB-IoT", "identifier"]
     assert values["communication system 2"] == ["Cat-M", "identifier"]
     assert values["communication system 3"] == ["EV-DO", "identifier"]
+
+
+def test_communication_mode_identifier_list(capsys):
+    values = normalized_values("Communication Mode", "Half-Duplex, Full-Duplex", capsys)
+
+    assert values["communication mode 1"] == ["Half-Duplex", "identifier"]
+    assert values["communication mode 2"] == ["Full-Duplex", "identifier"]
+
+
+def test_duplex_identifier_list(capsys):
+    values = normalized_values("Duplex", "Half-Duplex, Full-Duplex, -", capsys)
+
+    assert values["duplex 1"] == ["Half-Duplex", "identifier"]
+    assert values["duplex 2"] == ["Full-Duplex", "identifier"]
+    assert values["duplex 3"] == ["Unspecified", "identifier"]
 
 
 def test_standard_number_identifier_list(capsys):
@@ -3295,6 +3762,101 @@ def test_type_attribute(value, expected, capsys):
     }
 
 
+def test_types_attribute(capsys):
+    values = normalized_values("Types", "transceiver;隔离器", capsys)
+
+    assert values["type 1"] == ["Transceiver", "identifier"]
+    assert values["type 2"] == ["隔离器", "identifier"]
+
+    values = normalized_values("Types", "Receivers", capsys)
+
+    assert values["type 1"] == ["Receiver", "identifier"]
+
+    values = normalized_values("Types", "-", capsys)
+
+    assert values["type 1"] == ["Unspecified", "identifier"]
+
+
+def test_functional_type_identifiers(capsys):
+    values = normalized_values("Functional Type", "Split Transceiver, Receiver", capsys)
+
+    assert values["function type 1"] == ["Split Transceiver", "identifier"]
+    assert values["function type 2"] == ["Receiver", "identifier"]
+
+    values = normalized_values("Functional Type", "-", capsys)
+
+    assert values["function type 1"] == ["Unspecified", "identifier"]
+
+
+def test_igbt_type_identifiers(capsys):
+    values = normalized_values("IGBT Type", "FS (Field Stop), NPT (Non-Punch Through)", capsys)
+
+    assert values["igbt type 1"] == ["FS (Field Stop)", "identifier"]
+    assert values["igbt type 2"] == ["NPT (Non-Punch Through)", "identifier"]
+
+
+def test_conversion_type_identifiers(capsys):
+    values = normalized_values("Conversion Type", "AC-DC, AC/DC-DC", capsys)
+
+    assert values["conversion type 1"] == ["AC-DC", "identifier"]
+    assert values["conversion type 2"] == ["AC/DC-DC", "identifier"]
+
+    values = normalized_values("Conversion Type", "-", capsys)
+
+    assert values["conversion type 1"] == ["Unspecified", "identifier"]
+
+    values = normalized_values("Conversion Type VF/Fv", "V/F, F/V", capsys)
+
+    assert values["conversion type 1"] == ["V/F", "identifier"]
+    assert values["conversion type 2"] == ["F/V", "identifier"]
+
+
+def test_isolation_technology_attribute(capsys):
+    values = normalized_values("Isolation Technology", "Magnetic isolation, 电容隔离, 巨磁隔离 (GMR), -", capsys)
+
+    assert values["isolation technology 1"] == ["Magnetic Isolation", "identifier"]
+    assert values["isolation technology 2"] == ["Capacitive Isolation", "identifier"]
+    assert values["isolation technology 3"] == ["GMR Isolation", "identifier"]
+    assert values["isolation technology 4"] == ["Unspecified", "identifier"]
+
+
+@pytest.mark.parametrize("key", ["Synchronous Rectifier", "Synchronous Rectification"])
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
+        ("No", 0),
+        ("NO", 0),
+        ("NONE", "NaN"),
+        ("-", "NaN"),
+    ],
+)
+def test_synchronous_rectifier_attribute(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    assert_quantity(values["synchronous rectifier"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
+        ("Isolation", 1),
+        ("NO", 0),
+        ("Non-Insulated", 0),
+        ("Non-isolated", 0),
+        ("Without voltage isolation", 0),
+        ("带电压隔离", 1),
+        ("-", "NaN"),
+    ],
+)
+@pytest.mark.parametrize("key", ["Output Isolation", "Whether the Isolation", "Voltage Isolation or Not"])
+def test_isolation_flag_attribute(key, value, expected, capsys):
+    values = normalized_values(key, value, capsys)
+
+    assert_quantity(values["is isolated"], expected, "count")
+
+
 def test_logic_type_attribute(capsys):
     values = normalized_values("Logic Type", "Divide-by-2, Divide-by-10", capsys)
 
@@ -3310,11 +3872,50 @@ def test_logic_gate_type_attribute(capsys):
     assert values["logic gate 3"] == ["Configurable Multiple Function", "identifier"]
 
 
+def test_control_input_logic_attribute(capsys):
+    values = normalized_values("Control Input Logic", "Active High, Active Low", capsys)
+
+    assert values["control input logic 1"] == ["Active High", "identifier"]
+    assert values["control input logic 2"] == ["Active Low", "identifier"]
+
+    values = normalized_values("Control Input Logic", "-", capsys)
+
+    assert values["control input logic 1"] == ["Unspecified", "identifier"]
+
+
+def test_coding_scheme_attribute(capsys):
+    values = normalized_values("Coding Scheme", "D Code, A Code, B Code, X Code", capsys)
+
+    assert values["coding scheme 1"] == ["D Code", "identifier"]
+    assert values["coding scheme 2"] == ["A Code", "identifier"]
+    assert values["coding scheme 3"] == ["B Code", "identifier"]
+    assert values["coding scheme 4"] == ["X Code", "identifier"]
+
+
+def test_hole_shape_attribute(capsys):
+    values = normalized_values("Circular Hole/Square Hole", "Square Holes, Round Hole, -", capsys)
+
+    assert values["hole shape 1"] == ["Square Hole", "identifier"]
+    assert values["hole shape 2"] == ["Round Hole", "identifier"]
+    assert values["hole shape 3"] == ["Unspecified", "identifier"]
+
+
 def test_antenna_type_attribute(capsys):
     values = normalized_values("Antenna Type", "Stamp Hole Antenna, IPEX interface", capsys)
 
     assert values["antenna type 1"] == ["Stamp Hole Antenna", "identifier"]
     assert values["antenna type 2"] == ["IPEX interface", "identifier"]
+
+
+def test_polarization_type_attribute(capsys):
+    values = normalized_values("Polarization Type", "Linear Polarization, RHCP", capsys)
+
+    assert values["polarization 1"] == ["Linear", "identifier"]
+    assert values["polarization 2"] == ["RHCP", "identifier"]
+
+    values = normalized_values("Polarization Type", "-", capsys)
+
+    assert values["polarization 1"] == ["Unspecified", "identifier"]
 
 
 def test_sensor_type_attribute(capsys):
@@ -3343,6 +3944,36 @@ def test_holder_type_attribute(capsys):
     values = normalized_values("Holder Type", "Right-Angle", capsys)
 
     assert values["holder type 1"] == ["Right Angle", "identifier"]
+
+
+def test_fuseholder_type_attribute(capsys):
+    values = normalized_values("Fuseholder Type", "Bracket type", capsys)
+
+    assert values["holder type 1"] == ["Bracket Type", "identifier"]
+
+    values = normalized_values("Fuseholder Type", "-", capsys)
+
+    assert values["holder type 1"] == ["Unspecified", "identifier"]
+
+
+def test_fuse_type_attribute(capsys):
+    values = normalized_values("Fuse Type", "Screw Terminal", capsys)
+
+    assert values["fuse type 1"] == ["Screw Terminal", "identifier"]
+
+    values = normalized_values("Fuse Type", "-", capsys)
+
+    assert values["fuse type 1"] == ["Unspecified", "identifier"]
+
+
+def test_style_attribute(capsys):
+    values = normalized_values("Style", "Bent tip", capsys)
+
+    assert values["style 1"] == ["Bent Tip", "identifier"]
+
+    values = normalized_values("Style", "-", capsys)
+
+    assert values["style 1"] == ["Unspecified", "identifier"]
 
 
 def test_mounting_type_attribute(capsys):
@@ -3391,6 +4022,12 @@ def test_installation_method_identifiers(capsys):
 
     assert values["installation type 1"] == ["Unspecified", "identifier"]
 
+    values = normalized_values("Install", "Surface MountType, External connection wire, -", capsys)
+
+    assert values["installation type 1"] == ["Surface Mount", "identifier"]
+    assert values["installation type 2"] == ["External Connection Wire", "identifier"]
+    assert values["installation type 3"] == ["Unspecified", "identifier"]
+
 
 def test_head_type_attribute(capsys):
     values = normalized_values("Head Type", "Circular ring (90°)", capsys)
@@ -3402,6 +4039,22 @@ def test_coil_type_attribute(capsys):
     values = normalized_values("Coil Type", "2 Coil", capsys)
 
     assert values["coil type"] == ["2 Coil", "identifier"]
+
+
+@pytest.mark.parametrize(
+    ("value", "coils", "layers"),
+    [
+        ("Single Coil, Single Layer", 1, 1),
+        ("Three coils, single layer", 3, 1),
+        ("Single Coil, Double Layer", 1, 2),
+        ("Single coil, three layers", 1, 3),
+    ],
+)
+def test_number_of_coils_attribute(value, coils, layers, capsys):
+    values = normalized_values("Number of Coils", value, capsys)
+
+    assert_quantity(values["coils"], coils, "count")
+    assert_quantity(values["layers"], layers, "count")
 
 
 def test_dimming_attribute(capsys):
@@ -3571,12 +4224,36 @@ def test_topology_attribute(value, expected, capsys):
     }
 
 
+def test_ac_dc_architecture_identifiers(capsys):
+    values = normalized_values("Applicable to AC-DC Architecture", "Flyback, LLC, Forward", capsys)
+
+    assert values["architecture 1"] == ["Flyback", "identifier"]
+    assert values["architecture 2"] == ["LLC", "identifier"]
+    assert values["architecture 3"] == ["Forward", "identifier"]
+
+    values = normalized_values("ADC Architecture", "SAR, Sigma-Delta", capsys)
+
+    assert values["architecture 1"] == ["SAR", "identifier"]
+    assert values["architecture 2"] == ["Sigma-Delta", "identifier"]
+
+
 def test_driven_configuration_identifiers(capsys):
     values = normalized_values("Driven Configuration", "Low-side, high-side, half-bridge", capsys)
 
     assert values["configuration 1"] == ["Low Side", "identifier"]
     assert values["configuration 2"] == ["High Side", "identifier"]
     assert values["configuration 3"] == ["Half-Bridge", "identifier"]
+
+
+def test_trigger_type_identifiers(capsys):
+    values = normalized_values("Trigger Type", "Falling Edge, Rising Edge", capsys)
+
+    assert values["trigger type 1"] == ["Falling Edge", "identifier"]
+    assert values["trigger type 2"] == ["Rising Edge", "identifier"]
+
+    values = normalized_values("Trigger Type", "-", capsys)
+
+    assert values["trigger type 1"] == ["Unspecified", "identifier"]
 
 
 @pytest.mark.parametrize(
@@ -3712,6 +4389,40 @@ def test_contact_material_attribute(value, expected, capsys):
     }
 
 
+def test_body_material_attribute(capsys):
+    values = normalized_values("Body Material", "Copper alloy, Red copper", capsys)
+
+    assert values["material 1"] == ["Copper Alloy", "identifier"]
+    assert values["material 2"] == ["Red Copper", "identifier"]
+
+    values = normalized_values("Body Material", "-", capsys)
+
+    assert values["material 1"] == ["Unspecified", "identifier"]
+
+
+def test_material_attribute(capsys):
+    values = normalized_values(
+        "Material",
+        "Polyolefin Material with Appropriate Amount of Additives, Copper alloy, Stainless steel, Phosphor Bronze, Tin-plated",
+        capsys,
+    )
+
+    assert values["material 1"] == ["Polyolefin with Additives", "identifier"]
+    assert values["material 2"] == ["Copper Alloy", "identifier"]
+    assert values["material 3"] == ["Stainless Steel", "identifier"]
+    assert values["material 4"] == ["Phosphor Bronze", "identifier"]
+    assert values["material 5"] == ["Tin-Plated", "identifier"]
+
+
+def test_metal_material_attribute(capsys):
+    values = normalized_values("Metal Material", "Gold Plated, 铜镀金, Gold-plated copper, -", capsys)
+
+    assert values["material 1"] == ["Gold-Plated", "identifier"]
+    assert values["material 2"] == ["Gold-Plated Copper", "identifier"]
+    assert values["material 3"] == ["Gold-Plated Copper", "identifier"]
+    assert values["material 4"] == ["Unspecified", "identifier"]
+
+
 def test_contact_type_identifiers(capsys):
     values = normalized_values("Contact Type", "Dual-sided contacts / top and bottom connection", capsys)
 
@@ -3727,6 +4438,12 @@ def test_contact_type_identifiers(capsys):
 
     assert values["contact type 1"] == ["Normally Closed", "identifier"]
     assert values["contact type 2"] == ["Normally Open", "identifier"]
+
+    values = normalized_values("Connect Type", "Blade Contact (Female), Spring contact type, Blade Contact (Male)", capsys)
+
+    assert values["contact type 1"] == ["Blade Contact (Female)", "identifier"]
+    assert values["contact type 2"] == ["Spring Contact Type", "identifier"]
+    assert values["contact type 3"] == ["Blade Contact (Male)", "identifier"]
 
 
 def test_dielectric_material_attribute(capsys):
@@ -3746,6 +4463,20 @@ def test_contact_plating_attribute(capsys):
     assert values["plating 1"] == ["Silver", "identifier"]
     assert values["plating 2"] == ["Gold", "identifier"]
     assert values["plating 3"] == ["Gold-Palladium", "identifier"]
+
+    values = normalized_values("Contact Coating", "Nickel plated;Tin plated;silver plating;Tin-nickel plated", capsys)
+
+    assert values["plating 1"] == ["Nickel", "identifier"]
+    assert values["plating 2"] == ["Tin", "identifier"]
+    assert values["plating 3"] == ["Silver", "identifier"]
+    assert values["plating 4"] == ["Tin-Nickel", "identifier"]
+
+    values = normalized_values("Ontology Coating", "Tin;Zinc;Nickel;-", capsys)
+
+    assert values["plating 1"] == ["Tin", "identifier"]
+    assert values["plating 2"] == ["Zinc", "identifier"]
+    assert values["plating 3"] == ["Nickel", "identifier"]
+    assert values["plating 4"] == ["Unspecified", "identifier"]
 
 
 def test_contact_finish_identifiers(capsys):
@@ -3803,6 +4534,15 @@ def test_color_attribute_identifiers(capsys):
     }
 
 
+def test_display_color_identifiers(capsys):
+    values = normalized_values("Display Color", "Yellow green background blue text, Blue background white text, White, Blue", capsys)
+
+    assert values["display color 1"] == ["Yellow Green Background, Blue Text", "identifier"]
+    assert values["display color 2"] == ["Blue Background, White Text", "identifier"]
+    assert values["display color 3"] == ["White", "identifier"]
+    assert values["display color 4"] == ["Blue", "identifier"]
+
+
 def test_actuator_cap_color_identifiers(capsys):
     values = normalized_values("Actuator/Cap Color", "Yellow Cap", capsys)
 
@@ -3839,6 +4579,33 @@ def test_jacket_color_identifiers(capsys):
     assert values["color 1"] == ["None", "identifier"]
 
 
+def test_jacket_type_identifiers(capsys):
+    values = normalized_values("Jacket Type", "Uninsulated, Pre-insulated, Fully insulated, Heat shrink tube", capsys)
+
+    assert values["jacket type 1"] == ["Uninsulated", "identifier"]
+    assert values["jacket type 2"] == ["Pre-Insulated", "identifier"]
+    assert values["jacket type 3"] == ["Fully Insulated", "identifier"]
+    assert values["jacket type 4"] == ["Heat Shrink Tube", "identifier"]
+
+
+def test_pin_location_identifiers(capsys):
+    values = normalized_values("Pin Location", "Mid Terminal, Side Mount, Corner, -", capsys)
+
+    assert values["pin location 1"] == ["Mid Terminal", "identifier"]
+    assert values["pin location 2"] == ["Side Mount", "identifier"]
+    assert values["pin location 3"] == ["Corner", "identifier"]
+    assert values["pin location 4"] == ["Unspecified", "identifier"]
+
+
+def test_fixed_form_identifiers(capsys):
+    values = normalized_values("Fixed Form", "Screw fixed, Screw Fixing, Snap fastener, -", capsys)
+
+    assert values["fixing method 1"] == ["Screw Mount", "identifier"]
+    assert values["fixing method 2"] == ["Screw Mount", "identifier"]
+    assert values["fixing method 3"] == ["Snap Fastener", "identifier"]
+    assert values["fixing method 4"] == ["Unspecified", "identifier"]
+
+
 def test_plastic_color_identifiers(capsys):
     values = normalized_values("Plastic Color", "Non-Plastic", capsys)
 
@@ -3862,6 +4629,14 @@ def test_lens_color_identifiers(capsys):
     assert values["lens color 2"] == ["Frosted Green Lens", "identifier"]
 
 
+def test_catalog_class_attribute(capsys):
+    values = normalized_values("Basic/Extended", "Extended, Basic, Preferred", capsys)
+
+    assert values["catalog class 1"] == ["Extended", "identifier"]
+    assert values["catalog class 2"] == ["Basic", "identifier"]
+    assert values["catalog class 3"] == ["Preferred", "identifier"]
+
+
 def test_emitted_color_identifiers(capsys):
     values = normalized_values("Emitted Color", "Red, General Green/Yellow-Green", capsys)
 
@@ -3883,6 +4658,65 @@ def test_with_lamp_attribute(capsys):
     assert values["color 3"] == ["Blue", "identifier"]
 
 
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("With LED", 1),
+        ("Non-LED", 0),
+        ("Without LED", 0),
+        ("-", "NaN"),
+    ],
+)
+def test_led_presence_attribute(value, expected, capsys):
+    values = normalized_values("LED", value, capsys)
+
+    assert_quantity(values["with led"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
+        ("No", 0),
+        ("None", "NaN"),
+        ("-", "NaN"),
+    ],
+)
+def test_watchdog_presence_attribute(value, expected, capsys):
+    values = normalized_values("Watchdog", value, capsys)
+
+    assert_quantity(values["watchdog"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
+        ("No", 0),
+        ("None", "NaN"),
+        ("-", "NaN"),
+    ],
+)
+def test_manual_reset_presence_attribute(value, expected, capsys):
+    values = normalized_values("Manual Reset", value, capsys)
+
+    assert_quantity(values["manual reset"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Yes", 1),
+        ("No", 0),
+        ("-", "NaN"),
+    ],
+)
+def test_differential_input_presence_attribute(value, expected, capsys):
+    values = normalized_values("Differential Input", value, capsys)
+
+    assert_quantity(values["differential input"], expected, "count")
+
+
 def test_strike_gundam_bracket_presence(capsys):
     values = normalized_values("Strike Gundam", "With bracket", capsys)
 
@@ -3895,6 +4729,21 @@ def test_strike_gundam_bracket_presence(capsys):
     values = normalized_values("Strike Gundam", "-", capsys)
 
     assert_quantity(values["with bracket"], "NaN", "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("With Bracket", 1),
+        ("Without Bracket", 0),
+        ("Without bracket", 0),
+        ("-", "NaN"),
+    ],
+)
+def test_with_bracket_presence(value, expected, capsys):
+    values = normalized_values("With Bracket", value, capsys)
+
+    assert_quantity(values["with bracket"], expected, "count")
 
 
 @pytest.mark.parametrize(
@@ -4272,6 +5121,26 @@ def test_number_of_elements_count(value, expected, capsys):
     values = normalized_values("Number of Elements", value, capsys)
 
     assert_quantity(values["count"], expected, "count")
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        ("Single channel", {"count": 1}),
+        ("单通道", {"count": 1}),
+        ("五路", {"count": 5}),
+        ("Eight channels", {"count": 8}),
+        ("4/7", {"count 1": 4, "count 2": 7}),
+        ("2/4, 4/2", {"count 1": 2, "count 2": 4, "count 3": 4, "count 4": 2}),
+        ("4, 6", {"count 1": 4, "count 2": 6}),
+    ],
+)
+def test_number_of_lines_count(value, expected, capsys):
+    values = normalized_values("Number of Lines", value, capsys)
+
+    for quantity, count in expected.items():
+        assert_quantity(values[quantity], count, "count")
+
 
 @pytest.mark.parametrize(
     ("key", "value", "expected"),

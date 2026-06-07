@@ -1730,6 +1730,7 @@ def _readChannelCount(value):
     named_counts = {
         "single": 1,
         "single channel": 1,
+        "单通道": 1,
         "single port": 1,
         "dual": 2,
         "dual channel": 2,
@@ -1737,10 +1738,12 @@ def _readChannelCount(value):
         "four channels": 4,
         "five-way": 5,
         "five channels": 5,
+        "五路": 5,
         "quad": 4,
         "triple": 3,
         "hex": 6,
         "seven channels": 7,
+        "eight channels": 8,
     }
     normalized = value.lower()
     if normalized in named_counts:

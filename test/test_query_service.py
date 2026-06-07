@@ -331,7 +331,7 @@ def test_search_components_filters_by_text_stock_library_exact_and_numeric_value
     component = results["components"][0]
     assert component["selected_price"] == 0.005
     assert set(component["attributes"]) == {"Resistance", "Package", "Basic/Extended"}
-    assert component["attributes"]["Basic/Extended"]["values"]["default"][0] == "Basic"
+    assert component["attributes"]["Basic/Extended"]["values"]["catalog class 1"][0] == "Basic"
 
 
 def test_search_components_filters_by_required_attributes(tmp_path):

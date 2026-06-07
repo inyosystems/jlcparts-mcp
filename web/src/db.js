@@ -573,12 +573,21 @@ async function setSetting(key, value) {
     await db.settings.put({ key, value });
 }
 
-export async function getLocalManifest() {
-    if (manifestCache !== undefined) {
+async function readStoredManifest() {
+    return (await getSetting("manifest")) ?? null;
+}
+
+export async function getLocalManifest({ reload = false } = {}) {
+    if (!reload && manifestCache) {
         return manifestCache;
     }
-    manifestCache = (await getSetting("manifest")) ?? null;
-    return manifestCache;
+
+    const manifest = await readStoredManifest();
+    if (manifest) {
+        manifestCache = manifest;
+        return manifestCache;
+    }
+    return manifestCache ?? null;
 }
 
 async function storeManifest(manifest) {
@@ -707,7 +716,7 @@ async function ensureJsonFile(name, onDownloadProgress) {
 }
 
 export async function getCategories() {
-    return (await getLocalManifest())?.categories ?? [];
+    return (await getLocalManifest({ reload: true }))?.categories ?? [];
 }
 
 export async function hasLocalComponentLibrary() {

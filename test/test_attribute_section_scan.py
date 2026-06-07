@@ -11,6 +11,7 @@ from jlcparts.datatables import normalizeAttribute
 
 
 LUT_PATH = Path("web/public/data/attributes-lut.json.gz")
+DEFAULT_SOURCE_DB_PATH = Path("cache-v2.sqlite3")
 SECTION_SEPARATOR = "||"
 
 
@@ -35,6 +36,12 @@ def _values_from_file(path):
     ]
 
 
+def _default_source_db_path():
+    if DEFAULT_SOURCE_DB_PATH.exists():
+        return DEFAULT_SOURCE_DB_PATH
+    return None
+
+
 def _is_numeric_string(value):
     return isinstance(value, str) and re.search(r"\d", value)
 
@@ -55,6 +62,47 @@ def _attribute_values_from_jlc_extra(jlc_extra):
     if isinstance(attributes, list):
         return {}
     return attributes or {}
+
+
+def _json_path_for_key(key):
+    return f"$.{json.dumps(key)}"
+
+
+def _string_values_for_section_from_source_db(
+    db_path, section, value_pattern=None, max_values=None, numeric_only=True
+):
+    pattern = re.compile(value_pattern) if value_pattern else None
+    values = []
+    path = _json_path_for_key(section)
+
+    conn = sqlite3.connect(db_path)
+    try:
+        cursor = conn.execute(
+            """
+            SELECT DISTINCT json_extract(attributes, ?) AS value
+            FROM jlc_components
+            WHERE json_type(attributes, ?) = 'text'
+            UNION
+            SELECT DISTINCT json_extract(attributes, ?) AS value
+            FROM lcsc_components
+            WHERE json_type(attributes, ?) = 'text'
+            """,
+            [path, path, path, path],
+        )
+        for (value,) in cursor:
+            if not isinstance(value, str):
+                continue
+            if numeric_only and not _is_numeric_string(value):
+                continue
+            if pattern and not pattern.search(value):
+                continue
+            values.append(value)
+            if max_values and len(values) >= max_values:
+                break
+    finally:
+        conn.close()
+
+    return values
 
 
 def _string_values_for_section_from_sqlite(
@@ -125,6 +173,7 @@ def _values_for_focused_section(
     section,
     direct_values=None,
     value_file=None,
+    source_db_path=None,
     sqlite_path=None,
     value_pattern=None,
     limit=None,
@@ -135,6 +184,10 @@ def _values_for_focused_section(
 
     if values:
         pass
+    elif source_db_path:
+        values = _string_values_for_section_from_source_db(
+            source_db_path, section, value_pattern, limit, numeric_only
+        )
     elif sqlite_path:
         values = _string_values_for_section_from_sqlite(
             sqlite_path, section, value_pattern, limit, numeric_only
@@ -204,8 +257,14 @@ def test_selected_attribute_section_normalizes_generated_values(pytestconfig, ca
         "JLC_ATTRIBUTE_VALUE_FILE"
     )
     direct_values.extend(_values_from_file(value_file))
-    sqlite_path = pytestconfig.getoption("--attribute-sqlite") or os.environ.get(
-        "JLC_ATTRIBUTE_SQLITE"
+    source_db_path = (
+        pytestconfig.getoption("--attribute-source-db")
+        or os.environ.get("JLC_ATTRIBUTE_SOURCE_DB")
+        or _default_source_db_path()
+    )
+    sqlite_path = (
+        pytestconfig.getoption("--attribute-sqlite")
+        or os.environ.get("JLC_ATTRIBUTE_SQLITE")
     )
     numeric_only = not (
         pytestconfig.getoption("--attribute-all-strings")
@@ -217,6 +276,7 @@ def test_selected_attribute_section_normalizes_generated_values(pytestconfig, ca
             section,
             direct_values=direct_values,
             value_file=value_file,
+            source_db_path=source_db_path,
             sqlite_path=sqlite_path,
             value_pattern=value_pattern,
             limit=limit,
@@ -282,6 +342,16 @@ def test_attribute_section_scan_reads_value_file_without_generated_lut(
     ) == ["1A"]
 
 
+def test_attribute_section_scan_discovers_default_source_db(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+
+    assert _default_source_db_path() is None
+
+    Path("cache-v2.sqlite3").touch()
+
+    assert _default_source_db_path() == Path("cache-v2.sqlite3")
+
+
 def test_attribute_section_sqlite_loader_reads_only_selected_section(tmp_path):
     db_path = tmp_path / "cache.sqlite3"
     conn = sqlite3.connect(db_path)
@@ -309,5 +379,35 @@ def test_attribute_section_sqlite_loader_reads_only_selected_section(tmp_path):
         db_path, "Switching Current"
     ) == ["500mA", "1A"]
     assert _string_values_for_section_from_sqlite(
+        db_path, "Switching Current", r"mA$"
+    ) == ["500mA"]
+
+
+def test_attribute_section_source_db_loader_reads_only_selected_key(tmp_path):
+    db_path = tmp_path / "cache-v2.sqlite3"
+    conn = sqlite3.connect(db_path)
+    try:
+        conn.execute("CREATE TABLE jlc_components(attributes TEXT)")
+        conn.execute("CREATE TABLE lcsc_components(attributes TEXT)")
+        conn.execute(
+            "INSERT INTO jlc_components(attributes) VALUES (?)",
+            (json.dumps({"Switching Current": "500mA", "Other": "123"}),),
+        )
+        conn.execute(
+            "INSERT INTO jlc_components(attributes) VALUES (?)",
+            (json.dumps({"Switching Voltage": "180V"}),),
+        )
+        conn.execute(
+            "INSERT INTO lcsc_components(attributes) VALUES (?)",
+            (json.dumps({"Switching Current": "1A"}),),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+    assert _string_values_for_section_from_source_db(
+        db_path, "Switching Current"
+    ) == ["1A", "500mA"]
+    assert _string_values_for_section_from_source_db(
         db_path, "Switching Current", r"mA$"
     ) == ["500mA"]
