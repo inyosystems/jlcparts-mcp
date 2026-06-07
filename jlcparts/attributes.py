@@ -765,12 +765,12 @@ def _rangeParts(value):
     if "~" in value:
         return value.split("~", 1)
     if re.match(r"^\s*DC\s*-\s*", value, flags=re.IGNORECASE):
-        return re.split(r"\s*-\s*", value, 1)
+        return re.split(r"\s*-\s*", value, maxsplit=1)
     dcSuffix = re.match(r"^\s*(.*?)\s+DC\s*$", value, flags=re.IGNORECASE)
     if dcSuffix is not None:
         return ["DC", dcSuffix.group(1)]
     if re.search(r"\d\s*-\s*\d", value):
-        return re.split(r"\s*-\s*", value, 1)
+        return re.split(r"\s*-\s*", value, maxsplit=1)
     return None
 
 def scalarAttribute(value, reader, unit, name="value"):
@@ -4123,7 +4123,7 @@ def rdsOnMaxAtVgsAtIds(value):
     def splitConditions(condition):
         condition = condition.strip().lstrip("=").strip()
         if "," in condition or "，" in condition:
-            first, second = [x.strip() for x in re.split(r"[,，]", condition, 1)]
+            first, second = [x.strip() for x in re.split(r"[,，]", condition, maxsplit=1)]
         else:
             first, second = condition, "-"
 
